@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>스트레스 척도 테스트 활동지</title>
+<style>
+:root {
+  --ink: #21304d;
+  --ink-soft: #4c5a78;
+  --paper: #fff8e4;
+  --paper-deep: #f7e4b7;
+  --mint: #68d8bf;
+  --mint-dark: #239d87;
+  --coral: #ff8066;
+  --coral-dark: #d95041;
+  --lavender: #9b8cff;
+  --blue: #58a6ff;
+  --yellow: #ffd166;
+  --green: #94d66d;
+  --white: #fffdf3;
+  --line: #21304d;
+  --shadow: 6px 6px 0 rgba(33, 48, 77, 0.18);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  background-color: #f8edd2;
+  background-image:
+    linear-gradient(rgba(33, 48, 77, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(33, 48, 77, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  border: 3px solid var(--line);
+  background: var(--white);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  border: 3px solid var(--line);
+  background: var(--yellow);
+  box-shadow: 3px 3px 0 rgba(33, 48, 77, 0.22);
+  flex: 0 0 auto;
+}
+
+.brand-mark span:nth-child(2),
+.brand-mark span:nth-child(8),
+.brand-mark span:nth-child(14),
+.brand-mark span:nth-child(20),
+.brand-mark span:nth-child(24) {
+  background: var(--coral);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: clamp(1.05rem, 2.3vw, 1.55rem);
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.status-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.save-chip {
+  border: 2px solid var(--line);
+  background: #eaf9ff;
+  padding: 6px 10px;
+  box-shadow: 3px 3px 0 rgba(33, 48, 77, 0.12);
+  white-space: nowrap;
+}
+
+.hero {
+  border: 3px solid var(--line);
+  background: #fff3ca;
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+  gap: 18px;
+  align-items: stretch;
+  padding: 22px;
+  margin-bottom: 22px;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.eyebrow {
+  width: fit-content;
+  border: 2px solid var(--line);
+  background: var(--mint);
+  color: #082b29;
+  padding: 5px 10px;
+  font-weight: 800;
+  box-shadow: 3px 3px 0 rgba(33, 48, 77, 0.18);
+}
+
+.hero h2 {
+  margin: 0;
+  font-size: clamp(1.65rem, 4.5vw, 3.25rem);
+  line-height: 1.08;
+  word-break: keep-all;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 58ch;
+  color: var(--ink-soft);
+  font-size: 1rem;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+.procedure {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.procedure-item {
+  border: 2px solid var(--line);
+  background: var(--white);
+  min-height: 78px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 3px 3px 0 rgba(33, 48, 77, 0.13);
+}
+
+.procedure-item strong {
+  font-size: 0.96rem;
+}
+
+.procedure-item span {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.pixel-scene {
+  border: 3px solid var(--line);
+  background: #bdeaf1;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.pixel-scene svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  shape-rendering: crispEdges;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.panel {
+  border: 3px solid var(--line);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.panel-header {
+  border-bottom: 3px solid var(--line);
+  background: #eef4ff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.12rem;
+  word-break: keep-all;
+}
+
+.panel-header .tag {
+  border: 2px solid var(--line);
+  background: var(--yellow);
+  padding: 4px 8px;
+  font-weight: 800;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.panel-body {
+  padding: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label,
+.field .label {
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  border: 3px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 10px 12px;
+  border-radius: 0;
+  min-height: 44px;
+  box-shadow: inset 3px 3px 0 rgba(33, 48, 77, 0.08);
+}
+
+.field textarea {
+  min-height: 116px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus,
+.choice input:focus-visible + span {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.survey {
+  display: grid;
+  gap: 10px;
+}
+
+.scale-head {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) repeat(5, minmax(70px, 1fr));
+  gap: 6px;
+  align-items: stretch;
+  margin-bottom: 8px;
+}
+
+.scale-head div {
+  border: 2px solid var(--line);
+  background: #ffe7e1;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  word-break: keep-all;
+}
+
+.scale-head div:first-child {
+  background: #eaf9ff;
+}
+
+.question-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.5fr) repeat(5, minmax(70px, 1fr));
+  gap: 6px;
+  align-items: stretch;
+}
+
+.question-text {
+  border: 2px solid var(--line);
+  background: #fffaf0;
+  padding: 10px 12px;
+  line-height: 1.55;
+  word-break: keep-all;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.question-number {
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--line);
+  background: var(--lavender);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.question-text.positive .question-number {
+  background: var(--green);
+  color: #14320f;
+}
+
+.choice {
+  min-height: 54px;
+  cursor: pointer;
+  display: block;
+  position: relative;
+}
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice span {
+  height: 100%;
+  min-height: 54px;
+  border: 2px solid var(--line);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 0 transparent;
+}
+
+.choice input:checked + span {
+  background: var(--mint);
+  color: #082b29;
+  box-shadow: inset 0 -6px 0 rgba(33, 48, 77, 0.15);
+}
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.85fr) minmax(0, 1.4fr);
+  gap: 14px;
+}
+
+.activity-card {
+  border: 2px solid var(--line);
+  background: #fffaf0;
+  padding: 12px;
+  min-height: 100%;
+}
+
+.animal-note {
+  border: 2px solid var(--line);
+  background: #edf7e8;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.animal-note svg {
+  width: 82px;
+  height: 82px;
+  shape-rendering: crispEdges;
+}
+
+.animal-note p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.results-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.score-board {
+  border: 2px solid var(--line);
+  background: #fffaf0;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.score-card {
+  border: 2px solid var(--line);
+  background: #fff;
+  padding: 12px;
+  min-height: 92px;
+}
+
+.score-card span {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.score-card strong {
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
+  margin-top: 8px;
+}
+
+.score-card.pre strong {
+  color: var(--coral-dark);
+}
+
+.score-card.post strong {
+  color: var(--mint-dark);
+}
+
+.score-card.delta strong {
+  color: var(--ink);
+}
+
+.chart-panel {
+  border: 2px solid var(--line);
+  background: #ffffff;
+  min-height: 390px;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.chart-panel svg {
+  min-width: 760px;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.empty-chart {
+  min-height: 330px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--ink-soft);
+  line-height: 1.6;
+  padding: 20px;
+  background:
+    linear-gradient(rgba(33, 48, 77, 0.08) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(33, 48, 77, 0.08) 2px, transparent 2px);
+  background-size: 30px 30px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.btn {
+  border: 3px solid var(--line);
+  background: #fff;
+  min-height: 44px;
+  padding: 9px 14px;
+  font-weight: 900;
+  cursor: pointer;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 rgba(33, 48, 77, 0.2);
+}
+
+.btn:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 3px 3px 0 rgba(33, 48, 77, 0.2);
+}
+
+.btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: var(--coral);
+  color: #30110c;
+}
+
+.btn-secondary {
+  background: var(--mint);
+  color: #062925;
+}
+
+.btn-quiet {
+  background: #e8ecf8;
+}
+
+.footnote {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 920px) {
+  .hero,
+  .activity-grid,
+  .results-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .info-grid,
+  .procedure {
+    grid-template-columns: 1fr;
+  }
+
+  .top-bar {
+    position: static;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .status-strip {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    width: min(100% - 20px, 1180px);
+    padding-top: 10px;
+  }
+
+  .hero,
+  .panel-body {
+    padding: 12px;
+  }
+
+  .scale-head {
+    display: none;
+  }
+
+  .question-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    border: 2px solid var(--line);
+    background: #f4e7c9;
+    padding: 8px;
+  }
+
+  .question-text {
+    border-width: 0 0 2px;
+  }
+
+  .choice {
+    min-height: 46px;
+  }
+
+  .choice span {
+    justify-content: space-between;
+    min-height: 46px;
+    padding: 0 12px;
+  }
+
+  .choice span::before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: var(--ink-soft);
+  }
+
+  .animal-note {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .page-shell {
+    width: 100%;
+    padding: 0;
+  }
+
+  .top-bar,
+  .actions {
+    display: none;
+  }
+
+  .panel,
+  .hero {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .chart-panel {
+    overflow: visible;
+  }
+}
+</style>
+</head>
+<body>
+<div class="page-shell">
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <h1>스트레스 척도 테스트 활동지</h1>
+    </div>
+    <div class="status-strip">
+      <span class="save-chip" id="saveStatus">자동 저장 대기</span>
+      <span>전 검사 <strong id="preCount">0</strong>/10</span>
+      <span>후 검사 <strong id="postCount">0</strong>/10</span>
+    </div>
+  </header>
+
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="hero-copy">
+      <div class="eyebrow">STEAM 상담 활동</div>
+      <h2 id="heroTitle">마음의 전후 변화를 한 화면에 기록하기</h2>
+      <p>활동 전 스트레스 척도를 먼저 체크하고, 스트레스 해소 활동을 진행한 뒤, 같은 문항에 다시 응답합니다. 저장된 내용은 새로고침해도 유지됩니다.</p>
+      <div class="procedure" aria-label="활동 절차">
+        <div class="procedure-item">
+          <strong>1. 활동 전 검사</strong>
+          <span>최근 한 달의 느낌을 기준으로 10문항 응답</span>
+        </div>
+        <div class="procedure-item">
+          <strong>2. 해소 활동</strong>
+          <span>호흡, 산책, 대화, 음악, 그림 등 마음 돌보기</span>
+        </div>
+        <div class="procedure-item">
+          <strong>3. 활동 후 검사</strong>
+          <span>같은 문항으로 변화 확인 후 그래프 보기</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pixel-scene" aria-hidden="true">
+      <svg viewBox="0 0 420 270" role="img">
+        <rect x="0" y="0" width="420" height="270" fill="#bdeaf1"/>
+        <rect x="0" y="218" width="420" height="52" fill="#7bcf91"/>
+        <rect x="28" y="28" width="132" height="86" fill="#fff8e4" stroke="#21304d" stroke-width="6"/>
+        <rect x="42" y="44" width="96" height="10" fill="#68d8bf"/>
+        <rect x="42" y="64" width="76" height="10" fill="#ffd166"/>
+        <rect x="42" y="84" width="52" height="10" fill="#ff8066"/>
+        <rect x="256" y="30" width="96" height="58" fill="#fffdf3" stroke="#21304d" stroke-width="6"/>
+        <rect x="280" y="48" width="48" height="8" fill="#9b8cff"/>
+        <rect x="272" y="64" width="64" height="8" fill="#58a6ff"/>
+
+        <rect x="180" y="96" width="82" height="92" fill="#26324d"/>
+        <rect x="194" y="62" width="54" height="54" fill="#26324d"/>
+        <rect x="202" y="72" width="38" height="38" fill="#ffcfb3"/>
+        <rect x="208" y="88" width="8" height="8" fill="#21304d"/>
+        <rect x="228" y="88" width="8" height="8" fill="#21304d"/>
+        <rect x="216" y="102" width="14" height="6" fill="#d95041"/>
+        <rect x="194" y="116" width="56" height="22" fill="#fffdf3"/>
+        <rect x="202" y="138" width="40" height="52" fill="#58a6ff"/>
+        <rect x="190" y="150" width="14" height="48" fill="#ffcfb3"/>
+        <rect x="240" y="150" width="14" height="48" fill="#ffcfb3"/>
+        <rect x="198" y="190" width="16" height="42" fill="#21304d"/>
+        <rect x="230" y="190" width="16" height="42" fill="#21304d"/>
+        <rect x="188" y="232" width="28" height="12" fill="#ffffff" stroke="#21304d" stroke-width="4"/>
+        <rect x="228" y="232" width="28" height="12" fill="#ffffff" stroke="#21304d" stroke-width="4"/>
+        <rect x="168" y="174" width="42" height="30" fill="#ffd166" stroke="#21304d" stroke-width="5"/>
+        <rect x="176" y="184" width="26" height="6" fill="#ff8066"/>
+
+        <rect x="84" y="176" width="54" height="34" fill="#fffdf3" stroke="#21304d" stroke-width="5"/>
+        <rect x="94" y="154" width="12" height="24" fill="#fffdf3" stroke="#21304d" stroke-width="5"/>
+        <rect x="116" y="154" width="12" height="24" fill="#fffdf3" stroke="#21304d" stroke-width="5"/>
+        <rect x="96" y="188" width="8" height="8" fill="#21304d"/>
+        <rect x="120" y="188" width="8" height="8" fill="#21304d"/>
+        <rect x="108" y="200" width="12" height="5" fill="#ff8066"/>
+        <rect x="78" y="210" width="68" height="16" fill="#fffdf3" stroke="#21304d" stroke-width="5"/>
+
+        <rect x="302" y="176" width="58" height="42" fill="#ffd166" stroke="#21304d" stroke-width="5"/>
+        <rect x="294" y="164" width="18" height="18" fill="#ffd166" stroke="#21304d" stroke-width="5"/>
+        <rect x="350" y="164" width="18" height="18" fill="#ffd166" stroke="#21304d" stroke-width="5"/>
+        <rect x="316" y="192" width="8" height="8" fill="#21304d"/>
+        <rect x="340" y="192" width="8" height="8" fill="#21304d"/>
+        <rect x="328" y="204" width="12" height="5" fill="#d95041"/>
+        <rect x="360" y="198" width="26" height="12" fill="#ffd166" stroke="#21304d" stroke-width="5"/>
+
+        <rect x="30" y="232" width="36" height="10" fill="#21304d" opacity="0.16"/>
+        <rect x="282" y="236" width="76" height="10" fill="#21304d" opacity="0.16"/>
+      </svg>
+    </div>
+  </section>
+
+  <main class="grid">
+    <section class="panel" aria-labelledby="studentInfoTitle">
+      <div class="panel-header">
+        <h3 id="studentInfoTitle">기본 정보</h3>
+        <span class="tag">SAVE</span>
+      </div>
+      <div class="panel-body">
+        <div class="info-grid">
+          <div class="field">
+            <label for="studentName">이름</label>
+            <input id="studentName" type="text" autocomplete="name" placeholder="이름">
+          </div>
+          <div class="field">
+            <label for="studentId">학번</label>
+            <input id="studentId" type="text" placeholder="예: 2-3 15번">
+          </div>
+          <div class="field">
+            <label for="activityDate">날짜</label>
+            <input id="activityDate" type="date">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="preTitle">
+      <div class="panel-header">
+        <h3 id="preTitle">1. 활동 전 스트레스 척도 테스트</h3>
+        <span class="tag">BEFORE</span>
+      </div>
+      <div class="panel-body">
+        <div class="scale-head" aria-hidden="true">
+          <div>문항</div>
+          <div>전혀<br>없음</div>
+          <div>거의<br>없음</div>
+          <div>때때로<br>있음</div>
+          <div>자주<br>있음</div>
+          <div>매우<br>자주</div>
+        </div>
+        <div class="survey" id="preSurvey"></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="activityTitle">
+      <div class="panel-header">
+        <h3 id="activityTitle">2. 스트레스 해소 활동</h3>
+        <span class="tag">CARE</span>
+      </div>
+      <div class="panel-body">
+        <div class="activity-grid">
+          <div class="activity-card">
+            <div class="field">
+              <label for="activityType">활동 종류</label>
+              <input id="activityType" type="text" placeholder="예: 호흡 명상, 산책, 음악 듣기">
+            </div>
+            <div class="animal-note">
+              <svg viewBox="0 0 82 82" aria-hidden="true">
+                <rect width="82" height="82" fill="#bdeaf1"/>
+                <rect x="22" y="30" width="38" height="30" fill="#fffdf3" stroke="#21304d" stroke-width="4"/>
+                <rect x="18" y="20" width="14" height="18" fill="#fffdf3" stroke="#21304d" stroke-width="4"/>
+                <rect x="50" y="20" width="14" height="18" fill="#fffdf3" stroke="#21304d" stroke-width="4"/>
+                <rect x="31" y="43" width="6" height="6" fill="#21304d"/>
+                <rect x="47" y="43" width="6" height="6" fill="#21304d"/>
+                <rect x="38" y="53" width="10" height="4" fill="#ff8066"/>
+                <rect x="16" y="60" width="52" height="8" fill="#94d66d"/>
+              </svg>
+              <p>활동을 하며 몸이나 마음에서 달라진 점을 짧게 남겨두면 후 검사 결과를 해석할 때 도움이 됩니다.</p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="activityNote">스트레스 해소 활동 기록</label>
+            <textarea id="activityNote" placeholder="어떤 활동을 했고, 활동 중 어떤 느낌이 들었는지 기록해 보세요."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="postTitle">
+      <div class="panel-header">
+        <h3 id="postTitle">3. 활동 후 스트레스 척도 테스트</h3>
+        <span class="tag">AFTER</span>
+      </div>
+      <div class="panel-body">
+        <div class="scale-head" aria-hidden="true">
+          <div>문항</div>
+          <div>전혀<br>없음</div>
+          <div>거의<br>없음</div>
+          <div>때때로<br>있음</div>
+          <div>자주<br>있음</div>
+          <div>매우<br>자주</div>
+        </div>
+        <div class="survey" id="postSurvey"></div>
+      </div>
+    </section>
+
+    <section class="panel" id="results" aria-labelledby="resultTitle">
+      <div class="panel-header">
+        <h3 id="resultTitle">4. 전후 테스트 결과</h3>
+        <span class="tag">GRAPH</span>
+      </div>
+      <div class="panel-body">
+        <div class="results-layout">
+          <div class="score-board" id="scoreSummary">
+            <div class="score-card pre">
+              <span>활동 전 PSS 총점</span>
+              <strong>-</strong>
+            </div>
+            <div class="score-card post">
+              <span>활동 후 PSS 총점</span>
+              <strong>-</strong>
+            </div>
+            <div class="score-card delta">
+              <span>총점 변화</span>
+              <strong>-</strong>
+            </div>
+          </div>
+          <div class="chart-panel" id="comparisonChart">
+            <div class="empty-chart">전/후 검사를 모두 완료하면 문항별 변화 그래프가 표시됩니다.</div>
+          </div>
+        </div>
+        <p class="footnote">* 한국판 지각된 스트레스 척도(PSS) 형식을 바탕으로 구성했습니다. 4, 5, 6, 7, 8번 문항은 총점 계산 시 역채점합니다.</p>
+        <div class="actions">
+          <button class="btn btn-secondary" id="showResults" type="button">결과 보기</button>
+          <button class="btn btn-quiet" id="printPage" type="button">인쇄</button>
+          <button class="btn btn-primary" id="resetPage" type="button">초기화</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "steam_counseling_stress_activity_v1";
+  var QUESTIONS = [
+    "예상치 못한 일이 생겨서 기분 나빠진 적이 있었다.",
+    "중요한 일들을 통제할 수 없다고 느꼈다.",
+    "초조하거나 스트레스가 쌓인다고 느꼈다.",
+    "짜증나고 성가신 일들을 성공적으로 처리하였다.",
+    "생활 속에서 일어난 중요한 변화들을 효과적으로 대처하였다.",
+    "개인적인 문제를 처리하는 능력에 대해 자신감을 느꼈다.",
+    "나의 뜻대로 일이 진행된다고 느꼈다.",
+    "매사를 잘 컨트롤하고 있다고 느꼈다.",
+    "내가 통제할 수 없는 범위에서 발생한 일 때문에 화가 났다.",
+    "어려운 일이 너무 많이 쌓여서 극복할 수 없다고 느꼈다."
+  ];
+  var OPTIONS = ["전혀 없음", "거의 없음", "때때로 있음", "자주 있음", "매우 자주"];
+  var REVERSE_ITEMS = { 4: true, 5: true, 6: true, 7: true, 8: true };
+  var state = defaultState();
+  var saveTimer = null;
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function defaultState() {
+    return {
+      student: {
+        name: "",
+        id: "",
+        date: new Date().toISOString().slice(0, 10)
+      },
+      activity: {
+        type: "",
+        note: ""
+      },
+      pre: Array(10).fill(null),
+      post: Array(10).fill(null),
+      savedAt: null
+    };
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultState();
+      var parsed = JSON.parse(raw);
+      var next = defaultState();
+      next.student = Object.assign(next.student, parsed.student || {});
+      next.activity = Object.assign(next.activity, parsed.activity || {});
+      next.pre = normalizeAnswers(parsed.pre);
+      next.post = normalizeAnswers(parsed.post);
+      next.savedAt = parsed.savedAt || null;
+      return next;
+    } catch (error) {
+      return defaultState();
+    }
+  }
+
+  function normalizeAnswers(values) {
+    var answers = Array(10).fill(null);
+    if (!Array.isArray(values)) return answers;
+    for (var i = 0; i < 10; i += 1) {
+      var value = Number(values[i]);
+      answers[i] = Number.isInteger(value) && value >= 0 && value <= 4 ? value : null;
+    }
+    return answers;
+  }
+
+  function saveState(immediate) {
+    clearTimeout(saveTimer);
+    if (immediate) {
+      writeState();
+      return;
+    }
+    saveTimer = setTimeout(writeState, 250);
+  }
+
+  function writeState() {
+    state.savedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    updateSaveStatus();
+  }
+
+  function updateSaveStatus() {
+    var el = $("saveStatus");
+    if (!state.savedAt) {
+      el.textContent = "자동 저장 대기";
+      return;
+    }
+    var date = new Date(state.savedAt);
+    var hour = String(date.getHours()).padStart(2, "0");
+    var minute = String(date.getMinutes()).padStart(2, "0");
+    el.textContent = "저장됨 " + hour + ":" + minute;
+  }
+
+  function createSurvey(containerId, phase) {
+    var container = $(containerId);
+    container.innerHTML = "";
+
+    QUESTIONS.forEach(function (question, index) {
+      var qNumber = index + 1;
+      var row = document.createElement("div");
+      row.className = "question-row";
+
+      var text = document.createElement("div");
+      text.className = "question-text" + (REVERSE_ITEMS[qNumber] ? " positive" : "");
+      text.innerHTML = '<span class="question-number">' + qNumber + '</span><span>' + question + '</span>';
+      row.appendChild(text);
+
+      OPTIONS.forEach(function (label, value) {
+        var choice = document.createElement("label");
+        choice.className = "choice";
+        var id = phase + "-q" + qNumber + "-a" + value;
+        choice.setAttribute("for", id);
+        choice.innerHTML =
+          '<input id="' + id + '" type="radio" name="' + phase + '-q' + qNumber + '" value="' + value + '">' +
+          '<span data-label="' + label + '">' + value + '</span>';
+        row.appendChild(choice);
+      });
+
+      container.appendChild(row);
+    });
+  }
+
+  function syncFormFromState() {
+    $("studentName").value = state.student.name || "";
+    $("studentId").value = state.student.id || "";
+    $("activityDate").value = state.student.date || new Date().toISOString().slice(0, 10);
+    $("activityType").value = state.activity.type || "";
+    $("activityNote").value = state.activity.note || "";
+    syncAnswers("pre", state.pre);
+    syncAnswers("post", state.post);
+    updateProgress();
+    updateSaveStatus();
+    renderResults();
+  }
+
+  function syncAnswers(phase, answers) {
+    answers.forEach(function (value, index) {
+      if (value === null) return;
+      var input = document.querySelector('input[name="' + phase + "-q" + (index + 1) + '"][value="' + value + '"]');
+      if (input) input.checked = true;
+    });
+  }
+
+  function collectStudentField(target) {
+    if (target.id === "studentName") state.student.name = target.value.trim();
+    if (target.id === "studentId") state.student.id = target.value.trim();
+    if (target.id === "activityDate") state.student.date = target.value;
+    if (target.id === "activityType") state.activity.type = target.value;
+    if (target.id === "activityNote") state.activity.note = target.value.trim();
+  }
+
+  function collectAnswer(target) {
+    var match = target.name && target.name.match(/^(pre|post)-q(\d+)$/);
+    if (!match) return false;
+    var phase = match[1];
+    var index = Number(match[2]) - 1;
+    state[phase][index] = Number(target.value);
+    return true;
+  }
+
+  function countAnswers(values) {
+    return values.filter(function (value) { return value !== null; }).length;
+  }
+
+  function updateProgress() {
+    $("preCount").textContent = String(countAnswers(state.pre));
+    $("postCount").textContent = String(countAnswers(state.post));
+  }
+
+  function isComplete(values) {
+    return countAnswers(values) === 10;
+  }
+
+  function totalScore(values) {
+    if (!isComplete(values)) return null;
+    return values.reduce(function (sum, value, index) {
+      var number = index + 1;
+      return sum + (REVERSE_ITEMS[number] ? 4 - value : value);
+    }, 0);
+  }
+
+  function renderResults() {
+    updateProgress();
+    var preScore = totalScore(state.pre);
+    var postScore = totalScore(state.post);
+    renderScoreSummary(preScore, postScore);
+    renderChart(preScore !== null && postScore !== null);
+  }
+
+  function renderScoreSummary(preScore, postScore) {
+    var summary = $("scoreSummary");
+    var diff = preScore !== null && postScore !== null ? postScore - preScore : null;
+    var diffText = diff === null ? "-" : (diff > 0 ? "+" + diff : String(diff));
+    var meaning = diff === null ? "" : (diff < 0 ? " 감소" : diff > 0 ? " 증가" : " 변화 없음");
+    summary.innerHTML =
+      '<div class="score-card pre"><span>활동 전 PSS 총점</span><strong>' + displayScore(preScore) + '</strong></div>' +
+      '<div class="score-card post"><span>활동 후 PSS 총점</span><strong>' + displayScore(postScore) + '</strong></div>' +
+      '<div class="score-card delta"><span>총점 변화</span><strong>' + diffText + '</strong><span>' + meaning + '</span></div>';
+  }
+
+  function displayScore(score) {
+    return score === null ? "-" : String(score);
+  }
+
+  function renderChart(complete) {
+    var chart = $("comparisonChart");
+    if (!complete) {
+      chart.innerHTML = '<div class="empty-chart">전/후 검사를 모두 완료하면 문항별 변화 그래프가 표시됩니다.</div>';
+      return;
+    }
+
+    var width = 920;
+    var height = 410;
+    var left = 64;
+    var right = 32;
+    var top = 38;
+    var bottom = 74;
+    var chartWidth = width - left - right;
+    var chartHeight = height - top - bottom;
+    var prePoints = state.pre.map(pointFor);
+    var postPoints = state.post.map(pointFor);
+
+    function xFor(index) {
+      return left + (chartWidth / 9) * index;
+    }
+
+    function yFor(value) {
+      return top + ((4 - value) / 4) * chartHeight;
+    }
+
+    function pointFor(value, index) {
+      return { x: xFor(index), y: yFor(value), value: value };
+    }
+
+    function polyline(points) {
+      return points.map(function (point) { return point.x + "," + point.y; }).join(" ");
+    }
+
+    var svg = [];
+    svg.push('<svg viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="활동 전과 활동 후 스트레스 척도 문항별 비교 그래프">');
+    svg.push('<rect x="0" y="0" width="' + width + '" height="' + height + '" fill="#ffffff"/>');
+    svg.push('<text x="' + left + '" y="24" fill="#21304d" font-size="16" font-weight="900">문항별 응답 변화 그래프</text>');
+    svg.push('<rect x="' + (width - 258) + '" y="12" width="222" height="32" fill="#fff8e4" stroke="#21304d" stroke-width="2"/>');
+    svg.push('<rect x="' + (width - 244) + '" y="22" width="14" height="8" fill="#d95041"/><text x="' + (width - 222) + '" y="31" fill="#21304d" font-size="13" font-weight="800">활동 전</text>');
+    svg.push('<rect x="' + (width - 154) + '" y="22" width="14" height="8" fill="#239d87"/><text x="' + (width - 132) + '" y="31" fill="#21304d" font-size="13" font-weight="800">활동 후</text>');
+
+    for (var yValue = 0; yValue <= 4; yValue += 1) {
+      var y = yFor(yValue);
+      svg.push('<line x1="' + left + '" y1="' + y + '" x2="' + (width - right) + '" y2="' + y + '" stroke="#dbe2ef" stroke-width="2"/>');
+      svg.push('<text x="' + (left - 22) + '" y="' + (y + 5) + '" fill="#4c5a78" font-size="13" font-weight="800" text-anchor="end">' + yValue + '</text>');
+    }
+
+    for (var i = 0; i < 10; i += 1) {
+      var x = xFor(i);
+      svg.push('<line x1="' + x + '" y1="' + top + '" x2="' + x + '" y2="' + (height - bottom) + '" stroke="#edf1f8" stroke-width="2"/>');
+      svg.push('<text x="' + x + '" y="' + (height - 44) + '" fill="#21304d" font-size="13" font-weight="900" text-anchor="middle">Q' + (i + 1) + '</text>');
+      svg.push('<text x="' + x + '" y="' + (height - 24) + '" fill="#4c5a78" font-size="11" text-anchor="middle">' + deltaText(state.post[i] - state.pre[i]) + '</text>');
+      svg.push('<line x1="' + x + '" y1="' + prePoints[i].y + '" x2="' + x + '" y2="' + postPoints[i].y + '" stroke="#9aa8c0" stroke-width="3" stroke-dasharray="5 5"/>');
+    }
+
+    svg.push('<line x1="' + left + '" y1="' + top + '" x2="' + left + '" y2="' + (height - bottom) + '" stroke="#21304d" stroke-width="3"/>');
+    svg.push('<line x1="' + left + '" y1="' + (height - bottom) + '" x2="' + (width - right) + '" y2="' + (height - bottom) + '" stroke="#21304d" stroke-width="3"/>');
+    svg.push('<polyline points="' + polyline(prePoints) + '" fill="none" stroke="#d95041" stroke-width="5" stroke-linejoin="round" stroke-linecap="square"/>');
+    svg.push('<polyline points="' + polyline(postPoints) + '" fill="none" stroke="#239d87" stroke-width="5" stroke-linejoin="round" stroke-linecap="square"/>');
+
+    prePoints.forEach(function (point, index) {
+      svg.push('<rect x="' + (point.x - 7) + '" y="' + (point.y - 7) + '" width="14" height="14" fill="#ff8066" stroke="#21304d" stroke-width="3"/>');
+      svg.push('<text x="' + point.x + '" y="' + (point.y - 13) + '" fill="#21304d" font-size="11" font-weight="900" text-anchor="middle">' + state.pre[index] + '</text>');
+    });
+
+    postPoints.forEach(function (point, index) {
+      svg.push('<circle cx="' + point.x + '" cy="' + point.y + '" r="8" fill="#68d8bf" stroke="#21304d" stroke-width="3"/>');
+      svg.push('<text x="' + point.x + '" y="' + (point.y + 24) + '" fill="#21304d" font-size="11" font-weight="900" text-anchor="middle">' + state.post[index] + '</text>');
+    });
+
+    svg.push('<text x="22" y="' + (top + chartHeight / 2) + '" fill="#4c5a78" font-size="13" font-weight="900" transform="rotate(-90 22 ' + (top + chartHeight / 2) + ')">응답 점수</text>');
+    svg.push('</svg>');
+    chart.innerHTML = svg.join("");
+  }
+
+  function deltaText(delta) {
+    if (delta > 0) return "+" + delta;
+    return String(delta);
+  }
+
+  function initEvents() {
+    document.addEventListener("input", function (event) {
+      var target = event.target;
+      if (!target) return;
+      collectStudentField(target);
+      saveState(false);
+      renderResults();
+    });
+
+    document.addEventListener("change", function (event) {
+      var target = event.target;
+      if (!target) return;
+      if (target.matches('input[type="radio"]')) {
+        collectAnswer(target);
+      } else {
+        collectStudentField(target);
+      }
+      saveState(false);
+      renderResults();
+    });
+
+    $("showResults").addEventListener("click", function () {
+      saveState(true);
+      renderResults();
+      $("results").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    $("printPage").addEventListener("click", function () {
+      saveState(true);
+      window.print();
+    });
+
+    $("resetPage").addEventListener("click", function () {
+      if (!confirm("저장된 응답과 입력 내용을 모두 초기화할까요?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = defaultState();
+      document.querySelectorAll('input[type="radio"]').forEach(function (input) {
+        input.checked = false;
+      });
+      syncFormFromState();
+      writeState();
+    });
+  }
+
+  function init() {
+    createSurvey("preSurvey", "pre");
+    createSurvey("postSurvey", "post");
+    state = loadState();
+    syncFormFromState();
+    initEvents();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

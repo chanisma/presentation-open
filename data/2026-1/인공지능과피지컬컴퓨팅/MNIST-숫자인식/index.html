@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MNIST로 배우는 숫자 인식 AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #2196f3;
+  --dark: #1565c0;
+  --light: #e3f2fd;
+  --accent: #42a5f5;
+  --bg: #f0f4f8;
+  --card-bg: #ffffff;
+  --text: #212121;
+  --text-secondary: #546e7a;
+  --shadow: 0 4px 24px rgba(33,150,243,0.10);
+  --shadow-hover: 0 8px 32px rgba(33,150,243,0.18);
+  --radius: 16px;
+  --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+  --font-size: clamp(14px, 1.15vw, 22px);
+  --max-width: 1600px;
+  --dot-red: #ff5f57;
+  --dot-yellow: #ffbd2e;
+  --dot-green: #28c840;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { font-size: var(--font-size); scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  overflow: hidden;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== PROGRESS BAR ===== */
+#progressBar {
+  position: fixed; top: 0; left: 0;
+  height: 4px; background: linear-gradient(90deg, var(--main), var(--accent));
+  transition: width 0.4s ease; z-index: 9999;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ===== SLIDE CONTAINER ===== */
+.slides-container {
+  width: 100%; height: calc(100vh - 60px);
+  position: relative; overflow: hidden;
+}
+
+.slide {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.slide.active { opacity: 1; visibility: visible; }
+
+/* ===== BROWSER CARD ===== */
+.browser-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: var(--max-width);
+  width: 100%;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.browser-card::-webkit-scrollbar { width: 6px; }
+.browser-card::-webkit-scrollbar-track { background: transparent; }
+.browser-card::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+.browser-titlebar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #f7f7f7, #ececec);
+  border-bottom: 1px solid #ddd;
+  border-radius: var(--radius) var(--radius) 0 0;
+  position: sticky; top: 0; z-index: 10;
+}
+
+.browser-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.browser-dot.red { background: var(--dot-red); }
+.browser-dot.yellow { background: var(--dot-yellow); }
+.browser-dot.green { background: var(--dot-green); }
+
+.browser-title {
+  flex: 1; text-align: center;
+  font-size: 0.75rem; color: #888;
+  font-weight: 400;
+}
+
+.card-body { padding: 2.5rem 3rem; }
+
+/* ===== TYPOGRAPHY ===== */
+h1 { font-size: 2.4rem; font-weight: 900; line-height: 1.3; margin-bottom: 0.5rem; color: var(--dark); }
+h2 { font-size: 1.8rem; font-weight: 700; line-height: 1.3; margin-bottom: 1.2rem; color: var(--dark); }
+h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--text); }
+p { margin-bottom: 0.8rem; color: var(--text-secondary); }
+
+/* ===== BADGE ===== */
+.badge {
+  display: inline-block; padding: 0.25rem 0.9rem;
+  border-radius: 99px; font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.badge-blue { background: var(--light); color: var(--dark); }
+.badge-year {
+  background: linear-gradient(135deg, var(--main), var(--dark));
+  color: #fff;
+}
+.badge-stage {
+  display: inline-block; padding: 0.2rem 0.7rem;
+  border-radius: 8px; font-size: 0.7rem; font-weight: 700;
+  color: #fff; margin-bottom: 0.3rem;
+}
+
+/* ===== TAGS ===== */
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.tag {
+  background: var(--light); color: var(--dark);
+  padding: 0.2rem 0.7rem; border-radius: 99px;
+  font-size: 0.7rem; font-weight: 500;
+}
+
+/* ===== SECTION DIVIDER ===== */
+.section-divider {
+  text-align: center; padding: 3rem 0;
+}
+.section-icon {
+  font-size: 3.5rem; margin-bottom: 1rem;
+  display: block; line-height: 1;
+}
+.section-divider h2 {
+  font-size: 2rem; margin-bottom: 0.5rem;
+}
+.section-divider p { font-size: 1.1rem; }
+
+/* ===== COVER ===== */
+.cover { text-align: center; }
+.cover h1 { font-size: 2.8rem; margin-bottom: 0.3rem; }
+.cover .subtitle {
+  font-size: 1.15rem; color: var(--text-secondary);
+  font-weight: 400; margin-bottom: 1.5rem;
+}
+.cover .org {
+  font-size: 0.85rem; color: var(--accent);
+  font-weight: 500; margin-bottom: 0.5rem;
+}
+
+/* ===== TOC ===== */
+.toc-list { list-style: none; counter-reset: toc; }
+.toc-item {
+  counter-increment: toc;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+.toc-item:hover {
+  background: var(--light);
+  border-color: var(--accent);
+  transform: translateX(6px);
+}
+.toc-item::before {
+  content: counter(toc);
+  display: flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--main); color: #fff;
+  font-size: 0.8rem; font-weight: 700; flex-shrink: 0;
+}
+
+/* ===== INFO BOX ===== */
+.info-box {
+  background: var(--light);
+  border-left: 4px solid var(--main);
+  border-radius: 0 12px 12px 0;
+  padding: 1rem 1.2rem;
+  margin: 1.2rem 0;
+  font-size: 0.9rem;
+  color: var(--dark);
+}
+.info-box::before {
+  content: "i"; display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 1.4rem; height: 1.4rem; border-radius: 50%;
+  background: var(--main); color: #fff;
+  font-size: 0.7rem; font-weight: 700;
+  margin-right: 0.6rem; vertical-align: middle;
+}
+
+/* ===== HIGHLIGHT BOX ===== */
+.highlight-box {
+  background: linear-gradient(135deg, var(--main), var(--dark));
+  color: #fff; border-radius: 12px;
+  padding: 1.2rem 1.5rem; margin: 1.2rem 0;
+  font-weight: 500; font-size: 1rem;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.25);
+}
+
+/* ===== CARD GRID ===== */
+.card-grid {
+  display: grid; gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  margin: 1.2rem 0;
+}
+
+.card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* ===== FEATURE CARD ===== */
+.feature-card {
+  background: var(--card-bg);
+  border: 1px solid #e8eef3;
+  border-radius: 12px;
+  padding: 1.3rem;
+  transition: all var(--transition);
+}
+.feature-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+.feature-card .card-icon {
+  font-size: 1.8rem; margin-bottom: 0.6rem;
+  display: block; line-height: 1;
+}
+.feature-card h4 {
+  font-size: 0.95rem; font-weight: 700;
+  margin-bottom: 0.4rem; color: var(--dark);
+}
+.feature-card p {
+  font-size: 0.82rem; margin-bottom: 0;
+  color: var(--text-secondary);
+}
+
+/* ===== STEP CARDS ===== */
+.step-cards {
+  display: flex; gap: 1rem; margin: 1.2rem 0;
+  flex-wrap: wrap;
+}
+.step-card {
+  flex: 1; min-width: 200px;
+  background: var(--card-bg);
+  border: 1px solid #e8eef3;
+  border-radius: 12px; padding: 1.2rem;
+  text-align: center;
+  transition: all var(--transition);
+  position: relative;
+}
+.step-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--main); color: #fff;
+  font-size: 0.85rem; font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+.step-card h4 { font-size: 0.9rem; margin-bottom: 0.3rem; }
+.step-card p { font-size: 0.8rem; margin-bottom: 0; }
+
+/* ===== PIPELINE ===== */
+.pipeline {
+  display: flex; align-items: center; gap: 0.3rem;
+  flex-wrap: wrap; margin: 1.2rem 0;
+  justify-content: center;
+}
+.pipeline-stage {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 0.3rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  text-align: center;
+  min-width: 70px;
+}
+.pipeline-stage .stage-label {
+  font-size: 0.7rem; font-weight: 700; color: #fff;
+  padding: 0.15rem 0.5rem; border-radius: 6px;
+}
+.pipeline-stage .stage-desc {
+  font-size: 0.65rem; color: var(--text-secondary);
+}
+.pipeline-arrow {
+  font-size: 1.2rem; color: var(--accent); font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* stage colors */
+.stage-input .stage-label { background: #78909c; }
+.stage-conv .stage-label { background: #e91e63; }
+.stage-relu .stage-label { background: #ff9800; }
+.stage-pool .stage-label { background: #4caf50; }
+.stage-flat .stage-label { background: #9c27b0; }
+.stage-fc .stage-label { background: #3f51b5; }
+.stage-soft .stage-label { background: #00bcd4; }
+.stage-out .stage-label { background: #f44336; }
+
+/* ===== PIXEL GRID ===== */
+.pixel-grid {
+  display: inline-grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px; padding: 8px;
+  background: #263238; border-radius: 8px;
+  margin: 0.8rem auto;
+}
+.pixel {
+  width: clamp(18px, 2.5vw, 32px);
+  height: clamp(18px, 2.5vw, 32px);
+  border-radius: 3px;
+}
+.p0 { background: #263238; }
+.p1 { background: #455a64; }
+.p2 { background: #78909c; }
+.p3 { background: #b0bec5; }
+.p4 { background: #e0e0e0; }
+.p5 { background: #ffffff; }
+
+/* ===== TABLE ===== */
+.styled-table {
+  width: 100%; border-collapse: collapse;
+  margin: 1rem 0; font-size: 0.85rem;
+}
+.styled-table thead th {
+  background: var(--dark); color: #fff;
+  padding: 0.7rem 1rem; text-align: left;
+  font-weight: 600;
+}
+.styled-table thead th:first-child { border-radius: 8px 0 0 0; }
+.styled-table thead th:last-child { border-radius: 0 8px 0 0; }
+.styled-table tbody td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #e8eef3;
+}
+.styled-table tbody tr:nth-child(even) { background: #f8fafb; }
+.styled-table tbody tr:hover { background: var(--light); }
+.styled-table code {
+  background: #f1f3f5; padding: 0.15rem 0.4rem;
+  border-radius: 4px; font-size: 0.8rem;
+  color: #d63384; font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* ===== BUTTON ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1.5rem; border-radius: 99px;
+  font-size: 0.9rem; font-weight: 600;
+  text-decoration: none; cursor: pointer;
+  transition: all var(--transition);
+  border: none; font-family: inherit;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--main), var(--dark));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(33,150,243,0.4);
+}
+.btn-disabled {
+  background: #ccc; color: #888;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn-disabled:hover { transform: none; box-shadow: none; }
+
+/* ===== NUMBERED CARDS ===== */
+.numbered-cards {
+  display: grid; gap: 0.8rem; margin: 1rem 0;
+}
+.numbered-card {
+  display: flex; align-items: flex-start; gap: 1rem;
+  background: var(--card-bg); border: 1px solid #e8eef3;
+  border-radius: 12px; padding: 1rem 1.2rem;
+  transition: all var(--transition);
+}
+.numbered-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+}
+.numbered-card .num {
+  display: flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--main); color: #fff;
+  font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
+}
+.numbered-card .content h4 {
+  font-size: 0.9rem; margin-bottom: 0.2rem; color: var(--dark);
+}
+.numbered-card .content p {
+  font-size: 0.8rem; margin-bottom: 0; color: var(--text-secondary);
+}
+
+/* ===== DISCUSSION GRID ===== */
+.discussion-grid {
+  display: grid; gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 1.2rem 0;
+}
+.discussion-card {
+  background: #fff;
+  border: 1px solid #e8eef3;
+  border-radius: 12px; padding: 1.3rem;
+  transition: all var(--transition);
+}
+.discussion-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+.discussion-card .icon {
+  font-size: 1.5rem; margin-bottom: 0.5rem;
+  display: block;
+}
+.discussion-card p {
+  font-size: 0.88rem; margin: 0;
+  color: var(--text); font-weight: 500;
+}
+
+/* ===== TWO COLUMN ===== */
+.two-col {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1.5rem; margin: 1rem 0;
+}
+
+/* ===== COMPARISON BOX ===== */
+.compare-box {
+  background: var(--card-bg);
+  border: 1px solid #e8eef3;
+  border-radius: 12px; padding: 1.2rem;
+}
+.compare-box h4 {
+  text-align: center; margin-bottom: 0.8rem;
+  color: var(--dark); font-size: 1rem;
+}
+
+/* ===== FLOW DIAGRAM ===== */
+.flow {
+  display: flex; align-items: center; gap: 0.4rem;
+  flex-wrap: wrap; justify-content: center; margin: 1rem 0;
+}
+.flow-step {
+  background: var(--light); color: var(--dark);
+  padding: 0.4rem 0.8rem; border-radius: 8px;
+  font-size: 0.78rem; font-weight: 600;
+  text-align: center;
+}
+.flow-step.active-step {
+  background: var(--main); color: #fff;
+}
+.flow-arrow { color: var(--accent); font-weight: 700; }
+.flow-loop {
+  display: block; text-align: center;
+  font-size: 0.75rem; color: var(--accent);
+  margin-top: 0.3rem; font-weight: 600;
+}
+
+/* ===== GOAL LIST ===== */
+.goal-list {
+  list-style: none; margin: 0.8rem 0;
+}
+.goal-list li {
+  padding: 0.4rem 0; padding-left: 1.5rem;
+  position: relative; font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+.goal-list li::before {
+  content: ""; position: absolute; left: 0; top: 0.75rem;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--main);
+}
+
+/* ===== NAV ===== */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #e0e0e0;
+  display: flex; align-items: center;
+  justify-content: center; gap: 1.5rem;
+  z-index: 9998;
+  padding: 0 1rem;
+}
+.nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 2px solid var(--main); background: #fff;
+  color: var(--main); cursor: pointer;
+  font-size: 1.1rem; transition: all var(--transition);
+}
+.nav-btn:hover {
+  background: var(--main); color: #fff;
+}
+.nav-btn:disabled {
+  border-color: #ccc; color: #ccc; cursor: not-allowed;
+}
+.nav-btn:disabled:hover { background: #fff; color: #ccc; }
+.slide-counter {
+  font-size: 0.85rem; font-weight: 600; color: var(--dark);
+  min-width: 60px; text-align: center;
+  display: flex; align-items: center; gap: 0.3rem;
+}
+.slide-input {
+  width: 2rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+  background: transparent; font-size: 0.85rem; font-weight: 600; color: var(--dark);
+  font-family: inherit; padding: 0.1rem 0; outline: none; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.slide-input:hover { border-bottom-color: var(--main); }
+.slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px; }
+
+/* ===== END SLIDE ===== */
+.end-slide { text-align: center; }
+.end-slide h1 { font-size: 2.2rem; margin-bottom: 0.3rem; }
+.end-slide .end-subtitle { font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+/* ===== OBSERVATION CARDS ===== */
+.obs-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem; margin: 1rem 0;
+}
+.obs-card {
+  display: flex; align-items: flex-start; gap: 0.8rem;
+  background: #fff; border: 1px solid #e8eef3;
+  border-radius: 12px; padding: 1rem;
+  transition: all var(--transition);
+}
+.obs-card:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+.obs-card .icon { font-size: 1.5rem; flex-shrink: 0; line-height: 1; }
+.obs-card h4 { font-size: 0.88rem; margin-bottom: 0.2rem; color: var(--dark); }
+.obs-card p { font-size: 0.8rem; margin: 0; color: var(--text-secondary); }
+
+/* ===== KEY TAKEAWAY ===== */
+.takeaway-grid {
+  display: grid; gap: 1rem; margin: 1.2rem 0;
+}
+.takeaway-card {
+  display: flex; align-items: flex-start; gap: 1.2rem;
+  background: linear-gradient(135deg, #fff, var(--light));
+  border: 2px solid var(--accent);
+  border-radius: 14px; padding: 1.3rem 1.5rem;
+}
+.takeaway-card .icon {
+  font-size: 2rem; flex-shrink: 0; line-height: 1;
+}
+.takeaway-card p {
+  font-size: 1rem; font-weight: 500; margin: 0;
+  color: var(--text);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .card-body { padding: 2rem 2rem; }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  .cover h1 { font-size: 2.2rem; }
+  .card-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .slide { padding: 1rem; }
+  .card-body { padding: 1.5rem 1.2rem; }
+  h1 { font-size: 1.7rem; }
+  h2 { font-size: 1.3rem; }
+  .cover h1 { font-size: 1.8rem; }
+  .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+  .discussion-grid { grid-template-columns: 1fr; }
+  .obs-grid { grid-template-columns: 1fr; }
+  .pipeline { gap: 0.15rem; }
+  .pipeline-stage { min-width: 55px; padding: 0.4rem 0.5rem; }
+  .pipeline-stage .stage-label { font-size: 0.6rem; }
+  .step-cards { flex-direction: column; }
+  .styled-table { font-size: 0.75rem; }
+  .styled-table thead th,
+  .styled-table tbody td { padding: 0.4rem 0.6rem; }
+}
+
+@media (max-width: 480px) {
+  .card-body { padding: 1rem; }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.15rem; }
+  .cover h1 { font-size: 1.5rem; }
+  .feature-card { padding: 1rem; }
+  .browser-titlebar { padding: 8px 12px; }
+  .browser-dot { width: 10px; height: 10px; }
+  .nav-bar { gap: 1rem; }
+  .pixel { width: 16px; height: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div id="progressBar" style="width: 0%"></div>
+
+<div class="slides-container" id="slidesContainer">
+
+<!-- ==================== SLIDE 1: COVER ==================== -->
+<div class="slide active" data-slide="1">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">MNIST로 배우는 숫자 인식 AI</div>
+</div>
+<div class="card-body cover">
+  <div style="margin-bottom:1.5rem;">
+    <span class="badge badge-year">2026</span>
+  </div>
+  <h1>MNIST로 배우는<br>숫자 인식 AI</h1>
+  <p class="subtitle">이미지 분류 인공지능의 원리를 직접 체험하다</p>
+  <p class="org">샘플고등학교</p>
+  <div class="tags" style="justify-content:center;">
+    <span class="tag">인공지능</span>
+    <span class="tag">MNIST</span>
+    <span class="tag">CNN</span>
+    <span class="tag">딥러닝</span>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 2: TOC ==================== -->
+<div class="slide" data-slide="2">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">목차</div>
+</div>
+<div class="card-body">
+  <h2>목차</h2>
+  <ul class="toc-list">
+    <li class="toc-item" onclick="goToSlide(3)">MNIST 데이터셋이란?</li>
+    <li class="toc-item" onclick="goToSlide(4)">숫자 이미지의 데이터 변환 과정</li>
+    <li class="toc-item" onclick="goToSlide(5)">CNN은 어떻게 숫자를 분류할까?</li>
+    <li class="toc-item" onclick="goToSlide(7)">활동 1 - CNN이 보는 숫자</li>
+    <li class="toc-item" onclick="goToSlide(8)">활동 2 - 내가 그린 숫자 인식</li>
+    <li class="toc-item" onclick="goToSlide(10)">활동 3 - 코드로 학습시키기</li>
+    <li class="toc-item" onclick="goToSlide(14)">정리 및 성찰</li>
+  </ul>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 3: MNIST 데이터셋 ==================== -->
+<div class="slide" data-slide="3">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">MNIST 데이터셋이란?</div>
+</div>
+<div class="card-body">
+  <div class="section-divider" style="padding-top:0;">
+    <span class="section-icon">&#x1F522;</span>
+    <h2>MNIST 데이터셋이란?</h2>
+    <p>딥러닝의 "Hello World" - 손글씨 숫자 이미지 데이터셋</p>
+  </div>
+
+  <div class="two-col" style="align-items:center;">
+    <div>
+      <h3>핵심 정보</h3>
+      <ul class="goal-list">
+        <li><strong>70,000장</strong>의 손글씨 숫자 이미지 (학습 60,000 + 테스트 10,000)</li>
+        <li><strong>28 x 28 픽셀</strong> 흑백(grayscale) 이미지</li>
+        <li><strong>0 ~ 9</strong>까지 10가지 분류</li>
+        <li><strong>1998년</strong> Yann LeCun이 제작</li>
+      </ul>
+      <div class="info-box">각 픽셀은 0(흰색)~255(검정) 사이의 숫자값으로 표현됩니다</div>
+    </div>
+    <div style="text-align:center;">
+      <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.5rem;">숫자 "5"의 간략한 픽셀 표현</p>
+      <div class="pixel-grid">
+        <div class="pixel p0"></div><div class="pixel p2"></div><div class="pixel p5"></div><div class="pixel p5"></div><div class="pixel p5"></div><div class="pixel p3"></div><div class="pixel p0"></div>
+        <div class="pixel p0"></div><div class="pixel p4"></div><div class="pixel p5"></div><div class="pixel p0"></div><div class="pixel p0"></div><div class="pixel p0"></div><div class="pixel p0"></div>
+        <div class="pixel p0"></div><div class="pixel p3"></div><div class="pixel p5"></div><div class="pixel p4"></div><div class="pixel p3"></div><div class="pixel p1"></div><div class="pixel p0"></div>
+        <div class="pixel p0"></div><div class="pixel p0"></div><div class="pixel p1"></div><div class="pixel p2"></div><div class="pixel p4"></div><div class="pixel p5"></div><div class="pixel p0"></div>
+        <div class="pixel p0"></div><div class="pixel p0"></div><div class="pixel p0"></div><div class="pixel p0"></div><div class="pixel p2"></div><div class="pixel p5"></div><div class="pixel p0"></div>
+        <div class="pixel p0"></div><div class="pixel p4"></div><div class="pixel p3"></div><div class="pixel p2"></div><div class="pixel p4"></div><div class="pixel p5"></div><div class="pixel p0"></div>
+        <div class="pixel p0"></div><div class="pixel p1"></div><div class="pixel p4"></div><div class="pixel p5"></div><div class="pixel p5"></div><div class="pixel p2"></div><div class="pixel p0"></div>
+      </div>
+      <p style="font-size:0.7rem; color:#999; margin-top:0.3rem;">밝을수록 높은 픽셀값</p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 4: 이미지→데이터 변환 ==================== -->
+<div class="slide" data-slide="4">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">숫자 이미지가 데이터로 변환되는 과정</div>
+</div>
+<div class="card-body">
+  <h2>숫자 이미지가 데이터로 변환되는 과정</h2>
+  <p>컴퓨터가 이미지를 이해하는 방법을 알아봅시다</p>
+
+  <div class="step-cards">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <h4>사람이 쓴 숫자 이미지</h4>
+      <p style="font-size:2.5rem; margin:0.5rem 0;">&#9997;&#65039;</p>
+      <p>종이에 쓴 숫자를 스캔하거나 디지털로 입력</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <h4>28 x 28 격자로 나누기</h4>
+      <p style="font-size:2.5rem; margin:0.5rem 0;">&#x1F4CF;</p>
+      <p>784개의 작은 픽셀로 분할</p>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <h4>밝기를 숫자로 변환</h4>
+      <p style="font-size:2.5rem; margin:0.5rem 0;">&#x1F522;</p>
+      <p>각 픽셀의 밝기를 0~255 값으로 저장</p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    &#x1F4A1; 컴퓨터는 이미지를 <strong>'숫자의 배열'</strong>로 인식합니다. 28x28 = 784개의 숫자가 하나의 손글씨 이미지를 표현합니다.
+  </div>
+
+  <div class="info-box">
+    이 변환 과정을 '전처리(Preprocessing)'라고 합니다. 모든 이미지를 같은 크기, 같은 형식으로 맞추는 것이 중요합니다.
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 5: CNN 분류 파이프라인 ==================== -->
+<div class="slide" data-slide="5">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">CNN은 어떻게 숫자를 분류할까?</div>
+</div>
+<div class="card-body">
+  <h2>CNN은 어떻게 숫자를 분류할까?</h2>
+  <p>입력 이미지가 숫자로 분류되기까지의 전체 과정</p>
+
+  <div class="pipeline">
+    <div class="pipeline-stage stage-input">
+      <span class="stage-label">입력</span>
+      <span class="stage-desc">28x28</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="pipeline-stage stage-conv">
+      <span class="stage-label">컨볼루션</span>
+      <span class="stage-desc">특징 추출</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="pipeline-stage stage-relu">
+      <span class="stage-label">ReLU</span>
+      <span class="stage-desc">활성화</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="pipeline-stage stage-pool">
+      <span class="stage-label">풀링</span>
+      <span class="stage-desc">크기 축소</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="pipeline-stage stage-flat">
+      <span class="stage-label">Flatten</span>
+      <span class="stage-desc">1D 변환</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="pipeline-stage stage-fc">
+      <span class="stage-label">완전연결</span>
+      <span class="stage-desc">판단</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="pipeline-stage stage-soft">
+      <span class="stage-label">Softmax</span>
+      <span class="stage-desc">확률 계산</span>
+    </div>
+    <span class="pipeline-arrow">&rarr;</span>
+    <div class="pipeline-stage stage-out">
+      <span class="stage-label">출력</span>
+      <span class="stage-desc">0~9</span>
+    </div>
+  </div>
+
+  <div class="info-box">
+    지난 시간에 배운 CNN 구조를 MNIST 숫자 인식에 적용합니다. 각 단계가 어떤 역할을 하는지 다음 슬라이드에서 자세히 살펴봅시다.
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 6: CNN 단계별 역할 ==================== -->
+<div class="slide" data-slide="6">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">CNN 각 단계의 역할</div>
+</div>
+<div class="card-body">
+  <h2>CNN 각 단계의 역할</h2>
+  <p>각 단계가 숫자 인식에서 어떤 일을 하는지 알아봅시다</p>
+
+  <div class="card-grid card-grid-3">
+    <div class="feature-card">
+      <span class="card-icon">&#x1F50D;</span>
+      <h4>컨볼루션 (Convolution)</h4>
+      <p>필터가 이미지를 스캔하며 가장자리, 곡선 등의 특징을 추출합니다</p>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">&#x26A1;</span>
+      <h4>ReLU (활성화 함수)</h4>
+      <p>음수값을 0으로 만들어 중요한 특징만 남기고 불필요한 신호를 제거합니다</p>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">&#x1F4D0;</span>
+      <h4>풀링 (Pooling)</h4>
+      <p>특징 맵의 크기를 줄여 핵심 정보만 유지하고 계산량을 감소시킵니다</p>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">&#x1F4CA;</span>
+      <h4>Flatten (평탄화)</h4>
+      <p>2D 특징 맵을 1D 벡터로 변환하여 분류기에 입력할 수 있도록 합니다</p>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">&#x1F9E0;</span>
+      <h4>완전연결층 (Dense)</h4>
+      <p>추출된 모든 특징을 종합하여 어떤 숫자인지 판단합니다</p>
+    </div>
+    <div class="feature-card">
+      <span class="card-icon">&#x1F3AF;</span>
+      <h4>Softmax (출력)</h4>
+      <p>각 숫자(0~9)일 확률을 0~1 사이 값으로 계산합니다</p>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 7: 활동 1 안내 ==================== -->
+<div class="slide" data-slide="7">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">활동 1 - CNN이 보는 숫자</div>
+</div>
+<div class="card-body">
+  <div class="section-divider" style="padding-top:0;">
+    <span class="section-icon">&#x1F441;&#xFE0F;</span>
+    <h2>활동 1: CNN이 보는 숫자</h2>
+    <p>MNIST 테스트 데이터를 선택하여 CNN의 각 레이어에서 어떤 특징을 추출하는지 관찰합니다</p>
+  </div>
+
+  <h3>활동 목표</h3>
+  <ul class="goal-list">
+    <li>컨볼루션 필터가 추출하는 특징 확인하기</li>
+    <li>풀링 후 정보가 어떻게 압축되는지 관찰하기</li>
+    <li>최종 분류 결과와 확률 분포 확인하기</li>
+  </ul>
+
+  <div style="text-align:center; margin: 1.5rem 0;">
+    <a href="activity1.html" target="_blank" class="btn btn-primary">활동 1 시작하기 &rarr;</a>
+  </div>
+
+  <div class="info-box">
+    다양한 숫자를 선택하며 각 단계에서 무엇이 달라지는지 관찰해보세요. 초기 레이어와 후기 레이어의 차이에 주목!
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 8: 활동 2 안내 ==================== -->
+<div class="slide" data-slide="8">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">활동 2 - 내가 그린 숫자 인식</div>
+</div>
+<div class="card-body">
+  <div class="section-divider" style="padding-top:0;">
+    <span class="section-icon">&#x270F;&#xFE0F;</span>
+    <h2>활동 2: 내가 그린 숫자 인식</h2>
+    <p>직접 숫자를 그려 CNN 모델에 입력하고 각 처리 단계와 최종 결과를 확인합니다</p>
+  </div>
+
+  <h3>활동 목표</h3>
+  <ul class="goal-list">
+    <li>나만의 숫자를 입력해 AI가 인식하는지 확인하기</li>
+    <li>어떤 숫자가 잘 인식되고, 어떤 것이 어려운지 탐구하기</li>
+    <li>CNN이 특징을 추출하는 과정 직접 체험하기</li>
+  </ul>
+
+  <div style="text-align:center; margin: 1.5rem 0;">
+    <a href="activity2.html" target="_blank" class="btn btn-primary">활동 2 시작하기 &rarr;</a>
+  </div>
+
+  <div class="info-box">
+    일부러 애매하게 그려보세요! AI가 헷갈려하는 모습도 관찰해보세요. 예를 들어 1처럼 보이는 7, 3처럼 보이는 8 등을 시도해보세요.
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 9: CNN 학습 과정 요약 ==================== -->
+<div class="slide" data-slide="9">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">CNN이 학습하는 과정 요약</div>
+</div>
+<div class="card-body">
+  <h2>CNN이 학습하는 과정 요약</h2>
+  <p>모델이 어떻게 점점 똑똑해지는지 알아봅시다</p>
+
+  <div class="two-col">
+    <div class="compare-box">
+      <h4>&#x1F393; 학습 (Training)</h4>
+      <p style="font-size:0.85rem;">정답이 있는 데이터를 반복해서 보며 필터(가중치)를 개선하는 과정</p>
+    </div>
+    <div class="compare-box">
+      <h4>&#x1F50E; 추론 (Inference)</h4>
+      <p style="font-size:0.85rem;">학습 완료된 모델이 새로운 이미지를 보고 숫자를 맞추는 과정</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:1.5rem;">학습 과정 흐름</h3>
+  <div class="flow">
+    <span class="flow-step">&#x1F5BC; 이미지 입력</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step active-step">&#x27A1;&#xFE0F; 순전파</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">&#x2696;&#xFE0F; 예측 vs 정답</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step active-step">&#x1F4C9; 오차 계산</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step">&#x1F519; 역전파</span>
+    <span class="flow-arrow">&rarr;</span>
+    <span class="flow-step active-step">&#x1F527; 가중치 수정</span>
+  </div>
+  <div class="flow-loop">&#x1F504; 수천~수만 번 반복</div>
+
+  <div class="info-box" style="margin-top:1rem;">
+    수천~수만 번 반복하면서 필터(가중치)가 점점 좋아집니다. 이 과정이 바로 "딥러닝"입니다.
+  </div>
+
+  <div class="highlight-box">
+    활동 1, 2에서 관찰한 필터들은 바로 이 학습 과정을 통해 만들어진 것입니다!
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 10: 활동 3 안내 ==================== -->
+<div class="slide" data-slide="10">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">활동 3 - 코드로 MNIST 학습시키기</div>
+</div>
+<div class="card-body">
+  <div class="section-divider" style="padding-top:0;">
+    <span class="section-icon">&#x1F4BB;</span>
+    <h2>활동 3: 코드로 MNIST 학습시키기</h2>
+    <p>Google Colab에서 직접 CNN 모델을 구성하고 학습시켜봅니다</p>
+  </div>
+
+  <h3>코드에서 다룰 내용</h3>
+  <div class="numbered-cards">
+    <div class="numbered-card">
+      <div class="num">1</div>
+      <div class="content">
+        <h4>데이터 불러오기</h4>
+        <p>MNIST 데이터셋 로드 및 전처리 (정규화, 차원 변환)</p>
+      </div>
+    </div>
+    <div class="numbered-card">
+      <div class="num">2</div>
+      <div class="content">
+        <h4>모델 구성하기</h4>
+        <p>Conv2D, MaxPooling, Flatten, Dense 등 레이어 쌓기</p>
+      </div>
+    </div>
+    <div class="numbered-card">
+      <div class="num">3</div>
+      <div class="content">
+        <h4>학습시키기</h4>
+        <p>model.fit()으로 에포크별 정확도 변화 관찰</p>
+      </div>
+    </div>
+    <div class="numbered-card">
+      <div class="num">4</div>
+      <div class="content">
+        <h4>평가하기</h4>
+        <p>테스트 데이터로 최종 성능 확인 및 예측 결과 시각화</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin: 1.5rem 0; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+    <a href="https://colab.research.google.com/drive/1tTGJimHMQRC_-lNnv36g_OGTV-uG0gRx?usp=sharing" target="_blank" class="btn btn-primary">📓 MNIST 숫자인식 실습 노트북 열기 &rarr;</a>
+    <a href="https://colab.research.google.com/drive/1DxqL248d8ytZRHQTmKK_tRKP3mp9_7Lb?hl=ko" target="_blank" class="btn btn-secondary" style="background:var(--teal,#00897b);color:#fff;">🔧 활동2 모델 학습 코드 보기 &rarr;</a>
+  </div>
+
+  <div class="info-box">
+    CNN 수업에서 배운 각 단계가 코드에서 어떻게 구현되는지 확인해보세요. 이론과 실제의 연결이 핵심입니다!
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 11: 코드와 CNN 개념 연결 ==================== -->
+<div class="slide" data-slide="11">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">코드와 CNN 개념 연결</div>
+</div>
+<div class="card-body">
+  <h2>코드와 CNN 개념 연결</h2>
+  <p>이론에서 배운 CNN 구조가 Keras 코드에서 어떻게 구현되는지 비교합니다</p>
+
+  <table class="styled-table">
+    <thead>
+      <tr>
+        <th>CNN 개념</th>
+        <th>코드 (Keras)</th>
+        <th>역할</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>입력 이미지</td>
+        <td><code>input_shape=(28,28,1)</code></td>
+        <td>28x28 흑백 이미지 입력</td>
+      </tr>
+      <tr>
+        <td>컨볼루션</td>
+        <td><code>Conv2D(32, (5,5))</code></td>
+        <td>5x5 필터 32개로 특징 추출</td>
+      </tr>
+      <tr>
+        <td>활성화 함수</td>
+        <td><code>activation='relu'</code></td>
+        <td>비선형성 추가, 음수 제거</td>
+      </tr>
+      <tr>
+        <td>풀링</td>
+        <td><code>MaxPooling2D((2,2))</code></td>
+        <td>크기 축소 (28x28 &rarr; 14x14)</td>
+      </tr>
+      <tr>
+        <td>평탄화</td>
+        <td><code>Flatten()</code></td>
+        <td>2D &rarr; 1D 벡터 변환</td>
+      </tr>
+      <tr>
+        <td>완전연결</td>
+        <td><code>Dense(1024)</code></td>
+        <td>특징 조합하여 판단</td>
+      </tr>
+      <tr>
+        <td>출력</td>
+        <td><code>Dense(10, softmax)</code></td>
+        <td>0~9 각 확률 출력</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    &#x1F4A1; 코드의 각 줄이 CNN의 각 단계와 1:1로 대응됩니다. 이론을 이해하면 코드를 읽을 수 있습니다!
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 12: 학습 관찰 포인트 ==================== -->
+<div class="slide" data-slide="12">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">학습 과정에서 관찰할 것들</div>
+</div>
+<div class="card-body">
+  <h2>학습 과정에서 관찰할 것들</h2>
+  <p>에포크(Epoch)별 변화를 관찰하며 모델 학습의 특성을 이해합시다</p>
+
+  <div class="obs-grid">
+    <div class="obs-card">
+      <span class="icon">&#x1F4C8;</span>
+      <div>
+        <h4>정확도(Accuracy) 변화</h4>
+        <p>에포크가 진행될수록 정확도가 올라가는가? 어느 시점에서 수렴하는가?</p>
+      </div>
+    </div>
+    <div class="obs-card">
+      <span class="icon">&#x1F4C9;</span>
+      <div>
+        <h4>손실(Loss) 변화</h4>
+        <p>에포크가 진행될수록 손실이 내려가는가? 어느 시점에서 더 이상 줄지 않는가?</p>
+      </div>
+    </div>
+    <div class="obs-card">
+      <span class="icon">&#x1F504;</span>
+      <div>
+        <h4>과적합(Overfitting)</h4>
+        <p>학습(train) 정확도와 검증(val) 정확도가 벌어지기 시작하는가?</p>
+      </div>
+    </div>
+    <div class="obs-card">
+      <span class="icon">&#x23F1;&#xFE0F;</span>
+      <div>
+        <h4>학습 시간</h4>
+        <p>데이터 양과 모델 크기에 따라 학습 시간이 어떻게 변하는가?</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    &#x1F52C; 직접 하이퍼파라미터를 바꿔보며 결과가 어떻게 달라지는지 실험해보세요! (예: 에포크 수, 필터 개수, 학습률 등)
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 13: 핵심 정리 ==================== -->
+<div class="slide" data-slide="13">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">오늘의 핵심 정리</div>
+</div>
+<div class="card-body">
+  <h2>오늘의 핵심 정리</h2>
+  <p>오늘 배운 내용을 세 가지로 정리합니다</p>
+
+  <div class="takeaway-grid">
+    <div class="takeaway-card">
+      <span class="icon">&#x1F522;</span>
+      <p><strong>MNIST</strong>는 28x28 픽셀의 손글씨 숫자 이미지를 0~9로 분류하는 대표적인 딥러닝 데이터셋입니다</p>
+    </div>
+    <div class="takeaway-card">
+      <span class="icon">&#x1F9E0;</span>
+      <p><strong>CNN</strong>은 컨볼루션 &rarr; 활성화 &rarr; 풀링 &rarr; 완전연결 과정을 거쳐 이미지에서 특징을 추출하고 분류합니다</p>
+    </div>
+    <div class="takeaway-card">
+      <span class="icon">&#x1F4BB;</span>
+      <p>실제 코드에서도 동일한 구조로 모델을 구성하고, <strong>반복 학습</strong>을 통해 성능을 향상시킵니다</p>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="text-align:center; font-size:1.1rem;">
+    이미지 분류 AI의 핵심은 <strong>'특징 추출'</strong>과 <strong>'패턴 학습'</strong>입니다
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 14: 활동 성찰 ==================== -->
+<div class="slide" data-slide="14">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">활동 성찰</div>
+</div>
+<div class="card-body">
+  <h2>&#x1F4DD; 활동 성찰</h2>
+  <p>활동에서 관찰한 내용을 바탕으로 생각을 정리해봅시다</p>
+
+  <div class="discussion-grid">
+    <div class="discussion-card">
+      <span class="icon">&#x1F914;</span>
+      <p>CNN의 초기 레이어와 후기 레이어에서 추출하는 특징은 어떻게 다른가요?</p>
+    </div>
+    <div class="discussion-card">
+      <span class="icon">&#x1F4A1;</span>
+      <p>같은 숫자인데 인식률이 다른 경우가 있었나요? 왜 그럴까요?</p>
+    </div>
+    <div class="discussion-card">
+      <span class="icon">&#x1F50D;</span>
+      <p>AI가 숫자를 잘못 인식한 사례에서 배운 점은 무엇인가요?</p>
+    </div>
+    <div class="discussion-card">
+      <span class="icon">&#x1F30D;</span>
+      <p>이미지 분류 AI는 일상에서 어디에 활용될 수 있을까요?</p>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin: 1.5rem 0;">
+    <a href="#" class="btn btn-disabled google-form-btn" id="googleFormBtn" onclick="return false;">&#x1F4DD; 성찰 폼 작성하기 &rarr;</a>
+  </div>
+  <p style="text-align:center; font-size:0.75rem; color:#999;">선생님이 구글 폼 주소를 공유하면 버튼이 활성화됩니다</p>
+</div>
+</div>
+</div>
+
+<!-- ==================== SLIDE 15: END ==================== -->
+<div class="slide" data-slide="15">
+<div class="browser-card">
+<div class="browser-titlebar">
+  <div class="browser-dot red"></div>
+  <div class="browser-dot yellow"></div>
+  <div class="browser-dot green"></div>
+  <div class="browser-title">수업을 마치며</div>
+</div>
+<div class="card-body end-slide">
+  <p style="font-size:3rem; margin-bottom:0.5rem;">&#x1F3AF;</p>
+  <h1>감사합니다</h1>
+  <p class="end-subtitle">MNIST로 배우는 숫자 인식 AI</p>
+
+  <div class="highlight-box" style="max-width:600px; margin:1.5rem auto; text-align:center;">
+    이미지 분류 AI의 원리를 이해하고,<br>직접 체험하며 배운 오늘의 경험이<br>여러분의 AI 여정에 좋은 첫걸음이 되길 바랍니다
+  </div>
+
+  <p style="color:var(--text-secondary); font-size:0.85rem; margin-top:1.5rem;">샘플고등학교 | 인공지능과 피지컬 컴퓨팅</p>
+
+</div>
+</div>
+</div>
+
+</div><!-- end slides-container -->
+
+<!-- ===== NAV BAR ===== -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" aria-label="이전 슬라이드">&#x276E;</button>
+  <span class="slide-counter" id="slideCounter"><input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력"> / <span id="totalSlides">15</span></span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">&#x276F;</button>
+</div>
+
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentSlide = 1;
+
+  const progressBar = document.getElementById('progressBar');
+  const slideInput = document.getElementById('slideInput');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function updateSlide() {
+    slides.forEach(s => s.classList.remove('active'));
+    const target = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+    if (target) target.classList.add('active');
+
+    progressBar.style.width = ((currentSlide / totalSlides) * 100) + '%';
+    slideInput.value = currentSlide;
+    prevBtn.disabled = currentSlide === 1;
+    nextBtn.disabled = currentSlide === totalSlides;
+  }
+
+  slideInput.addEventListener('focus', function() { this.select(); });
+  slideInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      var n = parseInt(this.value);
+      if (n >= 1 && n <= totalSlides) goToSlide(n);
+      else this.value = currentSlide;
+      this.blur();
+    } else if (e.key === 'Escape') {
+      this.value = currentSlide;
+      this.blur();
+    }
+    e.stopPropagation();
+  });
+  slideInput.addEventListener('blur', function() {
+    var n = parseInt(this.value);
+    if (n >= 1 && n <= totalSlides) goToSlide(n);
+    else this.value = currentSlide;
+  });
+
+  window.goToSlide = function(n) {
+    if (n >= 1 && n <= totalSlides) {
+      currentSlide = n;
+      updateSlide();
+    }
+  };
+
+  window.nextSlide = function() {
+    if (currentSlide < totalSlides) {
+      currentSlide++;
+      updateSlide();
+    }
+  };
+
+  window.prevSlide = function() {
+    if (currentSlide > 1) {
+      currentSlide--;
+      updateSlide();
+    }
+  };
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    switch(e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+      case ' ':
+        e.preventDefault();
+        nextSlide();
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        prevSlide();
+        break;
+      case 'Home':
+        e.preventDefault();
+        goToSlide(1);
+        break;
+      case 'End':
+        e.preventDefault();
+        goToSlide(totalSlides);
+        break;
+    }
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) nextSlide();
+      else prevSlide();
+    }
+  }, { passive: true });
+
+  // Google Form URL management
+  window.setFormUrl = function(url) {
+    const formBtns = document.querySelectorAll('.google-form-btn');
+    formBtns.forEach(function(btn) {
+      btn.href = url;
+      btn.target = '_blank';
+      btn.classList.remove('btn-disabled');
+      btn.classList.add('btn-primary');
+      btn.onclick = null;
+    });
+  };
+
+  // Check URL parameter for form URL, or use default
+  const urlParams = new URLSearchParams(window.location.search);
+  const formUrl = urlParams.get('form');
+  if (formUrl) {
+    setFormUrl(decodeURIComponent(formUrl));
+  } else {
+    setFormUrl('https://docs.google.com/forms/d/e/YOUR_GOOGLE_DOC_ID/viewform');
+  }
+
+  // Handle #last hash to navigate to the last slide
+  if (window.location.hash === '#last') {
+    currentSlide = totalSlides;
+  }
+
+  // Initialize
+  updateSlide();
+})();
+</script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

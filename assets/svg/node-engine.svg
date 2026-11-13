@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 210" fill="none">
+  <!-- "Node 엔진 위에 탄 클로드" — 잉크 스케치. 의도: 준비물 슬라이드의
+       '클로드 코드가 올라탈 엔진' 비유를 그림 그대로. 바퀴 달린 엔진(육각
+       명판 = Node 모티프) 위에 미니 로봇이 앉아 깃발을 든다. 회화성:
+       열린 선·겹침 보조 스트로크·불균일 굵기. 앰버 잉크(#ffd9a8). -->
+  <g stroke="#ffd9a8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- 지면 대시 -->
+    <path d="M14 186 L54 186 M70 186 L118 186 M134 186 L192 186 M208 186 L246 186" stroke-width="2.2" opacity="0.5"/>
+    <!-- 엔진 몸체: 열린 둥근 박스 + 보조선 -->
+    <path d="M46 118 C44 104 52 96 66 95 L178 93 C194 93 202 102 203 116 L204 146 C204 158 196 165 184 166 L64 168 C52 168 46 160 46 148 Z" stroke-width="3.4"/>
+    <path d="M52 122 C52 112 58 104 68 102" stroke-width="1.7" opacity="0.45"/>
+    <!-- 육각 명판 (Node 모티프) -->
+    <path d="M112 112 L128 104 L144 112 L144 132 L128 140 L112 132 Z" stroke-width="2.8"/>
+    <path d="M120 118 L128 114 L136 118 L136 127 L128 131 L120 127 Z" stroke-width="1.8" opacity="0.55"/>
+    <!-- 굴뚝 + 연기 -->
+    <path d="M62 95 L62 76 L80 76 L80 94" stroke-width="3"/>
+    <path d="M70 68 C64 62 70 54 78 56" stroke-width="2.2" opacity="0.7"/>
+    <path d="M78 48 C72 42 80 34 88 38" stroke-width="2" opacity="0.5"/>
+    <!-- 바퀴 2 + 스포크 -->
+    <circle cx="84" cy="170" r="17" stroke-width="3.2"/>
+    <path d="M84 158 L84 182 M73 170 L95 170" stroke-width="2" opacity="0.6"/>
+    <circle cx="166" cy="170" r="17" stroke-width="3.2"/>
+    <path d="M166 158 L166 182 M155 170 L177 170" stroke-width="2" opacity="0.6"/>
+    <!-- 미니 클로드: 엔진 위에 앉음 -->
+    <path d="M156 60 C154 44 168 34 182 36 C198 38 206 50 203 64 C200 77 186 82 173 79 C162 76 156 70 156 62" stroke-width="3"/>
+    <path d="M170 54 C172 50 177 50 179 54" stroke-width="2.6"/>
+    <path d="M188 54 C190 50 195 50 197 54" stroke-width="2.6"/>
+    <path d="M175 66 C179 70 187 70 191 65" stroke-width="2.4"/>
+    <path d="M186 34 C188 28 192 24 197 23" stroke-width="2.4"/>
+    <circle cx="200" cy="21" r="3.4" stroke-width="2.2"/>
+    <!-- 몸·다리 (앉은 자세) -->
+    <path d="M166 80 C164 88 166 93 172 94 L192 93 C198 92 200 87 198 80" stroke-width="2.8"/>
+    <path d="M172 94 L170 104 M192 93 L194 103" stroke-width="2.6"/>
+    <!-- 깃발 든 팔 -->
+    <path d="M198 74 C208 70 216 62 220 52" stroke-width="2.8"/>
+    <path d="M222 50 L222 18" stroke-width="2.6"/>
+    <path d="M222 18 L244 26 L222 34" stroke-width="2.4"/>
+  </g>
+</svg>

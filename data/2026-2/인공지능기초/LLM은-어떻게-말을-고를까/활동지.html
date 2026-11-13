@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>글의 설계도 되찾기 · 인공지능 기초</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📐</text></svg>">
+<style>
+  :root {
+    --bg: #14131a;
+    --surface: #1c1b23;
+    --surface-2: #232129;
+    --fg: #f5f3ee;
+    --fg-muted: #a8a29a;
+    --fg-faint: #79736c;
+    --hair: rgba(255, 255, 255, 0.13);
+    --primary: #fbbf24;
+    --accent: linear-gradient(115deg, #fde047 0%, #fbbf24 52%, #a3e635 100%);
+    --c-amber: #fbbf24; --c-lime: #a3e635; --c-sky: #38bdf8;
+    --c-rose: #fb7185; --c-violet: #c4b5fd; --c-green: #34d399;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 12% -5%, rgba(251, 191, 36, 0.13), transparent 60%),
+      radial-gradient(900px 500px at 96% 8%, rgba(163, 230, 53, 0.08), transparent 55%),
+      var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    padding-bottom: 110px;
+    word-break: keep-all;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 0; }
+
+  /* ── 헤더 ── */
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 30px 28px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(0, 0, 0, 0.8);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker {
+    font-size: 12px; font-weight: 800; letter-spacing: 0.14em;
+    color: var(--primary); text-transform: uppercase;
+  }
+  .hero h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad {
+    background: var(--accent);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.sub { color: var(--fg-muted); font-size: 14.5px; margin-top: 8px; max-width: 660px; }
+  .hero .gear {
+    position: absolute; top: 14px; right: 14px; border: none; background: transparent;
+    font-size: 17px; cursor: pointer; opacity: 0.35; color: var(--fg);
+  }
+
+  .idrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; position: relative; }
+  .idrow .field { flex: 1 1 150px; }
+
+  #settingsPanel {
+    display: none; background: #2a2412; border: 1px dashed #a98a2c; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 18px; font-size: 13px;
+  }
+  #settingsPanel input { width: 100%; margin-top: 6px; }
+  #settingsPanel button { margin-top: 8px; }
+
+  /* ── 섹션 카드 ── */
+  section.card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 24px 24px 26px; margin-bottom: 18px;
+    box-shadow: 0 16px 44px -32px rgba(0, 0, 0, 0.9);
+    border-top: 4px solid var(--sec, var(--primary));
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .sec-badge {
+    flex: none; width: 34px; height: 34px; border-radius: 10px;
+    display: grid; place-items: center; font-weight: 800; font-size: 16px;
+    color: #1a1710; background: var(--sec, var(--primary));
+  }
+  .sec-head h2 { font-size: 18.5px; font-weight: 800; }
+  .sec-desc { color: var(--fg-muted); font-size: 13.5px; margin-bottom: 16px; }
+
+  label.q { display: block; font-weight: 700; font-size: 14.5px; margin: 16px 0 6px; }
+  label.q .req { color: var(--c-rose); }
+  .hint { font-weight: 500; color: var(--fg-faint); font-size: 12.5px; margin-left: 6px; }
+  input[type="text"], input[type="url"], input[type="date"], input[type="password"], textarea, select {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px;
+    padding: 10px 13px; font: inherit; font-size: 14.5px; color: var(--fg);
+    background: var(--surface-2); transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.18);
+  }
+  textarea { resize: vertical; min-height: 84px; }
+  textarea.tall { min-height: 118px; }
+  input:read-only, textarea:read-only { color: var(--fg-muted); }
+
+  /* ── 주제 고르기 ── */
+  .topic-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .topic-item {
+    display: block; cursor: pointer; border: 1.5px dashed var(--hair); border-radius: 12px;
+    padding: 11px 13px; background: var(--surface-2); transition: all 0.15s; font-size: 14px;
+  }
+  .topic-item:has(input:checked) {
+    border-style: solid; border-color: var(--c-sky);
+    background: color-mix(in srgb, var(--c-sky) 12%, var(--surface-2));
+  }
+  .topic-item input { accent-color: var(--c-sky); margin-right: 6px; }
+  .topic-item .t { font-weight: 700; }
+
+  /* ── 받은 글 고정 패널 ──
+     B부터 D까지는 원문을 보면서 채워야 하는 칸이다. A 구역이 화면 밖으로
+     나가면 이 패널이 상단에 붙어 원문을 계속 보여 준다.
+     화면을 덮으므로 html의 scroll-padding-top을 패널 높이만큼 잡아,
+     입력칸으로 자동 스크롤할 때 패널 뒤로 숨지 않게 한다. */
+  html { scroll-padding-top: var(--stick-h, 0px); }
+  .stick {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 45;
+    background: rgba(20, 19, 26, 0.96); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hair);
+    box-shadow: 0 14px 34px -20px rgba(0, 0, 0, 0.95);
+  }
+  .stick[hidden] { display: none; }
+  .stick-inner { max-width: 880px; margin: 0 auto; padding: 9px 18px 11px; }
+  .stick-head { display: flex; align-items: center; gap: 10px; }
+  .stick-title { flex: none; font-size: 12.5px; font-weight: 800; color: var(--c-sky); }
+  .stick-meta {
+    flex: 1; min-width: 0; font-size: 11.5px; color: var(--fg-faint);
+    font-family: 'JetBrains Mono', 'Malgun Gothic', monospace;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .stick-toggle {
+    flex: none; border: 1px solid var(--hair); background: transparent; color: var(--fg-muted);
+    border-radius: 999px; padding: 4px 13px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .stick-toggle:hover { color: var(--fg); border-color: var(--fg-faint); }
+  .stick-body {
+    margin-top: 8px; max-height: min(32vh, 280px); overflow-y: auto;
+    white-space: pre-wrap; font-size: 13.5px; line-height: 1.75;
+    border-left: 3px solid var(--c-sky); padding-left: 13px;
+  }
+  .stick.collapsed .stick-body { display: none; }
+  @media (max-width: 560px) {
+    .stick-inner { padding: 7px 14px 9px; }
+    .stick-body { font-size: 13px; max-height: 26vh; }
+  }
+
+  /* ── 읽기 점검표 (접이식 참고자료) ── */
+  .checklist {
+    border: 1px dashed var(--hair); border-radius: 12px; background: var(--surface-2);
+    padding: 0 14px; margin-bottom: 4px;
+  }
+  .checklist > summary {
+    cursor: pointer; padding: 11px 2px; font-size: 13.5px; font-weight: 700;
+    color: var(--fg-muted); list-style: none;
+  }
+  .checklist > summary::-webkit-details-marker { display: none; }
+  .checklist > summary::before { content: '▸ '; color: var(--primary); }
+  .checklist[open] > summary::before { content: '▾ '; }
+  .checklist[open] > summary { border-bottom: 1px solid var(--hair); margin-bottom: 12px; }
+  .cl-body { padding-bottom: 14px; }
+  .cl-lead { font-size: 12.5px; color: var(--fg-faint); margin-bottom: 12px; }
+  .cl-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .cl-h { display: block; font-size: 12.5px; font-weight: 800; margin-bottom: 6px; }
+  .cl-body ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .cl-body li { font-size: 13px; color: var(--fg-muted); padding-left: 12px; position: relative; }
+  .cl-body li::before { content: '·'; position: absolute; left: 2px; font-weight: 800; color: var(--fg-faint); }
+  .cl-foot {
+    margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--hair);
+    font-size: 12.5px; color: var(--fg-faint);
+  }
+
+  /* ── 정답지 공개 (E까지 다 채우면 나타나는 서랍) ── */
+  .reveal { margin-top: 18px; }
+  .reveal[hidden] { display: none; }
+  .reveal > details {
+    border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent);
+    border-radius: 12px; background: color-mix(in srgb, var(--primary) 7%, var(--surface-2));
+    padding: 0 14px;
+  }
+  .reveal > details > summary {
+    cursor: pointer; padding: 12px 2px; font-size: 14px; font-weight: 800;
+    color: var(--primary); list-style: none;
+  }
+  .reveal > details > summary::-webkit-details-marker { display: none; }
+  .reveal > details > summary::before { content: '▸ '; }
+  .reveal > details[open] > summary::before { content: '▾ '; }
+  .reveal > details[open] > summary { border-bottom: 1px solid var(--hair); margin-bottom: 12px; }
+  .rv-lead { font-size: 12.5px; color: var(--fg-faint); margin-bottom: 10px; line-height: 1.6; }
+  .rv-pre {
+    white-space: pre-wrap; word-break: keep-all; font-size: 13px; line-height: 1.75;
+    color: var(--fg); background: var(--surface); border: 1px solid var(--hair);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .rv-foot { font-size: 12.5px; color: var(--fg-muted); padding-bottom: 14px; line-height: 1.65; }
+  .rv-lock { font-size: 12.5px; color: var(--fg-faint); margin-top: 16px; }
+
+  /* ── 생성된 글 상자 ── */
+  .doc {
+    border: 1px solid var(--hair); border-left: 4px solid var(--c-sky);
+    border-radius: 12px; background: var(--surface-2); padding: 16px 18px;
+    white-space: pre-wrap; font-size: 14.5px; line-height: 1.85; min-height: 60px;
+  }
+  .doc.empty { color: var(--fg-faint); font-style: italic; white-space: normal; }
+  .doc-meta {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    margin-top: 8px; font-size: 12px; color: var(--fg-faint); font-family: 'JetBrains Mono', 'Malgun Gothic', monospace;
+  }
+
+  /* ── 시도 카드 ── */
+  .try {
+    border: 1px solid var(--hair); border-left: 4px solid var(--tone, var(--primary));
+    border-radius: 12px; padding: 14px 16px 18px; margin-top: 14px; background: var(--surface-2);
+  }
+  .try h3 { font-size: 15px; font-weight: 800; color: var(--tone, var(--primary)); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+
+  .counter { font-size: 12.5px; font-family: 'JetBrains Mono', 'Malgun Gothic', monospace; font-weight: 700; }
+  .counter.ok { color: var(--c-green); }
+  .counter.over { color: var(--c-rose); }
+
+  /* ── 채점 결과 ── */
+  .verdict { margin-top: 12px; display: none; }
+  .verdict.show { display: block; }
+  .verdict-top { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .verdict-score {
+    font-family: 'JetBrains Mono', monospace; font-size: 30px; font-weight: 800; line-height: 1;
+  }
+  .verdict-bar { flex: 1 1 160px; height: 9px; border-radius: 999px; background: rgba(255,255,255,0.09); overflow: hidden; }
+  .verdict-bar i { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.6s; }
+  .items { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+  .item {
+    display: flex; gap: 10px; align-items: flex-start;
+    border: 1px solid var(--hair); border-radius: 10px; padding: 9px 12px; background: var(--surface);
+  }
+  .item .sc {
+    flex: none; font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 13px;
+    min-width: 46px; text-align: right;
+  }
+  .item .lb { flex: none; font-weight: 800; font-size: 13px; min-width: 76px; }
+  .item .rs { color: var(--fg-muted); font-size: 12.5px; line-height: 1.55; }
+  .copied-warn {
+    margin-top: 10px; border: 1.5px solid var(--c-rose); background: rgba(251,113,133,0.1);
+    border-radius: 10px; padding: 10px 13px; font-size: 13px; font-weight: 700; color: var(--c-rose);
+  }
+
+  .no-stamp {
+    display: inline-block; margin-top: 12px; padding: 7px 14px; border-radius: 8px;
+    border: 2px solid var(--c-rose); color: var(--c-rose);
+    font-weight: 800; font-size: 12.5px; transform: rotate(-1.5deg);
+  }
+  .rubric {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+    font-size: 12px; font-weight: 800; font-family: 'JetBrains Mono', 'Malgun Gothic', monospace;
+    color: var(--fg-faint);
+  }
+  .rubric b { color: var(--primary); font-weight: 800; }
+
+  /* ── 액션 바 ── */
+  .actionbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(20, 19, 26, 0.94); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--hair); padding: 12px 18px;
+  }
+  .actionbar .inner { max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #draftStatus { font-size: 12px; color: var(--fg-faint); }
+  #draftStatus.pending { color: var(--c-amber); }
+  #draftStatus.saved { color: var(--c-green); }
+  #draftStatus.failed { color: var(--c-rose); font-weight: 700; }
+  .draft-note { font-size: 11px; color: var(--fg-faint); opacity: 0.8; }
+  .btn {
+    border: none; border-radius: 999px; padding: 12px 26px; font: inherit;
+    font-weight: 800; font-size: 15px; cursor: pointer; transition: transform 0.12s, opacity 0.15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #241a02; box-shadow: 0 10px 26px -12px rgba(251, 191, 36, 0.7); }
+  .btn-primary:disabled { opacity: 0.55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+  .btn-sm { padding: 9px 18px; font-size: 13.5px; }
+  .btn-run { background: color-mix(in srgb, var(--c-sky) 22%, var(--surface-2)); color: var(--c-sky); border: 1.5px solid color-mix(in srgb, var(--c-sky) 55%, transparent); }
+  .btn-run:disabled { opacity: 0.5; cursor: wait; }
+  .btn-score { background: color-mix(in srgb, var(--c-lime) 20%, var(--surface-2)); color: var(--c-lime); border: 1.5px solid color-mix(in srgb, var(--c-lime) 55%, transparent); }
+  .btn-score:disabled { opacity: 0.5; cursor: wait; }
+
+  .sid-hint {
+    margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px;
+    font-family: 'JetBrains Mono', 'Malgun Gothic', monospace;
+  }
+  .sid-hint.ok { color: var(--c-green); }
+  .sid-hint.bad { color: var(--c-rose); }
+
+  /* ── 제출 확인 모달 ── */
+  .backdrop {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px);
+    display: grid; place-items: center; padding: 18px; z-index: 70;
+  }
+  .backdrop[hidden] { display: none; }
+  .modal {
+    width: min(460px, 100%); max-height: 88vh; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 20px;
+    padding: 24px 24px 20px; box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.9);
+  }
+  .modal h3 { font-size: 19px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .modal .btn { padding: 10px 18px; font-size: 14px; }
+  #lkResult { margin-top: 16px; }
+  #lkResult[hidden] { display: none; }
+  .lk-ok {
+    border: 1.5px solid var(--c-green); background: rgba(52, 211, 153, 0.09);
+    border-radius: 14px; padding: 14px 16px;
+  }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-green); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--fg); margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { color: var(--fg); overflow-wrap: anywhere; }
+  .lk-bad {
+    border: 1.5px solid var(--c-rose); background: rgba(251, 113, 133, 0.1);
+    border-radius: 14px; padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--c-rose);
+  }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; }
+
+  #submitBanner {
+    display: none; align-items: center; gap: 10px; margin-bottom: 18px;
+    border: 1.5px solid var(--c-green); background: rgba(52, 211, 153, 0.09);
+    border-radius: 14px; padding: 11px 16px; font-size: 13.5px; font-weight: 700; color: var(--fg);
+  }
+  #submitBanner.show { display: flex; }
+  #submitBanner .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-green); }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(16px);
+    background: #f5f3ee; color: #14131a; padding: 12px 22px; border-radius: 12px;
+    font-size: 14px; font-weight: 700; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s; z-index: 60; max-width: 90vw; text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #34d399; color: #06281c; }
+  #toast.error { background: #fb7185; color: #3b0713; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    section.card { padding: 18px 16px 20px; }
+    .actionbar .inner { flex-wrap: wrap; gap: 8px; }
+    .draft-wrap { flex: 1 0 100%; order: -1; }
+    .draft-note { display: none; }
+    .actionbar .btn { flex: 1 1 auto; padding: 11px 10px; font-size: 13.5px; }
+    .wide-only { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <header class="hero">
+    <button class="gear" id="btnGear" type="button" aria-label="설정">⚙</button>
+    <div class="kicker">인공지능 기초 · 2026-2 · LLM은 어떻게 다음 말을 고를까</div>
+    <h1>글의 <span class="grad">설계도</span> 되찾기</h1>
+    <p class="sub">인공지능이 쓴 글에는 우리가 시키지 않은 규칙이 숨어 있다.
+      오늘은 그 규칙을 <strong>인공지능의 도움 없이 읽어 내고</strong>, 찾아낸 규칙만으로
+      같은 글을 다시 만들어 낼 프롬프트를 복원한다.</p>
+    <div class="idrow">
+      <div class="field">
+        <label class="q" for="studentId">학번 <span class="req">*</span></label>
+        <input type="text" id="studentId" placeholder="예: 20317" inputmode="numeric"
+               maxlength="5" autocomplete="off">
+        <div id="sidPreview" class="sid-hint"></div>
+      </div>
+      <div class="field">
+        <label class="q" for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="이름">
+      </div>
+      <div class="field">
+        <label class="q" for="today">날짜 <span class="req">*</span></label>
+        <input type="date" id="today">
+      </div>
+      <div class="field">
+        <label class="q" for="password">제출 암호 <span class="req">*</span></label>
+        <input type="password" id="password" placeholder="4자 이상" autocomplete="off">
+      </div>
+    </div>
+    <p class="sub" style="margin-top:10px; font-size:12.5px;">
+      🎫 <strong>학번</strong>은 <strong>학년 1자리, 반 2자리, 번호 2자리</strong>를 이어 붙인 다섯 자리 숫자로 적는다.
+      2학년 3반 17번이면 <strong>20317</strong>이 된다.<br>
+      🔑 <strong>제출 암호</strong>는 제출한 뒤에 <strong>내 제출 내용을 다시 확인하거나 양식으로 불러올 때</strong> 사용한다.
+      <span style="color:var(--c-rose); font-weight:700;">평소에 쓰는 비밀번호는 여기에 적지 않는다.</span>
+    </p>
+  </header>
+
+  <!-- 제출 상태 배너 -->
+  <div id="submitBanner"><span class="dot"></span><span id="submitBannerText"></span></div>
+
+  <!-- 받은 글 고정 패널 — A 구역이 화면 밖으로 나가면 상단에 붙는다 -->
+  <div class="stick" id="stickSource" hidden>
+    <div class="stick-inner">
+      <div class="stick-head">
+        <span class="stick-title">📄 받은 글</span>
+        <span class="stick-meta" id="stickMeta"></span>
+        <button class="stick-toggle" id="stickToggle" type="button">접기</button>
+      </div>
+      <div class="stick-body" id="stickBody"></div>
+    </div>
+  </div>
+
+  <!-- 설정 패널 (교사 전용) -->
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정: Apps Script 배포 URL</strong>
+    <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost btn-sm" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus" style="margin-left:8px;"></span>
+    <div style="margin-top:12px;"><strong>Solar 함수 URL</strong></div>
+    <input type="url" id="solarUrl" placeholder="https://<프로젝트>.supabase.co/functions/v1/solar">
+    <button class="btn btn-ghost btn-sm" id="btnSaveSolar" type="button">함수 URL 저장</button>
+    <span id="solarStatus" style="margin-left:8px;"></span>
+  </div>
+
+  <!-- A. 주제 고르고 글 만들기 -->
+  <section class="card" id="secA" style="--sec: var(--c-sky);">
+    <div class="sec-head"><span class="sec-badge">A</span><h2>주제를 고르고 글을 받는다</h2></div>
+    <p class="sec-desc">주제 하나를 고르고 [글 만들기]를 누르면 Solar Pro 3가 글을 한 편 써 준다.
+      <strong>주제만 정했을 뿐인데</strong> 문단 수와 말투와 마무리 방식이 이미 정해져 나온다.
+      그것을 정한 것은 내가 아니라 인공지능이다. 오늘 되찾을 것이 바로 그 부분이다.</p>
+
+    <label class="q">오늘의 주제 <span class="req">*</span>
+      <span class="hint">고른 뒤에는 바꾸지 않는다. 바꾸면 아래에 적은 분석이 모두 어긋난다</span></label>
+    <div class="topic-grid" id="topicGrid"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-run btn-sm" id="btnGenerate" type="button">글 만들기</button>
+      <span id="genStatus" style="font-size:12.5px; color:var(--fg-faint);"></span>
+    </div>
+
+    <label class="q" for="aSource">받은 글 <span class="req">*</span>
+      <span class="hint">이 글이 오늘의 분석 대상이다. 손으로 고치지 않는다</span></label>
+    <div class="doc empty" id="aSourceView">아직 글을 받지 않았다. 주제를 고르고 [글 만들기]를 누른다.</div>
+    <textarea id="aSource" hidden></textarea>
+    <div class="doc-meta">
+      <span id="srcMeta">문단 0 · 문장 0 · 글자 0</span>
+    </div>
+    <span class="no-stamp">지금부터 B 구역이 끝날 때까지는 인공지능에게 묻지 않는다. 물어서 얻은 답은 내 문해력이 아니다.</span>
+  </section>
+
+  <!-- B. 읽고 재기 -->
+  <section class="card" style="--sec: var(--c-rose);">
+    <div class="sec-head"><span class="sec-badge">B</span><h2>읽고, 재기</h2></div>
+    <p class="sec-desc">질문은 넷뿐이다. 대신 <strong>세어 보고 확인한 것만</strong> 적는다.
+      2번과 3번에 적은 답이 그대로 C 구역 프롬프트의 재료가 되므로, 짐작으로 적으면 C에서 그대로 틀린다.</p>
+
+    <details class="checklist">
+      <summary>📋 읽기 점검표 — 무엇을 살펴야 할지 막힐 때 펼쳐 본다</summary>
+      <div class="cl-body">
+        <p class="cl-lead">아래는 아홉 갈래로 나눈 자세한 질문이다. 답을 아홉 칸에 나누어 적을 필요는 없다.
+          살펴본 결과를 위의 네 칸에 모아 적으면 된다.</p>
+        <div class="cl-cols">
+          <div>
+            <span class="cl-h" style="color:var(--c-rose);">내용을 읽는 눈 → 1번 칸으로</span>
+            <ul>
+              <li>이 글이 말하려는 것은 무엇인가</li>
+              <li>무엇으로 그 말을 받치는가</li>
+              <li>누구에게 쓴 글인가, 그렇게 판단한 근거는 글의 어디에 있는가</li>
+              <li>빠짐없이 들어간 재료는 무엇인가</li>
+              <li>여기 나온 숫자를 믿어도 되는가</li>
+            </ul>
+          </div>
+          <div>
+            <span class="cl-h" style="color:var(--c-amber);">생김새를 보는 눈 → 2·3번 칸으로</span>
+            <ul>
+              <li>문단은 몇 개인가</li>
+              <li>각 문단은 무슨 일을 맡고 있는가</li>
+              <li>문장의 끝은 어떤 말로 끝나는가</li>
+              <li>한 문장과 글 전체는 얼마나 긴가</li>
+              <li>마지막 문장은 어떤 모양인가</li>
+              <li>제목이나 목록 기호가 있는가</li>
+            </ul>
+          </div>
+        </div>
+        <p class="cl-foot">인공지능은 사실을 확인하지 않고 그럴듯한 말을 고른다.
+          숫자를 볼 때 그것을 떠올린다.</p>
+      </div>
+    </details>
+
+    <label class="q" for="bMeaning">1. 무엇을 말하는 글이고, 무엇이 반드시 들어 있는가 <span class="req">*</span>
+      <span class="hint">주장을 내 말로 한 문장, 그것을 받치는 근거, 그리고 이 글에 빠짐없이 들어간 재료를 함께 적는다.
+      나온 숫자를 믿어도 되는지도 한 줄 덧붙인다</span></label>
+    <textarea id="bMeaning" class="tall"></textarea>
+
+    <label class="q" for="bParas">2. 문단은 몇 개이고, 각 문단은 무슨 일을 하는가 <span class="req">*</span></label>
+    <textarea id="bParas" placeholder="예) 문단 ○개. 첫째 문단은 …, 둘째 문단은 …, 셋째 문단은 …"></textarea>
+
+    <label class="q" for="bShape">3. 문장과 글의 마지막은 어떤 모양인가 <span class="req">*</span>
+      <span class="hint">문장이 어떤 말로 끝나는지, 한 문장과 글 전체가 얼마나 긴지, 마지막 문장은 어떤 모양인지.
+      가장 긴 문장을 하나 세어 보면 기준이 잡힌다</span></label>
+    <textarea id="bShape" class="tall"></textarea>
+
+    <div class="try" style="--tone: var(--c-violet); margin-top: 20px;">
+      <h3>4. 내가 만든 질문</h3>
+      <p class="sec-desc" style="margin: 6px 0 0;">앞의 셋은 내가 정한 질문이 아니다.
+        이 글을 더 알아내려면 <strong>무엇을 더 물어야 할까.</strong>
+        질문을 하나 만들고, 그 답도 스스로 찾아 적는다.
+        오늘 활동에서 가장 어려운 칸이고, 가장 중요한 칸이다.</p>
+
+      <label class="q" for="bMyQ">내가 만든 질문 <span class="req">*</span></label>
+      <input type="text" id="bMyQ" placeholder="예) 문단마다 문장 수가 같을까?">
+      <label class="q" for="bMyA">그 질문에 대한 답 <span class="req">*</span></label>
+      <textarea id="bMyA"></textarea>
+    </div>
+  </section>
+
+  <!-- D. 1차 복원 -->
+  <section class="card" style="--sec: var(--c-lime);">
+    <div class="sec-head"><span class="sec-badge">C</span><h2>1차 복원: 찾아낸 규칙을 프롬프트로</h2></div>
+    <p class="sec-desc">B의 2번과 3번에 적은 답을 옆에 두고, 그 규칙들을 지시문으로 옮긴다.
+      이 프롬프트만 받은 인공지능이 A의 글과 닮은 글을 써 낼 수 있어야 한다.</p>
+
+    <div class="try" style="--tone: var(--c-lime);">
+      <h3>1차</h3>
+      <label class="q" for="c1Prompt">복원한 프롬프트 <span class="req">*</span></label>
+      <textarea id="c1Prompt" class="tall" placeholder="예) 청소년의 소셜미디어 사용을 주제로 설명문을 써 줘. 문단은 …"></textarea>
+      <div class="doc-meta">
+        <span class="counter" id="c1Count">0어절</span>
+        <span>원문을 그대로 옮겨 적으면 복원이 아니다. 괄호 안은 권장 길이이며, 넘어도 진행은 된다.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-run btn-sm" id="btnRun1" type="button">이 프롬프트로 글 만들기</button>
+        <button class="btn btn-score btn-sm" id="btnScore1" type="button">원문과 견주어 채점</button>
+        <span id="run1Status" style="font-size:12.5px; color:var(--fg-faint);"></span>
+      </div>
+
+      <label class="q">1차 결과물</label>
+      <div class="doc empty" id="c1TextView">아직 만들지 않았다.</div>
+      <textarea id="c1Text" hidden></textarea>
+
+      <div class="verdict" id="c1Verdict">
+        <div class="verdict-top">
+          <span class="verdict-score" id="c1ScoreView">0<span style="font-size:16px;">점</span></span>
+          <span class="verdict-bar"><i id="c1Bar" style="width:0%"></i></span>
+        </div>
+        <div class="items" id="c1Items"></div>
+      </div>
+      <input type="text" id="c1Score" hidden>
+      <textarea id="c1Note" hidden></textarea>
+    </div>
+  </section>
+
+  <!-- E. 2차 복원 -->
+  <section class="card" style="--sec: var(--c-green);">
+    <div class="sec-head"><span class="sec-badge">D</span><h2>2차 복원: 채점 근거를 읽고 고친다</h2></div>
+    <p class="sec-desc">점수를 올리는 것이 목적이 아니라, <strong>왜 깎였는지 읽고 그 자리를 고치는 것</strong>이 목적이다.
+      무엇을 고쳤는지 적지 않으면 이 구역은 채점되지 않는다.</p>
+
+    <div class="try" style="--tone: var(--c-green);">
+      <h3>2차</h3>
+      <label class="q" for="d2Fix">1차 채점에서 무엇이 깎였고, 무엇을 고칠 것인가 <span class="req">*</span></label>
+      <textarea id="d2Fix" placeholder="예) 문단 구성 12점. 셋째 문단에 반대 의견이 없다고 했으니 그 조건을 프롬프트에 넣는다."></textarea>
+
+      <label class="q" for="d2Prompt">고쳐 쓴 프롬프트 <span class="req">*</span></label>
+      <textarea id="d2Prompt" class="tall"></textarea>
+      <div class="doc-meta">
+        <span class="counter" id="d2Count">0어절</span>
+        <span>권장 길이는 1차와 같다.</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-run btn-sm" id="btnRun2" type="button">이 프롬프트로 글 만들기</button>
+        <button class="btn btn-score btn-sm" id="btnScore2" type="button">원문과 견주어 채점</button>
+        <span id="run2Status" style="font-size:12.5px; color:var(--fg-faint);"></span>
+      </div>
+
+      <label class="q">2차 결과물</label>
+      <div class="doc empty" id="d2TextView">아직 만들지 않았다.</div>
+      <textarea id="d2Text" hidden></textarea>
+
+      <div class="verdict" id="d2Verdict">
+        <div class="verdict-top">
+          <span class="verdict-score" id="d2ScoreView">0<span style="font-size:16px;">점</span></span>
+          <span class="verdict-bar"><i id="d2Bar" style="width:0%"></i></span>
+        </div>
+        <div class="items" id="d2Items"></div>
+      </div>
+      <input type="text" id="d2Score" hidden>
+      <textarea id="d2Note" hidden></textarea>
+    </div>
+  </section>
+
+  <!-- F. 한 문장 정리 -->
+  <section class="card" style="--sec: var(--c-violet);">
+    <div class="sec-head"><span class="sec-badge">E</span><h2>한 문장 정리: 인공지능을 끄고 쓴다</h2></div>
+    <p class="sec-desc">마지막 5분 동안에는 도구를 모두 닫고, 오늘 알아낸 것을 자기 말로 정리한다.</p>
+
+    <label class="q" for="eSummary">오늘 내가 놓치고 있던 것은 무엇이었나 <span class="req">*</span>
+      <span class="hint">두 번의 채점 근거를 근거로 삼아 쓴다. 점수가 아니라 내가 못 본 것을 쓴다</span></label>
+    <textarea id="eSummary" class="tall" placeholder="예) 나는 글의 내용만 보고 있었고, 문장이 어디에서 끝나는지는 한 번도 세어 보지 않았다."></textarea>
+
+    <div class="rubric">
+      <span>채점 기준:</span>
+      <b>B의 분석</b><span>→</span>
+      <b>내가 만든 질문</b><span>→</span>
+      <b>1차 프롬프트</b><span>→</span>
+      <b>고친 근거와 2차</b>
+      <span>· 점수 자체는 채점 대상이 아니다</span>
+    </div>
+
+    <!-- E까지 다 채우면 열리는 서랍. 채우기 전에는 잠금 안내만 보인다. -->
+    <p class="rv-lock" id="revealLock">🔒 A부터 E까지 모두 채우면, 이 글을 만든 프롬프트를 여기서 확인할 수 있다.</p>
+    <div class="reveal" id="revealBox" hidden>
+      <details>
+        <summary>🔓 A 단계에서 이 글을 만든 프롬프트 보기</summary>
+        <div>
+          <p class="rv-lead">B 구역에서 찾아낸 규칙과 견주어 본다. 몇 개를 찾아냈고, 무엇을 놓쳤는가.
+            찾지 못한 규칙이 있다면 그것은 글의 어디에 드러나 있었는가.</p>
+          <pre class="rv-pre" id="revealPrompt"></pre>
+          <p class="rv-foot">이 지시문이 인공지능에게 주어진 전부다. 주제 한 줄은 여러분이 골랐고 나머지 형식은 모두 여기서 정해졌다.
+            C·D에서 쓴 프롬프트가 이것과 얼마나 가까웠는지 견주어 보자.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+</div>
+
+<!-- 액션 바 -->
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <a class="btn btn-ghost" href="/data/2026-2/인공지능기초/제출현황.html"
+       style="text-decoration:none; display:inline-block;">제출 현황</a>
+    <button class="btn btn-ghost" id="btnLookup" type="button">제출 확인</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-primary" id="btnSave" type="button">제출하기<span class="wide-only"> (TXT + 시트 저장)</span></button>
+  </div>
+</div>
+
+<!-- 제출 확인 모달 -->
+<div class="backdrop" id="lookupBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
+    <h3 id="lookupTitle">제출 확인 · 지난 제출 불러오기</h3>
+    <p class="m-desc">제출할 때 입력한 <strong>학번 · 이름 · 암호</strong>를 그대로 넣으면
+      가장 마지막으로 제출한 내용을 확인할 수 있어요.</p>
+    <label class="q" for="lkSid">학번</label>
+    <input type="text" id="lkSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label class="q" for="lkName">이름</label>
+    <input type="text" id="lkName" placeholder="이름">
+    <label class="q" for="lkPw">제출 암호</label>
+    <input type="password" id="lkPw" placeholder="제출할 때 정한 암호" autocomplete="off">
+    <div id="lkResult" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="lkClose" type="button">닫기</button>
+      <button class="btn btn-ghost" id="lkFill" type="button" hidden>양식에 불러오기</button>
+      <button class="btn btn-primary" id="lkGo" type="button">확인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SOURCE = 'design_recover';
+  var DRAFT_KEY = 'draft_design_recover';
+  var SUBMIT_KEY = 'submitted_design_recover';
+  var HANDOFF_KEY = 'handoff_design_recover';
+  var URL_KEY = 'gas_url_ai_basics_2026_2';
+  var SOLAR_KEY = 'solar_fn_url';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec'; // 인공지능 기초(2026-2) 과목 공용 배포 URL
+
+  /* Solar Pro 3 대리 호출 — Edge Function이 키와 시스템 프롬프트를 들고 있다.
+     anon 키는 라이브 레이어(live/runtime/config.js)와 같은 값이며 공개되어도
+     되는 키다. 실제 상한은 서버의 solar_bump_usage가 센다. */
+  var SOLAR_URL = 'https://your-project-ref.supabase.co/functions/v1/solar';
+  var SUPA_ANON = 'YOUR_SUPABASE_ANON_KEY';
+
+  /* 프롬프트 길이 권장 상한 — 원문 어절 수 대비 비율.
+     원문이 이미지가 아니라 글이므로 통째로 붙여 넣는 우회가 가능하다.
+     다만 진짜 방어선은 서버의 detectCopy(어절 6개 연속 일치)이고, 이 숫자는
+     "규칙을 말로 옮겨 적어라"는 눈금일 뿐이다.
+     2026-08-21 실사용 검증에서 0.4로 두었더니 원문 75어절에 상한 30어절이
+     걸려, 규칙 다섯 가지를 문장으로 적은 50어절짜리 프롬프트가 막혔다.
+     제대로 찾은 학생이 막히는 것은 활동을 망치므로 0.8로 올리고, 넘더라도
+     막지 않고 경고만 띄운다. */
+  var PROMPT_RATIO = 0.8;
+
+  /* 주제는 모두 찬반이 갈리는 물음 형태로 둔다.
+     「종이책과 전자책」처럼 둘을 나란히 놓는 제목을 주었더니 글이 "둘 다
+     장점이 있다"로 끝나 버려서, 활동지 B1의 "무엇을 말하는 글인가"에
+     학생이 답할 것이 없었다(2026-08-21 여섯 주제 실측). */
+  var TOPICS = [
+    '청소년의 소셜미디어 사용 시간을 제한해야 하는가',
+    '인공지능이 사람의 일자리를 대신해도 되는가',
+    '급식 잔반을 줄이려면 메뉴 가짓수를 줄여야 하는가',
+    '공공장소의 얼굴 인식 카메라를 늘려야 하는가',
+    '전자책이 종이책을 대신해야 하는가',
+    '자율주행차 사고의 책임은 제조사에 있는가'
+  ];
+
+  /* 텍스트 입력 필드 목록 — 임시저장·불러오기·초기화가 공유한다 */
+  var TEXT_FIELDS = [
+    'studentName', 'studentId', 'today', 'aSource',
+    'bMeaning', 'bParas', 'bShape', 'bMyQ', 'bMyA',
+    'c1Prompt', 'c1Text', 'c1Score', 'c1Note',
+    'd2Fix', 'd2Prompt', 'd2Text', 'd2Score', 'd2Note',
+    'eSummary'
+  ];
+
+  function el(id) { return document.getElementById(id); }
+  function v(id) { var e = el(id); return e ? e.value.trim() : ''; }
+
+  /* ── 학번(GCCNN) — 학년1 + 반2 + 번호2 ── */
+  var SID_RE = /^\d{5}$/;
+
+  function parseSid(sid) {
+    if (!SID_RE.test(sid)) return null;
+    return {
+      grade: parseInt(sid.slice(0, 1), 10),
+      cls: parseInt(sid.slice(1, 3), 10),
+      no: parseInt(sid.slice(3, 5), 10)
+    };
+  }
+  function sidLabel(sid) {
+    var s = parseSid(sid);
+    return s ? s.grade + '학년 ' + s.cls + '반 ' + s.no + '번' : sid;
+  }
+  function renderSidPreview() {
+    var e = el('sidPreview');
+    if (!e) return;
+    var sid = v('studentId');
+    if (!sid) { e.textContent = ''; e.className = 'sid-hint'; return; }
+    var s = parseSid(sid);
+    if (!s) {
+      e.textContent = '↳ 숫자 다섯 자리로 입력해 주세요 (예: 20317)';
+      e.className = 'sid-hint bad';
+      return;
+    }
+    var sane = s.grade >= 1 && s.grade <= 3 && s.cls >= 1 && s.no >= 1;
+    e.textContent = '↳ ' + sidLabel(sid) + (sane ? '' : ' (이 학번이 맞나요?)');
+    e.className = 'sid-hint ' + (sane ? 'ok' : 'bad');
+  }
+
+  /* ── 오늘 날짜 기본값 ── */
+  var todayEl = el('today');
+  if (!todayEl.value) {
+    var d = new Date();
+    todayEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  /* ── 주제 목록 그리기 ── */
+  (function renderTopics() {
+    var grid = el('topicGrid');
+    TOPICS.forEach(function (t, i) {
+      var label = document.createElement('label');
+      label.className = 'topic-item';
+      var input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'aTopic';
+      input.value = t;
+      var span = document.createElement('span');
+      span.className = 't';
+      span.textContent = t;
+      label.appendChild(input);
+      label.appendChild(span);
+      grid.appendChild(label);
+    });
+  })();
+
+  function pickRadio(name) {
+    var e = document.querySelector('input[name="' + name + '"]:checked');
+    return e ? e.value : '';
+  }
+  function setRadio(name, val) {
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function (r) { r.checked = false; });
+    if (!val) return;
+    var e = document.querySelector('input[name="' + name + '"][value="' + CSS.escape(val) + '"]');
+    if (e) e.checked = true;
+  }
+
+  /* ── 글 통계 ── */
+  function countWords(s) {
+    return s.trim() ? s.trim().split(/\s+/).length : 0;
+  }
+  function docStats(s) {
+    var t = s.trim();
+    if (!t) return { paras: 0, sents: 0, chars: 0, words: 0 };
+    return {
+      paras: t.split(/\n\s*\n/).filter(function (p) { return p.trim(); }).length,
+      sents: (t.match(/[.!?]+/g) || []).length,
+      chars: t.replace(/\s/g, '').length,
+      words: countWords(t)
+    };
+  }
+  function renderSrcMeta() {
+    var s = docStats(v('aSource'));
+    el('srcMeta').textContent =
+      '문단 ' + s.paras + ' · 문장 ' + s.sents + ' · 공백 뺀 글자 ' + s.chars + ' · 어절 ' + s.words;
+    renderCounter('c1Prompt', 'c1Count');
+    renderCounter('d2Prompt', 'd2Count');
+  }
+
+  function promptLimit() {
+    var w = countWords(v('aSource'));
+    return w ? Math.max(12, Math.round(w * PROMPT_RATIO)) : 0;
+  }
+  function renderCounter(fieldId, outId) {
+    var out = el(outId);
+    if (!out) return;
+    var n = countWords(v(fieldId));
+    var lim = promptLimit();
+    if (!lim) { out.textContent = n + '어절'; out.className = 'counter'; return; }
+    out.textContent = n + ' / ' + lim + '어절';
+    out.className = 'counter ' + (n > lim ? 'over' : 'ok');
+  }
+
+  /* ── 받은 글 표시 ── */
+  function renderSource() {
+    var t = v('aSource');
+    var view = el('aSourceView');
+    if (t) {
+      view.textContent = t;
+      view.classList.remove('empty');
+    } else {
+      view.textContent = '아직 글을 받지 않았다. 주제를 고르고 [글 만들기]를 누른다.';
+      view.classList.add('empty');
+    }
+    renderSrcMeta();
+    syncSticky();
+  }
+
+  /* ── 받은 글 고정 패널 ──
+     B부터 D까지는 원문을 보면서 채워야 한다. A 구역의 원문이 화면 밖으로
+     나가는 순간부터 같은 글을 상단에 붙여 둔다. 접은 상태는 기억해 둔다. */
+  var STICK_KEY = 'stick_collapsed_design_recover';
+  var stickEl = el('stickSource');
+  var stickBody = el('stickBody');
+  var stickMeta = el('stickMeta');
+  var stickToggle = el('stickToggle');
+  var srcOutOfView = false;
+
+  function measureStick() {
+    var h = (!stickEl.hidden) ? stickEl.getBoundingClientRect().height : 0;
+    document.documentElement.style.setProperty('--stick-h', Math.round(h) + 'px');
+  }
+
+  function syncSticky() {
+    var t = v('aSource');
+    if (!t) {
+      stickEl.hidden = true;
+      measureStick();
+      return;
+    }
+    stickBody.textContent = t;
+    var s = docStats(t);
+    stickMeta.textContent = '문단 ' + s.paras + ' · 문장 ' + s.sents + ' · 글자 ' + s.chars;
+    stickEl.hidden = !srcOutOfView;
+    measureStick();
+  }
+
+  (function initSticky() {
+    var collapsed = false;
+    try { collapsed = localStorage.getItem(STICK_KEY) === '1'; } catch (e) { /* 무시 */ }
+    if (collapsed) { stickEl.classList.add('collapsed'); stickToggle.textContent = '펼치기'; }
+
+    stickToggle.addEventListener('click', function () {
+      var nowCollapsed = stickEl.classList.toggle('collapsed');
+      stickToggle.textContent = nowCollapsed ? '펼치기' : '접기';
+      try { localStorage.setItem(STICK_KEY, nowCollapsed ? '1' : '0'); } catch (e) { /* 무시 */ }
+      measureStick();
+    });
+
+    // A 구역 전체가 화면에서 사라지면 패널을 띄운다. 원문 상자만 관찰하면
+    // 페이지 맨 위에서도 상자가 화면 아래에 있다는 이유로 패널이 떠서,
+    // 정작 원문이 바로 밑에 있는데 같은 글이 두 번 보인다(2026-08-22 실측).
+    // IntersectionObserver가 없는 구형 브라우저에서는 패널을 쓰지 않는다.
+    if (!('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function (entries) {
+      srcOutOfView = !entries[0].isIntersecting;
+      syncSticky();
+    }, { threshold: 0 }).observe(el('secA'));
+
+    window.addEventListener('resize', measureStick);
+  })();
+  function renderRunText(field, viewId) {
+    var t = v(field);
+    var view = el(viewId);
+    if (t) { view.textContent = t; view.classList.remove('empty'); }
+    else { view.textContent = '아직 만들지 않았다.'; view.classList.add('empty'); }
+  }
+
+  /* ── A 단계 생성 프롬프트 (E까지 채우면 공개) ────────────────────────
+     ⚠ 이것은 Edge Function 'solar'의 SYSTEM_PROMPT **사본**이다.
+        원본: supabase/functions/solar/index.ts
+        한쪽만 고치면 학생이 '내 글을 만든 프롬프트'가 아닌 것을 보게 된다.
+        프롬프트를 바꿀 때는 반드시 두 곳을 함께 고칠 것.
+     사용자 결정(2026-08-26): HTML에 미리 심어 둔다 — 소스 보기로 미리 읽힐 수
+     있다는 점은 감수한다. */
+  var REVEAL_PROMPT = "너는 고등학생용 짧은 논설문을 쓰는 필자다.\n사용자가 주제를 주면 아래 규칙을 모두 지켜 글을 쓴다.\n\n[출력]\n- 완성된 글만 내놓는다. 제목을 붙이지 않고, 받은 주제를 다시 적지 않는다.\n- 이 지시문에 쓰인 낱말을 글 안에 옮겨 적지 않는다. '첫째 문단', '반대 의견', '근거' 같은 말이 글에 나타나면 안 된다.\n- 번호, 목록 기호, 굵은 글씨, 소제목을 쓰지 않는다.\n\n[구성]\n- 문단은 정확히 세 개다. 문단 사이에만 빈 줄을 두고, 한 문단 안에서는 줄을 바꾸지 않는다.\n- 문단마다 문장을 정확히 세 개씩 쓴다. 네 문장을 쓰지 않는다.\n- 1문단은 현상을 두 문장으로 소개한 뒤, 세 번째 문장에서 이 글이 지지하는 입장을 못박는다.\n- 2문단은 그 입장을 받치는 까닭을 대고, 구체적인 숫자를 하나 넣는다.\n- 3문단은 반대편 주장을 한 문장으로 소개하고, 한 문장으로 되받아친 뒤, 세 번째 문장을 물음표로 끝나는 질문으로 쓴다. 이 질문이 글 전체의 마지막 문장이다. 그 뒤에는 문장도 문단도 덧붙이지 않는다.\n- 글 전체가 하나의 입장을 지지한다. 양쪽 다 옳다는 식으로 얼버무리지 않는다.\n\n[문장]\n- 모든 문장은 '-다'로 끝나는 한다체다. '-습니다'와 '-요'를 쓰지 않는다.\n- 문단마다 두 문장은 30자 안팎으로 짧게 쓰고, 나머지 한 문장은 두 절을 이어 붙여 45자를 넘기도록 길게 쓴다. 짧은 문장과 긴 문장이 한 문단 안에 반드시 섞여야 한다.\n- 문단마다 '그러나', '따라서', '게다가', '왜냐하면' 같은 이음말을 적어도 하나 쓴다.\n- 물음표는 글 전체에서 마지막 문장 하나에만 쓴다. 다른 문장에 물음표를 붙이지 않는다.";
+
+  /* 필수 칸이 모두 찼는지만 조용히 확인한다 (validate()와 달리 토스트를 띄우지 않는다) */
+  function allRequiredFilled() {
+    for (var i = 0; i < REQUIRED.length; i++) {
+      var f = REQUIRED[i];
+      var filled = f.id ? !!v(f.id) : !!pickRadio(f.radio);
+      if (!filled) return false;
+    }
+    return true;
+  }
+
+  function refreshReveal() {
+    var box = el('revealBox');
+    var lock = el('revealLock');
+    if (!box) return;
+    var open = allRequiredFilled();
+    box.hidden = !open;
+    if (lock) lock.hidden = open;
+    if (open && !box.dataset.filled) {
+      el('revealPrompt').textContent = REVEAL_PROMPT;
+      box.dataset.filled = '1';
+    }
+  }
+
+  /* ── 임시저장 (localStorage) ── */
+  var draftTimer = null;
+  var statusEl = el('draftStatus');
+
+  function getFormData() {
+    return {
+      source: SOURCE,
+      studentName: v('studentName'),
+      studentId: v('studentId'),
+      today: v('today'),
+      password: v('password'),
+      aTopic: pickRadio('aTopic'),
+      aSource: v('aSource'),
+      bMeaning: v('bMeaning'),
+      bParas: v('bParas'),
+      bShape: v('bShape'),
+      bMyQ: v('bMyQ'),
+      bMyA: v('bMyA'),
+      c1Prompt: v('c1Prompt'),
+      c1Text: v('c1Text'),
+      c1Score: v('c1Score'),
+      c1Note: v('c1Note'),
+      d2Fix: v('d2Fix'),
+      d2Prompt: v('d2Prompt'),
+      d2Text: v('d2Text'),
+      d2Score: v('d2Score'),
+      d2Note: v('d2Note'),
+      eSummary: v('eSummary')
+    };
+  }
+
+  function saveDraft() {
+    try {
+      var d = getFormData();
+      delete d.password; // 암호는 브라우저에 남기지 않는다
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+      statusEl.textContent = '임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      statusEl.className = 'saved';
+    } catch (e) {
+      // 저장 공간 부족 등 — 저장되지 않았다는 사실을 숨기지 않는다
+      statusEl.textContent = '임시저장 실패 — 이 기기에 저장 공간이 부족해요';
+      statusEl.className = 'failed';
+    }
+  }
+
+  /* 입력이 시작되면 곧바로 '저장 대기 중'으로 바꾼다. 그러지 않으면 방금 친
+     내용이 아직 저장되지 않았는데도 앞서 뜬 '임시저장됨'이 그대로 남아,
+     학생이 저장된 줄 알고 창을 닫아 버린다. */
+  function scheduleDraft() {
+    statusEl.textContent = '입력 중… 잠시 멈추면 임시저장됩니다';
+    statusEl.className = 'pending';
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function restoreDraft() {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    try {
+      var d = JSON.parse(raw);
+      TEXT_FIELDS.forEach(function (id) {
+        if (d[id]) el(id).value = d[id];
+      });
+      if (d.aTopic) setRadio('aTopic', d.aTopic);
+      statusEl.textContent = '임시저장 불러옴';
+      statusEl.className = 'saved';
+    } catch (e) { /* 손상된 draft — 무시 */ }
+  }
+
+  document.querySelectorAll('input, textarea, select').forEach(function (e) {
+    e.addEventListener('input', scheduleDraft);
+    e.addEventListener('change', scheduleDraft);
+    e.addEventListener('input', refreshReveal);
+    e.addEventListener('change', refreshReveal);
+  });
+
+  el('c1Prompt').addEventListener('input', function () { renderCounter('c1Prompt', 'c1Count'); });
+  el('d2Prompt').addEventListener('input', function () { renderCounter('d2Prompt', 'd2Count'); });
+
+  ['studentId', 'lkSid'].forEach(function (id) {
+    var e = el(id);
+    if (!e) return;
+    e.addEventListener('input', function () {
+      var cleaned = e.value.replace(/\D/g, '').slice(0, 5);
+      if (cleaned !== e.value) e.value = cleaned;
+      if (id === 'studentId') renderSidPreview();
+    });
+  });
+
+  /* ── 토스트 ── */
+  var toastEl = el('toast');
+  var toastTimer = null;
+  function showToast(msg, type, ms) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, ms || 2600);
+  }
+
+  /* ── 학생 기기 식별자 — 라이브 레이어와 같은 키를 쓴다 ── */
+  function getClientId() {
+    var id = localStorage.getItem('lp.clientId');
+    if (!id) {
+      id = (crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : String(Date.now()) + '-' + Math.random().toString(16).slice(2);
+      localStorage.setItem('lp.clientId', id);
+    }
+    return id;
+  }
+
+  function solarUrl() {
+    return localStorage.getItem(SOLAR_KEY) || SOLAR_URL;
+  }
+
+  function callSolar(payload) {
+    payload.clientId = getClientId();
+    return fetch(solarUrl(), {
+      method: 'POST',
+      headers: {
+        apikey: SUPA_ANON,
+        Authorization: 'Bearer ' + SUPA_ANON,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      return r.text().then(function (t) {
+        var data = null;
+        try { data = t ? JSON.parse(t) : null; } catch (e) { data = null; }
+        if (!r.ok) throw new Error((data && data.error) || ('서버 오류 (HTTP ' + r.status + ')'));
+        if (!data) throw new Error('응답을 해석하지 못했어요.');
+        return data;
+      });
+    });
+  }
+
+  function busy(btn, statusId, msg) {
+    btn.disabled = true;
+    if (statusId) el(statusId).textContent = msg;
+  }
+  function unbusy(btn, statusId, msg) {
+    btn.disabled = false;
+    if (statusId) el(statusId).textContent = msg || '';
+  }
+
+  /* ── A. 글 만들기 ── */
+  el('btnGenerate').addEventListener('click', function () {
+    var topic = pickRadio('aTopic');
+    if (!topic) { showToast('먼저 주제를 하나 고르세요.', 'error'); return; }
+    if (v('aSource') && !window.confirm('이미 받은 글이 있어요. 새로 받으면 지금 글은 사라지고, B와 C에 적은 분석이 어긋나게 돼요. 그래도 새로 받을까요?')) return;
+
+    var btn = this;
+    busy(btn, 'genStatus', 'Solar Pro 3가 글을 쓰는 중…');
+    callSolar({ action: 'generate', topic: topic })
+      .then(function (res) {
+        el('aSource').value = res.text;
+        renderSource();
+        saveDraft();
+        unbusy(btn, 'genStatus', '글을 받았어요.');
+        showToast('글을 받았어요. 이제 인공지능을 닫고 B부터 읽어 나가세요.', 'success', 4200);
+      })
+      .catch(function (err) {
+        unbusy(btn, 'genStatus', '');
+        showToast('글을 받지 못했어요: ' + err.message, 'error', 5200);
+      });
+  });
+
+  /* ── D·E. 재현하기 ── */
+  function makeRunner(promptField, textField, viewId, btnId, statusId) {
+    el(btnId).addEventListener('click', function () {
+      var p = v(promptField);
+      if (!v('aSource')) { showToast('A에서 먼저 글을 받아야 해요.', 'error'); return; }
+      if (!p) { showToast('프롬프트를 먼저 쓰세요.', 'error'); return; }
+      var lim = promptLimit();
+      if (lim && countWords(p) > lim) {
+        // 막지는 않는다. 규칙을 제대로 찾은 학생이 여기서 걸리면 활동이 끊긴다.
+        showToast('프롬프트가 권장 길이(' + lim + '어절)보다 길어요. 원문을 옮겨 적은 곳이 없는지 확인해 보세요.', 'error', 4600);
+      }
+      var btn = this;
+      busy(btn, statusId, '이 프롬프트로 글을 쓰는 중…');
+      callSolar({ action: 'reproduce', prompt: p })
+        .then(function (res) {
+          el(textField).value = res.text;
+          renderRunText(textField, viewId);
+          saveDraft();
+          unbusy(btn, statusId, '결과물을 받았어요. 이제 채점을 눌러 보세요.');
+        })
+        .catch(function (err) {
+          unbusy(btn, statusId, '');
+          showToast('글을 만들지 못했어요: ' + err.message, 'error', 5200);
+        });
+    });
+  }
+  makeRunner('c1Prompt', 'c1Text', 'c1TextView', 'btnRun1', 'run1Status');
+  makeRunner('d2Prompt', 'd2Text', 'd2TextView', 'btnRun2', 'run2Status');
+
+  /* ── D·E. 채점하기 ── */
+  function renderVerdict(prefix, data) {
+    var box = el(prefix + 'Verdict');
+    var itemsBox = el(prefix + 'Items');
+    itemsBox.textContent = '';
+
+    el(prefix + 'ScoreView').textContent = '';
+    var num = document.createTextNode(String(data.total));
+    var unit = document.createElement('span');
+    unit.style.fontSize = '16px';
+    unit.textContent = '점';
+    el(prefix + 'ScoreView').appendChild(num);
+    el(prefix + 'ScoreView').appendChild(unit);
+    el(prefix + 'Bar').style.width = data.total + '%';
+
+    (data.items || []).forEach(function (it) {
+      var row = document.createElement('div');
+      row.className = 'item';
+      var sc = document.createElement('span');
+      sc.className = 'sc';
+      sc.textContent = it.score + '/20';
+      sc.style.color = it.score >= 16 ? 'var(--c-green)' : (it.score >= 10 ? 'var(--c-amber)' : 'var(--c-rose)');
+      var lb = document.createElement('span');
+      lb.className = 'lb';
+      lb.textContent = it.label;
+      var rs = document.createElement('span');
+      rs.className = 'rs';
+      rs.textContent = it.reason;
+      row.appendChild(sc);
+      row.appendChild(lb);
+      row.appendChild(rs);
+      itemsBox.appendChild(row);
+    });
+
+    if (data.copied) {
+      var warn = document.createElement('div');
+      warn.className = 'copied-warn';
+      warn.textContent = '프롬프트에 원문의 문장이 그대로 들어 있어요. 그것은 복원이 아니라 옮겨 적기예요. 규칙을 설명하는 말로 바꾸세요.';
+      itemsBox.appendChild(warn);
+    }
+
+    box.classList.add('show');
+
+    el(prefix + 'Score').value = String(data.total);
+    el(prefix + 'Note').value = (data.items || []).map(function (it) {
+      return it.label + ' ' + it.score + '/20 — ' + it.reason;
+    }).join('\n') + (data.copied ? '\n[경고] 프롬프트에 원문 문장이 포함됨' : '');
+    saveDraft();
+  }
+
+  function makeScorer(promptField, textField, prefix, btnId, statusId) {
+    el(btnId).addEventListener('click', function () {
+      if (!v('aSource')) { showToast('A에서 먼저 글을 받아야 해요.', 'error'); return; }
+      if (!v(textField)) { showToast('먼저 이 프롬프트로 글을 만들어야 채점할 수 있어요.', 'error', 4000); return; }
+      var btn = this;
+      busy(btn, statusId, '원문과 견주는 중…');
+      callSolar({ action: 'score', source: v('aSource'), candidate: v(textField), prompt: v(promptField) })
+        .then(function (res) {
+          renderVerdict(prefix, res);
+          unbusy(btn, statusId, '채점을 마쳤어요.');
+        })
+        .catch(function (err) {
+          unbusy(btn, statusId, '');
+          showToast('채점하지 못했어요: ' + err.message, 'error', 5200);
+        });
+    });
+  }
+  makeScorer('c1Prompt', 'c1Text', 'c1', 'btnScore1', 'run1Status');
+  makeScorer('d2Prompt', 'd2Text', 'd2', 'btnScore2', 'run2Status');
+
+  /* ── 유효성 검사 — 모든 항목 필수 (문서 순서 그대로) ── */
+  var REQUIRED = [
+    { id: 'studentId',   label: '학번' },
+    { id: 'studentName', label: '이름' },
+    { id: 'today',       label: '날짜' },
+    { id: 'password',    label: '제출 암호' },
+    { radio: 'aTopic',   label: 'A. 오늘의 주제' },
+    { id: 'aSource',     label: 'A. 받은 글' },
+    { id: 'bMeaning',    label: 'B1. 무엇을 말하는 글인가' },
+    { id: 'bParas',      label: 'B2. 문단 구성' },
+    { id: 'bShape',      label: 'B3. 문장과 마지막 모양' },
+    { id: 'bMyQ',        label: 'B4. 내가 만든 질문' },
+    { id: 'bMyA',        label: 'B4. 그 질문의 답' },
+    { id: 'c1Prompt',    label: 'C. 1차 프롬프트' },
+    { id: 'c1Text',      label: 'C. 1차 결과물' },
+    { id: 'c1Score',     label: 'C. 1차 채점' },
+    { id: 'd2Fix',       label: 'D. 고칠 부분' },
+    { id: 'd2Prompt',    label: 'D. 2차 프롬프트' },
+    { id: 'd2Text',      label: 'D. 2차 결과물' },
+    { id: 'd2Score',     label: 'D. 2차 채점' },
+    { id: 'eSummary',    label: 'E. 한 문장 정리' }
+  ];
+
+  function focusField(id) {
+    var e = el(id);
+    if (!e || e.hidden) return;
+    e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { e.focus({ preventScroll: true }); }, 120);
+  }
+  function focusGroup(name) {
+    var e = document.querySelector('input[name="' + name + '"]');
+    if (e) e.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function validate() {
+    var missing = [];
+    var first = null;
+
+    REQUIRED.forEach(function (f) {
+      var filled = f.id ? !!v(f.id) : !!pickRadio(f.radio);
+      if (filled) return;
+      missing.push(f.label);
+      if (!first) first = f;
+    });
+
+    if (missing.length) {
+      var head = missing.slice(0, 3).join(', ');
+      showToast('아직 채우지 않은 항목이 ' + missing.length + '군데 있어요: ' + head +
+        (missing.length > 3 ? ' 외 ' + (missing.length - 3) + '개' : ''), 'error', 5000);
+      if (first.id) focusField(first.id);
+      else focusGroup(first.radio);
+      return false;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      showToast('학번은 학년 1자리, 반 2자리, 번호 2자리를 이어 붙인 다섯 자리 숫자예요. 예: 20317', 'error', 4600);
+      el('studentId').focus();
+      return false;
+    }
+    if (v('password').length < 4) {
+      showToast('제출 암호는 4자 이상으로 정해 주세요.', 'error', 3800);
+      return false;
+    }
+    return true;
+  }
+
+  /* ── TXT 저장 ── */
+  function buildTxt(data) {
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  글의 설계도 되찾기');
+    L.push('  수업: LLM은 어떻게 다음 말을 고를까');
+    L.push('  ' + data.studentId + ' (' + sidLabel(data.studentId) + ') ' + data.studentName + ' · ' + data.today);
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    L.push('');
+    L.push('【 A. 주제와 받은 글 】');
+    L.push('주제: ' + data.aTopic);
+    L.push('받은 글:');
+    L.push(data.aSource);
+    L.push('');
+    L.push('【 B. 읽고, 재기 】');
+    L.push('1. 무엇을 말하는 글이고 무엇이 들어 있나:');
+    L.push(data.bMeaning);
+    L.push('2. 문단 구성: ' + data.bParas);
+    L.push('3. 문장과 마지막 모양:');
+    L.push(data.bShape);
+    L.push('4. 내가 만든 질문: ' + data.bMyQ);
+    L.push('   답: ' + data.bMyA);
+    L.push('');
+    L.push('【 C. 1차 복원 】');
+    L.push('프롬프트:');
+    L.push(data.c1Prompt);
+    L.push('결과물:');
+    L.push(data.c1Text);
+    L.push('점수: ' + data.c1Score);
+    L.push('채점 근거:');
+    L.push(data.c1Note);
+    L.push('');
+    L.push('【 D. 2차 복원 】');
+    L.push('고칠 부분: ' + data.d2Fix);
+    L.push('프롬프트:');
+    L.push(data.d2Prompt);
+    L.push('결과물:');
+    L.push(data.d2Text);
+    L.push('점수: ' + data.d2Score);
+    L.push('채점 근거:');
+    L.push(data.d2Note);
+    L.push('');
+    L.push('【 E. 한 문장 정리 】');
+    L.push(data.eSummary);
+    return L.join('\n');
+  }
+  function downloadTxt(data) {
+    var blob = new Blob([buildTxt(data)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '글의설계도되찾기_' + (data.studentId || '') + '_' + (data.studentName || '무명') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── 제출 ── */
+  el('btnSave').addEventListener('click', function () {
+    if (!validate()) return;
+    var data = getFormData();
+    var btn = this;
+    btn.disabled = true;
+
+    downloadTxt(data);
+
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) {
+      showToast('TXT 파일로 저장했어요. 시트로 전송하는 기능은 선생님이 설정을 마친 뒤에 쓸 수 있어요.', 'success', 4200);
+      btn.disabled = false;
+      return;
+    }
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function () {
+      showToast('제출했어요. TXT 파일도 함께 저장했어요.', 'success', 4200);
+      localStorage.removeItem(DRAFT_KEY);
+      recordSubmitted(data);
+    }).catch(function (err) {
+      showToast('TXT 파일은 저장했지만, 시트로 전송하는 과정에서 오류가 생겼어요: ' + err.message, 'error', 5000);
+    }).finally(function () {
+      btn.disabled = false;
+    });
+  });
+
+  /* ── 초기화 ── */
+  el('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요? 받은 글과 채점 결과도 함께 지워져요.')) return;
+    document.querySelectorAll('input[type="text"], input[type="url"], input[type="password"], textarea').forEach(function (e) { e.value = ''; });
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function (e) { e.checked = false; });
+    ['c1Verdict', 'd2Verdict'].forEach(function (id) { el(id).classList.remove('show'); });
+    renderSource();
+    renderRunText('c1Text', 'c1TextView');
+    renderRunText('d2Text', 'd2TextView');
+    localStorage.removeItem(DRAFT_KEY);
+    refreshReveal();
+    statusEl.textContent = '초기화됨';
+    statusEl.className = '';
+    showToast('모든 입력을 지웠어요.');
+  });
+
+  /* ── 제출 상태 배너 ── */
+  var bannerEl = el('submitBanner');
+  var bannerTextEl = el('submitBannerText');
+
+  function showBanner(text) {
+    bannerTextEl.textContent = text;
+    bannerEl.classList.add('show');
+  }
+  function recordSubmitted(data) {
+    var stamp = new Date().toLocaleString('ko-KR');
+    try {
+      localStorage.setItem(SUBMIT_KEY, JSON.stringify({
+        at: stamp, name: data.studentName, sid: data.studentId
+      }));
+    } catch (e) { /* 무시 */ }
+    showBanner(stamp + '에 제출을 보냈어요. [제출 확인] 단추를 누르면 서버에 저장되었는지 확인할 수 있어요.');
+  }
+  (function restoreBanner() {
+    try {
+      var raw = localStorage.getItem(SUBMIT_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      showBanner('이 기기에서 ' + s.at + '에 제출을 보냈어요. [제출 확인] 단추를 누르면 제출한 내용을 다시 볼 수 있어요.');
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* ── 제출 확인 · 불러오기 ── */
+  var lookupBackdrop = el('lookupBackdrop');
+  var lkResult = el('lkResult');
+  var lkFillBtn = el('lkFill');
+  var lkGoBtn = el('lkGo');
+  var lastLookup = null;
+  var lastLookupPw = '';
+
+  function openLookup() {
+    el('lkSid').value = v('studentId');
+    el('lkName').value = v('studentName');
+    el('lkPw').value = '';
+    lkResult.hidden = true;
+    lkResult.textContent = '';
+    lkFillBtn.hidden = true;
+    lastLookup = null;
+    lookupBackdrop.hidden = false;
+    el('lkPw').focus();
+  }
+  function closeLookup() { lookupBackdrop.hidden = true; }
+
+  /* JSONP — Apps Script는 CORS 헤더를 주지 않으므로 fetch 실패 시 이 경로로 받는다 */
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'lkcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버가 응답하지 않아요.')); }, 20000);
+      function cleanup() {
+        clearTimeout(timer);
+        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      window[cb] = function (data) { cleanup(); resolve(data); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결하지 못했어요.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function requestLookup(p) {
+    var base = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!base) return Promise.reject(new Error('서버 주소가 설정되어 있지 않아요. 선생님께 말씀드려 주세요.'));
+    var qs = 'action=lookup&source=' + SOURCE +
+      '&studentId=' + encodeURIComponent(p.studentId) +
+      '&studentName=' + encodeURIComponent(p.studentName) +
+      '&password=' + encodeURIComponent(p.password);
+    var url = base + '?' + qs;
+    return fetch(url)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return jsonp(url); });
+  }
+
+  function renderLookup(res) {
+    lkResult.textContent = '';
+    lkResult.hidden = false;
+    if (res && res.status === 'ok') {
+      lastLookup = res.data;
+      lkFillBtn.hidden = false;
+      var box = document.createElement('div');
+      box.className = 'lk-ok';
+      var stamp = document.createElement('div');
+      stamp.className = 'stamp';
+      stamp.textContent = '제출이 확인되었어요';
+      var when = document.createElement('div');
+      when.className = 'when';
+      when.textContent = res.submittedAt;
+      box.appendChild(stamp);
+      box.appendChild(when);
+      var dl = document.createElement('dl');
+      [['주제', res.data.aTopic], ['1차 점수', res.data.c1Score], ['2차 점수', res.data.d2Score],
+       ['내가 만든 질문', res.data.bMyQ], ['한 문장 정리', res.data.eSummary]].forEach(function (pair) {
+        if (!pair[1]) return;
+        var dt = document.createElement('dt');
+        dt.textContent = pair[0];
+        var dd = document.createElement('dd');
+        dd.textContent = pair[1];
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+      });
+      box.appendChild(dl);
+      lkResult.appendChild(box);
+      return;
+    }
+    lkFillBtn.hidden = true;
+    lastLookup = null;
+    var bad = document.createElement('div');
+    bad.className = 'lk-bad';
+    if (res && res.status === 'denied') {
+      bad.textContent = '암호가 일치하지 않아요. 제출할 때 정한 암호를 다시 확인해 주세요.';
+    } else if (res && res.status === 'notfound') {
+      bad.textContent = '이 학번과 이름으로 제출된 기록이 없어요. 아직 제출하지 않았거나, 학번이나 이름을 제출할 때와 다르게 입력했을 수 있어요.';
+    } else {
+      bad.textContent = '오류가 생겼어요: ' + ((res && res.message) || '원인을 알 수 없는 오류');
+    }
+    lkResult.appendChild(bad);
+  }
+
+  function fillFormFrom(d) {
+    TEXT_FIELDS.forEach(function (id) {
+      var e = el(id);
+      if (e && typeof d[id] === 'string') e.value = d[id];
+    });
+    setRadio('aTopic', d.aTopic);
+    renderSidPreview();
+    renderSource();
+    renderRunText('c1Text', 'c1TextView');
+    renderRunText('d2Text', 'd2TextView');
+    restoreVerdict('c1');
+    restoreVerdict('d2');
+    saveDraft();
+  }
+
+  el('btnLookup').addEventListener('click', openLookup);
+  el('lkClose').addEventListener('click', closeLookup);
+  lookupBackdrop.addEventListener('click', function (e) { if (e.target === lookupBackdrop) closeLookup(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !lookupBackdrop.hidden) closeLookup();
+  });
+  ['lkSid', 'lkName', 'lkPw'].forEach(function (id) {
+    el(id).addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); lkGoBtn.click(); }
+    });
+  });
+
+  lkGoBtn.addEventListener('click', function () {
+    var p = {
+      studentId: el('lkSid').value.trim(),
+      studentName: el('lkName').value.trim(),
+      password: el('lkPw').value.trim()
+    };
+    if (!p.studentId || !p.studentName || !p.password) {
+      renderLookup({ status: 'error', message: '학번과 이름, 암호를 모두 입력해 주세요.' });
+      return;
+    }
+    if (!SID_RE.test(p.studentId)) {
+      renderLookup({ status: 'error', message: '학번은 학년 1자리, 반 2자리, 번호 2자리를 이어 붙인 다섯 자리 숫자예요 (예: 20317).' });
+      return;
+    }
+    lkGoBtn.disabled = true;
+    lkResult.hidden = false;
+    lkResult.textContent = '';
+    lkFillBtn.hidden = true;
+    var wait = document.createElement('div');
+    wait.className = 'lk-wait';
+    wait.textContent = '확인하는 중…';
+    lkResult.appendChild(wait);
+
+    requestLookup(p)
+      .then(function (res) {
+        if (res && res.status === 'ok') lastLookupPw = p.password;
+        renderLookup(res);
+      })
+      .catch(function (err) { renderLookup({ status: 'error', message: err.message }); })
+      .finally(function () { lkGoBtn.disabled = false; });
+  });
+
+  lkFillBtn.addEventListener('click', function () {
+    if (!lastLookup) return;
+    if (!window.confirm('지금 화면에 쓴 내용을 지우고, 제출했던 내용을 불러올까요?')) return;
+    fillFormFrom(lastLookup);
+    if (lastLookupPw) el('password').value = lastLookupPw;
+    closeLookup();
+    showToast('제출했던 내용을 양식에 불러왔어요. 고쳐서 다시 제출하면 가장 마지막에 낸 내용으로 갱신돼요.', 'success', 4200);
+  });
+
+  /* ── 설정 패널 (⚙ 5번 클릭으로 열림 — 교사 전용) ── */
+  var gearCount = 0, gearTimer = null;
+  el('btnGear').addEventListener('click', function () {
+    gearCount += 1;
+    clearTimeout(gearTimer);
+    gearTimer = setTimeout(function () { gearCount = 0; }, 1600);
+    if (gearCount >= 5) {
+      gearCount = 0;
+      var p = el('settingsPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      el('scriptUrl').value = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+      el('solarUrl').value = localStorage.getItem(SOLAR_KEY) || SOLAR_URL;
+    }
+  });
+  el('btnSaveUrl').addEventListener('click', function () {
+    var u = el('scriptUrl').value.trim();
+    if (u) { localStorage.setItem(URL_KEY, u); el('urlStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(URL_KEY); el('urlStatus').textContent = '기본값 사용'; }
+  });
+  el('btnSaveSolar').addEventListener('click', function () {
+    var u = el('solarUrl').value.trim();
+    if (u) { localStorage.setItem(SOLAR_KEY, u); el('solarStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(SOLAR_KEY); el('solarStatus').textContent = '기본값 사용'; }
+  });
+
+  /* ── 제출 현황 페이지에서 넘어온 경우 (?sid=20317&restore=1) ── */
+  (function handoff() {
+    var params = new URLSearchParams(location.search);
+    var sid = params.get('sid');
+    if (sid && SID_RE.test(sid)) {
+      el('studentId').value = sid;
+      renderSidPreview();
+      scheduleDraft();
+    }
+    if (params.get('restore') !== '1') return;
+
+    var raw = null;
+    try { raw = sessionStorage.getItem(HANDOFF_KEY); sessionStorage.removeItem(HANDOFF_KEY); } catch (e) { /* 무시 */ }
+    if (!raw) return;
+    try {
+      var payload = JSON.parse(raw);
+      if (!payload || !payload.data) return;
+      fillFormFrom(payload.data);
+      if (payload.password) el('password').value = payload.password;
+      if (payload.at) showBanner(payload.at + '에 제출한 내용을 불러왔어요. 고쳐서 다시 제출하면 가장 마지막에 낸 내용으로 갱신돼요.');
+      showToast('제출했던 내용을 불러왔어요.', 'success', 3800);
+    } catch (e) { /* 손상된 핸드오프 — 무시 */ }
+  })();
+
+  /* ── 저장된 채점 결과 다시 보이기 ──
+     새로고침하거나 지난 제출을 불러왔을 때, 점수와 근거가 화면에서 사라지면
+     E 구역에서 무엇을 고칠지 판단할 근거가 없어진다. 항목별 원본 JSON을
+     따로 두지 않고 c1Note·d2Note에 적어 둔 줄을 되읽어 복원한다. */
+  function restoreVerdict(prefix) {
+    var total = parseInt(v(prefix + 'Score'), 10);
+    var note = v(prefix + 'Note');
+    if (!(total >= 0) || !note) return;
+    var copied = note.indexOf('[경고]') !== -1;
+    var items = note.split('\n').map(function (line) {
+      var m = line.match(/^(.+?)\s(\d+)\/20\s—\s([\s\S]*)$/);
+      return m ? { label: m[1], score: parseInt(m[2], 10), reason: m[3] } : null;
+    }).filter(Boolean);
+    if (!items.length) return;
+    renderVerdict(prefix, { total: total, items: items, copied: copied });
+  }
+
+  /* ── 초기 렌더 ── */
+  restoreDraft();
+  renderSidPreview();
+  renderSource();
+  renderRunText('c1Text', 'c1TextView');
+  renderRunText('d2Text', 'd2TextView');
+  restoreVerdict('c1');
+  restoreVerdict('d2');
+  refreshReveal();
+})();
+</script>
+<!-- 제출 마감 — apps-script.js SOURCES의 deadline과 같은 값 (생성일 + 45일).
+     서버도 마감 뒤 제출을 받지 않는다. 제출 확인(조회)은 마감 뒤에도 쓸 수 있다. -->
+<script>
+(function () {
+  var DEADLINE = '2026-10-05';
+  var end = new Date(DEADLINE + 'T23:59:59+09:00');
+  var closed = Date.now() > end.getTime();
+  var p = DEADLINE.split('-');
+  var label = Number(p[1]) + '월 ' + Number(p[2]) + '일';
+  var lookupBtn = document.getElementById('btnLookup');
+  var lookupName = lookupBtn ? lookupBtn.textContent.trim() : '제출 확인';
+  var box = document.createElement('div');
+  box.id = 'deadlineNotice';
+  box.setAttribute('role', 'status');
+  box.style.cssText = 'margin:14px 0 4px; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; line-height:1.5;' +
+    (closed ? 'background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5;'
+            : 'background:#eef4ff; color:#1e3a8a; border:1px solid #c7d7fe;');
+  box.textContent = closed
+    ? '⏰ 제출이 마감되었습니다 (' + label + ' 23:59까지). 이미 낸 내용은 [' + lookupName + ']에서 볼 수 있습니다.'
+    : '⏰ 제출 마감: ' + label + ' 23:59까지';
+  var hero = document.querySelector('header');
+  if (hero) hero.appendChild(box);
+  if (!closed) return;
+  var btn = document.getElementById('btnSubmit') || document.getElementById('btnSave');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '제출 마감';
+  btn.style.opacity = '0.5';
+  btn.style.cursor = 'not-allowed';
+  btn.title = label + '에 마감되었습니다.';
+  btn.addEventListener('click', function (e) { e.stopImmediatePropagation(); e.preventDefault(); }, true);
+})();
+</script>
+</body>
+</html>

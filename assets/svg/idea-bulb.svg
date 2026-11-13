@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 210" fill="none">
+  <!-- 아이디어 전구 — 잉크 스케치. 의도: "머릿속 아이디어" 출발점.
+       손그림 전구 + 필라멘트 + 방사 빛살. 앰버 잉크. -->
+  <g stroke="#ffd9a8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- 전구 유리: 비정형 원 + 보조선 -->
+    <path d="M52 92 C48 60 74 38 98 42 C122 46 134 70 128 94 C124 110 114 118 108 128 L72 130 C66 118 56 108 52 94" stroke-width="3.2"/>
+    <path d="M58 84 C58 66 74 50 92 50" stroke-width="1.7" opacity="0.45"/>
+    <!-- 필라멘트 -->
+    <path d="M76 128 C78 114 84 110 90 116 C96 110 102 114 104 127" stroke-width="2.6"/>
+    <!-- 소켓 나사선 -->
+    <path d="M70 138 L110 136 M72 148 L108 146 M76 158 L104 156" stroke-width="2.8"/>
+    <path d="M84 166 L96 165" stroke-width="2.6"/>
+    <!-- 방사 빛살 6 -->
+    <path d="M90 24 L90 10" stroke-width="2.8"/>
+    <path d="M46 40 L36 30" stroke-width="2.8"/>
+    <path d="M134 38 L144 28" stroke-width="2.8"/>
+    <path d="M34 82 L20 80" stroke-width="2.6"/>
+    <path d="M146 78 L160 74" stroke-width="2.6"/>
+    <path d="M142 110 L154 118" stroke-width="2.2" opacity="0.7"/>
+    <!-- 반짝 십자 -->
+    <path d="M148 46 L148 58 M142 52 L154 52" stroke-width="2" opacity="0.7"/>
+  </g>
+</svg>

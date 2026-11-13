@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4컷 영상 만들기 — 인공지능 기초</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<style>
+  :root {
+    --bg: #f6f3f8;
+    --surface: #ffffff;
+    --fg: #1a1220;
+    --fg-muted: #574a60;
+    --fg-faint: #8a7d93;
+    --hair: rgba(60, 20, 70, 0.16);
+    --primary: #d8368a;
+    --accent: linear-gradient(115deg, #ffd24a 0%, #ff4fa3 55%, #3ddcff 100%);
+    --c-magenta: #d8368a; --c-cyan: #0e9fbf; --c-yellow: #c98f00;
+    --c-amber: #d97706; --c-green: #059669; --c-rose: #e11d48; --c-violet: #7c3aed;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 15% -5%, rgba(255, 79, 163, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(61, 220, 255, 0.12), transparent 55%),
+      var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    padding-bottom: 110px;
+    word-break: keep-all;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 0; }
+
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 30px 28px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(80, 20, 90, 0.35);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(60, 20, 70, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(60, 20, 70, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--primary); text-transform: uppercase; }
+  .hero h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad { background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { color: var(--fg-muted); font-size: 14.5px; margin-top: 8px; max-width: 640px; }
+  .hero .gear { position: absolute; top: 14px; right: 14px; border: none; background: transparent; font-size: 17px; cursor: pointer; opacity: 0.35; }
+
+  .idrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; position: relative; }
+  .idrow .field { flex: 1 1 150px; }
+
+  #settingsPanel {
+    display: none; background: #fffbe9; border: 1px dashed #d9b53c; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 18px; font-size: 13px;
+  }
+  #settingsPanel input { width: 100%; margin-top: 6px; }
+  #settingsPanel button { margin-top: 8px; }
+
+  section.card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 24px 24px 26px; margin-bottom: 18px;
+    box-shadow: 0 16px 44px -32px rgba(80, 20, 90, 0.3);
+    border-top: 4px solid var(--sec, var(--primary));
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .sec-badge { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 16px; color: #fff; background: var(--sec, var(--primary)); }
+  .sec-head h2 { font-size: 18.5px; font-weight: 800; }
+  .sec-desc { color: var(--fg-muted); font-size: 13.5px; margin-bottom: 16px; }
+
+  label.q { display: block; font-weight: 700; font-size: 14.5px; margin: 16px 0 6px; }
+  label.q .req { color: var(--c-rose); }
+  .hint { font-weight: 500; color: var(--fg-faint); font-size: 12.5px; margin-left: 6px; }
+  input[type="text"], input[type="url"], input[type="date"], input[type="password"], textarea, select {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px;
+    padding: 10px 13px; font: inherit; font-size: 14.5px; color: var(--fg);
+    background: #fdfbfe; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(216, 54, 138, 0.13); }
+  textarea { resize: vertical; min-height: 74px; }
+
+  /* 컷 카드 — 필름 스트립 */
+  .cuts { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-top: 8px; }
+  .cut {
+    border: 1.5px solid var(--hair); border-radius: 14px; padding: 14px 16px 16px; background: #fdfbfe;
+    position: relative;
+  }
+  .cut::before, .cut::after {
+    content: ''; position: absolute; left: 10px; right: 10px; height: 6px;
+    background-image: radial-gradient(circle, rgba(26,18,32,0.35) 2px, transparent 2.5px);
+    background-size: 14px 6px; opacity: 0.55;
+  }
+  .cut::before { top: 4px; } .cut::after { bottom: 4px; }
+  .cut h3 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+  .cut h3 .role { font-size: 12px; font-weight: 700; color: var(--fg-faint); }
+  .cut label.q { margin-top: 10px; font-size: 13.5px; }
+  .cut textarea { min-height: 62px; font-size: 13.5px; }
+
+  /* 프롬프트 다섯 조각 안내 */
+  .pieces { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+  .pieces span { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 1.5px solid var(--tone); color: var(--tone); background: color-mix(in srgb, var(--tone) 6%, #fff); }
+
+  /* 공유 확인 */
+  .share-box {
+    display: flex; align-items: flex-start; gap: 10px; margin-top: 12px;
+    border: 1.5px dashed var(--c-magenta); border-radius: 12px; padding: 12px 14px;
+    background: rgba(216, 54, 138, 0.05); font-size: 13.5px; font-weight: 600; cursor: pointer;
+  }
+  .share-box:has(input:checked) { border-style: solid; background: rgba(216, 54, 138, 0.10); }
+  .share-box input { accent-color: var(--c-magenta); margin-top: 3px; }
+
+  .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px); border-top: 1px solid var(--hair); padding: 12px 18px; }
+  .actionbar .inner { max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #draftStatus { font-size: 12px; color: var(--fg-faint); }
+  #draftStatus.pending { color: var(--c-amber); }
+  #draftStatus.saved { color: var(--c-green); }
+  #draftStatus.failed { color: var(--c-rose); font-weight: 700; }
+  .draft-note { font-size: 11px; color: var(--fg-faint); opacity: 0.8; }
+  .btn { border: none; border-radius: 999px; padding: 12px 26px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; transition: transform 0.12s, opacity 0.15s; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: linear-gradient(115deg, #ffb347 0%, #ff4fa3 55%, #7c3aed 100%); color: #fff; box-shadow: 0 10px 26px -12px rgba(216, 54, 138, 0.6); }
+  .btn-primary:disabled { opacity: 0.55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+
+  .sid-hint { margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px; font-family: 'JetBrains Mono', 'Malgun Gothic', monospace; }
+  .sid-hint.ok { color: var(--c-green); }
+  .sid-hint.bad { color: var(--c-rose); }
+
+  .backdrop { position: fixed; inset: 0; background: rgba(26, 18, 32, 0.45); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 18px; z-index: 70; }
+  .backdrop[hidden] { display: none; }
+  .modal { width: min(460px, 100%); max-height: 88vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--hair); border-radius: 20px; padding: 24px 24px 20px; box-shadow: 0 30px 80px -30px rgba(26, 18, 32, 0.5); }
+  .modal h3 { font-size: 19px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .modal .btn { padding: 10px 18px; font-size: 14px; }
+  #lkResult { margin-top: 16px; }
+  #lkResult[hidden] { display: none; }
+  .lk-ok { border: 1.5px solid var(--c-green); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 14px 16px; }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-green); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--fg); margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { color: var(--fg); overflow-wrap: anywhere; }
+  .lk-bad { border: 1.5px solid var(--c-rose); background: rgba(225, 29, 72, 0.06); border-radius: 14px; padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--c-rose); }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; }
+
+  #submitBanner { display: none; align-items: center; gap: 10px; margin-bottom: 18px; border: 1.5px solid var(--c-green); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 11px 16px; font-size: 13.5px; font-weight: 700; color: var(--fg); }
+  #submitBanner.show { display: flex; }
+  #submitBanner .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-green); }
+
+  #toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(16px); background: #1a1220; color: #fff; padding: 12px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 60; max-width: 90vw; text-align: center; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #059669; }
+  #toast.error { background: #e11d48; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    section.card { padding: 18px 16px 20px; }
+    .actionbar .inner { flex-wrap: wrap; gap: 8px; }
+    .draft-wrap { flex: 1 0 100%; order: -1; }
+    .draft-note { display: none; }
+    .actionbar .btn { flex: 1 1 auto; padding: 11px 10px; font-size: 13.5px; }
+    .wide-only { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="gear" id="btnGear" type="button" aria-label="설정">⚙</button>
+    <div class="kicker">인공지능 기초 · 2026-2 · 트랜스포머는 어떻게 영상과 음악을 만들까</div>
+    <h1>4컷 영상 <span class="grad">만들기</span></h1>
+    <p class="sub">미리캔버스 AI 영상(이미지→비디오)으로 컷 4개를 만들어 한 편으로 잇는다.
+      제출하는 것은 세 가지 — <strong>컷마다 장면 설명과 프롬프트</strong>, 그리고 <strong>최종 영상의 공유 링크</strong>.
+      AI가 잇는 것은 한 클립 안 프레임 사이이고, 클립과 클립 사이는 여러분이 설계로 잇는다.</p>
+    <div class="idrow">
+      <div class="field">
+        <label class="q" for="studentId">학번 <span class="req">*</span></label>
+        <input type="text" id="studentId" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+        <div id="sidPreview" class="sid-hint"></div>
+      </div>
+      <div class="field">
+        <label class="q" for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="이름">
+      </div>
+      <div class="field">
+        <label class="q" for="today">날짜 <span class="req">*</span></label>
+        <input type="date" id="today">
+      </div>
+      <div class="field">
+        <label class="q" for="password">제출 암호 <span class="req">*</span><span class="hint">4자 이상 · 이번 활동용으로 직접 정한다</span></label>
+        <input type="password" id="password" placeholder="4자 이상" autocomplete="off">
+      </div>
+    </div>
+    <p class="sub" style="margin-top:10px; font-size:12.5px;">
+      🎫 <strong>학번</strong>은 <strong>학년(1) + 반(2) + 번호(2)</strong> 다섯 자리 — 2학년 3반 17번이면 <strong>20317</strong>.<br>
+      🔑 <strong>제출 암호</strong>는 이번 활동용으로 <strong>직접 4자 이상 정한다</strong>. 나중에 <strong>제출 확인·불러오기</strong>에 쓰는 열쇠다.
+      <span style="color:var(--c-rose); font-weight:700;">평소 쓰는 비밀번호는 쓰지 말 것</span> — 잊으면 선생님께 문의.
+    </p>
+  </header>
+
+  <div id="submitBanner"><span class="dot"></span><span id="submitBannerText"></span></div>
+
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정 — Apps Script 배포 URL</strong>
+    <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus" style="margin-left:8px;"></span>
+  </div>
+
+  <!-- A. 기획 -->
+  <section class="card" style="--sec: var(--c-magenta);">
+    <div class="sec-head"><span class="sec-badge">A</span><h2>기획 — 무엇을 이을 것인가</h2></div>
+    <p class="sec-desc">생성 버튼을 누르기 전에 쓴다. 컷 4개가 한 편이 되려면 <strong>같은 주인공·같은 스타일·이어지는 동작</strong>이 필요하다. 이미지 4장(파일명 01~04)은 수업 전에 준비한 것을 쓴다.</p>
+    <label class="q" for="aTitle">영상 제목 <span class="req">*</span></label>
+    <input type="text" id="aTitle" placeholder="예: 파란 우산의 하루">
+    <label class="q" for="aStory">한 줄 줄거리 <span class="req">*</span><span class="hint">설정 → 변화 → 절정 → 마무리가 한 문장 안에</span></label>
+    <input type="text" id="aStory" placeholder="예: 파란 우산을 든 소녀가 비 오는 골목을 걷다가 고양이를 만나 함께 집으로 돌아간다">
+    <label class="q" for="aHero">주인공과 스타일 <span class="req">*</span><span class="hint">4장의 이미지를 만들 때 매번 똑같이 쓸 묘사</span></label>
+    <textarea id="aHero" placeholder="예: 노란 비옷에 파란 우산을 든 단발머리 소녀, 파스텔 수채화 스타일, 저녁 골목"></textarea>
+  </section>
+
+  <!-- B. 컷 1~4 -->
+  <section class="card" style="--sec: var(--c-cyan);">
+    <div class="sec-head"><span class="sec-badge">B</span><h2>컷 1~4 — 장면 설명과 프롬프트</h2></div>
+    <p class="sec-desc">이미지→비디오에서는 사진이 주체와 스타일을 이미 정한다. 프롬프트에는 <strong>움직임</strong>을 쓴다. 다섯 요소를 갖추자 (컷 = 설계한 장면 단위 · 클립 = 생성된 영상 파일):</p>
+    <div class="pieces">
+      <span style="--tone: var(--c-magenta);">① 주체와 동작</span>
+      <span style="--tone: var(--c-cyan);">② 움직임의 방향·속도·순서</span>
+      <span style="--tone: var(--c-yellow);">③ 카메라</span>
+      <span style="--tone: var(--c-violet);">④ 분위기·조명</span>
+      <span style="--tone: var(--c-green);">⑤ 유지할 것</span>
+    </div>
+    <div class="cuts">
+      <div class="cut">
+        <h3>컷 1 <span class="role">설정 · 누가 어디에</span></h3>
+        <label class="q" for="cut1Desc">장면 설명 <span class="req">*</span></label>
+        <textarea id="cut1Desc" placeholder="이 컷에서 무엇이 보이고 무슨 일이 일어나는가"></textarea>
+        <label class="q" for="cut1Prompt">입력한 프롬프트 <span class="req">*</span></label>
+        <textarea id="cut1Prompt" placeholder="미리캔버스에 실제로 넣은 프롬프트 그대로"></textarea>
+      </div>
+      <div class="cut">
+        <h3>컷 2 <span class="role">변화 · 무슨 일이</span></h3>
+        <label class="q" for="cut2Desc">장면 설명 <span class="req">*</span></label>
+        <textarea id="cut2Desc" placeholder="이 컷에서 무엇이 보이고 무슨 일이 일어나는가"></textarea>
+        <label class="q" for="cut2Prompt">입력한 프롬프트 <span class="req">*</span></label>
+        <textarea id="cut2Prompt" placeholder="미리캔버스에 실제로 넣은 프롬프트 그대로"></textarea>
+      </div>
+      <div class="cut">
+        <h3>컷 3 <span class="role">절정</span></h3>
+        <label class="q" for="cut3Desc">장면 설명 <span class="req">*</span></label>
+        <textarea id="cut3Desc" placeholder="이 컷에서 무엇이 보이고 무슨 일이 일어나는가"></textarea>
+        <label class="q" for="cut3Prompt">입력한 프롬프트 <span class="req">*</span></label>
+        <textarea id="cut3Prompt" placeholder="미리캔버스에 실제로 넣은 프롬프트 그대로"></textarea>
+      </div>
+      <div class="cut">
+        <h3>컷 4 <span class="role">마무리</span></h3>
+        <label class="q" for="cut4Desc">장면 설명 <span class="req">*</span></label>
+        <textarea id="cut4Desc" placeholder="이 컷에서 무엇이 보이고 무슨 일이 일어나는가"></textarea>
+        <label class="q" for="cut4Prompt">입력한 프롬프트 <span class="req">*</span></label>
+        <textarea id="cut4Prompt" placeholder="미리캔버스에 실제로 넣은 프롬프트 그대로"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- C. 최종 영상 -->
+  <section class="card" style="--sec: var(--c-yellow);">
+    <div class="sec-head"><span class="sec-badge">C</span><h2>최종 영상 — 한 편으로 이어서 공유</h2></div>
+    <p class="sec-desc">에디터에서 클립 4개를 순서대로 이어 붙인 뒤 상단 <strong>공유 → 접근 권한을 "링크가 있는 누구나 · 보기 가능"</strong>으로 바꾸고 <strong>링크 복사</strong>를 누른다. 공개 설정을 하지 않으면 링크를 받은 사람이 열 수 없다. 제출은 <strong>[제출하기] 뒤 [제출 확인]에서 학번·이름·암호로 접수가 확인</strong>되어야 완료다. TXT는 내 기기용 사본이다.</p>
+    <label class="q" for="cLink">최종 영상 공유 링크 <span class="req">*</span><span class="hint">https:// 로 시작하는 주소</span></label>
+    <input type="url" id="cLink" placeholder="https://www.miricanvas.com/…" inputmode="url" autocomplete="off">
+    <label class="share-box" for="cShare">
+      <input type="checkbox" id="cShare" value="확인">
+      <span>공개 설정(접근 권한 <strong>"링크가 있는 누구나"</strong>, 또는 <strong>게시 → 디자인 문서 공개</strong>)을 켰고, 짝의 <strong>시크릿 창</strong>에서 로그인 요구 없이 <strong>4컷 전체가 재생</strong>되는 것을 확인했다. <span class="req">*</span></span>
+    </label>
+    <label class="q" for="cJoin">이어 붙일 때 한 일 <span class="hint">선택 — 순서 조정·자막·음악·전환 효과 등</span></label>
+    <input type="text" id="cJoin" placeholder="예: 컷 2와 3 사이에 페이드 전환, 배경음악 추가">
+  </section>
+
+  <!-- D. 성찰 -->
+  <section class="card" style="--sec: var(--c-violet);">
+    <div class="sec-head"><span class="sec-badge">D</span><h2>한 줄 성찰</h2></div>
+    <p class="sec-desc">프롬프트대로 되지 않은 컷이 있었다면 무엇이 어긋났는지, 다음에 프롬프트의 어느 조각을 고치겠는지 한 줄로.</p>
+    <label class="q" for="dReflect">한 줄 <span class="hint">선택</span></label>
+    <input type="text" id="dReflect" placeholder="예: 컷 3에서 카메라를 안 적었더니 화면이 흔들렸다 — 다음엔 '카메라 고정'을 넣겠다">
+  </section>
+
+</div>
+
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <a class="btn btn-ghost" href="/data/2026-2/인공지능기초/제출현황.html" style="text-decoration:none; display:inline-block;">제출 현황</a>
+    <button class="btn btn-ghost" id="btnLookup" type="button">제출 확인</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-primary" id="btnSave" type="button">제출하기<span class="wide-only"> (TXT + 시트 저장)</span></button>
+  </div>
+</div>
+
+<div class="backdrop" id="lookupBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
+    <h3 id="lookupTitle">제출 확인 · 지난 제출 불러오기</h3>
+    <p class="m-desc">제출할 때 쓴 <strong>학번 · 이름 · 암호</strong>를 넣으면 가장 마지막으로 제출한 내용을 확인할 수 있어요.</p>
+    <label class="q" for="lkSid">학번</label>
+    <input type="text" id="lkSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label class="q" for="lkName">이름</label>
+    <input type="text" id="lkName" placeholder="이름">
+    <label class="q" for="lkPw">제출 암호</label>
+    <input type="password" id="lkPw" placeholder="제출할 때 정한 암호" autocomplete="off">
+    <div id="lkResult" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="lkClose" type="button">닫기</button>
+      <button class="btn btn-ghost" id="lkFill" type="button" hidden>양식에 불러오기</button>
+      <button class="btn btn-primary" id="lkGo" type="button">확인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SOURCE = 'video_four_cuts';
+  var DRAFT_KEY = 'draft_video_four_cuts';
+  var URL_KEY = 'gas_url_ai_basics_2026_2';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec'; // 인공지능 기초(2026-2) 과목 공용 배포 URL
+  var TEXT_IDS = ['studentName', 'studentId', 'today', 'aTitle', 'aStory', 'aHero',
+    'cut1Desc', 'cut1Prompt', 'cut2Desc', 'cut2Prompt', 'cut3Desc', 'cut3Prompt', 'cut4Desc', 'cut4Prompt',
+    'cLink', 'cJoin', 'dReflect'];
+
+  var SID_RE = /^\d{5}$/;
+  function parseSid(sid) {
+    if (!SID_RE.test(sid)) return null;
+    return { grade: parseInt(sid.slice(0, 1), 10), cls: parseInt(sid.slice(1, 3), 10), no: parseInt(sid.slice(3, 5), 10) };
+  }
+  function sidLabel(sid) { var s = parseSid(sid); return s ? s.grade + '학년 ' + s.cls + '반 ' + s.no + '번' : sid; }
+  function renderSidPreview() {
+    var el = document.getElementById('sidPreview');
+    var sid = v('studentId');
+    if (!sid) { el.textContent = ''; el.className = 'sid-hint'; return; }
+    var s = parseSid(sid);
+    if (!s) { el.textContent = '↳ 숫자 5자리로 입력하세요 (예: 20317)'; el.className = 'sid-hint bad'; return; }
+    var sane = s.grade >= 1 && s.grade <= 3 && s.cls >= 1 && s.no >= 1;
+    el.textContent = '↳ ' + sidLabel(sid) + (sane ? '' : ' — 맞나요?');
+    el.className = 'sid-hint ' + (sane ? 'ok' : 'bad');
+  }
+
+  var todayEl = document.getElementById('today');
+  if (!todayEl.value) {
+    var d = new Date();
+    todayEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function v(id) { return document.getElementById(id).value.trim(); }
+  function getFormData() {
+    var data = { source: SOURCE, password: v('password') };
+    TEXT_IDS.forEach(function (id) { data[id] = v(id); });
+    data.cShare = document.getElementById('cShare').checked ? '확인' : '';
+    return data;
+  }
+
+  /* ── 임시저장 ── */
+  var draftTimer = null;
+  var statusEl = document.getElementById('draftStatus');
+  function saveDraft() {
+    try {
+      var dd = getFormData();
+      delete dd.password;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(dd));
+      statusEl.textContent = '임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      statusEl.className = 'saved';
+    } catch (e) {
+      statusEl.textContent = '임시저장 실패 — 이 기기에 저장 공간이 부족해요';
+      statusEl.className = 'failed';
+    }
+  }
+  function scheduleDraft() {
+    statusEl.textContent = '입력 중… 잠시 멈추면 임시저장됩니다';
+    statusEl.className = 'pending';
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function applyData(dd) {
+    TEXT_IDS.forEach(function (id) { var el = document.getElementById(id); if (el && typeof dd[id] === 'string') el.value = dd[id]; });
+    document.getElementById('cShare').checked = !!dd.cShare;
+    renderSidPreview();
+  }
+  function restoreDraft() {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    try { applyData(JSON.parse(raw)); statusEl.textContent = '임시저장 불러옴'; statusEl.className = 'saved'; } catch (e) { /* 손상된 draft */ }
+  }
+  document.querySelectorAll('input, textarea, select').forEach(function (el) {
+    el.addEventListener('input', scheduleDraft);
+    el.addEventListener('change', scheduleDraft);
+  });
+  restoreDraft();
+
+  ['studentId', 'lkSid'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () {
+      var cleaned = el.value.replace(/\D/g, '').slice(0, 5);
+      if (cleaned !== el.value) el.value = cleaned;
+      if (id === 'studentId') renderSidPreview();
+    });
+  });
+  renderSidPreview();
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg, type, ms) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, ms || 2600);
+  }
+
+  /* ── 유효성 검사 ── */
+  var REQUIRED = [
+    { id: 'studentId', label: '학번' }, { id: 'studentName', label: '이름' }, { id: 'today', label: '날짜' }, { id: 'password', label: '제출 암호' },
+    { id: 'aTitle', label: 'A. 영상 제목' }, { id: 'aStory', label: 'A. 한 줄 줄거리' }, { id: 'aHero', label: 'A. 주인공과 스타일' },
+    { id: 'cut1Desc', label: 'B. 컷 1 장면' }, { id: 'cut1Prompt', label: 'B. 컷 1 프롬프트' },
+    { id: 'cut2Desc', label: 'B. 컷 2 장면' }, { id: 'cut2Prompt', label: 'B. 컷 2 프롬프트' },
+    { id: 'cut3Desc', label: 'B. 컷 3 장면' }, { id: 'cut3Prompt', label: 'B. 컷 3 프롬프트' },
+    { id: 'cut4Desc', label: 'B. 컷 4 장면' }, { id: 'cut4Prompt', label: 'B. 컷 4 프롬프트' },
+    { id: 'cLink', label: 'C. 최종 영상 링크' }, { check: 'cShare', label: 'C. 공유 설정 확인' }
+  ];
+  function focusField(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { el.focus({ preventScroll: true }); }, 120);
+  }
+  function validate() {
+    var missing = [], first = null;
+    REQUIRED.forEach(function (f) {
+      var filled = f.id ? !!v(f.id) : document.getElementById(f.check).checked;
+      if (filled) return;
+      missing.push(f.label);
+      if (!first) first = f;
+    });
+    if (missing.length) {
+      var head = missing.slice(0, 3).join(', ');
+      showToast('아직 안 쓴 곳이 ' + missing.length + '군데 있어요: ' + head + (missing.length > 3 ? ' 외 ' + (missing.length - 3) + '개' : ''), 'error', 5000);
+      focusField(first.id || first.check);
+      return false;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      showToast('학번은 학년(1) + 반(2) + 번호(2) 다섯 자리 숫자예요. 예: 20317', 'error', 4600);
+      focusField('studentId');
+      return false;
+    }
+    if (!/^https?:\/\/\S+$/i.test(v('cLink'))) {
+      showToast('최종 영상 링크는 https:// 로 시작하는 주소를 그대로 붙여 넣어 주세요.', 'error', 4600);
+      focusField('cLink');
+      return false;
+    }
+    if (v('password').length < 4) {
+      showToast('제출 암호는 4자 이상으로 정해 주세요.', 'error', 3800);
+      focusField('password');
+      return false;
+    }
+    return true;
+  }
+
+  /* ── TXT ── */
+  function buildTxt(data) {
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  4컷 영상 만들기 — 트랜스포머는 어떻게 영상과 음악을 만들까');
+    L.push('  ' + data.studentId + ' (' + sidLabel(data.studentId) + ') ' + data.studentName + ' · ' + data.today);
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    L.push('');
+    L.push('【 A. 기획 】');
+    L.push('제목: ' + data.aTitle);
+    L.push('한 줄 줄거리: ' + data.aStory);
+    L.push('주인공과 스타일: ' + data.aHero);
+    L.push('');
+    L.push('【 B. 컷 1~4 】');
+    [1, 2, 3, 4].forEach(function (n) {
+      L.push('컷 ' + n + ' 장면: ' + data['cut' + n + 'Desc']);
+      L.push('컷 ' + n + ' 프롬프트: ' + data['cut' + n + 'Prompt']);
+    });
+    L.push('');
+    L.push('【 C. 최종 영상 】');
+    L.push('공유 링크: ' + data.cLink);
+    L.push('공유 설정 확인: ' + (data.cShare || '미확인'));
+    L.push('이어 붙일 때 한 일: ' + data.cJoin);
+    L.push('');
+    L.push('【 D. 한 줄 성찰 】');
+    L.push(data.dReflect);
+    return L.join('\n');
+  }
+  function downloadTxt(data) {
+    var blob = new Blob([buildTxt(data)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '4컷영상_' + (data.studentId || '') + '_' + (data.studentName || '무명') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── 제출 ── */
+  document.getElementById('btnSave').addEventListener('click', function () {
+    if (!validate()) return;
+    var data = getFormData();
+    var btn = this;
+    btn.disabled = true;
+    downloadTxt(data);
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) { showToast('TXT 파일로 저장됐어요. (시트 전송은 선생님 설정 후 가능)', 'success', 4200); btn.disabled = false; return; }
+    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      .then(function () { showToast('제출 완료! TXT 파일도 함께 저장됐어요.', 'success', 4200); localStorage.removeItem(DRAFT_KEY); recordSubmitted(data); })
+      .catch(function (err) { showToast('TXT는 저장됐어요. 시트 전송 오류: ' + err.message, 'error', 5000); })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요?')) return;
+    document.querySelectorAll('input[type="text"], input[type="url"], input[type="password"], textarea').forEach(function (el) { el.value = ''; });
+    document.getElementById('cShare').checked = false;
+    localStorage.removeItem(DRAFT_KEY);
+    statusEl.textContent = '초기화됨';
+    statusEl.className = '';
+    renderSidPreview();
+    showToast('모든 입력을 지웠어요.');
+  });
+
+  /* ── 제출 상태 배너 ── */
+  var SUBMIT_KEY = 'submitted_video_four_cuts';
+  var bannerEl = document.getElementById('submitBanner');
+  var bannerTextEl = document.getElementById('submitBannerText');
+  function showBanner(text) { bannerTextEl.textContent = text; bannerEl.classList.add('show'); }
+  function recordSubmitted(data) {
+    var stamp = new Date().toLocaleString('ko-KR');
+    try { localStorage.setItem(SUBMIT_KEY, JSON.stringify({ at: stamp, name: data.studentName, sid: data.studentId })); } catch (e) { /* 무시 */ }
+    showBanner('제출을 보냈습니다 · ' + stamp + ' — [제출 확인]으로 서버에 저장됐는지 확인할 수 있어요.');
+  }
+  (function restoreBanner() {
+    try {
+      var raw = localStorage.getItem(SUBMIT_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      showBanner('이 기기에서 ' + s.at + '에 제출을 보냈습니다 — [제출 확인]으로 내용을 다시 볼 수 있어요.');
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* ── 제출 확인 · 불러오기 ── */
+  var lookupBackdrop = document.getElementById('lookupBackdrop');
+  var lkResult = document.getElementById('lkResult');
+  var lkFillBtn = document.getElementById('lkFill');
+  var lkGoBtn = document.getElementById('lkGo');
+  var lastLookup = null, lastLookupPw = '';
+  function openLookup() {
+    document.getElementById('lkSid').value = v('studentId');
+    document.getElementById('lkName').value = v('studentName');
+    document.getElementById('lkPw').value = '';
+    lkResult.hidden = true; lkResult.textContent = ''; lkFillBtn.hidden = true; lastLookup = null;
+    lookupBackdrop.hidden = false;
+    document.getElementById('lkPw').focus();
+  }
+  function closeLookup() { lookupBackdrop.hidden = true; }
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'lkcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버 응답이 없습니다.')); }, 20000);
+      function cleanup() { clearTimeout(timer); try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (script.parentNode) script.parentNode.removeChild(script); }
+      window[cb] = function (data) { cleanup(); resolve(data); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결할 수 없습니다.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function requestLookup(p) {
+    var base = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!base) return Promise.reject(new Error('서버 주소가 설정되지 않았습니다. 선생님께 문의하세요.'));
+    var qs = 'action=lookup&source=' + SOURCE + '&studentId=' + encodeURIComponent(p.studentId) + '&studentName=' + encodeURIComponent(p.studentName) + '&password=' + encodeURIComponent(p.password);
+    var url = base + '?' + qs;
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).catch(function () { return jsonp(url); });
+  }
+  function renderLookup(res) {
+    lkResult.textContent = '';
+    lkResult.hidden = false;
+    if (res && res.status === 'ok') {
+      lastLookup = res.data;
+      lkFillBtn.hidden = false;
+      var box = document.createElement('div'); box.className = 'lk-ok';
+      var stamp = document.createElement('div'); stamp.className = 'stamp'; stamp.textContent = '제출이 확인되었습니다';
+      var when = document.createElement('div'); when.className = 'when'; when.textContent = res.submittedAt;
+      box.appendChild(stamp); box.appendChild(when);
+      var dl = document.createElement('dl');
+      [['A 제목', res.data.aTitle], ['A 줄거리', res.data.aStory], ['C 링크', res.data.cLink], ['C 공유', res.data.cShare]].forEach(function (pair) {
+        if (!pair[1]) return;
+        var dt = document.createElement('dt'); dt.textContent = pair[0];
+        var dd = document.createElement('dd'); dd.textContent = pair[1];
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      box.appendChild(dl);
+      lkResult.appendChild(box);
+      return;
+    }
+    lkFillBtn.hidden = true; lastLookup = null;
+    var bad = document.createElement('div'); bad.className = 'lk-bad';
+    if (res && res.status === 'denied') bad.textContent = '암호가 일치하지 않습니다. 제출할 때 정한 암호를 다시 확인해 주세요.';
+    else if (res && res.status === 'notfound') bad.textContent = '이 학번·이름으로 제출된 기록이 없습니다. 아직 제출하지 않았거나, 학번·이름이 제출할 때와 다를 수 있어요.';
+    else bad.textContent = '오류: ' + ((res && res.message) || '알 수 없는 오류');
+    lkResult.appendChild(bad);
+  }
+  document.getElementById('btnLookup').addEventListener('click', openLookup);
+  document.getElementById('lkClose').addEventListener('click', closeLookup);
+  lookupBackdrop.addEventListener('click', function (e) { if (e.target === lookupBackdrop) closeLookup(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lookupBackdrop.hidden) closeLookup(); });
+  ['lkSid', 'lkName', 'lkPw'].forEach(function (id) {
+    document.getElementById(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); lkGoBtn.click(); } });
+  });
+  lkGoBtn.addEventListener('click', function () {
+    var p = { studentId: document.getElementById('lkSid').value.trim(), studentName: document.getElementById('lkName').value.trim(), password: document.getElementById('lkPw').value.trim() };
+    if (!p.studentId || !p.studentName || !p.password) { renderLookup({ status: 'error', message: '학번 · 이름 · 암호를 모두 입력해 주세요.' }); return; }
+    if (!SID_RE.test(p.studentId)) { renderLookup({ status: 'error', message: '학번은 숫자 5자리예요 (학년1 + 반2 + 번호2, 예: 20317).' }); return; }
+    lkGoBtn.disabled = true;
+    lkResult.hidden = false; lkResult.textContent = ''; lkFillBtn.hidden = true;
+    var wait = document.createElement('div'); wait.className = 'lk-wait'; wait.textContent = '확인하는 중…'; lkResult.appendChild(wait);
+    requestLookup(p)
+      .then(function (res) { if (res && res.status === 'ok') lastLookupPw = p.password; renderLookup(res); })
+      .catch(function (err) { renderLookup({ status: 'error', message: err.message }); })
+      .finally(function () { lkGoBtn.disabled = false; });
+  });
+  lkFillBtn.addEventListener('click', function () {
+    if (!lastLookup) return;
+    if (!window.confirm('지금 화면의 내용을 지우고, 제출했던 내용을 불러올까요?')) return;
+    applyData(lastLookup);
+    saveDraft();
+    if (lastLookupPw) document.getElementById('password').value = lastLookupPw;
+    closeLookup();
+    showToast('제출했던 내용을 양식에 불러왔어요. 고친 뒤 다시 제출하면 최신 내용으로 갱신돼요.', 'success', 4200);
+  });
+
+  /* ── 설정 패널 (⚙ 5번 클릭 — 교사 전용) ── */
+  var gearCount = 0, gearTimer = null;
+  document.getElementById('btnGear').addEventListener('click', function () {
+    gearCount += 1;
+    clearTimeout(gearTimer);
+    gearTimer = setTimeout(function () { gearCount = 0; }, 1600);
+    if (gearCount >= 5) {
+      gearCount = 0;
+      var p = document.getElementById('settingsPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('scriptUrl').value = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    }
+  });
+  document.getElementById('btnSaveUrl').addEventListener('click', function () {
+    var u = document.getElementById('scriptUrl').value.trim();
+    if (u) { localStorage.setItem(URL_KEY, u); document.getElementById('urlStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(URL_KEY); document.getElementById('urlStatus').textContent = '기본값 사용'; }
+  });
+
+  /* ── 제출 현황 페이지에서 넘어온 경우 (?sid=…&restore=1) ── */
+  (function handoff() {
+    var params = new URLSearchParams(location.search);
+    var sid = params.get('sid');
+    if (sid && /^\d{5}$/.test(sid)) { document.getElementById('studentId').value = sid; renderSidPreview(); scheduleDraft(); }
+    if (params.get('restore') !== '1') return;
+    var key = 'handoff_' + SOURCE;
+    var raw = null;
+    try { raw = sessionStorage.getItem(key); sessionStorage.removeItem(key); } catch (e) { /* 무시 */ }
+    if (!raw) return;
+    try {
+      var payload = JSON.parse(raw);
+      if (!payload || !payload.data) return;
+      applyData(payload.data);
+      saveDraft();
+      if (payload.password) document.getElementById('password').value = payload.password;
+      if (payload.at) showBanner(payload.at + '에 낸 내용을 불러왔어요 — 고쳐서 다시 제출하면 최신 내용으로 갱신됩니다.');
+      showToast('제출했던 내용을 불러왔어요.', 'success', 3800);
+    } catch (e) { /* 무시 */ }
+  })();
+})();
+</script>
+</body>
+</html>

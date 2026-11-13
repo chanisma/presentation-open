@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>정보과제연구 — 수업 · 활동지 링크</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>">
+<style>
+  :root {
+    --bg: #faf6ec;
+    --surface: #ffffff;
+    --fg: #062a1e;
+    --fg-muted: #3f6657;
+    --fg-faint: #7a9a8c;
+    --hair: rgba(6, 68, 46, 0.16);
+    --primary: #059669;
+    --accent: linear-gradient(115deg, #34d399 0%, #059669 55%, #0891b2 100%);
+    --c-cyan: #0891b2; --c-amber: #d97706;
+    --radius: 18px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 15% -5%, rgba(5, 150, 105, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(8, 145, 178, 0.10), transparent 55%),
+      var(--bg);
+    color: var(--fg); line-height: 1.6; word-break: keep-all;
+    padding: 28px 16px 40px;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; }
+
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 26px 24px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(6, 68, 46, 0.35);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(6, 68, 46, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 68, 46, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--primary); text-transform: uppercase; }
+  .hero h1 { font-size: clamp(24px, 6vw, 32px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad { background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { color: var(--fg-muted); font-size: 14px; margin-top: 8px; }
+
+  .lesson {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 22px 22px 20px; margin-bottom: 16px;
+    box-shadow: 0 16px 44px -32px rgba(6, 68, 46, 0.3);
+    border-top: 4px solid var(--tone, var(--primary));
+  }
+  .lesson .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: var(--tone, var(--primary)); }
+  .lesson h2 { font-size: 19px; font-weight: 800; margin-top: 4px; }
+  .lesson p.desc { color: var(--fg-muted); font-size: 13.5px; margin-top: 8px; margin-bottom: 16px; }
+
+  .link-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .lbtn {
+    flex: 1 1 180px; display: flex; align-items: center; gap: 10px;
+    border-radius: 14px; padding: 13px 16px; text-decoration: none;
+    font-weight: 800; font-size: 14.5px; transition: transform 0.12s, opacity 0.15s;
+  }
+  .lbtn:active { transform: scale(0.97); }
+  .lbtn .ico { font-size: 18px; flex: none; }
+  .lbtn .lbl { display: flex; flex-direction: column; gap: 1px; }
+  .lbtn .lbl small { font-weight: 600; font-size: 11px; opacity: 0.85; }
+  .lbtn.deck { background: var(--accent); color: #fff; box-shadow: 0 10px 26px -12px rgba(5, 150, 105, 0.55); }
+  .lbtn.sheet { background: #fff; color: var(--fg); border: 1.5px solid var(--hair); }
+  .lbtn.sheet:hover, .lbtn.deck:hover { opacity: 0.92; }
+
+  footer {
+    text-align: center; color: var(--fg-faint); font-size: 12.5px; margin-top: 22px;
+  }
+
+  @media (max-width: 420px) {
+    .lbtn { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">정보과제연구 · 2026-2</div>
+    <h1>수업 · <span class="grad">활동지 링크</span></h1>
+    <p class="sub">차시별로 수업(웹앱 덱)과 활동지를 모았다. 눌러서 새 창으로 연다.</p>
+  </header>
+
+  <section class="lesson" style="--tone: var(--c-cyan);">
+    <div class="kicker">2차시</div>
+    <h2>데이터의 가치와 활용 — 데이터에서 서비스로</h2>
+    <p class="desc">두 데이터를 결합·변환·예측·개방의 렌즈로 이어 붙여 한 문장 기획서를 만드는 수업.</p>
+    <div class="link-row">
+      <a class="lbtn deck" href="/index.html?deck=info-research-data-value" target="_blank" rel="noopener">
+        <span class="ico">🧭</span>
+        <span class="lbl">수업 보기<small>웹앱 덱</small></span>
+      </a>
+      <a class="lbtn sheet" href="/data/2026-2/정보과제연구/데이터의-가치와-활용/활동지.html" target="_blank" rel="noopener">
+        <span class="ico">📝</span>
+        <span class="lbl">활동지 열기<small>한 문장 기획서</small></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="lesson" style="--tone: var(--c-amber);">
+    <div class="kicker">3차시</div>
+    <h2>바이브코딩 — 말이 설계가 되다</h2>
+    <p class="desc">AI에게 프롬프트로 명령해 결과물을 조금씩 깎아 나가는 실습과 프롬프트 기록.</p>
+    <div class="link-row">
+      <a class="lbtn deck" href="/index.html?deck=info-research-vibe-coding" target="_blank" rel="noopener">
+        <span class="ico">💬</span>
+        <span class="lbl">수업 보기<small>웹앱 덱</small></span>
+      </a>
+      <a class="lbtn sheet" href="/data/2026-2/정보과제연구/바이브코딩/활동지.html" target="_blank" rel="noopener">
+        <span class="ico">📝</span>
+        <span class="lbl">활동지 열기<small>프롬프트 기록</small></span>
+      </a>
+    </div>
+  </section>
+
+  <footer>링크가 안 열리면 선생님에게 알려 주세요.</footer>
+
+</div>
+</body>
+</html>

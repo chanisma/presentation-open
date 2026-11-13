@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>온톨로지의 이해 — 지식 표현의 구조</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── 1. Reset & CSS Variables ─── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --style-bg: #FFFFFF;
+      --style-bg-rgb: 255,255,255;
+      --style-primary: #111111;
+      --style-accent: #E8000D;
+      --style-text: #111111;
+      --style-text-secondary: #444444;
+      --style-divider: #DDDDDD;
+      --font-title: 'Noto Sans KR', 'Arial', sans-serif;
+      --font-body: 'Noto Sans KR', 'Arial', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+      --card-radius: 0.3rem;
+      --nav-height: 2.8rem;
+    }
+    html, body {
+      font-family: var(--font-body);
+      font-size: clamp(16px, 1.5vw, 28px);
+      background: #F5F5F5;
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden;
+      height: 100%;
+    }
+    h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; }
+    h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.25; }
+    h3 { font-size: 1.15rem; font-weight: 600; line-height: 1.3; }
+    p { margin-bottom: 0.6rem; }
+
+    /* ─── 2. Accessibility ─── */
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+    .skip-link { position:absolute; top:-40px; left:0; background:var(--style-accent); color:#fff; padding:8px 16px; z-index:9999; font-size:14px; transition:top 0.2s; text-decoration:none; }
+    .skip-link:focus { top:0; }
+    :focus-visible { outline:3px solid var(--style-accent); outline-offset:2px; }
+    :focus:not(:focus-visible) { outline:none; }
+
+    /* ─── 3. Progress Bar ─── */
+    .progress-bar { position:fixed; top:0; left:0; height:3px; background:var(--style-accent); z-index:1000; transition:width 0.4s ease; }
+
+    /* ─── 4. Slide Container ─── */
+    .presentation { width:100%; height:calc(100vh - var(--nav-height)); position:relative; overflow:hidden; }
+    .slide { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:1.5rem; opacity:0; visibility:hidden; transition:opacity 0.5s ease, visibility 0.5s; }
+    .slide.active { opacity:1; visibility:visible; }
+
+    /* ─── 5. Browser Card Chrome (Swiss) ─── */
+    .browser-card {
+      width: 100%; max-width: 960px;
+      background: var(--style-bg);
+      border-left: 6px solid var(--style-accent);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+      max-height: calc(100vh - var(--nav-height) - 3rem);
+      display: flex; flex-direction: column;
+    }
+    .browser-card--frameless { border-left: none; background: transparent; box-shadow: none; }
+    .browser-topbar {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: #FAFAFA;
+      border-bottom: 1px solid var(--style-divider);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      color: var(--style-text-secondary);
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .dot { width:10px; height:10px; border-radius:50%; }
+    .dot-r { background:#FF5F57; }
+    .dot-y { background:#FFBD2E; }
+    .dot-g { background:#28CA41; }
+    .topbar-title { margin-left: auto; }
+    .browser-content { padding: 2rem; overflow-y: auto; flex: 1; }
+
+    /* ─── 6. Swiss Style Specifics ─── */
+    .red-rule { width: 60px; height: 4px; background: var(--style-accent); margin: 0.8rem 0; }
+    .section-label { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--style-text-secondary); margin-bottom: 0.3rem; }
+
+    /* ─── 7. Cover ─── */
+    .slide.cover { background: linear-gradient(135deg, #111 0%, #2a2a2a 100%); }
+    .cover .browser-card { background: transparent; border-left: none; box-shadow: none; }
+    .cover .browser-content { color: #fff; text-align: left; }
+    .cover h1 { color: #fff; font-size: 2.8rem; margin-bottom: 0.5rem; }
+    .cover .subtitle { color: rgba(255,255,255,0.7); font-size: 1.1rem; }
+    .cover .red-rule { width: 80px; height: 6px; }
+    .cover .meta { font-family: var(--font-mono); font-size: 0.75rem; color: rgba(255,255,255,0.5); letter-spacing: 0.1em; margin-top: 1.5rem; }
+
+    /* ─── 8. Components ─── */
+    /* stat-highlight */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .stat-card { text-align: center; padding: 1.2rem 0.8rem; border: 1px solid var(--style-divider); }
+    .stat-number { font-size: 2rem; font-weight: 800; color: var(--style-accent); }
+    .stat-label { font-size: 0.85rem; color: var(--style-text-secondary); margin-top: 0.3rem; }
+
+    /* card-grid */
+    .card-grid { display: grid; gap: 1rem; margin: 1rem 0; }
+    .card-grid.grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .card-grid.grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid.grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .card { padding: 1.2rem; border: 1px solid var(--style-divider); background: #FAFAFA; }
+    .card-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .card h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+    .card p { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* two-column */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+    .col ul { padding-left: 1.2rem; }
+    .col li { margin-bottom: 0.4rem; font-size: 0.95rem; }
+
+    /* comparison */
+    .comparison-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
+    .comparison-table th { background: var(--style-accent); color: #fff; padding: 0.6rem 0.8rem; text-align: left; font-weight: 600; }
+    .comparison-table td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--style-divider); }
+    .comparison-table tr:nth-child(even) td { background: #FAFAFA; }
+
+    /* timeline */
+    .timeline { display: flex; flex-direction: column; gap: 1rem; margin: 1rem 0; }
+    .timeline-item { display: flex; gap: 1rem; align-items: flex-start; }
+    .timeline-num { width: 2.2rem; height: 2.2rem; background: var(--style-accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+    .timeline-content h3 { font-size: 0.95rem; }
+    .timeline-content p { font-size: 0.85rem; color: var(--style-text-secondary); }
+
+    /* activity-list */
+    .activity-list { list-style: none; margin: 1rem 0; }
+    .activity-list li { display: flex; gap: 0.8rem; align-items: flex-start; padding: 0.8rem 0; border-bottom: 1px solid var(--style-divider); }
+    .activity-list .step-num { background: var(--style-accent); color: #fff; width: 1.8rem; height: 1.8rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
+    .activity-list .step-text { font-size: 0.92rem; }
+    .activity-list .step-desc { font-size: 0.82rem; color: var(--style-text-secondary); }
+
+    /* quote */
+    .quote-block { border-left: 4px solid var(--style-accent); padding: 1.2rem 1.5rem; margin: 1rem 0; background: #FAFAFA; }
+    .quote-text { font-size: 1.15rem; font-weight: 500; font-style: italic; line-height: 1.6; }
+    .quote-author { font-size: 0.85rem; color: var(--style-text-secondary); margin-top: 0.5rem; }
+
+    /* info-box */
+    .info-box { padding: 1rem 1.2rem; border: 1px solid var(--style-divider); border-left: 4px solid var(--style-accent); margin: 0.8rem 0; background: #FAFAFA; }
+    .info-box-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .info-box p { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* badge */
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.75rem; font-weight: 600; border: 1px solid; margin: 0.15rem; }
+    .badge-red { color: var(--style-accent); border-color: var(--style-accent); }
+    .badge-gray { color: #666; border-color: #999; }
+
+    /* showcase-grid */
+    .showcase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+    .showcase-item { text-align: center; padding: 1rem; border: 1px solid var(--style-divider); }
+    .showcase-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .showcase-item h3 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+    .showcase-item p { font-size: 0.82rem; color: var(--style-text-secondary); }
+
+    /* diagram box (CSS-only ontology diagrams) */
+    .diagram-box { background: #FAFAFA; border: 1px solid var(--style-divider); padding: 1.5rem; margin: 1rem 0; text-align: center; }
+    .diagram-node { display: inline-block; padding: 0.5rem 1rem; border: 2px solid var(--style-accent); margin: 0.3rem; font-size: 0.85rem; font-weight: 600; }
+    .diagram-node.filled { background: var(--style-accent); color: #fff; }
+    .diagram-arrow { font-size: 1.2rem; color: var(--style-text-secondary); margin: 0 0.3rem; }
+    .diagram-row { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
+    .diagram-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--style-text-secondary); letter-spacing: 0.05em; }
+
+    /* end slide */
+    .slide.end { background: linear-gradient(135deg, #111 0%, #2a2a2a 100%); }
+    .end .browser-card { background: transparent; border-left: none; box-shadow: none; }
+    .end .browser-content { color: #fff; text-align: center; }
+    .end h1 { color: #fff; }
+    .end p { color: rgba(255,255,255,0.7); }
+
+    /* ─── 9. Navigation ─── */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: var(--nav-height);
+      display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--style-divider);
+      z-index: 999;
+    }
+    .nav-btn {
+      width: 2rem; height: 2rem;
+      background: none; border: 1px solid var(--style-divider);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover { background: #f0f0f0; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn svg { width: 1.2rem; height: 1.2rem; fill: var(--style-text); }
+    .nav-counter { font-family: var(--font-mono); font-size: 0.75rem; color: var(--style-text-secondary); letter-spacing: 0.05em; }
+    .slide-input {
+      width: 2rem; text-align: center; border: 1px solid var(--style-divider);
+      font-family: var(--font-mono); font-size: 0.75rem; padding: 0.15rem;
+      background: transparent;
+    }
+
+    /* ─── 10. Responsive ─── */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .browser-content { padding: 1.5rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .two-col, .card-grid.grid-3, .card-grid.grid-2 { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .showcase-grid { grid-template-columns: repeat(2, 1fr); }
+      .cover h1 { font-size: 2rem; }
+      .comparison-table { font-size: 0.8rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .stat-grid { grid-template-columns: 1fr; }
+      .showcase-grid { grid-template-columns: 1fr; }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+    }
+
+    /* ─── 11. High Contrast & Reduced Motion ─── */
+    @media (prefers-contrast: high) {
+      :root { --style-accent: #CC0000; --style-text: #000; }
+      .browser-card { border: 2px solid #000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="15" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ═══ SLIDE 1: Cover ═══ -->
+    <div class="slide cover active" data-slide="1" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content">
+          <div class="section-label">Knowledge Representation</div>
+          <div class="red-rule"></div>
+          <h1>온톨로지의 이해</h1>
+          <p class="subtitle">지식을 구조화하는 기술 — 개념, 관계, 그리고 의미의 체계</p>
+          <div class="meta">2026 · 정보과학 수업자료 · Swiss International Style</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 2: 학습 목표 ═══ -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 2: 학습 목표">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">학습 목표</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Learning Objectives</div>
+          <h2>이 수업에서 배울 3가지</h2>
+          <div class="red-rule"></div>
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-number">01</div>
+              <div class="stat-label">온톨로지의 개념과<br>철학적 기원 이해</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">02</div>
+              <div class="stat-label">정보과학에서의<br>온톨로지 구조 파악</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">03</div>
+              <div class="stat-label">실생활 속 온톨로지<br>활용 사례 탐구</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 3: 온톨로지란? ═══ -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 3: 온톨로지란?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">개념 정의</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">What is Ontology?</div>
+          <h2>온톨로지란 무엇인가?</h2>
+          <div class="red-rule"></div>
+          <div class="two-col">
+            <div class="col">
+              <h3>✦ 철학에서의 온톨로지</h3>
+              <p style="font-size:0.92rem;color:var(--style-text-secondary);">존재론(存在論) — "존재하는 것은 무엇인가?"를 탐구하는 철학의 한 분야</p>
+              <ul>
+                <li>아리스토텔레스의 범주론에서 시작</li>
+                <li>존재의 본질과 구조를 분류</li>
+                <li>세계를 이해하는 개념적 틀 제공</li>
+              </ul>
+            </div>
+            <div class="col">
+              <h3>◆ 정보과학에서의 온톨로지</h3>
+              <p style="font-size:0.92rem;color:var(--style-text-secondary);">"공유된 개념화의 형식적이고 명시적인 명세" — Tom Gruber (1993)</p>
+              <ul>
+                <li>특정 분야의 지식을 체계적으로 표현</li>
+                <li>개념, 속성, 관계를 정의</li>
+                <li>컴퓨터가 이해할 수 있는 형식</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 4: 핵심 구성요소 ═══ -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 4: 핵심 구성요소">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">구성요소</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Core Components</div>
+          <h2>온톨로지의 4가지 핵심 구성요소</h2>
+          <div class="red-rule"></div>
+          <div class="card-grid grid-2">
+            <div class="card" style="border-left:4px solid var(--style-accent);">
+              <h3>클래스 (Class)</h3>
+              <p>같은 특성을 가진 개체들의 집합. 예: "동물", "포유류", "개"</p>
+            </div>
+            <div class="card" style="border-left:4px solid #444;">
+              <h3>관계 (Relation)</h3>
+              <p>클래스 간의 연결. 예: "개 → 하위분류 → 포유류"</p>
+            </div>
+            <div class="card" style="border-left:4px solid var(--style-accent);">
+              <h3>속성 (Property)</h3>
+              <p>클래스의 특징을 기술. 예: "이름", "나이", "서식지"</p>
+            </div>
+            <div class="card" style="border-left:4px solid #444;">
+              <h3>인스턴스 (Instance)</h3>
+              <p>클래스에 속하는 구체적 개체. 예: "내 반려견 초코"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 5: 온톨로지 구조 다이어그램 ═══ -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 5: 온톨로지 구조">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">구조 다이어그램</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Structure Diagram</div>
+          <h2>온톨로지의 계층 구조</h2>
+          <div class="red-rule"></div>
+          <div class="image-focus">
+            <div class="image-container">
+              <img src="img-05-ontology-diagram.jpg" alt="온톨로지 클래스 계층 구조 다이어그램"
+                   loading="lazy" style="max-height:350px;object-fit:contain;"
+                   onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder" style="display:none;">
+                <span class="placeholder-icon">🖼️</span>
+                <span class="placeholder-text">이미지를 불러올 수 없습니다</span>
+              </div>
+            </div>
+            <p class="image-caption">온톨로지의 클래스-서브클래스 계층 구조 (출처: Stanford/Noy & McGuinness)</p>
+          </div>
+          <div class="info-box" style="margin-top:0.8rem;">
+            <div class="info-box-title">구조 읽는 법</div>
+            <p>상위 클래스(Thing) → 하위 클래스(생물/무생물) → 더 구체적 클래스(동물/식물) → 인스턴스(초코)로 내려갑니다. 이것이 <strong>is-a 관계</strong>입니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 6: 왜 필요한가? ═══ -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 6: 온톨로지가 필요한 이유">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">필요성</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Why Ontology?</div>
+          <h2>왜 온톨로지가 필요한가?</h2>
+          <div class="red-rule"></div>
+          <div class="card-grid grid-3">
+            <div class="card">
+                            <h3>지식 공유</h3>
+              <p>같은 용어를 다르게 이해하는 문제 해결. 공통 어휘와 의미 합의.</p>
+            </div>
+            <div class="card">
+                            <h3>시맨틱 검색</h3>
+              <p>"사과" 검색 시 과일인지, 회사인지, 사과(謝過)인지 구분 가능.</p>
+            </div>
+            <div class="card">
+                            <h3>AI 추론</h3>
+              <p>기계가 맥락을 이해하고 새로운 지식을 추론할 수 있게 함.</p>
+            </div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-title">핵심 포인트</div>
+            <p>온톨로지는 "사람과 컴퓨터가 같은 언어로 지식을 이해하는 약속"입니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 7: RDF 트리플 ═══ -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 7: RDF 트리플">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">RDF 트리플</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">RDF Triple</div>
+          <h2>온톨로지의 표현 방법: RDF</h2>
+          <div class="red-rule"></div>
+          <p>RDF(Resource Description Framework)는 온톨로지를 표현하는 기본 단위입니다.</p>
+          <div class="diagram-box">
+            <div class="diagram-label">주어 (Subject) → 서술어 (Predicate) → 목적어 (Object)</div>
+            <div class="diagram-row" style="margin-top:1rem;">
+              <span class="diagram-node filled">세종대왕</span>
+              <span class="diagram-arrow">—발명→</span>
+              <span class="diagram-node filled">한글</span>
+            </div>
+            <div class="diagram-row">
+              <span class="diagram-node">세종대왕</span>
+              <span class="diagram-arrow">—직업→</span>
+              <span class="diagram-node">왕</span>
+            </div>
+            <div class="diagram-row">
+              <span class="diagram-node">한글</span>
+              <span class="diagram-arrow">—유형→</span>
+              <span class="diagram-node">문자체계</span>
+            </div>
+          </div>
+          <div class="info-box">
+            <div class="info-box-title">코드로 보면</div>
+            <p style="font-family:var(--font-mono);font-size:0.8rem;">&lt;세종대왕&gt; &lt;발명&gt; &lt;한글&gt; .<br>&lt;세종대왕&gt; &lt;유형&gt; &lt;왕&gt; .<br>&lt;한글&gt; &lt;유형&gt; &lt;문자체계&gt; .</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 8: 시맨틱 웹 ═══ -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 8: 시맨틱 웹">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">시맨틱 웹</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Semantic Web</div>
+          <h2>시맨틱 웹과 온톨로지</h2>
+          <div class="red-rule"></div>
+          <div class="two-col">
+            <div class="col">
+              <h3>웹의 진화</h3>
+              <ul>
+                <li><strong>Web 1.0</strong> — 읽기 전용 (HTML 문서)</li>
+                <li><strong>Web 2.0</strong> — 읽기+쓰기 (SNS, 블로그)</li>
+                <li><strong>Web 3.0</strong> — 의미 이해 (시맨틱 웹)</li>
+              </ul>
+              <p style="font-size:0.88rem;color:var(--style-text-secondary);margin-top:0.5rem;">팀 버너스-리(Tim Berners-Lee)가 제안한 차세대 웹</p>
+            </div>
+            <div class="col">
+              <h3>시맨틱 웹 기술 스택</h3>
+              <div class="image-focus" style="margin:0.5rem 0;">
+                <div class="image-container" style="max-width:100%;">
+                  <img src="img-08-semantic-web.png" alt="시맨틱 웹 레이어 케이크 다이어그램"
+                       loading="lazy" style="max-height:300px;object-fit:contain;width:100%;"
+                       onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <div class="image-placeholder" style="display:none;">
+                    <span class="placeholder-icon">🖼️</span>
+                    <span class="placeholder-text">이미지를 불러올 수 없습니다</span>
+                  </div>
+                </div>
+                <p class="image-caption" style="font-size:0.75rem;">Semantic Web Layer Cake (CC BY-SA 4.0, Wikimedia Commons)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 9: 온톨로지 vs DB vs 지식그래프 ═══ -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 9: 비교">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">비교 분석</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Comparison</div>
+          <h2>온톨로지 vs 데이터베이스 vs 지식그래프</h2>
+          <div class="red-rule"></div>
+          <table class="comparison-table">
+            <thead>
+              <tr><th>항목</th><th>데이터베이스</th><th>온톨로지</th><th>지식그래프</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>목적</strong></td><td>데이터 저장/조회</td><td>지식의 의미 정의</td><td>관계 기반 지식 탐색</td></tr>
+              <tr><td><strong>구조</strong></td><td>테이블 (행·열)</td><td>클래스·속성·관계</td><td>노드·엣지 그래프</td></tr>
+              <tr><td><strong>유연성</strong></td><td>스키마 고정</td><td>확장 가능</td><td>매우 유연</td></tr>
+              <tr><td><strong>추론</strong></td><td>불가</td><td>논리적 추론 가능</td><td>부분적 추론</td></tr>
+              <tr><td><strong>예시</strong></td><td>MySQL, PostgreSQL</td><td>OWL, Protégé</td><td>Google KG, Wikidata</td></tr>
+            </tbody>
+          </table>
+          <div class="info-box">
+            <div class="info-box-title">관계</div>
+            <p>온톨로지는 지식그래프의 "설계도"이고, 지식그래프는 온톨로지에 따라 구축된 "실제 데이터"입니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 10: 구축 과정 ═══ -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 10: 온톨로지 구축 과정">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">구축 과정</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Building Process</div>
+          <h2>온톨로지는 어떻게 만드는가?</h2>
+          <div class="red-rule"></div>
+          <ol class="activity-list">
+            <li><span class="step-num">1</span><div><div class="step-text">도메인 범위 결정</div><div class="step-desc">어떤 분야의 지식을 표현할 것인가? (예: 의료, 교육, 음식)</div></div></li>
+            <li><span class="step-num">2</span><div><div class="step-text">핵심 개념(클래스) 나열</div><div class="step-desc">해당 분야의 주요 개념들을 브레인스토밍으로 수집</div></div></li>
+            <li><span class="step-num">3</span><div><div class="step-text">계층 구조 설계</div><div class="step-desc">상위/하위 관계(is-a)로 클래스를 조직화</div></div></li>
+            <li><span class="step-num">4</span><div><div class="step-text">속성과 관계 정의</div><div class="step-desc">각 클래스의 속성(has-a)과 클래스 간 관계를 명세</div></div></li>
+            <li><span class="step-num">5</span><div><div class="step-text">인스턴스 생성 및 검증</div><div class="step-desc">실제 데이터를 입력하고 추론 엔진으로 일관성 확인</div></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 11: OWL 언어 ═══ -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 11: OWL 언어">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">OWL</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Web Ontology Language</div>
+          <h2>OWL — 온톨로지를 작성하는 언어</h2>
+          <div class="red-rule"></div>
+          <div class="two-col">
+            <div class="col">
+              <h3>OWL이란?</h3>
+              <ul>
+                <li>W3C 표준 온톨로지 언어</li>
+                <li>RDF 위에 구축된 표현력 높은 언어</li>
+                <li>논리적 추론을 지원</li>
+              </ul>
+              <div style="margin-top:0.8rem;">
+                <span class="badge badge-red">OWL Lite</span>
+                <span class="badge badge-red">OWL DL</span>
+                <span class="badge badge-red">OWL Full</span>
+              </div>
+            </div>
+            <div class="col">
+              <h3>도구: Protégé</h3>
+              <div class="info-box">
+                <div class="info-box-title">Protégé</div>
+                <p>스탠포드 대학이 개발한 무료 온톨로지 편집기. GUI로 클래스, 속성, 관계를 시각적으로 설계할 수 있음.</p>
+              </div>
+              <p style="font-size:0.85rem;color:var(--style-text-secondary);">protege.stanford.edu</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 12: 활용 분야 ═══ -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 12: 활용 분야">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">활용 분야</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Applications</div>
+          <h2>온톨로지가 사용되는 곳</h2>
+          <div class="red-rule"></div>
+          <div class="showcase-grid">
+            <div class="showcase-item">
+              <div class="showcase-icon" style="font-size:1.5rem;font-weight:800;color:var(--style-accent);">✦</div>
+              <h3>의료</h3>
+              <p>SNOMED CT — 30만 개 의학 개념의 표준 용어 체계</p>
+            </div>
+            <div class="showcase-item">
+              <div class="showcase-icon" style="font-size:1.5rem;font-weight:800;color:var(--style-accent);">◆</div>
+              <h3>생명과학</h3>
+              <p>Gene Ontology — 유전자 기능을 분류하는 세계 표준</p>
+            </div>
+            <div class="showcase-item">
+              <div class="showcase-icon" style="font-size:1.5rem;font-weight:800;color:var(--style-accent);">※</div>
+              <h3>웹 검색</h3>
+              <p>Schema.org — 구글·빙이 사용하는 웹 콘텐츠 의미 표현</p>
+            </div>
+            <div class="showcase-item">
+              <div class="showcase-icon" style="font-size:1.5rem;font-weight:800;color:var(--style-accent);">❧</div>
+              <h3>도서관</h3>
+              <p>더블린 코어 — 전 세계 디지털 자원의 메타데이터 표준</p>
+            </div>
+            <div class="showcase-item">
+              <div class="showcase-icon" style="font-size:1.5rem;font-weight:800;color:var(--style-accent);">⊕</div>
+              <h3>제조업</h3>
+              <p>제품 온톨로지 — 부품·공정·품질 지식의 체계화</p>
+            </div>
+            <div class="showcase-item">
+              <div class="showcase-icon" style="font-size:1.5rem;font-weight:800;color:var(--style-accent);">◈</div>
+              <h3>인공지능</h3>
+              <p>AI 에이전트의 세계 모델 — 상식과 맥락 이해의 기반</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 13: 대표적인 온톨로지 ═══ -->
+    <div class="slide" data-slide="13" role="region" aria-label="슬라이드 13: 대표적인 온톨로지">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">대표 사례</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Notable Ontologies</div>
+          <h2>세상을 구조화한 유명 온톨로지들</h2>
+          <div class="red-rule"></div>
+          <div class="card-grid grid-2">
+            <div class="card">
+                            <h3>DBpedia</h3>
+              <p>위키피디아의 구조화된 버전. 수백만 개의 엔티티와 관계를 RDF로 제공.</p>
+              <span class="badge badge-gray">4.5M+ 엔티티</span>
+            </div>
+            <div class="card">
+                            <h3>FOAF</h3>
+              <p>Friend of a Friend — 사람과 사회적 관계를 표현하는 온톨로지.</p>
+              <span class="badge badge-gray">소셜 네트워크</span>
+            </div>
+            <div class="card">
+                            <h3>Wikidata</h3>
+              <p>위키미디어 재단의 개방형 지식 베이스. 100M+ 항목.</p>
+              <span class="badge badge-gray">다국어 지원</span>
+            </div>
+            <div class="card">
+                            <h3>Gene Ontology</h3>
+              <p>생물학 유전자 기능의 표준 분류. 전 세계 연구자가 공동 관리.</p>
+              <span class="badge badge-gray">44K+ 용어</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 14: 미래 전망 ═══ -->
+    <div class="slide" data-slide="14" role="region" aria-label="슬라이드 14: 미래 전망">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span class="topbar-title">미래 전망</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-label">Future Outlook</div>
+          <h2>온톨로지의 미래</h2>
+          <div class="red-rule"></div>
+          <div class="quote-block">
+            <div class="quote-text">"I have a dream for the Web in which computers become capable of analyzing all the data — the content, links, and transactions between people and computers."</div>
+            <div class="quote-author">— Tim Berners-Lee, 시맨틱 웹의 아버지</div>
+          </div>
+          <div class="card-grid grid-3" style="margin-top:1rem;">
+            <div class="card">
+                            <h3>LLM + 온톨로지</h3>
+              <p>대규모 언어 모델에 구조화된 지식을 결합하여 정확성 향상</p>
+            </div>
+            <div class="card">
+                            <h3>디지털 트윈</h3>
+              <p>도시·건물·공장의 디지털 복제에 온톨로지로 의미 부여</p>
+            </div>
+            <div class="card">
+                            <h3>분산 지식</h3>
+              <p>블록체인 + 온톨로지로 탈중앙화된 지식 공유 네트워크</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ SLIDE 15: 마무리 ═══ -->
+    <div class="slide end" data-slide="15" role="region" aria-label="슬라이드 15: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content">
+          <div class="section-label" style="color:rgba(255,255,255,0.5);">Summary</div>
+          <div class="red-rule" style="margin:0.5rem auto;"></div>
+          <h1 style="font-size:2.2rem;">지식의 구조를 설계하라</h1>
+          <p style="font-size:1.1rem;margin:1rem 0;">온톨로지는 단순한 기술이 아닌,<br>세상을 이해하고 소통하는 새로운 방법입니다.</p>
+          <div style="margin-top:1.5rem;display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;">
+            <div style="text-align:center;">
+              <div style="font-size:1.5rem;color:var(--style-accent);">✦</div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);">개념 정의</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:1.5rem;color:var(--style-accent);">◆</div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);">관계 연결</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:1.5rem;color:var(--style-accent);">※</div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);">기계 추론</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:1.5rem;color:var(--style-accent);">⊕</div>
+              <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);">지식 공유</div>
+            </div>
+          </div>
+          <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:2rem;">참고: Gruber (1993), W3C OWL Spec, Stanford Protégé</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides">15</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+
+    function showSlide(n) {
+      if (n < 0 || n >= total) return;
+      slides[current].classList.remove('active');
+      current = n;
+      slides[current].classList.add('active');
+      document.getElementById('slideInput').value = current + 1;
+      document.getElementById('prevBtn').disabled = current === 0;
+      document.getElementById('nextBtn').disabled = current === total - 1;
+      document.getElementById('progressBar').style.width = ((current + 1) / total * 100) + '%';
+      document.getElementById('slideAnnounce').textContent = '슬라이드 ' + (current + 1) + ' / ' + total;
+    }
+
+    function nextSlide() { showSlide(current + 1); }
+    function prevSlide() { showSlide(current - 1); }
+
+    document.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT') return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+      if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+      if (e.key === 'End') { e.preventDefault(); showSlide(total - 1); }
+    });
+
+    document.getElementById('slideInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const val = parseInt(e.target.value);
+        if (val >= 1 && val <= total) showSlide(val - 1);
+        e.target.blur();
+      }
+    });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+    }, { passive: true });
+
+    let wheelLocked = false;
+    document.querySelector('.presentation').addEventListener('wheel', e => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    showSlide(0);
+  </script>
+</body>
+</html>

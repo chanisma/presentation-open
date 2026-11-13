@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 360" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 정면에서 본 나무 테 모래시계. 유리 안은 비워 두었다 — 덱이 글자 블록(모래 대신)을 위 칸에 쌓고 아래로 떨어뜨린다
+       (쇼츠 대본 쓰기 S11 — 글자 예산). 어두운 배경에서도 나무 판과 유리 테두리가 밝게 보인다. 텍스트 없음.
+       팔레트: ink #10131d · wood #c98f55 · woodDark #9a6534 · woodTop #e0ad73 · glass #cfe3ee · post #b07a45
+       앵커: 위 칸 안쪽 x 64~176, y 46~150 · 목 (120, 180) · 아래 칸 안쪽 x 64~176, y 210~314 -->
+  <path d="M30 352 C90 358 150 358 210 352" stroke="#10131d" stroke-width="8" opacity=".12" />
+  <!-- 유리 -->
+  <path d="M58 36 L182 36 C182 98 150 150 128 176 L128 184 C150 210 182 262 182 324 L58 324 C58 262 90 210 112 184 L112 176 C90 150 58 98 58 36 Z"
+        fill="#cfe3ee" fill-opacity=".22" stroke="#10131d" stroke-width="2.4" />
+  <path d="M70 46 C72 92 92 130 108 156" stroke="#ffffff" stroke-width="3.4" opacity=".55" />
+  <path d="M70 312 C72 270 86 236 104 212" stroke="#ffffff" stroke-width="2.6" opacity=".4" />
+  <!-- 기둥 -->
+  <g>
+    <rect x="22" y="30" width="14" height="300" rx="5" fill="#b07a45" stroke="#10131d" stroke-width="2.2" />
+    <rect x="204" y="30" width="14" height="300" rx="5" fill="#b07a45" stroke="#10131d" stroke-width="2.2" />
+    <path d="M27 46 L27 316" stroke="#ffffff" stroke-width="2" opacity=".3" />
+    <path d="M209 46 L209 316" stroke="#ffffff" stroke-width="2" opacity=".3" />
+  </g>
+  <!-- 위 판 -->
+  <path d="M14 14 L226 14 C230 14 232 17 232 20 L232 30 C232 34 230 36 226 36 L14 36 C10 36 8 34 8 30 L8 20 C8 17 10 14 14 14 Z" fill="#c98f55" stroke="#10131d" stroke-width="2.4" />
+  <path d="M10 14 L230 14 L224 6 L16 6 Z" fill="#e0ad73" stroke="#10131d" stroke-width="2.2" />
+  <!-- 아래 판 -->
+  <path d="M14 324 L226 324 C230 324 232 327 232 330 L232 340 C232 344 230 346 226 346 L14 346 C10 346 8 344 8 340 L8 330 C8 327 10 324 14 324 Z" fill="#9a6534" stroke="#10131d" stroke-width="2.4" />
+  <path d="M10 324 L230 324 L224 316 L16 316 Z" fill="#c98f55" stroke="#10131d" stroke-width="2.2" />
+  <g stroke="#10131d" stroke-width="1.2" opacity=".3"><path d="M30 24 C80 22 150 26 210 24" /><path d="M30 336 C90 334 150 338 210 336" /></g>
+</svg>

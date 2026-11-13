@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>수학 학부모 설명회</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bayon&display=swap" rel="stylesheet">
+  <style>
+    /* ── 1. Reset & CSS Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --style-bg: #F4CED3;
+      --style-primary: #E33529;
+      --style-accent: #2B6786;
+      --style-text: #693413;          /* darker → higher contrast */
+      --style-text-secondary: #924E26; /* lighter → lower contrast */
+
+      /* Extended palette */
+      --cream: #F3F3E9;
+      --cream-dark: #EDE2E2;
+      --pink-mid: #F0B5BE;
+      --pink-deep: #E8A0AD;
+      --red: #E33529;
+      --yellow-hl: #FFF500;
+      --teal: #2B6786;
+      --brown: #693413;
+      --brown-light: #924E26;
+      --black: #1A1A1A;
+      --white: #FFFFFF;
+    }
+
+    @font-face {
+      font-family: 'Pretendard Variable';
+      src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/web/variable/pretendardvariable.css');
+    }
+
+    /* ── 2. Base Typography ── */
+    html, body {
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: clamp(16px, 1.5vw, 28px);
+      background: var(--style-bg);
+      color: var(--style-text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.1; color: var(--red); }
+    h2 { font-size: 1.5rem; font-weight: 700; color: var(--brown); }
+    h3 { font-size: 1.15rem; font-weight: 700; color: var(--brown); }
+    p  { font-size: 1rem; line-height: 1.65; color: var(--style-text); }
+
+    .font-bayon {
+      font-family: 'Bayon', sans-serif;
+      letter-spacing: 0.02em;
+      line-height: 0.95;
+    }
+
+    /* ── 3. Slide Container & Navigation ── */
+    .progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: var(--red);
+      transition: width 0.3s ease;
+      z-index: 100;
+    }
+
+    .presentation {
+      height: calc(100vh - 42px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ── 4. Browser Card Chrome ── */
+    .browser-card {
+      width: 100%;
+      max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--cream);
+      border-radius: 1.8rem;
+      box-shadow: 0 8px 32px rgba(227,53,41,0.10), 0 2px 8px rgba(105,52,19,0.08);
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.2rem;
+      background: var(--cream);
+      border-bottom: 1px solid var(--pink-deep);
+      border-radius: 1.8rem 1.8rem 0 0;
+      flex-shrink: 0;
+    }
+    .dot {
+      width: 13px; height: 13px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot.red    { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green  { background: #28C840; }
+    .topbar-title {
+      font-family: 'Bayon', sans-serif;
+      font-size: 0.88rem;
+      letter-spacing: 0.06em;
+      color: var(--brown-light);
+      margin-left: auto;
+      margin-right: auto;
+      padding-right: 3rem;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    /* ── 5. Background Decoration ── */
+    .slide::before, .slide::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .slide::before {
+      width: 340px; height: 340px;
+      background: radial-gradient(circle, var(--pink-mid) 0%, transparent 70%);
+      top: -80px; right: -60px;
+      opacity: 0.5;
+    }
+    .slide::after {
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, var(--cream) 0%, transparent 70%);
+      bottom: 30px; left: -40px;
+      opacity: 0.6;
+    }
+
+    /* ── 5. Components ── */
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 0.22em 0.8em;
+      border-radius: 2rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .badge-red   { background: var(--red); color: var(--white); }
+    .badge-pink  { background: var(--pink-mid); color: #7A2020; }
+    .badge-cream { background: var(--cream-dark); color: var(--brown); }
+    .badge-teal  { background: rgba(43,103,134,0.12); color: var(--teal); }
+
+    /* Card grid */
+    .card-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: var(--white);
+      border-radius: 1.2rem;
+      padding: 1rem 1.1rem;
+      box-shadow: 0 2px 8px rgba(105,52,19,0.07);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .card-pink  { background: var(--style-bg); }
+    .card-cream { background: var(--cream-dark); }
+    .card-red   { background: var(--red); color: var(--yellow-hl); }
+    .card-red h3, .card-red p { color: var(--yellow-hl); }
+
+    .card-tilt   { transform: rotate(-2deg); transition: transform 0.3s ease; }
+    .card-tilt:hover { transform: rotate(0deg); }
+    .card-tilt-r { transform: rotate(1.5deg); transition: transform 0.3s ease; }
+    .card-tilt-r:hover { transform: rotate(0deg); }
+
+    .card-icon  { font-size: 1.4rem; margin-bottom: 0.2rem; }
+    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--brown); }
+    .card-red .card-title { color: var(--yellow-hl); }
+    .card-desc  { font-size: 0.88rem; line-height: 1.5; color: var(--style-text-secondary); }
+    .card-red .card-desc  { color: var(--yellow-hl); opacity: 0.9; }
+
+    /* Section number */
+    .sec-num {
+      font-family: 'Bayon', sans-serif;
+      font-size: 2.2rem;
+      color: var(--red);
+      opacity: 0.2;
+      line-height: 1;
+      margin-bottom: 0.1rem;
+    }
+
+    /* Bullet list */
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .bullet-list li {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--style-text);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+    .bullet-list li::before {
+      content: '';
+      flex-shrink: 0;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--red);
+      margin-top: 0.45em;
+    }
+
+    /* Highlight box */
+    .highlight-box {
+      background: rgba(227,53,41,0.07);
+      border-left: 3px solid var(--red);
+      border-radius: 0 0.8rem 0.8rem 0;
+      padding: 0.6rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .highlight-box p { font-size: 0.95rem; color: var(--brown); }
+
+    /* Timeline */
+    .timeline {
+      display: flex;
+      gap: 0.5rem;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 0.7rem; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--red), var(--pink-mid), var(--red));
+      opacity: 0.25;
+      border-radius: 1px;
+    }
+    .tl-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.4rem;
+      padding-top: 0.1rem;
+    }
+    .tl-dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 3px solid var(--red);
+      background: var(--white);
+      flex-shrink: 0;
+      z-index: 1;
+    }
+    .tl-dot.active-dot { background: var(--red); }
+    .tl-month {
+      font-family: 'Bayon', sans-serif;
+      font-size: 0.95rem;
+      color: var(--red);
+      letter-spacing: 0.02em;
+    }
+    .tl-title { font-size: 0.88rem; font-weight: 700; color: var(--brown); line-height: 1.3; }
+    .tl-desc  { font-size: 0.8rem; color: var(--style-text-secondary); line-height: 1.4; }
+
+    /* Big number stat */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+    .stat-card {
+      background: var(--white);
+      border-radius: 1.2rem;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(105,52,19,0.07);
+    }
+    .stat-num {
+      font-family: 'Bayon', sans-serif;
+      font-size: 3rem;
+      color: var(--red);
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.88rem; color: var(--style-text-secondary); margin-top: 0.3rem; }
+
+    /* Cover slide */
+    .cover-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.7rem;
+      min-height: 520px;
+      background: var(--cream);
+      border-radius: 0 0 1.8rem 1.8rem;
+    }
+    .cover-title {
+      font-family: 'Bayon', sans-serif;
+      font-size: 3rem;
+      color: var(--red);
+      letter-spacing: 0.02em;
+      line-height: 0.95;
+    }
+    .cover-outline {
+      font-family: 'Bayon', sans-serif;
+      font-size: 2rem;
+      color: var(--cream);
+      -webkit-text-stroke: 2px var(--red);
+      letter-spacing: 0.05em;
+    }
+    .cover-subtitle {
+      font-size: 1.05rem;
+      color: var(--style-text-secondary);
+      line-height: 1.5;
+    }
+    .cover-divider {
+      width: 80px; height: 3px;
+      background: linear-gradient(to right, var(--red), var(--pink-mid));
+      border-radius: 2px;
+    }
+    .cover-meta {
+      display: flex;
+      gap: 0.8rem;
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      align-items: center;
+    }
+    .cover-pills {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .cover-pill {
+      background: var(--white);
+      border-radius: 3rem;
+      padding: 0.4em 1em;
+      font-size: 0.88rem;
+      color: var(--brown);
+      box-shadow: 0 2px 6px rgba(227,53,41,0.12);
+      font-weight: 600;
+    }
+
+    /* Slide-specific content layouts */
+    .slide-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .slide-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin-bottom: 0.2rem;
+    }
+    .row-gap {
+      display: flex;
+      gap: 0.75rem;
+    }
+    .col { flex: 1; display: flex; flex-direction: column; gap: 0.6rem; }
+
+    /* TOC */
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.6rem 1rem;
+      background: var(--white);
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 1px 4px rgba(105,52,19,0.06);
+    }
+    .toc-item:hover { background: var(--pink-mid); transform: translateX(4px); }
+    .toc-num {
+      font-family: 'Bayon', sans-serif;
+      font-size: 1.3rem;
+      color: var(--red);
+      min-width: 2rem;
+      opacity: 0.7;
+    }
+    .toc-text { flex: 1; font-size: 0.95rem; font-weight: 600; color: var(--brown); }
+    .toc-arrow { color: var(--red); font-size: 0.9rem; opacity: 0.5; }
+
+    /* Step card */
+    .step-card {
+      position: relative;
+      background: var(--white);
+      border-radius: 1.2rem;
+      padding: 0.85rem 1rem 0.85rem 1rem;
+      box-shadow: 0 2px 8px rgba(105,52,19,0.07);
+    }
+    .step-num {
+      position: absolute;
+      top: 0.5rem; right: 0.8rem;
+      font-family: 'Bayon', sans-serif;
+      font-size: 2rem;
+      color: var(--red);
+      opacity: 0.15;
+      line-height: 1;
+    }
+    .step-title { font-size: 1rem; font-weight: 700; color: var(--brown); margin-bottom: 0.25rem; }
+    .step-desc  { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* Info row */
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.9rem;
+      background: var(--cream-dark);
+      border-radius: 0.9rem;
+      font-size: 0.9rem;
+      color: var(--brown);
+    }
+    .info-row strong { color: var(--red); font-weight: 700; }
+
+    /* ── 6. Animations ── */
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleUp {
+      from { opacity: 0; transform: scale(0.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .anim-up    { animation: popUp  0.55s ease-out both; }
+    .anim-scale { animation: scaleUp 0.5s ease-out both; }
+    .anim-up-d1 { animation-delay: 0.08s; }
+    .anim-up-d2 { animation-delay: 0.16s; }
+    .anim-up-d3 { animation-delay: 0.24s; }
+    .anim-up-d4 { animation-delay: 0.32s; }
+    .anim-up-d5 { animation-delay: 0.40s; }
+
+    /* ── 7. Navigation Bar ── */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      background: rgba(243,243,233,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--pink-deep);
+      z-index: 50;
+    }
+    .nav-btn {
+      width: 2rem; height: 2rem;
+      border-radius: 50%;
+      border: 2px solid var(--red);
+      background: transparent;
+      color: var(--red);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--red); color: var(--white); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn svg { width: 1.1rem; height: 1.1rem; fill: currentColor; }
+
+    .nav-counter {
+      font-size: 0.88rem;
+      color: var(--brown);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .slide-input {
+      width: 2.2rem;
+      border: 1px solid var(--pink-deep);
+      border-radius: 0.4rem;
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--brown);
+      background: var(--white);
+      padding: 0.1rem;
+    }
+    .slide-input:focus { outline: 2px solid var(--red); }
+
+    /* ── 8. Accessibility ── */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .skip-link {
+      position: absolute;
+      top: -40px; left: 0;
+      background: var(--red);
+      color: var(--white);
+      padding: 8px 16px;
+      z-index: 9999;
+      font-size: 14px;
+      border-radius: 0 0 4px 0;
+      transition: top 0.2s;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--red); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── 9. Responsive ── */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(13px, 1.8vw, 18px); }
+      .browser-content { padding: 0.8rem 1.2rem; }
+      .cover-title { font-size: 2.4rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .row-gap { flex-direction: column; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .timeline { flex-direction: column; }
+      .timeline::before { display: none; }
+    }
+    @media (max-width: 480px) {
+      .browser-content { padding: 0.8rem; }
+      .cover-title { font-size: 1.8rem; }
+      .card { padding: 0.75rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ══ 슬라이드 1: 표지 ══ -->
+    <div class="slide active" data-slide="0"
+         role="region" aria-label="슬라이드 1: 표지 — 수학 학부모 설명회">
+      <div class="browser-card anim-scale">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">MATH PARENT ORIENTATION 2026</span>
+        </div>
+        <div class="browser-content cover-slide">
+          <div class="badge badge-red anim-up">2026학년도</div>
+          <p class="cover-outline font-bayon anim-up anim-up-d1">MATHEMATICS</p>
+          <h1 class="cover-title anim-up anim-up-d2">수학 학부모 설명회</h1>
+          <p class="cover-subtitle anim-up anim-up-d3">우리 아이의 수학 학습, 함께 이해하고 함께 돕겠습니다</p>
+          <div class="cover-divider anim-up anim-up-d3" aria-hidden="true"></div>
+          <div class="cover-pills anim-up anim-up-d4">
+            <span class="cover-pill">학습 목표</span>
+            <span class="cover-pill">교육과정 안내</span>
+            <span class="cover-pill">가정 연계 방법</span>
+          </div>
+          <div class="cover-meta anim-up anim-up-d5">
+            <span>○○중학교 수학부</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-03">2026년 3월</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 슬라이드 2: 목차 ══ -->
+    <div class="slide" data-slide="1"
+         role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">TABLE OF CONTENTS</span>
+        </div>
+        <div class="browser-content slide-body">
+          <div class="slide-header">
+            <div class="sec-num font-bayon" aria-hidden="true">00</div>
+            <h2>오늘의 순서</h2>
+          </div>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item anim-up" onclick="goToSlide(2)" role="button" tabindex="0"
+                  aria-label="슬라이드 3으로 이동: 수학 교육과정 개요"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                <span class="toc-num" aria-hidden="true">01</span>
+                <span class="toc-text">수학 교육과정 개요</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item anim-up anim-up-d1" onclick="goToSlide(3)" role="button" tabindex="0"
+                  aria-label="슬라이드 4로 이동: 학년별 핵심 단원"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num" aria-hidden="true">02</span>
+                <span class="toc-text">학년별 핵심 단원</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item anim-up anim-up-d2" onclick="goToSlide(4)" role="button" tabindex="0"
+                  aria-label="슬라이드 5로 이동: 평가 방식 안내"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num" aria-hidden="true">03</span>
+                <span class="toc-text">평가 방식 안내</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item anim-up anim-up-d3" onclick="goToSlide(5)" role="button" tabindex="0"
+                  aria-label="슬라이드 6으로 이동: 가정 학습 지원 방법"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                <span class="toc-num" aria-hidden="true">04</span>
+                <span class="toc-text">가정 학습 지원 방법</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item anim-up anim-up-d4" onclick="goToSlide(6)" role="button" tabindex="0"
+                  aria-label="슬라이드 7로 이동: 수학 불안 극복 전략"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num" aria-hidden="true">05</span>
+                <span class="toc-text">수학 불안 극복 전략</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item anim-up anim-up-d5" onclick="goToSlide(7)" role="button" tabindex="0"
+                  aria-label="슬라이드 8로 이동: 학교·가정 협력 안내"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                <span class="toc-num" aria-hidden="true">06</span>
+                <span class="toc-text">학교·가정 협력 안내</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 슬라이드 3: 수학 교육과정 개요 ══ -->
+    <div class="slide" data-slide="2"
+         role="region" aria-label="슬라이드 3: 수학 교육과정 개요">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">CURRICULUM OVERVIEW</span>
+        </div>
+        <div class="browser-content slide-body">
+          <div class="slide-header">
+            <div class="sec-num font-bayon" aria-hidden="true">01</div>
+            <h2>수학 교육과정 개요</h2>
+            <span class="badge badge-pink" style="margin-left:auto">2022 개정</span>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>2022 개정 교육과정은 <strong>수학적 역량 함양</strong>과 <strong>과정 중심 평가</strong>를 강조합니다. 정답보다 사고 과정이 중요합니다.</p>
+          </div>
+          <div class="card-grid grid-3">
+            <div class="card card-tilt anim-up">
+              <span class="card-icon" aria-hidden="true">📐</span>
+              <h3 class="card-title">수와 연산</h3>
+              <p class="card-desc">수 체계 확장 및 연산 원리 이해. 암기보다 구조적 사고 강조</p>
+            </div>
+            <div class="card anim-up anim-up-d1">
+              <span class="card-icon" aria-hidden="true">📊</span>
+              <h3 class="card-title">대수와 함수</h3>
+              <p class="card-desc">변수·식·방정식 관계 탐구. 일상 상황과 연결하여 이해</p>
+            </div>
+            <div class="card card-tilt-r anim-up anim-up-d2">
+              <h3 class="card-title">기하와 측정</h3>
+              <p class="card-desc">도형 성질·공간 감각·측정 활용. 시각적 사고력 개발</p>
+            </div>
+            <div class="card card-pink anim-up anim-up-d3">
+              <span class="card-icon" aria-hidden="true">📈</span>
+              <h3 class="card-title">확률과 통계</h3>
+              <p class="card-desc">데이터 해석 및 불확실성 이해. 미래 사회 핵심 역량</p>
+            </div>
+            <div class="card card-red anim-up anim-up-d4" style="grid-column: span 2;">
+              <h3 class="card-title" style="font-size:1rem">핵심 역량 목표</h3>
+              <p class="card-desc">수학적 추론 · 문제해결 · 의사소통 · 정보처리 · 창의·융합</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 슬라이드 4: 학년별 핵심 단원 ══ -->
+    <div class="slide" data-slide="3"
+         role="region" aria-label="슬라이드 4: 학년별 핵심 단원">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">KEY UNITS BY GRADE</span>
+        </div>
+        <div class="browser-content slide-body">
+          <div class="slide-header">
+            <div class="sec-num font-bayon" aria-hidden="true">02</div>
+            <h2>학년별 핵심 단원</h2>
+          </div>
+          <div class="row-gap">
+            <div class="col">
+              <div class="card card-pink anim-up">
+                <div class="badge badge-red" style="align-self:flex-start;margin-bottom:0.3rem">1학년</div>
+                <ul class="bullet-list">
+                  <li>소인수분해 · 정수와 유리수</li>
+                  <li>문자와 식 · 일차방정식</li>
+                  <li>기본 도형 · 평면도형</li>
+                  <li>통계 기초 (도수분포)</li>
+                </ul>
+              </div>
+              <div class="card anim-up anim-up-d2">
+                <div class="badge badge-teal" style="align-self:flex-start;margin-bottom:0.3rem">2학년</div>
+                <ul class="bullet-list">
+                  <li>유리수와 순환소수</li>
+                  <li>일차함수와 그래프</li>
+                  <li>삼각형 · 사각형의 성질</li>
+                  <li>확률 기초</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card anim-up anim-up-d1">
+                <div class="badge badge-cream" style="align-self:flex-start;margin-bottom:0.3rem">3학년</div>
+                <ul class="bullet-list">
+                  <li>제곱근과 실수</li>
+                  <li>이차방정식 · 이차함수</li>
+                  <li>피타고라스 정리 · 삼각비</li>
+                  <li>통계 심화 (상관관계)</li>
+                </ul>
+              </div>
+              <div class="card card-cream anim-up anim-up-d3">
+                <span class="card-icon" aria-hidden="true">💡</span>
+                <h3 class="card-title">학습 연계 포인트</h3>
+                <p class="card-desc">각 학년 내용은 나선형 구조로 연결됩니다. 1학년 기초가 2·3학년 심화의 핵심입니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 슬라이드 5: 평가 방식 안내 ══ -->
+    <div class="slide" data-slide="4"
+         role="region" aria-label="슬라이드 5: 평가 방식 안내">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">ASSESSMENT GUIDE</span>
+        </div>
+        <div class="browser-content slide-body">
+          <div class="slide-header">
+            <div class="sec-num font-bayon" aria-hidden="true">03</div>
+            <h2>평가 방식 안내</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-card anim-up" role="listitem">
+              <div class="stat-num font-bayon">40%</div>
+              <div class="stat-label">지필 평가<br>(중간·기말)</div>
+            </div>
+            <div class="stat-card card-pink anim-up anim-up-d1" role="listitem">
+              <div class="stat-num font-bayon">35%</div>
+              <div class="stat-label">수행 평가<br>(프로젝트·서술)</div>
+            </div>
+            <div class="stat-card anim-up anim-up-d2" role="listitem">
+              <div class="stat-num font-bayon">25%</div>
+              <div class="stat-label">과정 평가<br>(수업 참여·과제)</div>
+            </div>
+          </div>
+          <div class="card-grid grid-2" style="margin-top:0.2rem">
+            <div class="step-card anim-up anim-up-d3">
+              <div class="step-num font-bayon" aria-hidden="true">01</div>
+              <div class="step-title">수행 평가 유형</div>
+              <p class="step-desc">수학 일지 쓰기, 오류 분석 보고서, 생활 속 수학 탐구 발표, 모둠 프로젝트</p>
+            </div>
+            <div class="step-card anim-up anim-up-d4">
+              <div class="step-num font-bayon" aria-hidden="true">02</div>
+              <div class="step-title">과정 중심 평가란?</div>
+              <p class="step-desc">정답 유무가 아닌 문제 해결 과정·사고력을 평가합니다. 틀려도 과정이 정확하면 점수를 받을 수 있습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 슬라이드 6: 가정 학습 지원 방법 ══ -->
+    <div class="slide" data-slide="5"
+         role="region" aria-label="슬라이드 6: 가정 학습 지원 방법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">HOME LEARNING SUPPORT</span>
+        </div>
+        <div class="browser-content slide-body">
+          <div class="slide-header">
+            <div class="sec-num font-bayon" aria-hidden="true">04</div>
+            <h2>가정 학습 지원 방법</h2>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>부모님의 역할은 <strong>정답을 가르치는 것</strong>이 아닌, <strong>생각하는 환경을 만드는 것</strong>입니다.</p>
+          </div>
+          <div class="row-gap">
+            <div class="col">
+              <div class="card anim-up">
+                <h3 class="card-title">매일 루틴 만들기</h3>
+                <ul class="bullet-list" style="margin-top:0.3rem">
+                  <li>하루 20~30분 수학 복습 시간 확보</li>
+                  <li>교과서 예제 풀이 확인 습관화</li>
+                  <li>오답 노트 점검 함께하기</li>
+                </ul>
+              </div>
+              <div class="card card-pink anim-up anim-up-d2">
+                <h3 class="card-title">질문하는 환경 만들기</h3>
+                <ul class="bullet-list" style="margin-top:0.3rem">
+                  <li>"왜 그렇게 풀었어?" 과정 묻기</li>
+                  <li>틀려도 격려, 모르는 건 선생님께</li>
+                  <li>수학 관련 실생활 대화 나누기</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card anim-up anim-up-d1">
+                <h3 class="card-title">추천 학습 자료</h3>
+                <div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.3rem">
+                  <div class="info-row"><strong>EBS</strong> 중학 수학 강의 (무료)</div>
+                  <div class="info-row"><strong>수학사랑</strong> 수학 게임 · 퍼즐</div>
+                  <div class="info-row"><strong>Khan Academy</strong> 한국어 버전</div>
+                </div>
+              </div>
+              <div class="card card-red anim-up anim-up-d3">
+                <h3 class="card-title">이것만은 피해주세요</h3>
+                <ul class="bullet-list" style="margin-top:0.3rem">
+                  <li style="color:var(--yellow-hl)">학원 숙제 대신 풀어주기</li>
+                  <li style="color:var(--yellow-hl)">점수만으로 칭찬·꾸지람</li>
+                  <li style="color:var(--yellow-hl)">"나도 수학 못했어" 발언</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 슬라이드 7: 수학 불안 극복 전략 ══ -->
+    <div class="slide" data-slide="6"
+         role="region" aria-label="슬라이드 7: 수학 불안 극복 전략">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">OVERCOMING MATH ANXIETY</span>
+        </div>
+        <div class="browser-content slide-body">
+          <div class="slide-header">
+            <div class="sec-num font-bayon" aria-hidden="true">05</div>
+            <h2>수학 불안 극복 전략</h2>
+          </div>
+          <div class="row-gap">
+            <div class="col">
+              <div class="highlight-box" role="note">
+                <p>수학 불안은 학습 의욕 저하와 직결됩니다. 초기 발견과 부모님의 올바른 반응이 핵심입니다.</p>
+              </div>
+              <div class="card anim-up">
+                <h3 class="card-title">수학 불안 신호 체크</h3>
+                <ul class="bullet-list" style="margin-top:0.3rem">
+                  <li>수학 시험 전날 복통·두통 호소</li>
+                  <li>"수학은 원래 어려워" 포기 발언</li>
+                  <li>수학 숙제 회피, 시간 지연</li>
+                  <li>수학 시간 집중도 급격히 저하</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card card-pink anim-up anim-up-d1">
+                <span class="card-icon" aria-hidden="true">🌱</span>
+                <h3 class="card-title">성장 마인드셋 심어주기</h3>
+                <p class="card-desc">"아직 못하는 것"이지 "못하는 아이"가 아님을 반복적으로 강조. 작은 성공 경험을 쌓도록 쉬운 문제부터 시작.</p>
+              </div>
+              <div class="card anim-up anim-up-d2">
+                <h3 class="card-title">학교와 소통하세요</h3>
+                <ul class="bullet-list" style="margin-top:0.3rem">
+                  <li>담당 교사와 상담 예약 (매달 1회)</li>
+                  <li>학교 수학 클리닉 프로그램 활용</li>
+                  <li>학부모 상담 주간 적극 참여</li>
+                </ul>
+              </div>
+              <div class="card card-cream anim-up anim-up-d3">
+                <h3 class="card-title">전문 지원이 필요한 경우</h3>
+                <p class="card-desc">3주 이상 학습 거부 또는 신체 증상이 지속되면 Wee 클래스 연계 상담을 권장합니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 슬라이드 8: 학교·가정 협력 안내 ══ -->
+    <div class="slide" data-slide="7"
+         role="region" aria-label="슬라이드 8: 학교·가정 협력 안내 및 마무리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">SCHOOL–HOME PARTNERSHIP</span>
+        </div>
+        <div class="browser-content slide-body">
+          <div class="slide-header">
+            <div class="sec-num font-bayon" aria-hidden="true">06</div>
+            <h2>학교·가정 협력 안내</h2>
+          </div>
+          <div class="row-gap">
+            <div class="col">
+              <div class="card anim-up">
+                <h3 class="card-title">연간 협력 일정</h3>
+                <div class="timeline" role="list" aria-label="연간 협력 일정" style="flex-direction:column;gap:0.35rem;margin-top:0.4rem">
+                  <div class="info-row anim-up anim-up-d1" role="listitem">
+                    <strong>3월</strong> 학부모 설명회 · 학습 계획 공유
+                  </div>
+                  <div class="info-row anim-up anim-up-d2" role="listitem">
+                    <strong>5월</strong> 1차 지필 후 개별 상담 주간
+                  </div>
+                  <div class="info-row anim-up anim-up-d3" role="listitem">
+                    <strong>9월</strong> 2학기 교육과정 안내
+                  </div>
+                  <div class="info-row anim-up anim-up-d4" role="listitem">
+                    <strong>11월</strong> 수학 심화반 · 보충반 신청
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="card card-pink anim-up anim-up-d1">
+                <h3 class="card-title">소통 채널</h3>
+                <ul class="bullet-list" style="margin-top:0.3rem">
+                  <li>학교 알림장 앱 (매주 금요일 공지)</li>
+                  <li>수학 교사 이메일 상담</li>
+                  <li>학년 학부모 단체 채팅방</li>
+                </ul>
+              </div>
+              <div class="card card-red anim-up anim-up-d2">
+                <h3 class="card-title">함께 만들어가는 수학 교육</h3>
+                <p class="card-desc">학교는 배움의 장, 가정은 성장의 장입니다. 선생님과 부모님이 같은 방향을 바라볼 때 아이의 수학 자신감이 자랍니다.</p>
+                <div style="margin-top:0.5rem">
+                  <span class="badge" style="background:var(--yellow-hl);color:var(--red);font-weight:800">수학은 함께 할 수 있습니다</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cover-meta anim-up anim-up-d5" style="justify-content:center;margin-top:0.3rem">
+            <span>문의: 수학부 담당교사</span>
+            <span aria-hidden="true">·</span>
+            <span>교무실 ☎ 내선 123</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled
+            aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()"
+            aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" style="margin-left:0.3rem">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const TOTAL = 8;
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    const announce = document.getElementById('slideAnnounce');
+
+    function showSlide(n) {
+      slides[current].classList.remove('active');
+      current = Math.max(0, Math.min(n, TOTAL - 1));
+      slides[current].classList.add('active');
+
+      // Reset animations
+      const animEls = slides[current].querySelectorAll('[class*="anim-"]');
+      animEls.forEach(el => {
+        el.style.animation = 'none';
+        el.offsetHeight; // reflow
+        el.style.animation = '';
+      });
+
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === TOTAL - 1;
+      slideInput.value = current + 1;
+      progressBar.style.width = ((current + 1) / TOTAL * 100) + '%';
+      progressBar.setAttribute('aria-valuenow', current + 1);
+
+      const title = slides[current].getAttribute('aria-label') || ('슬라이드 ' + (current + 1));
+      announce.textContent = title;
+
+      // Focus management
+      const content = slides[current].querySelector('.browser-content');
+      if (content) content.focus({ preventScroll: true });
+    }
+
+    function nextSlide() { if (current < TOTAL - 1) showSlide(current + 1); }
+    function prevSlide() { if (current > 0) showSlide(current - 1); }
+    function goToSlide(n) { showSlide(n); }
+
+    slideInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const val = parseInt(this.value, 10);
+        if (!isNaN(val) && val >= 1 && val <= TOTAL) showSlide(val - 1);
+        else this.value = current + 1;
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (document.activeElement === slideInput) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); prevSlide(); }
+      if (e.key === 'Home') { e.preventDefault(); showSlide(0); }
+      if (e.key === 'End')  { e.preventDefault(); showSlide(TOTAL - 1); }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = '';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = '';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    // Init
+    progressBar.style.width = (1 / TOTAL * 100) + '%';
+  </script>
+</body>
+</html>

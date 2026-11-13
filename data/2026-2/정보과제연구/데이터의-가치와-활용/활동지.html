@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>데이터에서 서비스로 — 한 문장 기획서 · 정보과제연구</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧭</text></svg>">
+<style>
+  :root {
+    --bg: #eefaf4;
+    --surface: #ffffff;
+    --fg: #062a1e;
+    --fg-muted: #3f6657;
+    --fg-faint: #7a9a8c;
+    --hair: rgba(6, 68, 46, 0.16);
+    --primary: #059669;
+    --accent: linear-gradient(115deg, #34d399 0%, #059669 55%, #0891b2 100%);
+    --c-emerald: #059669; --c-cyan: #0891b2; --c-amber: #d97706; --c-rose: #e11d48; --c-slate: #475569; --c-violet: #7c3aed;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 15% -5%, rgba(5, 150, 105, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(8, 145, 178, 0.10), transparent 55%),
+      var(--bg);
+    color: var(--fg); line-height: 1.65; padding-bottom: 110px; word-break: keep-all;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 0; }
+
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 30px 28px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(6, 68, 46, 0.35);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(6, 68, 46, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 68, 46, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--primary); text-transform: uppercase; }
+  .hero h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad { background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { color: var(--fg-muted); font-size: 14.5px; margin-top: 8px; max-width: 640px; }
+  .hero .gear { position: absolute; top: 14px; right: 14px; border: none; background: transparent; font-size: 17px; cursor: pointer; opacity: 0.35; }
+  .idrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; position: relative; }
+  .idrow .field { flex: 1 1 150px; }
+
+  #settingsPanel { display: none; background: #fffbe9; border: 1px dashed #d9b53c; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 13px; }
+  #settingsPanel input { width: 100%; margin-top: 6px; }
+  #settingsPanel button { margin-top: 8px; }
+
+  section.card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 24px 24px 26px; margin-bottom: 18px;
+    box-shadow: 0 16px 44px -32px rgba(6, 68, 46, 0.3);
+    border-top: 4px solid var(--sec, var(--primary));
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .sec-badge { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 15px; color: #fff; background: var(--sec, var(--primary)); }
+  .sec-head h2 { font-size: 18.5px; font-weight: 800; }
+  .sec-time { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 800; color: var(--c-amber); border: 1.5px solid rgba(217, 119, 6, 0.45); border-radius: 8px; padding: 2px 9px; }
+  .sec-desc { color: var(--fg-muted); font-size: 13.5px; margin-bottom: 16px; }
+  .sec-desc strong { color: var(--fg); }
+
+  label.q { display: block; font-weight: 700; font-size: 14.5px; margin: 16px 0 6px; }
+  label.q .req { color: var(--c-rose); }
+  .hint { font-weight: 500; color: var(--fg-faint); font-size: 12.5px; margin-left: 6px; }
+  input[type="text"], input[type="url"], input[type="date"], input[type="password"], textarea, select {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px; padding: 10px 13px;
+    font: inherit; font-size: 14.5px; color: var(--fg); background: #fbfffd; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.13); }
+  textarea { resize: vertical; min-height: 64px; }
+
+  /* 데이터 카드 3장 (1단계) */
+  .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .data-card { border: 1.5px dashed var(--hair); border-radius: 14px; padding: 12px 14px 14px; background: #f8fdfb; }
+  .data-card .n { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; color: var(--primary); }
+  .data-card label.q { margin: 10px 0 4px; font-size: 13.5px; }
+
+  /* 뒤집기 표 (2단계) */
+  .flip-grid { display: grid; grid-template-columns: 28px 1fr; gap: 8px 10px; align-items: center; }
+  .flip-grid .num { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--c-rose); text-align: right; }
+
+  /* 렌즈 4칸 (3단계) */
+  .lens-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .lens-box { border: 2px solid var(--tone); border-radius: 14px; padding: 12px 14px 14px; background: color-mix(in srgb, var(--tone) 5%, #fff); }
+  .lens-box .lt { font-weight: 800; color: var(--tone); font-size: 15px; }
+  .lens-box .lq { font-size: 12.5px; color: var(--fg-muted); margin-bottom: 8px; }
+  .card-draw { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+  .card-draw .field { flex: 1 1 180px; }
+
+  /* 한 문장 기획서 (4단계) */
+  .pitch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .pitch-grid label.q { margin: 6px 0 4px; font-size: 13.5px; }
+  .slot-tail { font-size: 12px; color: var(--fg-faint); font-weight: 600; margin-left: 4px; }
+  .pitch-preview {
+    margin-top: 16px; border: 2px solid var(--primary); border-radius: 14px; padding: 14px 18px;
+    background: rgba(5, 150, 105, 0.06); font-size: 16px; font-weight: 700; line-height: 1.8; min-height: 58px;
+  }
+  .pitch-preview .slot { border-bottom: 3px solid var(--tone, var(--primary)); padding: 0 4px; color: var(--fg); }
+  .pitch-preview .slot.empty { color: var(--fg-faint); font-weight: 600; font-size: 0.85em; }
+  .pitch-preview .tail { color: var(--fg-muted); font-weight: 600; font-size: 0.9em; }
+
+  /* 킬러 질문 (5단계) */
+  .killer { border-left: 4px solid var(--c-rose); padding-left: 14px; margin-top: 14px; }
+  .killer .kq { font-weight: 800; font-size: 14.5px; }
+  .killer .kq .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--c-rose); color: #fff; font-size: 12px; margin-right: 6px; }
+  .killer .kd { font-size: 12.5px; color: var(--fg-muted); margin: 2px 0 6px; }
+
+  .no-stamp { display: inline-block; margin-top: 12px; padding: 7px 14px; border-radius: 8px; border: 2px solid var(--c-rose); color: var(--c-rose); font-weight: 800; font-size: 12.5px; transform: rotate(-1.5deg); background: #fff; }
+
+  .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px); border-top: 1px solid var(--hair); padding: 12px 18px; }
+  .actionbar .inner { max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #draftStatus { font-size: 12px; color: var(--fg-faint); }
+  #draftStatus.pending { color: var(--c-amber); }
+  #draftStatus.saved { color: var(--c-emerald); }
+  #draftStatus.failed { color: var(--c-rose); font-weight: 700; }
+  .draft-note { font-size: 11px; color: var(--fg-faint); opacity: 0.8; }
+  .btn { border: none; border-radius: 999px; padding: 12px 26px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; transition: transform 0.12s, opacity 0.15s; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 10px 26px -12px rgba(5, 150, 105, 0.6); }
+  .btn-primary:disabled { opacity: 0.55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+
+  .sid-hint { margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px; font-family: 'JetBrains Mono', 'Malgun Gothic', monospace; }
+  .sid-hint.ok { color: var(--c-emerald); }
+  .sid-hint.bad { color: var(--c-rose); }
+
+  .backdrop { position: fixed; inset: 0; background: rgba(6, 40, 28, 0.45); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 18px; z-index: 70; }
+  .backdrop[hidden] { display: none; }
+  .modal { width: min(460px, 100%); max-height: 88vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--hair); border-radius: 20px; padding: 24px 24px 20px; box-shadow: 0 30px 80px -30px rgba(6, 40, 28, 0.5); }
+  .modal h3 { font-size: 19px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .modal .btn { padding: 10px 18px; font-size: 14px; }
+  #lkResult { margin-top: 16px; }
+  #lkResult[hidden] { display: none; }
+  .lk-ok { border: 1.5px solid var(--c-emerald); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 14px 16px; }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-emerald); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--fg); margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { color: var(--fg); overflow-wrap: anywhere; }
+  .lk-bad { border: 1.5px solid var(--c-rose); background: rgba(225, 29, 72, 0.06); border-radius: 14px; padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--c-rose); }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; }
+
+  #submitBanner { display: none; align-items: center; gap: 10px; margin-bottom: 18px; border: 1.5px solid var(--c-emerald); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 11px 16px; font-size: 13.5px; font-weight: 700; color: var(--fg); }
+  #submitBanner.show { display: flex; }
+  #submitBanner .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-emerald); }
+
+  #toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(16px); background: #062a1e; color: #fff; padding: 12px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 60; max-width: 90vw; text-align: center; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #059669; }
+  #toast.error { background: #e11d48; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    section.card { padding: 18px 16px 20px; }
+    .actionbar .inner { flex-wrap: wrap; gap: 8px; }
+    .draft-wrap { flex: 1 0 100%; order: -1; }
+    .draft-note { display: none; }
+    .actionbar .btn { flex: 1 1 auto; padding: 11px 10px; font-size: 13.5px; }
+    .wide-only { display: none; }
+  }
+  @media print {
+    body { padding-bottom: 0; background: #fff; }
+    .actionbar, .hero .gear, #settingsPanel, #toast, .backdrop { display: none !important; }
+    section.card { break-inside: avoid; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="gear" id="btnGear" type="button" aria-label="설정">⚙</button>
+    <div class="kicker">정보과제연구 · 2026-2 · 데이터의 가치와 활용 (2차시)</div>
+    <h1>데이터에서 <span class="grad">서비스로</span> — 한 문장 기획서</h1>
+    <p class="sub">브레인스토밍이 아니다. <strong>실제로 존재하는 데이터</strong>에서 출발해 문제로 거꾸로 간다.
+      다섯 단계를 순서대로 채우면 마지막에 한 문장이 남는다 — 그 문장이 3차시 바이브코딩의 첫 프롬프트다.</p>
+    <div class="idrow">
+      <div class="field">
+        <label class="q" for="studentId">학번 <span class="req">*</span></label>
+        <input type="text" id="studentId" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+        <div id="sidPreview" class="sid-hint"></div>
+      </div>
+      <div class="field">
+        <label class="q" for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="이름">
+      </div>
+      <div class="field">
+        <label class="q" for="today">날짜 <span class="req">*</span></label>
+        <input type="date" id="today">
+      </div>
+      <div class="field">
+        <label class="q" for="password">제출 암호 <span class="req">*</span></label>
+        <input type="password" id="password" placeholder="4자 이상" autocomplete="off">
+      </div>
+    </div>
+    <p class="sub" style="margin-top:10px; font-size:12.5px;">
+      🎫 <strong>학번</strong>은 <strong>학년(1) + 반(2) + 번호(2)</strong> 다섯 자리 — 2학년 3반 17번이면 <strong>20317</strong>.
+      제출은 <strong>각자</strong> 한다 — 같은 데이터를 골랐어도 연결과 기획서는 사람마다 다르다.<br>
+      🔑 <strong>제출 암호</strong>는 나중에 <strong>제출 확인·불러오기</strong>에 쓰는 열쇠다.
+      <span style="color:var(--c-rose); font-weight:700;">평소 쓰는 비밀번호는 쓰지 말 것</span> — 잊으면 선생님께 문의.
+    </p>
+  </header>
+
+  <div id="submitBanner"><span class="dot"></span><span id="submitBannerText"></span></div>
+
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정 — Apps Script 배포 URL</strong>
+    <div style="color:#92400e; margin-top:4px;">정보과제연구 과목 공용 URL (<code>data/2026-2/정보과제연구/apps-script.js</code> 배포). 비어 있으면 TXT 저장만 된다.</div>
+    <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus" style="margin-left:8px;"></span>
+  </div>
+
+  <!-- 1단계 -->
+  <section class="card" style="--sec: var(--c-emerald);">
+    <div class="sec-head"><span class="sec-badge">1</span><h2>데이터 사냥</h2><span class="sec-time">⏱ 10분</span></div>
+    <p class="sec-desc">데이터셋 <strong>3개</strong>를 고른다. 내용은 안 봐도 된다 — <strong>컬럼 이름만</strong> 본다. 컬럼 이름이 곧 "이 데이터가 아는 것".
+      포털: <a href="https://www.data.go.kr" target="_blank" rel="noopener">공공데이터포털</a> ·
+      <a href="https://data.seoul.go.kr" target="_blank" rel="noopener">서울 열린데이터광장</a> ·
+      <a href="https://www.schoolinfo.go.kr" target="_blank" rel="noopener">학교알리미</a>.
+      학교 데이터(급식 잔반량·도서관 대출·시간표·매점·분실물·결석·온습도·주변 사고 지점)를 섞으면 더 좋다.</p>
+    <div class="data-grid">
+      <div class="data-card">
+        <span class="n">데이터 ①</span>
+        <label class="q" for="d1Name">이름 <span class="req">*</span></label>
+        <input type="text" id="d1Name" placeholder="예: 서울시 심야택시 승하차 정보">
+        <label class="q" for="d1Src">출처 <span class="req">*</span><span class="hint">URL 또는 "학교 · 급식실"</span></label>
+        <input type="text" id="d1Src" placeholder="https://… 또는 학교 ○○부">
+        <label class="q" for="d1Cols">컬럼 이름 3개 <span class="req">*</span></label>
+        <input type="text" id="d1Cols" placeholder="예: 승차시각, 승차구, 하차구">
+      </div>
+      <div class="data-card">
+        <span class="n">데이터 ②</span>
+        <label class="q" for="d2Name">이름 <span class="req">*</span></label>
+        <input type="text" id="d2Name" placeholder="예: 우리 학교 급식 잔반량">
+        <label class="q" for="d2Src">출처 <span class="req">*</span></label>
+        <input type="text" id="d2Src" placeholder="https://… 또는 학교 급식실">
+        <label class="q" for="d2Cols">컬럼 이름 3개 <span class="req">*</span></label>
+        <input type="text" id="d2Cols" placeholder="예: 날짜, 메뉴, 잔반(kg)">
+      </div>
+      <div class="data-card">
+        <span class="n">데이터 ③</span>
+        <label class="q" for="d3Name">이름 <span class="req">*</span></label>
+        <input type="text" id="d3Name" placeholder="예: 시내버스 도착 정보">
+        <label class="q" for="d3Src">출처 <span class="req">*</span></label>
+        <input type="text" id="d3Src" placeholder="https://…">
+        <label class="q" for="d3Cols">컬럼 이름 3개 <span class="req">*</span></label>
+        <input type="text" id="d3Cols" placeholder="예: 노선번호, 정류장, 도착예정(초)">
+      </div>
+    </div>
+  </section>
+
+  <!-- 2단계 -->
+  <section class="card" style="--sec: var(--c-rose);">
+    <div class="sec-head"><span class="sec-badge">2</span><h2>뒤집기 — 원래 목적 밖에서</h2><span class="sec-time">⏱ 10분</span></div>
+    <p class="sec-desc">셋 중 <strong>주력 데이터 하나</strong>를 고르고 두 칸을 채운다. 완성 예시 — KT 통화 기록: 원래 목적은 <strong>요금 청구</strong>,
+      목적 밖 질문은 "심야에 사람이 어디 있나?" → 올빼미버스. 세 개에서 막히는 게 정상, 네 번째부터 진짜가 나온다.</p>
+    <label class="q" for="flipTarget">주력 데이터 <span class="req">*</span><span class="hint">①②③ 중 하나의 이름</span></label>
+    <input type="text" id="flipTarget" placeholder="예: 우리 학교 급식 잔반량">
+    <label class="q" for="flipPurpose">① 원래 누가, 왜 모았나? <span class="req">*</span></label>
+    <input type="text" id="flipPurpose" placeholder="예: 급식실이 · 조리량과 음식물쓰레기 처리비 계산하려고">
+    <label class="q">② 그 목적 말고, 이 데이터가 답할 수 있는 질문 5개 <span class="req">*</span><span class="hint">억지로라도 5개</span></label>
+    <div class="flip-grid">
+      <span class="num">1</span><input type="text" id="flipQ1" placeholder="질문 1">
+      <span class="num">2</span><input type="text" id="flipQ2" placeholder="질문 2">
+      <span class="num">3</span><input type="text" id="flipQ3" placeholder="질문 3 — 여기서 막히는 게 정상">
+      <span class="num">4</span><input type="text" id="flipQ4" placeholder="질문 4 — 진짜 아이디어는 여기부터">
+      <span class="num">5</span><input type="text" id="flipQ5" placeholder="질문 5">
+    </div>
+  </section>
+
+  <!-- 3단계 -->
+  <section class="card" style="--sec: var(--c-cyan);">
+    <div class="sec-head"><span class="sec-badge">3</span><h2>두 데이터 잇기</h2><span class="sec-time">⏱ 10분</span></div>
+    <p class="sec-desc"><strong>카드 A</strong>는 2단계에서 고른 주력 데이터가 자동으로 들어가고, <strong>카드 B</strong>는 1단계에서 사냥한 데이터 중 직접 하나 고른다.
+      이제 <strong>이 둘을 어떻게 이을지</strong>를 렌즈마다 하나씩 적는다 — 렌즈가 바뀌면 연결 방식도 달라진다. 네 가지를 그려 본 뒤 4단계에서 그중 하나를 고른다.
+      멀어 보이는 둘일수록 남이 못 본 연결이 나온다 (올빼미버스도 전화기 × 택시였다).</p>
+    <div class="card-draw">
+      <div class="field">
+        <label class="q" for="cardA">카드 A · 주력 데이터 <span class="req">*</span><span class="hint">2단계에서 자동으로</span></label>
+        <input type="text" id="cardA" placeholder="2단계를 채우면 자동으로 들어온다" readonly>
+      </div>
+      <div class="field">
+        <label class="q" for="cardB">카드 B · 내가 고른 데이터 <span class="req">*</span><span class="hint">카드 A와 다른 데이터 하나 — 직접 써도 된다</span></label>
+        <input type="text" id="cardB" list="cardBList" placeholder="예: 학교 시간표" autocomplete="off">
+        <datalist id="cardBList"></datalist>
+      </div>
+    </div>
+    <label class="q">네 렌즈, 네 가지 연결 <span class="req">*</span><span class="hint">렌즈마다 연결 하나씩</span></label>
+    <div class="lens-grid">
+      <div class="lens-box" style="--tone: var(--c-emerald);">
+        <div class="lt">결합</div><div class="lq">상관없어 보이는 두 데이터를 붙이면?</div>
+        <textarea id="lensJoin" placeholder="예: 잔반량 × 시간표 → 5교시 체육 후 잔반 급증?"></textarea>
+      </div>
+      <div class="lens-box" style="--tone: var(--c-cyan);">
+        <div class="lt">변환</div><div class="lq">이 데이터를 아무나 읽을 수 있게 바꾸면?</div>
+        <textarea id="lensTranslate" placeholder="예: 오늘 메뉴 잔반 예보 전광판"></textarea>
+      </div>
+      <div class="lens-box" style="--tone: var(--c-amber);">
+        <div class="lt">예측</div><div class="lq">과거 데이터로 앞을 말하면?</div>
+        <textarea id="lensPredict" placeholder="예: 내일 잔반량 예측 → 조리량 조정"></textarea>
+      </div>
+      <div class="lens-box" style="--tone: var(--c-slate);">
+        <div class="lt">개방</div><div class="lq">내가 만든 결과를 남이 쓰게 하면?</div>
+        <textarea id="lensOpen" placeholder="예: 급식실·영양교사에게 주간 리포트 공개"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4단계 -->
+  <section class="card" style="--sec: var(--c-amber);">
+    <div class="sec-head"><span class="sec-badge">4</span><h2>한 문장 기획서</h2><span class="sec-time">⏱ 10분</span></div>
+    <p class="sec-desc">빈칸 <strong>여섯 개</strong>가 기획서 전부다. 더 쓰지 않는다. 3단계 네 칸 중 가장 살아남을 것 하나를 골라 채운다.</p>
+    <div class="pitch-grid">
+      <div><label class="q" for="pWho">[누가] <span class="req">*</span><span class="slot-tail">…이/가</span></label><input type="text" id="pWho" placeholder="예: 야간자율학습 학생"></div>
+      <div><label class="q" for="pWhen">[어떤 상황] <span class="req">*</span><span class="slot-tail">…에서 겪는</span></label><input type="text" id="pWhen" placeholder="예: 밤 9시 하교"></div>
+      <div><label class="q" for="pProblem">[문제] <span class="req">*</span><span class="slot-tail">…을/를,</span></label><input type="text" id="pProblem" placeholder="예: 버스 기다림"></div>
+      <div><label class="q" for="pData">[데이터 A + B] <span class="req">*</span><span class="slot-tail">…을/를</span></label><input type="text" id="pData" placeholder="예: 시간표 + 시내버스 도착 정보"></div>
+      <div><label class="q" for="pLens">[렌즈] <span class="req">*</span><span class="slot-tail">…(으)로 써서</span></label>
+        <select id="pLens">
+          <option value="">— 렌즈 —</option>
+          <option value="결합">결합</option>
+          <option value="변환">변환</option>
+          <option value="예측">예측</option>
+          <option value="개방">개방</option>
+        </select></div>
+      <div><label class="q" for="pWhat">[무엇] <span class="req">*</span><span class="slot-tail">…(으)로 해결한다.</span></label><input type="text" id="pWhat" placeholder="예: 하교 시각 맞춤 버스 알림판"></div>
+    </div>
+    <div class="pitch-preview" id="pitchPreview" aria-live="polite"></div>
+    <span class="no-stamp">"그냥 앱 만들기" — 데이터와 렌즈가 없으면 기획서가 아님</span>
+  </section>
+
+  <!-- 5단계 -->
+  <section class="card" style="--sec: var(--c-rose);">
+    <div class="sec-head"><span class="sec-badge">5</span><h2>킬러 질문 — 자가 검증</h2><span class="sec-time">⏱ 5분</span></div>
+    <p class="sec-desc">하나라도 답이 안 나오면 4단계로 돌아가 고친다. 특히 <strong>ⓑ</strong> — 데이터가 실제로 없으면 전부 무효다.</p>
+    <div class="killer">
+      <div class="kq"><span class="n">a</span>이 서비스가 없으면, 지금 사람들은 뭘 하고 있나? <span class="req">*</span></div>
+      <div class="kd">대체 행동이 충분히 편하면 아무도 안 쓴다</div>
+      <input type="text" id="kA" placeholder="예: 정류장 앱을 켜서 노선마다 따로 본다 — 귀찮아서 그냥 나가서 기다린다">
+    </div>
+    <div class="killer">
+      <div class="kq"><span class="n">b</span>그 데이터, 진짜로 존재하고 내가 접근할 수 있나? <span class="req">*</span></div>
+      <div class="kd">API · 다운로드 · 학교 협조 — 셋 중 무엇으로? 여기서 가장 많이 죽는다</div>
+      <input type="text" id="kB" placeholder="예: 버스 도착 정보는 공공데이터포털 API(키 발급 필요), 시간표는 교무실 엑셀">
+      <label class="q" for="kBAccess" style="margin-top:8px;">접근 경로 <span class="hint">과제 — 다음 시간까지: URL 또는 담당자 이름</span></label>
+      <input type="text" id="kBAccess" placeholder="예: https://www.data.go.kr/data/15000… / 교무부 ○○○ 선생님">
+    </div>
+    <div class="killer">
+      <div class="kq"><span class="n">c</span>한 번 쓰고 안 들어올 서비스는 아닌가? <span class="req">*</span></div>
+      <div class="kd">다시 올 이유가 있어야 한다</div>
+      <input type="text" id="kC" placeholder="예: 매일 하교 시각이 달라서 매일 본다">
+    </div>
+  </section>
+
+
+</div>
+
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <button class="btn btn-ghost" id="btnLookup" type="button">제출 확인</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-primary" id="btnSave" type="button">제출하기<span class="wide-only"> (TXT + 시트 저장)</span></button>
+  </div>
+</div>
+
+<div class="backdrop" id="lookupBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
+    <h3 id="lookupTitle">제출 확인 · 지난 제출 불러오기</h3>
+    <p class="m-desc">제출할 때 쓴 <strong>학번 · 이름 · 암호</strong>를 넣으면 가장 마지막으로 제출한 내용을 확인할 수 있어요.</p>
+    <label class="q" for="lkSid">학번</label>
+    <input type="text" id="lkSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label class="q" for="lkName">이름</label>
+    <input type="text" id="lkName" placeholder="이름">
+    <label class="q" for="lkPw">제출 암호</label>
+    <input type="password" id="lkPw" placeholder="제출할 때 정한 암호" autocomplete="off">
+    <div id="lkResult" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="lkClose" type="button">닫기</button>
+      <button class="btn btn-ghost" id="lkFill" type="button" hidden>양식에 불러오기</button>
+      <button class="btn btn-primary" id="lkGo" type="button">확인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SOURCE = 'data_service_idea';
+  var DRAFT_KEY = 'draft_data_service_idea';
+  var SUBMIT_KEY = 'submitted_data_service_idea';
+  var URL_KEY = 'gas_url_info_research_2026_2';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec'; // 정보과제연구(2026-2) 과목 공용 배포 URL
+
+  /* 텍스트 필드 id 목록 — 임시저장·불러오기·초기화가 함께 쓴다 */
+  var TEXT_IDS = ['studentName', 'studentId', 'today',
+    'd1Name', 'd1Src', 'd1Cols', 'd2Name', 'd2Src', 'd2Cols', 'd3Name', 'd3Src', 'd3Cols',
+    'flipTarget', 'flipPurpose', 'flipQ1', 'flipQ2', 'flipQ3', 'flipQ4', 'flipQ5',
+    'cardA', 'cardB', 'lensJoin', 'lensTranslate', 'lensPredict', 'lensOpen',
+    'pWho', 'pWhen', 'pProblem', 'pData', 'pLens', 'pWhat',
+    'kA', 'kB', 'kBAccess', 'kC'];
+
+  /* ── 학번(GCCNN) ── */
+  var SID_RE = /^\d{5}$/;
+  function parseSid(sid) {
+    if (!SID_RE.test(sid)) return null;
+    return { grade: parseInt(sid.slice(0, 1), 10), cls: parseInt(sid.slice(1, 3), 10), no: parseInt(sid.slice(3, 5), 10) };
+  }
+  function sidLabel(sid) {
+    var s = parseSid(sid);
+    return s ? s.grade + '학년 ' + s.cls + '반 ' + s.no + '번' : sid;
+  }
+  function renderSidPreview() {
+    var el = document.getElementById('sidPreview');
+    var sid = v('studentId');
+    if (!sid) { el.textContent = ''; el.className = 'sid-hint'; return; }
+    var s = parseSid(sid);
+    if (!s) { el.textContent = '↳ 숫자 5자리로 입력하세요 (예: 20317)'; el.className = 'sid-hint bad'; return; }
+    var sane = s.grade >= 1 && s.grade <= 3 && s.cls >= 1 && s.no >= 1;
+    el.textContent = '↳ ' + sidLabel(sid) + (sane ? '' : ' — 맞나요?');
+    el.className = 'sid-hint ' + (sane ? 'ok' : 'bad');
+  }
+
+  var todayEl = document.getElementById('today');
+  if (!todayEl.value) {
+    var d = new Date();
+    todayEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function v(id) { return document.getElementById(id).value.trim(); }
+
+  function pitchSentence(d) {
+    return (d.pWho || '[누가]') + '이(가) ' + (d.pWhen || '[어떤 상황]') + '에서 겪는 ' + (d.pProblem || '[문제]') + '을(를), ' +
+      (d.pData || '[데이터 A + B]') + '을(를) ' + (d.pLens || '[렌즈]') + '(으)로 써서 ' + (d.pWhat || '[무엇]') + '(으)로 해결한다.';
+  }
+
+  function getFormData() {
+    var data = { source: SOURCE, password: v('password') };
+    TEXT_IDS.forEach(function (id) { data[id] = v(id); });
+    data.pitch = pitchSentence(data);
+    return data;
+  }
+
+  /* ── 카드 A = 2단계 주력 데이터 (자동) · 카드 B 추천 목록 = 1단계 데이터 ①②③ ── */
+  function syncCards() {
+    var target = v('flipTarget');
+    var a = document.getElementById('cardA');
+    if (a.value !== target) a.value = target;
+    var dl = document.getElementById('cardBList');
+    dl.textContent = '';
+    ['d1Name', 'd2Name', 'd3Name'].forEach(function (id) {
+      var name = v(id);
+      if (!name || name === target) return;
+      var opt = document.createElement('option');
+      opt.value = name;
+      dl.appendChild(opt);
+    });
+  }
+  ['flipTarget', 'd1Name', 'd2Name', 'd3Name'].forEach(function (id) {
+    document.getElementById(id).addEventListener('input', syncCards);
+  });
+
+  /* ── 한 문장 미리보기 (textContent만 사용) ── */
+  var SLOTS = [
+    ['pWho', '[누가]', '이(가)', 'var(--c-emerald)'], ['pWhen', '[어떤 상황]', '에서 겪는', 'var(--c-emerald)'],
+    ['pProblem', '[문제]', '을(를),', 'var(--c-rose)'], ['pData', '[데이터 A + B]', '을(를)', 'var(--c-cyan)'],
+    ['pLens', '[렌즈]', '(으)로 써서', 'var(--c-amber)'], ['pWhat', '[무엇]', '(으)로 해결한다.', 'var(--c-emerald)']
+  ];
+  function renderPitch() {
+    var box = document.getElementById('pitchPreview');
+    box.textContent = '';
+    SLOTS.forEach(function (s) {
+      var val = v(s[0]);
+      var span = document.createElement('span');
+      span.className = 'slot' + (val ? '' : ' empty');
+      span.style.setProperty('--tone', s[3]);
+      span.textContent = val || s[1];
+      var tail = document.createElement('span');
+      tail.className = 'tail';
+      tail.textContent = s[2] + ' ';
+      box.appendChild(span);
+      box.appendChild(tail);
+    });
+  }
+
+  /* ── 임시저장 ── */
+  var draftTimer = null;
+  var statusEl = document.getElementById('draftStatus');
+  function saveDraft() {
+    try {
+      var d = getFormData();
+      delete d.password;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+      statusEl.textContent = '임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      statusEl.className = 'saved';
+    } catch (e) {
+      statusEl.textContent = '임시저장 실패 — 이 기기에 저장 공간이 부족해요';
+      statusEl.className = 'failed';
+    }
+  }
+  function scheduleDraft() {
+    statusEl.textContent = '입력 중… 잠시 멈추면 임시저장됩니다';
+    statusEl.className = 'pending';
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function fillFormFrom(d) {
+    TEXT_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && typeof d[id] === 'string') el.value = d[id];
+    });
+    renderSidPreview();
+    syncCards();
+    renderPitch();
+  }
+  function restoreDraft() {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    try {
+      fillFormFrom(JSON.parse(raw));
+      statusEl.textContent = '임시저장 불러옴';
+      statusEl.className = 'saved';
+    } catch (e) { /* 손상된 draft — 무시 */ }
+  }
+  document.querySelectorAll('input, textarea, select').forEach(function (el) {
+    el.addEventListener('input', scheduleDraft);
+    el.addEventListener('change', scheduleDraft);
+  });
+  SLOTS.forEach(function (s) {
+    var el = document.getElementById(s[0]);
+    el.addEventListener('input', renderPitch);
+    el.addEventListener('change', renderPitch);
+  });
+  restoreDraft();
+  syncCards();
+  renderPitch();
+
+  ['studentId', 'lkSid'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () {
+      var cleaned = el.value.replace(/\D/g, '').slice(0, 5);
+      if (cleaned !== el.value) el.value = cleaned;
+      if (id === 'studentId') renderSidPreview();
+    });
+  });
+  renderSidPreview();
+
+  /* ── 토스트 ── */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg, type, ms) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, ms || 2600);
+  }
+
+  /* ── 유효성 — kBAccess(과제)만 선택 ── */
+  var REQUIRED = [
+    ['studentId', '학번'], ['studentName', '이름'], ['today', '날짜'], ['password', '제출 암호'],
+    ['d1Name', '1. 데이터① 이름'], ['d1Src', '1. 데이터① 출처'], ['d1Cols', '1. 데이터① 컬럼'],
+    ['d2Name', '1. 데이터② 이름'], ['d2Src', '1. 데이터② 출처'], ['d2Cols', '1. 데이터② 컬럼'],
+    ['d3Name', '1. 데이터③ 이름'], ['d3Src', '1. 데이터③ 출처'], ['d3Cols', '1. 데이터③ 컬럼'],
+    ['flipTarget', '2. 주력 데이터'], ['flipPurpose', '2. 원래 목적'],
+    ['flipQ1', '2. 질문 1'], ['flipQ2', '2. 질문 2'], ['flipQ3', '2. 질문 3'], ['flipQ4', '2. 질문 4'], ['flipQ5', '2. 질문 5'],
+    ['cardA', '3. 카드 A (2단계 주력 데이터)'], ['cardB', '3. 카드 B (내가 고른 데이터)'],
+    ['lensJoin', '3. 결합'], ['lensTranslate', '3. 변환'], ['lensPredict', '3. 예측'], ['lensOpen', '3. 개방'],
+    ['pWho', '4. 누가'], ['pWhen', '4. 어떤 상황'], ['pProblem', '4. 문제'], ['pData', '4. 데이터 A + B'], ['pLens', '4. 렌즈'], ['pWhat', '4. 무엇'],
+    ['kA', '5. ⓐ'], ['kB', '5. ⓑ'], ['kC', '5. ⓒ']
+  ];
+  function focusField(id) {
+    var el = document.getElementById(id);
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { el.focus({ preventScroll: true }); }, 120);
+  }
+  function validate() {
+    var missing = [];
+    var first = null;
+    REQUIRED.forEach(function (f) {
+      if (v(f[0])) return;
+      missing.push(f[1]);
+      if (!first) first = f[0];
+    });
+    if (missing.length) {
+      var head = missing.slice(0, 3).join(', ');
+      showToast('아직 안 쓴 곳이 ' + missing.length + '군데 있어요: ' + head + (missing.length > 3 ? ' 외 ' + (missing.length - 3) + '개' : ''), 'error', 5000);
+      focusField(first);
+      return false;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      showToast('학번은 학년(1) + 반(2) + 번호(2) 다섯 자리 숫자예요. 예: 20317', 'error', 4600);
+      document.getElementById('studentId').focus();
+      return false;
+    }
+    if (v('password').length < 4) {
+      showToast('제출 암호는 4자 이상으로 정해 주세요.', 'error', 3800);
+      return false;
+    }
+    return true;
+  }
+
+  /* ── TXT ── */
+  function buildTxt(d) {
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  데이터에서 서비스로 — 한 문장 기획서 (정보과제연구)');
+    L.push('  ' + d.studentId + ' (' + sidLabel(d.studentId) + ') ' + d.studentName + ' · ' + d.today);
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    L.push('');
+    L.push('【 1. 데이터 사냥 】');
+    [1, 2, 3].forEach(function (n) {
+      L.push('데이터 ' + n + ': ' + d['d' + n + 'Name'] + ' | 출처: ' + d['d' + n + 'Src'] + ' | 컬럼: ' + d['d' + n + 'Cols']);
+    });
+    L.push('');
+    L.push('【 2. 뒤집기 】');
+    L.push('주력 데이터: ' + d.flipTarget);
+    L.push('원래 목적: ' + d.flipPurpose);
+    [1, 2, 3, 4, 5].forEach(function (n) { L.push('질문 ' + n + ': ' + d['flipQ' + n]); });
+    L.push('');
+    L.push('【 3. 두 데이터 잇기 】');
+    L.push('카드 A(주력): ' + d.cardA + ' / 카드 B(내가 선택): ' + d.cardB);
+    L.push('결합: ' + d.lensJoin);
+    L.push('변환: ' + d.lensTranslate);
+    L.push('예측: ' + d.lensPredict);
+    L.push('개방: ' + d.lensOpen);
+    L.push('');
+    L.push('【 4. 한 문장 기획서 】');
+    L.push(d.pitch);
+    L.push('');
+    L.push('【 5. 킬러 질문 】');
+    L.push('ⓐ 지금 사람들은: ' + d.kA);
+    L.push('ⓑ 데이터 존재·접근: ' + d.kB + (d.kBAccess ? ' | 접근 경로: ' + d.kBAccess : ''));
+    L.push('ⓒ 재방문 이유: ' + d.kC);
+    return L.join('\n');
+  }
+  function downloadTxt(d) {
+    var blob = new Blob([buildTxt(d)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '한문장기획서_' + (d.studentId || '') + '_' + (d.studentName || '무명') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── 제출 ── */
+  document.getElementById('btnSave').addEventListener('click', function () {
+    if (!validate()) return;
+    var data = getFormData();
+    var btn = this;
+    btn.disabled = true;
+    downloadTxt(data);
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) {
+      showToast('TXT 파일로 저장됐어요. (시트 전송은 선생님 설정 후 가능)', 'success', 4200);
+      btn.disabled = false;
+      return;
+    }
+    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      .then(function () {
+        showToast('제출 완료! TXT 파일도 함께 저장됐어요.', 'success', 4200);
+        localStorage.removeItem(DRAFT_KEY);
+        recordSubmitted(data);
+      })
+      .catch(function (err) { showToast('TXT는 저장됐어요. 시트 전송 오류: ' + err.message, 'error', 5000); })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요?')) return;
+    document.querySelectorAll('input[type="text"], input[type="url"], input[type="password"], textarea').forEach(function (el) { el.value = ''; });
+    document.getElementById('pLens').value = '';
+    localStorage.removeItem(DRAFT_KEY);
+    statusEl.textContent = '초기화됨';
+    statusEl.className = '';
+    renderSidPreview();
+    renderPitch();
+    showToast('모든 입력을 지웠어요.');
+  });
+
+  /* ── 제출 배너 ── */
+  var bannerEl = document.getElementById('submitBanner');
+  var bannerTextEl = document.getElementById('submitBannerText');
+  function showBanner(text) { bannerTextEl.textContent = text; bannerEl.classList.add('show'); }
+  function recordSubmitted(data) {
+    var stamp = new Date().toLocaleString('ko-KR');
+    try { localStorage.setItem(SUBMIT_KEY, JSON.stringify({ at: stamp, name: data.studentName, sid: data.studentId })); } catch (e) { /* 무시 */ }
+    showBanner('제출을 보냈습니다 · ' + stamp + ' — [제출 확인]으로 서버에 저장됐는지 확인할 수 있어요.');
+  }
+  (function restoreBanner() {
+    try {
+      var raw = localStorage.getItem(SUBMIT_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      showBanner('이 기기에서 ' + s.at + '에 제출을 보냈습니다 — [제출 확인]으로 내용을 다시 볼 수 있어요.');
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* ── 제출 확인 (fetch → JSONP 폴백) ── */
+  var lookupBackdrop = document.getElementById('lookupBackdrop');
+  var lkResult = document.getElementById('lkResult');
+  var lkFillBtn = document.getElementById('lkFill');
+  var lkGoBtn = document.getElementById('lkGo');
+  var lastLookup = null;
+  var lastLookupPw = '';
+
+  function openLookup() {
+    document.getElementById('lkSid').value = v('studentId');
+    document.getElementById('lkName').value = v('studentName');
+    document.getElementById('lkPw').value = '';
+    lkResult.hidden = true; lkResult.textContent = '';
+    lkFillBtn.hidden = true; lastLookup = null;
+    lookupBackdrop.hidden = false;
+    document.getElementById('lkPw').focus();
+  }
+  function closeLookup() { lookupBackdrop.hidden = true; }
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'lkcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버 응답이 없습니다.')); }, 20000);
+      function cleanup() {
+        clearTimeout(timer);
+        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      window[cb] = function (data) { cleanup(); resolve(data); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결할 수 없습니다.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function requestLookup(p) {
+    var base = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!base) return Promise.reject(new Error('서버 주소가 설정되지 않았습니다. 선생님께 문의하세요.'));
+    var url = base + '?action=lookup&source=' + SOURCE +
+      '&studentId=' + encodeURIComponent(p.studentId) +
+      '&studentName=' + encodeURIComponent(p.studentName) +
+      '&password=' + encodeURIComponent(p.password);
+    return fetch(url)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return jsonp(url); });
+  }
+  function renderLookup(res) {
+    lkResult.textContent = '';
+    lkResult.hidden = false;
+    if (res && res.status === 'ok') {
+      lastLookup = res.data;
+      lkFillBtn.hidden = false;
+      var box = document.createElement('div'); box.className = 'lk-ok';
+      var stamp = document.createElement('div'); stamp.className = 'stamp'; stamp.textContent = '제출이 확인되었습니다';
+      var when = document.createElement('div'); when.className = 'when'; when.textContent = res.submittedAt;
+      box.appendChild(stamp); box.appendChild(when);
+      var dl = document.createElement('dl');
+      [['주력 데이터', res.data.flipTarget], ['렌즈', res.data.pLens], ['기획서', res.data.pitch]].forEach(function (pair) {
+        if (!pair[1]) return;
+        var dt = document.createElement('dt'); dt.textContent = pair[0];
+        var dd = document.createElement('dd'); dd.textContent = pair[1];
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      box.appendChild(dl);
+      lkResult.appendChild(box);
+      return;
+    }
+    lkFillBtn.hidden = true; lastLookup = null;
+    var bad = document.createElement('div'); bad.className = 'lk-bad';
+    if (res && res.status === 'denied') bad.textContent = '암호가 일치하지 않습니다. 제출할 때 정한 암호를 다시 확인해 주세요.';
+    else if (res && res.status === 'notfound') bad.textContent = '이 학번·이름으로 제출된 기록이 없습니다. 아직 제출하지 않았거나, 학번·이름이 제출할 때와 다를 수 있어요.';
+    else bad.textContent = '오류: ' + ((res && res.message) || '알 수 없는 오류');
+    lkResult.appendChild(bad);
+  }
+  document.getElementById('btnLookup').addEventListener('click', openLookup);
+  document.getElementById('lkClose').addEventListener('click', closeLookup);
+  lookupBackdrop.addEventListener('click', function (e) { if (e.target === lookupBackdrop) closeLookup(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lookupBackdrop.hidden) closeLookup(); });
+  ['lkSid', 'lkName', 'lkPw'].forEach(function (id) {
+    document.getElementById(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); lkGoBtn.click(); } });
+  });
+  lkGoBtn.addEventListener('click', function () {
+    var p = { studentId: document.getElementById('lkSid').value.trim(), studentName: document.getElementById('lkName').value.trim(), password: document.getElementById('lkPw').value.trim() };
+    if (!p.studentId || !p.studentName || !p.password) { renderLookup({ status: 'error', message: '학번 · 이름 · 암호를 모두 입력해 주세요.' }); return; }
+    if (!SID_RE.test(p.studentId)) { renderLookup({ status: 'error', message: '학번은 숫자 5자리예요 (학년1 + 반2 + 번호2, 예: 20317).' }); return; }
+    lkGoBtn.disabled = true;
+    lkResult.hidden = false; lkResult.textContent = ''; lkFillBtn.hidden = true;
+    var wait = document.createElement('div'); wait.className = 'lk-wait'; wait.textContent = '확인하는 중…';
+    lkResult.appendChild(wait);
+    requestLookup(p)
+      .then(function (res) { if (res && res.status === 'ok') lastLookupPw = p.password; renderLookup(res); })
+      .catch(function (err) { renderLookup({ status: 'error', message: err.message }); })
+      .finally(function () { lkGoBtn.disabled = false; });
+  });
+  lkFillBtn.addEventListener('click', function () {
+    if (!lastLookup) return;
+    if (!window.confirm('지금 화면의 내용을 지우고, 제출했던 내용을 불러올까요?')) return;
+    fillFormFrom(lastLookup);
+    if (lastLookupPw) document.getElementById('password').value = lastLookupPw;
+    saveDraft();
+    closeLookup();
+    showToast('제출했던 내용을 양식에 불러왔어요. 고친 뒤 다시 제출하면 최신 내용으로 갱신돼요.', 'success', 4200);
+  });
+
+  /* ── 설정 패널 (⚙ 5번 클릭) ── */
+  var gearCount = 0, gearTimer = null;
+  document.getElementById('btnGear').addEventListener('click', function () {
+    gearCount += 1;
+    clearTimeout(gearTimer);
+    gearTimer = setTimeout(function () { gearCount = 0; }, 1600);
+    if (gearCount >= 5) {
+      gearCount = 0;
+      var p = document.getElementById('settingsPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('scriptUrl').value = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    }
+  });
+  document.getElementById('btnSaveUrl').addEventListener('click', function () {
+    var u = document.getElementById('scriptUrl').value.trim();
+    if (u) { localStorage.setItem(URL_KEY, u); document.getElementById('urlStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(URL_KEY); document.getElementById('urlStatus').textContent = DEFAULT_URL ? '기본값 사용' : 'URL 없음 — TXT 저장만'; }
+  });
+
+  /* ?sid=20317 로 들어오면 학번을 채운다 */
+  (function handoff() {
+    var sid = new URLSearchParams(location.search).get('sid');
+    if (sid && /^\d{5}$/.test(sid)) { document.getElementById('studentId').value = sid; renderSidPreview(); scheduleDraft(); }
+  })();
+})();
+</script>
+</body>
+</html>

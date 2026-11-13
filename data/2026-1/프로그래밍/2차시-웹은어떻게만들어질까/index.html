@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로그래밍 2차시 - 웹은 어떻게 만들어질까?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --main: #2196f3;
+  --dark: #1565c0;
+  --light: #e3f2fd;
+  --accent: #42a5f5;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --red-dot: #ff5f57;
+  --yellow-dot: #ffbd2e;
+  --green-dot: #28c840;
+  --blue-accent: #2196f3;
+  --orange-accent: #ff9800;
+  --purple-accent: #9c27b0;
+  --green-accent: #43b867;
+  --red-accent: #e53935;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--main);
+  overflow: hidden;
+  color: var(--gray-900);
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+
+.presentation { width: 100%; height: 100%; position: relative; }
+
+.slide {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2.2vh 3vw;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+.browser-card {
+  background: var(--white);
+  border-radius: 1rem;
+  width: 100%; max-width: 1600px;
+  height: 100%; max-height: calc(100vh - 4.4vh);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.browser-topbar {
+  background: var(--gray-100);
+  padding: 0.6rem 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
+.dot.red { background: var(--red-dot); }
+.dot.yellow { background: var(--yellow-dot); }
+.dot.green { background: var(--green-dot); }
+
+.browser-topbar .title {
+  flex: 1; text-align: center;
+  font-size: 0.8rem; color: var(--gray-600);
+  font-weight: 500; margin-right: 2.5rem;
+}
+
+.browser-content {
+  padding: 2.5rem 3.5rem;
+  overflow-y: auto; flex: 1;
+}
+
+/* Typography */
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; margin-bottom: 0.5rem; }
+h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 1rem; color: var(--dark); }
+h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.6rem; }
+p  { font-size: 1.05rem; line-height: 1.7; color: var(--gray-800); }
+
+.subtitle { font-size: 1.2rem; color: var(--gray-600); font-weight: 400; margin-bottom: 0.3rem; }
+
+/* Badge */
+.badge {
+  display: inline-block; padding: 0.25rem 0.75rem;
+  border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+  margin-right: 0.4rem; margin-bottom: 0.4rem;
+}
+.badge.blue { background: var(--light); color: var(--dark); }
+.badge.green { background: #e8f5e9; color: #2d8a49; }
+.badge.orange { background: #fff3e0; color: #e65100; }
+.badge.purple { background: #f3e5f5; color: #7b1fa2; }
+
+/* Info box */
+.info-box {
+  background: var(--light);
+  border-left: 4px solid var(--accent);
+  padding: 1rem 1.3rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 1rem 0; font-size: 1rem; line-height: 1.6;
+}
+.info-box.green { background: #e8f5e9; border-left-color: var(--green-accent); }
+.info-box.orange { background: #fff3e0; border-left-color: var(--orange-accent); }
+.info-box.purple { background: #f3e5f5; border-left-color: var(--purple-accent); }
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+
+/* Card items */
+.card-item {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.7rem; padding: 1.2rem;
+}
+.card-item .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.card-item h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; }
+.card-item p { font-size: 0.95rem; color: var(--gray-600); line-height: 1.5; }
+
+/* Section divider */
+.section-divider { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.3rem; }
+.section-divider .section-icon {
+  width: 2.8rem; height: 2.8rem; border-radius: 0.6rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; background: var(--light);
+}
+.section-divider .section-text h2 { margin-bottom: 0; }
+.section-divider .section-text .section-sub { font-size: 0.9rem; color: var(--gray-600); font-weight: 400; }
+
+/* Cover */
+.cover-content { text-align: center; padding: 2rem 1.5rem; }
+.cover-content h1 { font-size: 2.8rem; margin-bottom: 0.8rem; color: var(--dark); }
+.cover-content .year-badge {
+  display: inline-block; background: var(--dark); color: var(--white);
+  padding: 0.4rem 1.5rem; border-radius: 1.5rem;
+  font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem;
+}
+
+/* Highlight box */
+.highlight-box {
+  background: linear-gradient(135deg, var(--light), #bbdefb);
+  border-radius: 0.8rem; padding: 1.5rem; margin: 1rem 0; text-align: center;
+}
+.highlight-box .big-text { font-size: 1.5rem; font-weight: 800; color: var(--dark); margin-bottom: 0.3rem; }
+.highlight-box .small-text { font-size: 0.95rem; color: var(--gray-600); }
+
+/* Track cards */
+.track-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.track-card {
+  border-radius: 0.8rem; padding: 1.4rem; text-align: center;
+  border: 2px solid transparent; transition: all 0.2s;
+}
+.track-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.track-card.data { background: #e8f5e9; border-color: #a5d6a7; }
+.track-card.web { background: var(--light); border-color: #90caf9; }
+.track-card.vibe { background: #f3e5f5; border-color: #ce93d8; }
+.track-card .track-emoji { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.track-card .track-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.3rem; }
+.track-card .track-desc { font-size: 0.9rem; color: var(--gray-600); line-height: 1.5; }
+
+/* Code block */
+.code-block {
+  background: #1e1e1e; color: #d4d4d4;
+  border-radius: 0.6rem; padding: 1rem 1.3rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.95rem; line-height: 1.7;
+  overflow-x: auto; margin: 0.8rem 0;
+}
+.code-block .tag { color: #569cd6; }
+.code-block .attr { color: #9cdcfe; }
+.code-block .value { color: #ce9178; }
+.code-block .comment { color: #6a9955; }
+.code-block .string { color: #ce9178; }
+.code-block .function { color: #dcdcaa; }
+.code-block .keyword { color: #c586c0; }
+.code-block .property { color: #9cdcfe; }
+
+/* Flow diagram */
+.flow-diagram {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin: 1.5rem 0; flex-wrap: wrap;
+}
+.flow-step {
+  background: var(--white); border: 2px solid var(--accent);
+  border-radius: 0.8rem; padding: 1rem 1.2rem;
+  text-align: center; min-width: 130px; transition: all 0.2s;
+}
+.flow-step:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.flow-step .flow-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+.flow-step .flow-label { font-size: 0.85rem; font-weight: 600; color: var(--dark); }
+.flow-step .flow-desc { font-size: 0.75rem; color: var(--gray-600); margin-top: 0.15rem; }
+.flow-arrow { font-size: 1.5rem; color: var(--accent); padding: 0 0.3rem; flex-shrink: 0; }
+
+/* Analogy box */
+.analogy-box {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border-radius: 0.8rem; padding: 1.5rem; margin: 1rem 0;
+  border: 1px solid #ffcc80;
+}
+.analogy-box .analogy-title { font-size: 1.1rem; font-weight: 700; color: #e65100; margin-bottom: 0.5rem; }
+.analogy-box .analogy-content { font-size: 1rem; color: var(--gray-800); line-height: 1.7; }
+
+/* Comparison visual */
+.compare-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; margin: 1rem 0; align-items: center; }
+.compare-card {
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: 0.8rem; padding: 1.5rem; text-align: center;
+}
+.compare-card .compare-emoji { font-size: 3rem; margin-bottom: 0.5rem; }
+.compare-card .compare-name { font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 0.3rem; }
+.compare-card .compare-desc { font-size: 0.9rem; color: var(--gray-600); line-height: 1.5; }
+.compare-vs { font-size: 1.5rem; font-weight: 800; color: var(--accent); text-align: center; }
+
+/* Structure diagram */
+.structure-diagram {
+  border: 2px solid var(--gray-300); border-radius: 0.8rem;
+  overflow: hidden; margin: 1rem 0;
+}
+.structure-section {
+  padding: 1rem 1.5rem; border-bottom: 1px dashed var(--gray-300);
+  display: flex; align-items: center; gap: 1rem;
+  transition: background 0.2s;
+}
+.structure-section:last-child { border-bottom: none; }
+.structure-section:hover { background: var(--light); }
+.structure-section .struct-label {
+  display: inline-block; padding: 0.3rem 0.8rem;
+  border-radius: 0.4rem; font-size: 0.85rem; font-weight: 700;
+  min-width: 100px; text-align: center; color: var(--white);
+}
+.structure-section .struct-desc { font-size: 0.95rem; color: var(--gray-800); }
+.struct-header { background: #e53935; }
+.struct-nav { background: var(--orange-accent); }
+.struct-main { background: var(--dark); }
+.struct-footer { background: var(--gray-600); }
+
+/* Activity box */
+.activity-box {
+  background: var(--white); border: 2px solid var(--accent);
+  border-radius: 0.8rem; padding: 1.5rem; margin: 1rem 0;
+}
+.activity-box .activity-title {
+  font-size: 1.2rem; font-weight: 700; color: var(--dark);
+  margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.activity-steps { list-style: none; }
+.activity-steps li {
+  display: flex; align-items: flex-start; gap: 0.8rem;
+  padding: 0.6rem 0; font-size: 1rem; line-height: 1.6;
+}
+.activity-steps li .step-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 1.8rem; height: 1.8rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  font-size: 0.8rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem;
+}
+
+/* House build cards */
+.house-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.house-card {
+  border-radius: 0.8rem; padding: 1.5rem; text-align: center;
+  border: 2px solid transparent; transition: all 0.2s;
+}
+.house-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.house-card.html { background: #fce4ec; border-color: #ef9a9a; }
+.house-card.css { background: #e8eaf6; border-color: #9fa8da; }
+.house-card.js { background: #fff8e1; border-color: #ffe082; }
+.house-card .house-emoji { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.house-card .house-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.2rem; }
+.house-card .house-role { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; }
+.house-card .house-desc { font-size: 0.85rem; color: var(--gray-600); line-height: 1.5; }
+.house-card.html .house-name { color: #c62828; }
+.house-card.html .house-role { color: #e53935; }
+.house-card.css .house-name { color: #283593; }
+.house-card.css .house-role { color: #3f51b5; }
+.house-card.js .house-name { color: #f57f17; }
+.house-card.js .house-role { color: #ff8f00; }
+
+/* Learning goals */
+.goal-list { list-style: none; margin: 1rem 0; }
+.goal-list li {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.8rem 1rem; margin-bottom: 0.5rem;
+  background: var(--gray-50); border-radius: 0.6rem;
+  border: 1px solid var(--gray-200); font-size: 1.05rem;
+}
+.goal-list li .goal-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
+}
+
+/* End slide */
+.end-content { text-align: center; padding: 2rem 1.5rem; }
+.end-content h1 { color: var(--dark); margin-bottom: 0.5rem; }
+.end-content p { font-size: 1.2rem; margin-bottom: 1.5rem; }
+
+/* Navigation */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem; padding: 0.8rem 1.5rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--gray-200);
+  z-index: 999;
+}
+.nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 2.6rem; height: 2.6rem;
+  border: 1px solid var(--gray-200); border-radius: 0.5rem;
+  background: var(--white); cursor: pointer;
+  font-size: 1.1rem; color: var(--gray-700); transition: all 0.2s;
+}
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--main); color: var(--main); background: var(--light);
+}
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.nav-counter {
+  font-size: 0.85rem; font-weight: 600; color: var(--gray-600);
+  min-width: 5rem; text-align: center;
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 3px; background: rgba(255,255,255,0.8);
+  transition: width 0.4s ease; z-index: 100;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  html, body { font-size: clamp(13px, 1.8vw, 18px); }
+  .browser-content { padding: 2rem 2.5rem; }
+  .house-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  html, body { font-size: clamp(13px, 2.8vw, 17px); }
+  .slide { padding: 1vh 2vw; }
+  .browser-card { border-radius: 0.7rem; }
+  .browser-content { padding: 1.5rem 1.5rem; }
+  .grid-2, .grid-3, .track-grid, .house-grid { grid-template-columns: 1fr; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .compare-vs { transform: rotate(90deg); }
+  .cover-content h1 { font-size: 2rem; }
+  .flow-diagram { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+  .structure-section { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+}
+
+@media (max-width: 480px) {
+  html, body { font-size: clamp(13px, 3.5vw, 16px); }
+  .browser-content { padding: 1.2rem 1rem; }
+  .nav-btn { width: 2.4rem; height: 2.4rem; font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- Slide 1: 표지 -->
+  <div class="slide active" data-slide="0">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">프로그래밍 2차시</div>
+      </div>
+      <div class="browser-content">
+        <div class="cover-content">
+          <div class="year-badge">프로그래밍 · 2차시</div>
+          <h1>웹은 어떻게<br>만들어질까?</h1>
+          <p class="subtitle">우리가 매일 사용하는 웹사이트의 비밀</p>
+
+          <div style="display: flex; justify-content: center; gap: 0.6rem; margin-top: 1.5rem; flex-wrap: wrap;">
+            <span class="badge blue">인터넷과 웹</span>
+            <span class="badge orange">클라이언트-서버</span>
+            <span class="badge purple">HTML · CSS · JS</span>
+          </div>
+
+          <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+            <div style="text-align: center;">
+              <div style="font-size: 2.5rem;">🌐</div>
+              <div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.3rem;">웹의 원리</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 2.5rem;">🔍</div>
+              <div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.3rem;">구조 분석</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 2.5rem;">💻</div>
+              <div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.3rem;">코드 맛보기</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2: 지난 시간 복습 -->
+  <div class="slide" data-slide="1">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">지난 시간 복습</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🔄</div>
+          <div class="section-text">
+            <h2>지난 시간, 우리가 배운 것</h2>
+            <div class="section-sub">프로그래밍 수업의 3가지 트랙을 기억하나요?</div>
+          </div>
+        </div>
+
+        <div class="track-grid">
+          <div class="track-card data">
+            <div class="track-emoji">📊</div>
+            <div class="track-name">데이터 연구</div>
+            <div class="track-desc">데이터를 수집·분석하여<br>연구 주제를 탐구</div>
+          </div>
+          <div class="track-card web" style="border-width: 3px; box-shadow: 0 4px 15px rgba(33,150,243,0.3);">
+            <div class="track-emoji">🌐</div>
+            <div class="track-name">웹 언어</div>
+            <div class="track-desc">HTML · CSS · JS로<br>나만의 웹 페이지 만들기</div>
+            <div style="margin-top: 0.5rem;">
+              <span class="badge blue" style="font-size: 0.75rem;">오늘 시작!</span>
+            </div>
+          </div>
+          <div class="track-card vibe">
+            <div class="track-emoji">✨</div>
+            <div class="track-name">바이브 코딩</div>
+            <div class="track-desc">AI와 대화하며<br>코드를 만드는 새 방식</div>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top: 1.2rem;">
+          <div class="big-text" style="font-size: 1.3rem;">오늘부터 '웹 언어' 트랙을 시작합니다!</div>
+          <div class="small-text">웹사이트가 어떻게 만들어지는지, 그 비밀을 함께 알아봐요</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: 오늘의 질문 -->
+  <div class="slide" data-slide="2">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">오늘의 질문</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">❓</div>
+          <div class="section-text">
+            <h2>오늘의 질문</h2>
+            <div class="section-sub">여러분이 매일 사용하는 것들의 비밀</div>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-bottom: 1.5rem; padding: 2rem;">
+          <div class="big-text" style="font-size: 1.6rem;">"이 웹사이트들은 어떻게 만들어졌을까?"</div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+          <div style="text-align: center;">
+            <div style="font-size: 2.8rem;">📸</div>
+            <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.3rem;">인스타그램</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2.8rem;">▶️</div>
+            <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.3rem;">유튜브</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2.8rem;">🟢</div>
+            <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.3rem;">네이버</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2.8rem;">🥕</div>
+            <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.3rem;">당근마켓</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 2.8rem;">💙</div>
+            <div style="font-size: 0.9rem; font-weight: 600; margin-top: 0.3rem;">토스</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 1.5rem;">🎯 오늘의 학습 목표</h3>
+        <ul class="goal-list">
+          <li>
+            <span class="goal-num">1</span>
+            인터넷과 웹의 차이를 설명할 수 있다
+          </li>
+          <li>
+            <span class="goal-num">2</span>
+            웹사이트가 화면에 보이는 과정(클라이언트-서버)을 이해한다
+          </li>
+          <li>
+            <span class="goal-num">3</span>
+            웹사이트의 구조(헤더/내비/메인/푸터)를 분석할 수 있다
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: 인터넷 vs 웹 -->
+  <div class="slide" data-slide="3">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">인터넷 vs 웹</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🌍</div>
+          <div class="section-text">
+            <h2>인터넷과 웹, 같은 걸까?</h2>
+            <div class="section-sub">많이 헷갈리지만 사실은 다릅니다!</div>
+          </div>
+        </div>
+
+        <div class="compare-grid">
+          <div class="compare-card" style="border-top: 3px solid var(--orange-accent);">
+            <div class="compare-emoji">🛣️</div>
+            <div class="compare-name">인터넷 (Internet)</div>
+            <div class="compare-desc">
+              전 세계 컴퓨터를 연결하는<br>
+              <strong>거대한 네트워크(도로)</strong><br><br>
+              1969년에 시작된<br>
+              컴퓨터 간 통신 기술
+            </div>
+          </div>
+          <div class="compare-vs">≠</div>
+          <div class="compare-card" style="border-top: 3px solid var(--dark);">
+            <div class="compare-emoji">🌐</div>
+            <div class="compare-name">웹 (WWW)</div>
+            <div class="compare-desc">
+              인터넷 위에서 동작하는<br>
+              <strong>서비스 중 하나(버스)</strong><br><br>
+              1991년에 만들어진<br>
+              문서를 공유하는 시스템
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box">
+          <div class="analogy-title">💡 쉽게 이해하기</div>
+          <div class="analogy-content">
+            <strong>인터넷</strong>은 전국의 <strong>고속도로</strong>와 같아요. 도로 자체는 여러 교통수단이 다닐 수 있죠.<br>
+            <strong>웹</strong>은 그 도로 위를 달리는 <strong>버스</strong> 같은 거예요. 도로 위에는 버스(웹) 말고도 택시(이메일), 오토바이(메신저), 트럭(파일 전송) 등 다양한 서비스가 있어요!
+          </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 0.8rem;">
+          <strong>📌 핵심 정리</strong><br>
+          인터넷 = 네트워크(기반 시설) / 웹 = 인터넷 위의 서비스 중 하나. 우리가 브라우저로 보는 것이 바로 <strong>웹</strong>!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: 웹사이트가 보이는 과정 ① -->
+  <div class="slide" data-slide="4">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">웹사이트가 보이는 과정 ①</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">☕</div>
+          <div class="section-text">
+            <h2>웹사이트는 어떻게 보일까?</h2>
+            <div class="section-sub">카페에서 커피 주문하는 것과 같아요!</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 1rem;">
+          <div>
+            <h3 style="color: var(--orange-accent);">☕ 카페 주문</h3>
+            <div class="card-item" style="margin-top: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem;">
+                <span style="font-size: 1.5rem;">🙋‍♀️</span>
+                <span style="font-weight: 600;">나 (손님)</span>
+              </div>
+              <p>"아이스 아메리카노 주세요!" → <strong>주문</strong></p>
+            </div>
+            <div style="text-align: center; font-size: 1.5rem; margin: 0.4rem 0;">⬇️</div>
+            <div class="card-item">
+              <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem;">
+                <span style="font-size: 1.5rem;">👨‍🍳</span>
+                <span style="font-weight: 600;">바리스타</span>
+              </div>
+              <p>커피를 만들어서 전달 → <strong>응답</strong></p>
+            </div>
+          </div>
+
+          <div>
+            <h3 style="color: var(--dark);">🌐 웹사이트 접속</h3>
+            <div class="card-item" style="margin-top: 0.5rem; border-left: 3px solid var(--dark);">
+              <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem;">
+                <span style="font-size: 1.5rem;">💻</span>
+                <span style="font-weight: 600;">클라이언트 (내 브라우저)</span>
+              </div>
+              <p>"naver.com 보여줘!" → <strong>요청(Request)</strong></p>
+            </div>
+            <div style="text-align: center; font-size: 1.5rem; margin: 0.4rem 0;">⬇️</div>
+            <div class="card-item" style="border-left: 3px solid var(--dark);">
+              <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem;">
+                <span style="font-size: 1.5rem;">🖥️</span>
+                <span style="font-weight: 600;">서버 (네이버 컴퓨터)</span>
+              </div>
+              <p>HTML/CSS/JS 파일 전달 → <strong>응답(Response)</strong></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box orange" style="margin-top: 1rem;">
+          <strong>🔑 핵심!</strong>
+          웹사이트는 어딘가에 있는 <strong>서버 컴퓨터에 저장된 파일</strong>을 내 브라우저가 받아서 보여주는 것이에요!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: 웹사이트가 보이는 과정 ② -->
+  <div class="slide" data-slide="5">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">웹사이트가 보이는 과정 ②</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🔄</div>
+          <div class="section-text">
+            <h2>단계별로 살펴보기</h2>
+            <div class="section-sub">URL을 입력하면 무슨 일이 일어날까?</div>
+          </div>
+        </div>
+
+        <div class="flow-diagram">
+          <div class="flow-step">
+            <div class="flow-icon">⌨️</div>
+            <div class="flow-label">1. URL 입력</div>
+            <div class="flow-desc">주소창에<br>naver.com 입력</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-icon">📡</div>
+            <div class="flow-label">2. 서버 찾기</div>
+            <div class="flow-desc">DNS가 서버의<br>주소를 찾아줌</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-icon">📨</div>
+            <div class="flow-label">3. 요청 전송</div>
+            <div class="flow-desc">서버에<br>"페이지 주세요!" 요청</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step">
+            <div class="flow-icon">📦</div>
+            <div class="flow-label">4. 파일 전달</div>
+            <div class="flow-desc">서버가 HTML,<br>CSS, JS 파일 전송</div>
+          </div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-step" style="border-color: var(--dark); background: var(--light);">
+            <div class="flow-icon">🖥️</div>
+            <div class="flow-label">5. 화면 표시</div>
+            <div class="flow-desc">브라우저가<br>파일을 해석해서 표시</div>
+          </div>
+        </div>
+
+        <div class="analogy-box" style="margin-top: 1.5rem;">
+          <div class="analogy-title">💡 이것도 알아두세요!</div>
+          <div class="analogy-content">
+            <strong>URL</strong> = 웹사이트의 주소 (예: https://www.naver.com)<br>
+            <strong>DNS</strong> = 인터넷의 전화번호부. "naver.com"이라는 이름을 서버의 실제 주소(숫자)로 바꿔주는 역할<br>
+            <strong>브라우저</strong> = 크롬, 사파리, 엣지 같은 앱. 서버에서 받은 파일을 예쁘게 화면에 그려주는 프로그램
+          </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 0.8rem;">
+          <strong>⚡ 놀라운 사실</strong><br>
+          이 모든 과정이 <strong>0.5초 이내</strong>에 일어나요! 우리가 주소를 입력하고 엔터를 누르면, 순식간에 전 세계 어딘가의 서버에서 파일을 가져옵니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Quiz ①: 웹 동작 과정 개념 체크 (라이브 세션 연결 시 미니바에서 문항 열기 / 평상시엔 정적 퀴즈로 사용) -->
+  <div class="slide" data-slide="live-q1" data-live="quiz" data-live-id="q1-first-step">
+    <script type="application/json" class="live-config">
+    {
+      "kind": "choice",
+      "prompt": "주소창에 naver.com을 입력하고 Enter를 눌렀다. 가장 먼저 일어나는 일은?",
+      "options": [
+        "서버가 HTML 파일을 보내준다",
+        "DNS가 서버의 실제 주소를 찾아준다",
+        "브라우저가 화면을 그리기 시작한다",
+        "서버가 완성된 화면을 통째로 보내준다"
+      ],
+      "answer": 1,
+      "misconceptions": {
+        "0": "요청 없이 응답이 먼저 온다고 생각",
+        "2": "파일을 받기 전에 화면을 그릴 수 있다고 생각",
+        "3": "서버가 완성된 '화면'을 보낸다고 생각 (실제로는 파일을 보냄)"
+      }
+    }
+    </script>
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">실시간 퀴즈 — 다 함께 참여!</div>
+      </div>
+      <div class="browser-content live-stage">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.2rem;">
+          <span class="badge blue">📡 실시간 퀴즈</span>
+          <span style="color:var(--gray-600); font-size:0.95rem;">참여 페이지에서 세션 코드를 입력하고 답해보세요</span>
+        </div>
+        <h1 style="margin-bottom:2rem;">주소창에 naver.com을 입력하고 Enter!<br>가장 <span style="color:var(--dark);">먼저</span> 일어나는 일은?</h1>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; max-width:1200px;">
+          <div style="display:flex; gap:0.9rem; align-items:center; border:2px solid var(--gray-200); border-radius:0.8rem; padding:1.1rem 1.3rem;">
+            <span style="flex:none; width:2.2rem; height:2.2rem; border-radius:0.6rem; background:var(--light); color:var(--dark); font-weight:800; display:flex; align-items:center; justify-content:center;">1</span>
+            <span style="font-size:1.1rem;">서버가 HTML 파일을 보내준다</span>
+          </div>
+          <div style="display:flex; gap:0.9rem; align-items:center; border:2px solid var(--gray-200); border-radius:0.8rem; padding:1.1rem 1.3rem;">
+            <span style="flex:none; width:2.2rem; height:2.2rem; border-radius:0.6rem; background:var(--light); color:var(--dark); font-weight:800; display:flex; align-items:center; justify-content:center;">2</span>
+            <span style="font-size:1.1rem;">DNS가 서버의 실제 주소를 찾아준다</span>
+          </div>
+          <div style="display:flex; gap:0.9rem; align-items:center; border:2px solid var(--gray-200); border-radius:0.8rem; padding:1.1rem 1.3rem;">
+            <span style="flex:none; width:2.2rem; height:2.2rem; border-radius:0.6rem; background:var(--light); color:var(--dark); font-weight:800; display:flex; align-items:center; justify-content:center;">3</span>
+            <span style="font-size:1.1rem;">브라우저가 화면을 그리기 시작한다</span>
+          </div>
+          <div style="display:flex; gap:0.9rem; align-items:center; border:2px solid var(--gray-200); border-radius:0.8rem; padding:1.1rem 1.3rem;">
+            <span style="flex:none; width:2.2rem; height:2.2rem; border-radius:0.6rem; background:var(--light); color:var(--dark); font-weight:800; display:flex; align-items:center; justify-content:center;">4</span>
+            <span style="font-size:1.1rem;">서버가 완성된 화면을 통째로 보내준다</span>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top:1.8rem;">
+          <strong>💡 힌트</strong> — 앞에서 본 5단계 과정을 순서대로 떠올려보세요. 편지를 보내려면 먼저 무엇을 알아야 할까요?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: 웹페이지의 3가지 언어 ① -->
+  <div class="slide" data-slide="6">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">웹페이지의 3가지 언어 ①</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🏠</div>
+          <div class="section-text">
+            <h2>집을 짓는 것처럼!</h2>
+            <div class="section-sub">웹페이지를 만드는 3가지 언어를 집 짓기에 비유해 봐요</div>
+          </div>
+        </div>
+
+        <div class="house-grid">
+          <div class="house-card html">
+            <div class="house-emoji">🏗️</div>
+            <div class="house-name">HTML</div>
+            <div class="house-role">설계도 & 골조</div>
+            <div class="house-desc">
+              방, 벽, 문, 창문의 위치를 정하는 것처럼<br>
+              웹페이지의 <strong>구조와 내용</strong>을 담당<br><br>
+              "여기에 제목, 여기에 사진,<br>여기에 버튼을 놓겠다!"
+            </div>
+          </div>
+          <div class="house-card css">
+            <div class="house-emoji">🎨</div>
+            <div class="house-name">CSS</div>
+            <div class="house-role">인테리어 디자인</div>
+            <div class="house-desc">
+              벽지 색, 가구 배치, 조명을 꾸미는 것처럼<br>
+              웹페이지의 <strong>디자인과 레이아웃</strong>을 담당<br><br>
+              "배경은 파란색, 글자는 크게,<br>버튼은 둥글게!"
+            </div>
+          </div>
+          <div class="house-card js">
+            <div class="house-emoji">⚡</div>
+            <div class="house-name">JavaScript</div>
+            <div class="house-role">전자기기 & 자동화</div>
+            <div class="house-desc">
+              스위치를 누르면 불이 켜지는 것처럼<br>
+              웹페이지의 <strong>동작과 상호작용</strong>을 담당<br><br>
+              "버튼을 누르면 메뉴가 열리고,<br>스크롤하면 이미지가 바뀌고!"
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box purple" style="margin-top: 0.8rem;">
+          <strong>🎓 우리 수업에서는?</strong><br>
+          <strong>HTML</strong>부터 시작해서 → <strong>CSS</strong>로 꾸미고 → <strong>JavaScript</strong>로 움직이게 만드는 순서로 배웁니다!<br>
+          한 번에 다 배우는 게 아니라, <strong>차근차근 하나씩</strong> 배워요.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: 웹페이지의 3가지 언어 ② -->
+  <div class="slide" data-slide="7">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">웹페이지의 3가지 언어 ②</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">👀</div>
+          <div class="section-text">
+            <h2>실제 코드는 이렇게 생겼어요</h2>
+            <div class="section-sub">아직 외울 필요 없어요! 눈으로만 구경해 봅시다</div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 1rem;">
+          <div>
+            <h3 style="color: #c62828; margin-bottom: 0.5rem;">🏗️ HTML (구조)</h3>
+            <div class="code-block">
+              <span class="tag">&lt;h1&gt;</span>안녕하세요!<span class="tag">&lt;/h1&gt;</span><br>
+              <span class="tag">&lt;p&gt;</span>반갑습니다<span class="tag">&lt;/p&gt;</span><br>
+              <span class="tag">&lt;button&gt;</span>클릭<span class="tag">&lt;/button&gt;</span>
+            </div>
+            <p style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">
+              "무엇을" 보여줄지 결정
+            </p>
+          </div>
+          <div>
+            <h3 style="color: #283593; margin-bottom: 0.5rem;">🎨 CSS (디자인)</h3>
+            <div class="code-block">
+              <span class="property">color</span>: <span class="value">blue</span>;<br>
+              <span class="property">font-size</span>: <span class="value">24px</span>;<br>
+              <span class="property">background</span>: <span class="value">pink</span>;
+            </div>
+            <p style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">
+              "어떻게" 보여줄지 결정
+            </p>
+          </div>
+          <div>
+            <h3 style="color: #f57f17; margin-bottom: 0.5rem;">⚡ JavaScript (동작)</h3>
+            <div class="code-block">
+              <span class="keyword">if</span> (버튼 클릭) {<br>
+              &nbsp;&nbsp;<span class="function">alert</span>(<span class="string">'안녕!'</span>);<br>
+              }
+            </div>
+            <p style="font-size: 0.85rem; text-align: center; margin-top: 0.5rem;">
+              "어떻게 반응"할지 결정
+            </p>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top: 1.2rem;">
+          <div class="big-text" style="font-size: 1.2rem;">🏗️ 뼈대(HTML) + 🎨 옷(CSS) + ⚡ 두뇌(JS) = 🌐 웹사이트!</div>
+          <div class="small-text">세 가지가 합쳐져서 우리가 보는 웹페이지가 완성됩니다</div>
+        </div>
+
+        <div class="info-box green" style="margin-top: 0.8rem;">
+          <strong>💬 걱정 마세요!</strong><br>
+          지금은 코드가 낯설어 보이지만, 다음 시간부터 하나하나 배우면 금방 익숙해져요. 이번 학기가 끝나면 여러분도 이런 코드를 직접 작성하게 됩니다!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: 웹사이트 구조 분석 -->
+  <div class="slide" data-slide="8">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">웹사이트 구조 분석</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🧩</div>
+          <div class="section-text">
+            <h2>웹사이트는 블록으로 구성되어 있어요</h2>
+            <div class="section-sub">대부분의 웹사이트는 비슷한 구조를 가지고 있습니다</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 1rem; align-items: start;">
+          <!-- 미니 웹사이트 목업 -->
+          <div>
+            <p style="font-size: 0.85rem; font-weight: 600; color: var(--gray-600); margin-bottom: 0.5rem; text-align: center;">👇 이것도 웹사이트예요! 각 영역을 확인해 보세요</p>
+            <div style="border: 2px solid var(--gray-300); border-radius: 0.6rem; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+              <!-- 미니 브라우저 바 -->
+              <div style="background: #f0f0f0; padding: 0.4rem 0.8rem; display: flex; align-items: center; gap: 0.3rem; border-bottom: 1px solid #ddd;">
+                <span style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #ff5f57;"></span>
+                <span style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #ffbd2e;"></span>
+                <span style="width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #28c840;"></span>
+                <span style="flex:1; text-align: center; font-size: 0.65rem; color: #999;">🔒 my-school.kr</span>
+              </div>
+
+              <!-- Header 영역 -->
+              <div style="background: #e53935; color: white; padding: 0.7rem 1rem; display: flex; align-items: center; justify-content: space-between; position: relative;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <span style="font-size: 1.2rem;">🏫</span>
+                  <span style="font-weight: 700; font-size: 0.9rem;">샘플고</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.2); padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.7rem;">🔍 검색</div>
+                <span style="position: absolute; top: 0.2rem; right: 0.3rem; background: white; color: #e53935; font-size: 0.55rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 0.2rem;">Header</span>
+              </div>
+
+              <!-- Nav 영역 -->
+              <div style="background: #ff9800; color: white; padding: 0.4rem 1rem; display: flex; gap: 1rem; font-size: 0.75rem; font-weight: 500; position: relative;">
+                <span>🏠 홈</span>
+                <span>📢 공지사항</span>
+                <span>📸 갤러리</span>
+                <span>📞 문의</span>
+                <span style="position: absolute; top: 0.15rem; right: 0.3rem; background: white; color: #e65100; font-size: 0.55rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 0.2rem;">Nav</span>
+              </div>
+
+              <!-- Main 영역 -->
+              <div style="background: #e3f2fd; padding: 0.8rem 1rem; min-height: 140px; position: relative;">
+                <span style="position: absolute; top: 0.3rem; right: 0.3rem; background: #1565c0; color: white; font-size: 0.55rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 0.2rem;">Main</span>
+                <div style="font-size: 0.85rem; font-weight: 700; color: #1565c0; margin-bottom: 0.5rem;">📌 오늘의 공지</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;">
+                  <div style="background: white; padding: 0.5rem; border-radius: 0.4rem; font-size: 0.7rem; border: 1px solid #bbdefb;">
+                    <div style="font-weight: 600;">🎉 체육대회 안내</div>
+                    <div style="color: #999; font-size: 0.6rem; margin-top: 0.2rem;">5월 15일 개최 예정</div>
+                  </div>
+                  <div style="background: white; padding: 0.5rem; border-radius: 0.4rem; font-size: 0.7rem; border: 1px solid #bbdefb;">
+                    <div style="font-weight: 600;">📚 중간고사 일정</div>
+                    <div style="color: #999; font-size: 0.6rem; margin-top: 0.2rem;">4월 21일~25일</div>
+                  </div>
+                  <div style="background: white; padding: 0.5rem; border-radius: 0.4rem; font-size: 0.7rem; border: 1px solid #bbdefb;">
+                    <div style="font-weight: 600;">🍽️ 오늘의 급식</div>
+                    <div style="color: #999; font-size: 0.6rem; margin-top: 0.2rem;">김치볶음밥, 떡국</div>
+                  </div>
+                  <div style="background: white; padding: 0.5rem; border-radius: 0.4rem; font-size: 0.7rem; border: 1px solid #bbdefb;">
+                    <div style="font-weight: 600;">📸 사진 갤러리</div>
+                    <div style="color: #999; font-size: 0.6rem; margin-top: 0.2rem;">최근 행사 사진 12장</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer 영역 -->
+              <div style="background: #616161; color: #ccc; padding: 0.5rem 1rem; font-size: 0.6rem; position: relative; line-height: 1.5;">
+                <span style="position: absolute; top: 0.15rem; right: 0.3rem; background: white; color: #616161; font-size: 0.55rem; font-weight: 800; padding: 0.1rem 0.35rem; border-radius: 0.2rem;">Footer</span>
+                샘플고등학교 | 📍 전주시 | 📞 063-XXX-XXXX<br>
+                © 2026 All rights reserved.
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽 설명 -->
+          <div>
+            <h3 style="margin-bottom: 0.8rem;">🔍 각 영역의 역할</h3>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem; margin-bottom: 0.4rem; background: #fce4ec; border-radius: 0.5rem; border-left: 4px solid #e53935;">
+              <span style="font-size: 1.3rem;">🏷️</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #c62828;">Header (헤더)</div>
+                <div style="font-size: 0.85rem; color: var(--gray-600);">사이트 로고, 이름, 검색창 — <strong>사이트의 얼굴</strong></div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem; margin-bottom: 0.4rem; background: #fff3e0; border-radius: 0.5rem; border-left: 4px solid #ff9800;">
+              <span style="font-size: 1.3rem;">🧭</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #e65100;">Nav (내비게이션)</div>
+                <div style="font-size: 0.85rem; color: var(--gray-600);">메뉴, 링크 모음 — <strong>길 안내 표지판</strong></div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem; margin-bottom: 0.4rem; background: #e3f2fd; border-radius: 0.5rem; border-left: 4px solid #1565c0;">
+              <span style="font-size: 1.3rem;">📄</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #1565c0;">Main (메인 콘텐츠)</div>
+                <div style="font-size: 0.85rem; color: var(--gray-600);">핵심 내용, 기사, 상품 — <strong>사이트의 심장</strong></div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem; margin-bottom: 0.4rem; background: #f5f5f5; border-radius: 0.5rem; border-left: 4px solid #616161;">
+              <span style="font-size: 1.3rem;">📎</span>
+              <div>
+                <div style="font-weight: 700; font-size: 0.95rem; color: #424242;">Footer (푸터)</div>
+                <div style="font-size: 0.85rem; color: var(--gray-600);">연락처, 저작권, 약관 — <strong>부록 정보</strong></div>
+              </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 0.8rem; font-size: 0.9rem;">
+              <strong>💡 발견!</strong><br>
+              왼쪽의 학교 웹사이트 목업을 보세요. 모든 웹사이트는 이 4가지 블록의 조합으로 만들어져요!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: 소스 코드 보는 방법 -->
+  <div class="slide" data-slide="9">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">웹사이트의 코드를 직접 볼 수 있다?!</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🔬</div>
+          <div class="section-text">
+            <h2>웹사이트의 소스 코드 들여다보기</h2>
+            <div class="section-sub">모든 웹사이트의 코드는 누구나 볼 수 있어요!</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top: 0.8rem; align-items: start;">
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">방법 1: 페이지 소스 보기</h3>
+            <div style="background: #1e1e1e; border-radius: 0.6rem; padding: 1rem; margin-bottom: 0.8rem;">
+              <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+                <span style="background: #569cd6; color: white; padding: 0.2rem 0.6rem; border-radius: 0.3rem; font-size: 0.8rem; font-weight: 700; font-family: 'Consolas', monospace;">Ctrl</span>
+                <span style="color: #d4d4d4; font-size: 1.2rem;">+</span>
+                <span style="background: #569cd6; color: white; padding: 0.2rem 0.6rem; border-radius: 0.3rem; font-size: 0.8rem; font-weight: 700; font-family: 'Consolas', monospace;">U</span>
+              </div>
+              <div style="color: #6a9955; font-size: 0.8rem; font-family: 'Consolas', monospace;">// 웹사이트의 전체 HTML 코드를 볼 수 있어요</div>
+            </div>
+
+            <h3 style="margin-bottom: 0.6rem;">방법 2: 개발자 도구 열기</h3>
+            <div style="background: #1e1e1e; border-radius: 0.6rem; padding: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem;">
+                <span style="background: #c586c0; color: white; padding: 0.2rem 0.6rem; border-radius: 0.3rem; font-size: 0.8rem; font-weight: 700; font-family: 'Consolas', monospace;">F12</span>
+                <span style="color: #d4d4d4; font-size: 0.8rem; margin: 0 0.3rem;">또는</span>
+                <span style="background: #c586c0; color: white; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-size: 0.7rem; font-weight: 700; font-family: 'Consolas', monospace;">Ctrl+Shift+I</span>
+              </div>
+              <div style="color: #6a9955; font-size: 0.8rem; font-family: 'Consolas', monospace;">// 코드와 화면을 동시에 보면서 분석!</div>
+            </div>
+
+            <div class="info-box purple" style="margin-top: 0.8rem; font-size: 0.9rem;">
+              <strong>🖱️ 더 쉬운 방법!</strong><br>
+              궁금한 부분에서 <strong>마우스 오른쪽 클릭 → "검사"</strong>를 누르면 그 부분의 코드로 바로 이동해요!
+            </div>
+          </div>
+
+          <div>
+            <h3 style="margin-bottom: 0.6rem;">🔍 개발자 도구로 구조 확인하기</h3>
+            <!-- 개발자 도구 미니 목업 -->
+            <div style="border: 2px solid var(--gray-300); border-radius: 0.6rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+              <!-- 상단: 웹페이지 영역 -->
+              <div style="background: white; padding: 0.6rem; border-bottom: 2px solid #42a5f5;">
+                <div style="font-size: 0.65rem; color: #999; margin-bottom: 0.3rem;">웹페이지 화면</div>
+                <div style="border: 2px dashed #42a5f5; background: rgba(66,165,245,0.08); padding: 0.4rem; border-radius: 0.3rem; text-align: center;">
+                  <div style="background: #e53935; color: white; padding: 0.25rem; border-radius: 0.2rem; font-size: 0.7rem; font-weight: 600; margin-bottom: 0.2rem;">🏫 샘플고 ← <span style="background: rgba(255,255,255,0.3); padding: 0 0.3rem; border-radius: 0.2rem;">마우스를 올리면 강조!</span></div>
+                  <div style="font-size: 0.6rem; color: #42a5f5;">↕ 코드와 화면이 연결됩니다</div>
+                </div>
+              </div>
+              <!-- 하단: 코드 영역 -->
+              <div style="background: #1e1e1e; padding: 0.6rem; font-family: 'Consolas', monospace; font-size: 0.7rem; line-height: 1.6;">
+                <div style="color: #808080;">Elements</div>
+                <div style="margin-top: 0.3rem;">
+                  <span style="color: #808080;">▼ </span><span style="color: #569cd6;">&lt;body&gt;</span>
+                </div>
+                <div style="padding-left: 1rem;">
+                  <span style="color: #808080;">▼ </span><span style="color: #569cd6;">&lt;header&gt;</span>
+                  <span style="background: rgba(66,165,245,0.3); padding: 0.1rem 0.3rem; border-radius: 0.2rem; color: #42a5f5; font-size: 0.6rem; margin-left: 0.3rem;">← 여기!</span>
+                </div>
+                <div style="padding-left: 2rem; color: #ce9178;">🏫 샘플고</div>
+                <div style="padding-left: 1rem;"><span style="color: #569cd6;">&lt;/header&gt;</span></div>
+                <div style="padding-left: 1rem; opacity: 0.5;"><span style="color: #569cd6;">&lt;nav&gt;</span> ... <span style="color: #569cd6;">&lt;/nav&gt;</span></div>
+                <div style="padding-left: 1rem; opacity: 0.5;"><span style="color: #569cd6;">&lt;main&gt;</span> ... <span style="color: #569cd6;">&lt;/main&gt;</span></div>
+                <div style="padding-left: 1rem; opacity: 0.5;"><span style="color: #569cd6;">&lt;footer&gt;</span> ... <span style="color: #569cd6;">&lt;/footer&gt;</span></div>
+                <div><span style="color: #569cd6;">&lt;/body&gt;</span></div>
+              </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 0.8rem; font-size: 0.9rem;">
+              <strong>✨ 발견!</strong><br>
+              코드에서 <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem;">&lt;header&gt;</span>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem;">&lt;nav&gt;</span>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem;">&lt;main&gt;</span>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem;">&lt;footer&gt;</span>
+              태그가 앞에서 배운 4가지 영역과 <strong>똑같아요!</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Quiz ②: HTML 역할 오개념 체크 (OX) -->
+  <div class="slide" data-slide="live-q2" data-live="quiz" data-live-id="q2-html-role">
+    <script type="application/json" class="live-config">
+    {
+      "kind": "ox",
+      "prompt": "HTML은 웹페이지의 '디자인(색·글꼴·배치)'을 담당하는 언어다.",
+      "answer": false,
+      "misconceptions": {
+        "true": "HTML(구조)과 CSS(디자인)의 역할 혼동"
+      }
+    }
+    </script>
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">실시간 OX 퀴즈</div>
+      </div>
+      <div class="browser-content live-stage">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.2rem;">
+          <span class="badge green">⭕ 실시간 OX</span>
+          <span style="color:var(--gray-600); font-size:0.95rem;">O일까요, X일까요? 참여 페이지에서 선택하세요</span>
+        </div>
+        <h1 style="margin-bottom:2.2rem;">HTML은 웹페이지의 <span style="color:var(--dark);">'디자인(색·글꼴·배치)'</span>을<br>담당하는 언어다?</h1>
+        <div style="display:flex; gap:1.5rem; max-width:900px;">
+          <div style="flex:1; text-align:center; border:2px solid var(--gray-200); border-radius:1rem; padding:2rem 0;">
+            <div style="font-size:4rem; font-weight:900; color:var(--green-accent); line-height:1;">O</div>
+            <div style="color:var(--gray-600); margin-top:0.6rem;">맞다</div>
+          </div>
+          <div style="flex:1; text-align:center; border:2px solid var(--gray-200); border-radius:1rem; padding:2rem 0;">
+            <div style="font-size:4rem; font-weight:900; color:var(--red-accent); line-height:1;">X</div>
+            <div style="color:var(--gray-600); margin-top:0.6rem;">아니다</div>
+          </div>
+        </div>
+        <div class="info-box orange" style="margin-top:1.8rem;">
+          <strong>🤔 생각해보기</strong> — 방금 배운 세 가지 언어(HTML·CSS·JavaScript)는 각각 어떤 역할이었나요?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Code: 웹 코드 실습 — 자기소개 카드 (라이브 세션에서 실시간 제출·우수작 공유) -->
+  <div class="slide" data-slide="live-c1" data-live="quiz" data-live-id="c1-intro-page">
+    <script type="application/json" class="live-config">
+    {
+      "kind": "code",
+      "prompt": "배운 태그로 '나를 소개하는 카드'를 만들어보세요. h1에 이름, p에 소개 한 줄, style로 색까지 입히면 완성!",
+      "language": "web",
+      "starter": "<h1>내 이름</h1>\n<p>나를 소개하는 한 줄</p>\n\n<style>\n  h1 { color: royalblue; }\n  p  { color: gray; }\n</style>"
+    }
+    </script>
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">실습: 나를 소개하는 카드</div>
+      </div>
+      <div class="browser-content live-stage">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:1.2rem;">
+          <span class="badge purple">⌨️ 코드 실습</span>
+          <span style="color:var(--gray-600); font-size:0.95rem;">참여 페이지에서 직접 코드를 쓰고 제출하세요 — 잘 만든 카드는 화면에서 함께 봅니다</span>
+        </div>
+        <h1 style="margin-bottom:1.6rem;">HTML로 <span style="color:var(--dark);">나를 소개하는 카드</span> 만들기</h1>
+        <div style="display:flex; gap:1.6rem; align-items:stretch; max-width:1250px;">
+          <div style="flex:1.2; background:#1e2433; border-radius:0.8rem; padding:1.3rem 1.5rem; font-family:Consolas,monospace; font-size:1rem; line-height:1.8; color:#e8ecf6;">
+            <span style="color:#7ee0a3;">&lt;h1&gt;</span>내 이름<span style="color:#7ee0a3;">&lt;/h1&gt;</span><br>
+            <span style="color:#7ee0a3;">&lt;p&gt;</span>나를 소개하는 한 줄<span style="color:#7ee0a3;">&lt;/p&gt;</span><br><br>
+            <span style="color:#8ab8ff;">&lt;style&gt;</span><br>
+            &nbsp;&nbsp;h1 { color: royalblue; }<br>
+            <span style="color:#8ab8ff;">&lt;/style&gt;</span>
+          </div>
+          <div style="display:flex; align-items:center; color:var(--gray-600); font-size:1.6rem;">→</div>
+          <div style="flex:1; border:2px solid var(--gray-200); border-radius:0.8rem; padding:1.3rem 1.5rem;">
+            <div style="font-size:1.6rem; font-weight:800; color:royalblue;">내 이름</div>
+            <div style="color:#757575; margin-top:0.4rem;">나를 소개하는 한 줄</div>
+            <div style="margin-top:1rem; font-size:0.85rem; color:var(--gray-600);">← 코드가 이렇게 화면이 됩니다</div>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top:1.6rem;">
+          <strong>💡 도전</strong> — 배경색(background), 테두리(border), 가운데 정렬(text-align)까지 써보면 최고!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: 활동 - 웹사이트 구조 찾기 -->
+  <div class="slide" data-slide="10">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">활동: 웹사이트 구조 찾기</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">✏️</div>
+          <div class="section-text">
+            <h2>활동: 웹사이트 구조 찾기</h2>
+            <div class="section-sub">좋아하는 웹사이트에서 4가지 영역을 찾고, 코드도 확인해 봅시다!</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="align-items: start;">
+          <div class="activity-box" style="margin: 0;">
+            <div class="activity-title">📋 활동 순서</div>
+            <ul class="activity-steps">
+              <li>
+                <span class="step-num">1</span>
+                <div>좋아하는 웹사이트 <strong>1개</strong>를 선택하세요<br><span style="font-size: 0.85rem; color: var(--gray-600);">멜론, 올리브영, 무신사, 쿠팡 등 무엇이든!</span></div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>눈으로 먼저 <strong>헤더 / 내비 / 메인 / 푸터</strong> 영역을 찾아보세요</div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div><strong>F12</strong>를 눌러 개발자 도구를 열고, 각 영역 위에 <strong>마우스를 올려</strong> 코드에서 어떤 태그인지 확인하세요</div>
+              </li>
+              <li>
+                <span class="step-num">4</span>
+                <div>활동지에 각 영역의 <strong>내용</strong>과 <strong>태그 이름</strong>을 적어보세요</div>
+              </li>
+              <li>
+                <span class="step-num">5</span>
+                <div>모둠원과 함께 분석 결과를 <strong>비교</strong>해 봅시다</div>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="https://docs.google.com/forms/d/e/YOUR_GOOGLE_DOC_ID/viewform" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.8rem 1.5rem; background: linear-gradient(135deg, var(--main), var(--dark)); color: white; border-radius: 0.8rem; text-decoration: none; font-size: 1.1rem; font-weight: 700; box-shadow: 0 4px 15px rgba(33,150,243,0.4); transition: transform 0.2s, box-shadow 0.2s; margin-bottom: 0.6rem;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(33,150,243,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 15px rgba(33,150,243,0.4)'">📝 활동지 열기 (Google Form)</a>
+
+            <div class="info-box green" style="margin-top: 0;">
+              <strong>💡 팁</strong><br>
+              개발자 도구에서 코드 위에 마우스를 올리면, 화면에서 해당 영역이 <strong>파란색으로 강조</strong>돼요! 이걸 활용하면 쉽게 찾을 수 있어요.
+            </div>
+
+            <div class="info-box" style="margin-top: 0.6rem;">
+              <strong>🔍 이런 것도 찾아보세요!</strong><br>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem; font-size: 0.9rem;">&lt;header&gt;</span> 헤더 영역<br>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem; font-size: 0.9rem;">&lt;nav&gt;</span> 내비게이션 영역<br>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem; font-size: 0.9rem;">&lt;main&gt;</span> 메인 콘텐츠 영역<br>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem; font-size: 0.9rem;">&lt;footer&gt;</span> 푸터 영역<br>
+              <span style="font-family: monospace; background: #eee; padding: 0.1rem 0.3rem; border-radius: 0.2rem; font-size: 0.9rem;">&lt;div&gt;</span> 범용 블록 (영역 나누기)
+            </div>
+
+            <div class="info-box orange" style="margin-top: 0.6rem;">
+              <strong>🔮 다음 시간 예고</strong><br>
+              다음 시간에는 <strong>VS Code</strong>를 설치하고, <strong>HTML 코드를 직접</strong> 작성해 봅니다!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">◀</button>
+  <div class="nav-counter" id="navCounter">1 / 11</div>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">▶</button>
+</div>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const progressBar = document.getElementById('progressBar');
+  const navCounter = document.getElementById('navCounter');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function updateSlide(direction) {
+    slides[currentSlide].classList.remove('active');
+    if (direction === 'next') currentSlide++;
+    else currentSlide--;
+    slides[currentSlide].classList.add('active');
+    updateUI();
+  }
+
+  function goToSlide(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateUI();
+  }
+
+  function nextSlide() {
+    if (currentSlide < totalSlides - 1) updateSlide('next');
+  }
+
+  function prevSlide() {
+    if (currentSlide > 0) updateSlide('prev');
+  }
+
+  function updateUI() {
+    const progress = ((currentSlide + 1) / totalSlides) * 100;
+    progressBar.style.width = progress + '%';
+    navCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === totalSlides - 1;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault(); nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault(); prevSlide();
+    } else if (e.key === 'Home') {
+      e.preventDefault(); goToSlide(0);
+    } else if (e.key === 'End') {
+      e.preventDefault(); goToSlide(totalSlides - 1);
+    }
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextSlide();
+      else prevSlide();
+    }
+  }, { passive: true });
+
+  updateUI();
+</script>
+
+<!-- 라이브 레이어 opt-in: ?live= 파라미터 없이는 아무 동작도 하지 않음 -->
+<script type="module" src="../../../../live/runtime/live.js?v=3"></script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

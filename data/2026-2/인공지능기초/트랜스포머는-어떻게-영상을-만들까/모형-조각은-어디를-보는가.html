@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0d12">
+<title>조각은 어디를 보는가 — 시공간 어텐션 3D 모형</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══ ① 색 토큰 — 다크 필름 스튜디오. 덱(트랜스포머는 어떻게 영상을 만들까)과 같은 팔레트: 필름 블랙 + 마젠타, 어텐션은 형광 앰버 ═══ */
+:root{--ink:#f2f4f8;--muted:#9aa3b2;--line:#2a3140;--paper:rgba(18,21,29,.86);--accent:#ff4fa3;--amber:#f5a524;--amber-ink:#ffd48a;--cyan:#3ddcff;--yellow:#ffd24a;--bg:#0b0d12;--stage:radial-gradient(120% 90% at 50% 42%,#1a1f2b 0%,#0f131b 55%,#080a0f 100%);--btn:rgba(255,255,255,.06);--btn-line:#3a4353}
+/* ═══ ② 골격 — 스캐폴드 그대로 (아트보드 스케일·카드·콜아웃·라벨·재생 바) ═══ */
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Segoe UI',sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;color:var(--ink);border:1px solid var(--btn-line);background:var(--btn);border-radius:3px;min-height:30px;padding:4px 10px;white-space:nowrap;font-size:12px;letter-spacing:.02em;font-weight:500}
+button:hover{border-color:var(--ink)}
+button[aria-pressed="true"]{background:var(--ink);color:#0b0d12;border-color:var(--ink)}
+button.accent[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+button.amber[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#1a1200}
+select{border:1px solid var(--btn-line);background:#151923;border-radius:3px;min-height:30px;padding:2px 6px;font-size:12px;color:var(--ink)}
+#stage{position:absolute;inset:0;touch-action:none;background:var(--stage)}
+#stage canvas{width:100%;height:100%;display:block;outline:none}
+#ui{position:absolute;inset:0;pointer-events:none}
+#artboard{position:absolute;left:50%;top:50%;width:1672px;height:941px;transform:translate(-50%,-50%) scale(var(--scale,1));transform-origin:center;pointer-events:none}
+#artboard>*{pointer-events:auto}
+#callouts{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.callout-line{fill:none;stroke:var(--accent);stroke-width:1;opacity:.8}
+.callout-back{fill:rgba(18,21,29,.88);stroke:rgba(90,100,120,.7);stroke-width:.8}
+.callout-text{font-weight:700;font-size:13px;fill:var(--ink)}
+.callout-small{font-size:10px;letter-spacing:.12em;fill:var(--muted)}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;padding:4px 9px;border-radius:5px;background:rgba(18,21,29,.9);border:1px solid rgba(154,163,178,.35);font-size:12px;font-weight:700;white-space:nowrap;color:var(--ink)}
+.lbl.word{cursor:pointer;font-size:14px;padding:6px 12px;border-color:rgba(255,79,163,.55)}
+.lbl.word.key{border-color:var(--amber);box-shadow:0 0 0 2px rgba(245,165,36,.35)}
+.lbl.word.dim{opacity:.35}
+.lbl.frame{font-size:11px;letter-spacing:.1em;color:var(--muted);background:transparent;border:none}
+.title{position:absolute;left:48px;top:38px;width:560px;pointer-events:none}
+.kicker{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
+.title h1{margin:4px 0 6px;font-size:34px;line-height:1.1;font-weight:900;letter-spacing:-.02em}
+.micro{font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.subtle{font-weight:400;letter-spacing:.02em;color:var(--muted)}
+.subtle b{color:var(--ink);font-weight:700}
+.card{padding:12px 13px;background:var(--paper);border:1px solid rgba(90,100,120,.45);backdrop-filter:blur(6px);border-radius:4px}
+.card-title{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.14em}
+.card-title .subtle{letter-spacing:.02em;font-size:11px}
+.note{margin:8px 0 0;font-size:11px;line-height:1.55;color:#c2c9d6;word-break:keep-all}
+.note.faint{color:#8a94a5;margin-top:6px}
+.diagram{width:100%;display:block;margin-top:6px}
+.control-label{font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:700;margin:6px 0 4px}
+.control-label:first-child{margin-top:0}
+.control-row{display:flex;flex-wrap:wrap;gap:5px}
+.control-row button{flex:1 1 auto}
+.calc{font-size:11.5px;line-height:1.7;font-variant-numeric:tabular-nums;margin-top:6px}
+.calc div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.calc b{color:var(--ink)}
+.calc .lbl2{display:inline-block;width:14px;font-weight:900}
+.calc .out{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)}
+.swatch{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-2px;margin-right:3px;border:1px solid rgba(255,255,255,.25)}
+.formula{margin-top:8px;font-size:13px;font-weight:700;text-align:center;padding:5px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.transport{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);width:760px;padding:10px 12px}
+.transport-buttons{display:flex;gap:6px}
+.transport-buttons button{flex:1;height:34px;font-weight:700}
+.transport-buttons #play{flex:1.3}
+.scrub-row{display:flex;gap:8px;align-items:center;margin-top:9px}
+.scrub-row input[type=range]{flex:1;accent-color:var(--amber);height:26px}
+.range-label{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:10px;letter-spacing:.06em;color:var(--muted);margin-top:2px;padding:0 12px;text-align:center}
+.mode-switch{position:absolute;right:48px;bottom:40px;display:flex;gap:6px}
+.hints{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:10px;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+#restore{position:absolute;right:16px;bottom:16px;display:none;z-index:5}
+.hidden-overlays #ui{display:none}.hidden-overlays #restore{display:block}
+.loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);z-index:9;font-size:13px;color:var(--muted)}
+.loading b{font-size:20px;color:var(--ink);font-weight:900}
+.loading[hidden]{display:none}
+@media(max-width:700px){
+  html,body{overflow:auto;height:auto;min-height:100%}
+  #stage{height:58vh;position:fixed}
+  #ui{position:relative;top:0;height:auto;padding:14px;pointer-events:auto}
+  #artboard{position:static;width:auto;height:auto;transform:none!important;display:flex;flex-direction:column;gap:10px;padding-top:58vh}
+  .title{position:fixed;top:12px;left:14px;width:auto;pointer-events:none}.title h1{font-size:22px}
+  .card,.right-col,.transport,.mode-switch{position:static;width:auto;transform:none}
+  .hints,#callouts,#labels{display:none}
+}
+/* ═══ embed 모드(덱 삽입) — 무대 + 어텐션 종류·프레임 선택·재생 바만 남긴다 ═══ */
+.embed .title,.embed .current,.embed .maps,.embed .tasks,.embed .right-col,.embed .hints,.embed .mode-switch{display:none}
+#embed-bar{display:none;position:absolute;left:48px;top:28px;align-items:center;gap:10px;padding:10px 12px}
+.embed #embed-bar{display:flex}
+#embed-bar .control-row{flex-wrap:nowrap}
+#embed-bar .embed-title{font-size:14px;font-weight:900;letter-spacing:-.01em;margin-right:6px;white-space:nowrap}
+#embed-bar .embed-sub{font-size:11px;color:var(--muted);white-space:nowrap}
+.embed .transport{width:640px;bottom:24px}
+/* ═══ ③ 모형 고유 카드 위치 — 좌 열 48~348 · 우 열 1294~1624 · 무대 자유 영역 350~1290 × 110~790 ═══ */
+.current{position:absolute;left:48px;top:150px;width:300px}
+.q-row{display:flex;align-items:baseline;gap:10px;margin-top:4px}
+.q-word{flex:0 0 auto;white-space:nowrap;font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1.05;background:linear-gradient(transparent 55%,rgba(245,165,36,.45) 55%)}
+.q-role{flex:1;min-width:0;font-size:11px;color:var(--muted);letter-spacing:.02em;line-height:1.4;word-break:keep-all}
+.phases{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:10px}
+.ph{position:relative;height:26px;border:1px solid var(--line);border-radius:3px;overflow:hidden;font-size:10.5px;font-weight:700;letter-spacing:.06em;display:flex;align-items:center;justify-content:center;color:#8a94a5;background:rgba(255,255,255,.04)}
+.ph i{position:absolute;left:0;top:0;bottom:0;width:0%;background:rgba(245,165,36,.4);z-index:0}
+.ph span{position:relative;z-index:1}
+.ph.done{color:var(--ink)}
+.maps{position:absolute;left:48px;top:392px;width:300px}
+.tasks{position:absolute;left:48px;top:636px;width:300px}
+.tasks ol{margin:6px 0 0;padding-left:18px;font-size:11px;line-height:1.55;color:#c2c9d6;word-break:keep-all}
+.tasks li{margin-bottom:3px}
+.right-col{position:absolute;right:48px;top:38px;width:330px;display:flex;flex-direction:column;gap:12px}
+.pill{display:inline-block;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;border:1px solid var(--btn-line);color:var(--muted);margin-left:4px;vertical-align:1px}
+</style>
+</head>
+<body data-deck-title="조각은 어디를 보는가 — 시공간 어텐션 3D 모형" data-subject="인공지능 기초">
+<main id="stage" aria-label="시공간 어텐션 3D 모형. 드래그로 회전하고, 휠로 확대하고, 조각을 클릭하면 그 조각이 어디를 보는지 계산합니다."></main>
+<div id="ui"><div id="artboard">
+
+<header class="title">
+  <div class="kicker">VIDEO TRANSFORMER · SPATIOTEMPORAL ATTENTION</div>
+  <h1>조각은 어디를 보는가</h1>
+  <div class="micro">영상 패치를 토큰으로 표현한 모형 &nbsp;·&nbsp; softmax(QKᵀ / √d) · V &nbsp;·&nbsp; d = 6 &nbsp;·&nbsp; 4프레임 × 4×4 조각 · 손설계 임베딩</div>
+</header>
+
+<!-- ▼▼ 모형 고유 카드 ▼▼ -->
+<section class="card current">
+  <div class="card-title">기준 조각 Q · 정보를 모으는 곳 <span class="subtle" id="q-pos">프레임 2 · 3행 2열</span></div>
+  <div class="q-row"><div class="q-word" id="q-word">공 조각</div><div class="q-role" id="q-ask">"같은 프레임에서 나와 닮은 조각은 어디 있나?"</div></div>
+  <div class="phases">
+    <div class="ph" id="ph-0"><i></i><span>① 점수 s = q·k÷√d</span></div>
+    <div class="ph" id="ph-1"><i></i><span>② 소프트맥스</span></div>
+    <div class="ph" id="ph-2"><i></i><span>③ 가중합 Σw·v</span></div>
+  </div>
+  <p class="note" id="head-note"></p>
+</section>
+
+<section class="card maps">
+  <div class="card-title">어텐션 지도 <span class="subtle">합 = <b id="w-sum">1.00</b> · 볼 수 있는 키 <b id="w-count">16</b></span></div>
+  <svg class="diagram" id="maps-chart" viewBox="0 0 300 118" aria-label="프레임별 4×4 어텐션 가중치 지도"></svg>
+  <p class="note" id="maps-note">밝기 = 가중치. 빗금 = 마스크로 참조가 막힌 조각. 칸을 클릭하면 그 조각을 읽는 조각으로 바꿉니다.</p>
+</section>
+
+<section class="card tasks">
+  <div class="card-title">과제 <span class="subtle">12분</span></div>
+  <ol>
+    <li>「프레임 2의 공」이 읽는 조각인 상태에서 <b>1 공간 · 2 시간 · 4 교차</b>를 차례로 눌러 형광펜이 어디로 가는지 본다. 자기 자신에게도 가중치가 간다.</li>
+    <li>왼쪽 지도에서 프레임 2의 4행 4열(잔디)을 클릭해 읽는 조각으로 바꾸고, <b>4 교차</b>에서 어느 낱말을 보는지 확인한다.</li>
+    <li><b>3 전체</b>에서 「프레임 N의 공」을 1→4로 바꾸며 밝은 공 조각의 위치를 순서대로 읽어 공의 방향을 말한다.</li>
+  </ol>
+</section>
+
+<aside class="right-col">
+  <section class="card calcard">
+    <div class="card-title">계산 <span class="subtle" id="calc-pair"></span></div>
+    <div class="formula">score = q · k ÷ √d &nbsp;→&nbsp; w = softmax &nbsp;→&nbsp; out = Σ w·v</div>
+    <div class="calc" id="calc"></div>
+    <p class="note">무대에서 볼 수 있는 조각을 클릭하면 참고 대상(K)이 되어 그 조각과의 계산을 보여 줍니다. 볼 수 없는 조각이나 왼쪽 지도의 칸을 클릭하면 기준 조각(Q)이 바뀝니다. 빔은 참고 대상의 정보가 기준 조각으로 모이는 방향입니다. 실제 모델은 색이 아니라 훨씬 큰 특징 벡터를 모읍니다 — 여기서는 보이도록 색으로 나타냈고, 이 출력은 완성 프레임이 아닙니다.</p>
+  </section>
+  <section class="card settings">
+    <div class="control-label">어텐션 · 누가 누구를 볼 수 있는가</div><div class="control-row" id="head-controls"></div>
+    <p class="note" id="mask-note"></p>
+    <div class="control-row" style="margin-top:6px;align-items:center">
+      <select id="scale" aria-label="점수 배율"><option value="0.5">배율 ×0.5</option><option value="1" selected>÷√d 그대로</option><option value="2">배율 ×2</option><option value="4">배율 ×4</option></select>
+      <select id="frame-pick" aria-label="읽는 조각의 프레임"><option value="0">프레임 1의 공</option><option value="1" selected>프레임 2의 공</option><option value="2">프레임 3의 공</option><option value="3">프레임 4의 공</option></select>
+    </div>
+    <p class="note faint">영상은 수식으로 그린 4프레임 장난감(하늘·잔디 위를 오른쪽으로 굴러가는 빨간 공)이고, 임베딩과 W 행렬은 원리를 보이기 위해 손으로 설계했습니다. 실제 모델은 조각이 수천 개, 헤드가 수십 개이고 W 행렬을 학습으로 정하지만, 어텐션 한 헤드의 계산 순서(내적 → ÷√d → 소프트맥스 → 가중합)는 이 모형과 같습니다. 공간·시간·전체·교차라는 범위 구분은 실제 영상 모델들이 쓰는 구분이며, 어떤 조합을 쓰는지는 모델마다 다릅니다.</p>
+  </section>
+  <section class="card view">
+    <div class="control-label">카메라</div><div class="control-row" id="camera-controls"></div>
+    <div class="control-label">표시</div><div class="control-row" id="overlay-controls"></div>
+  </section>
+</aside>
+<!-- ▲▲ 모형 고유 카드 ▲▲ -->
+
+<section class="card transport">
+  <div class="transport-buttons">
+    <button id="prev-frame">◀ 앞 프레임의 같은 자리</button>
+    <button id="play" class="amber" aria-pressed="true">▶ 계산 재생</button>
+    <button id="next-frame">뒤 프레임의 같은 자리 ▶</button>
+    <select id="speed" aria-label="재생 속도"><option value="6">느리게 · 6초</option><option value="4" selected>보통 · 4초</option><option value="2">빠르게 · 2초</option></select>
+  </div>
+  <div class="scrub-row"><input type="range" id="t-range" min="0" max="1000" step="1" value="0" aria-label="계산 진행도"></div>
+  <div class="range-label"><span>① 어텐션 점수 s (빔이 닿는다)</span><span>② 소프트맥스 → 가중치 w, 합 1</span><span>③ 출력 = Σ w·v (색으로 표시)</span></div>
+</section>
+<div class="mode-switch"><button id="interactive-mode" aria-pressed="true">인터랙티브</button><button id="demo-mode" aria-pressed="false">↻ 자동 시연</button></div>
+<section class="card" id="embed-bar"><span class="embed-title">조각은 어디를 보는가</span><span class="embed-sub">어텐션 종류 · 기준 조각</span></section>
+<div class="hints">볼 수 있는 조각 클릭 = 참고 대상(K) · 볼 수 없는 조각·지도 칸 클릭 = 기준 조각(Q) · ← → 앞뒤 프레임 · Space 재생 · 1 2 3 4 어텐션 종류 · H 오버레이 숨김</div>
+<svg id="callouts" viewBox="0 0 1672 941" aria-hidden="true"></svg>
+<div id="labels"></div>
+</div></div>
+<button id="restore">오버레이 표시 · H</button>
+<div class="loading" id="loading"><b>조각은 어디를 보는가</b><span id="loading-msg">무대를 준비하는 중…</span></div>
+
+<script>
+setTimeout(function(){var l=document.getElementById('loading');if(l&&!l.hidden&&!window.videoAttentionApp){document.getElementById('loading-msg').innerHTML='3D 라이브러리를 불러오지 못했습니다.<br>이 페이지는 허브(웹 서버)에서 열어야 합니다. 파일을 직접 두 번 클릭해 열면 동작하지 않습니다.';}},8000);
+</script>
+<script type="module">
+import * as THREE from '../../../../assets/vendor/three/three.module.min.js';
+const APP='videoAttentionApp';
+const PI=Math.PI,TAU=PI*2,DEG=PI/180;
+const $=id=>document.getElementById(id);
+const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp;
+const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
+const fmt=(v,d=2)=>(v<0?'−':'')+Math.abs(v).toFixed(d);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ▼▼ 모형 고유 — 데이터 ▼▼
+// 장난감 영상: F프레임 × N×N 조각. 하늘(위 두 줄)·잔디(아래 두 줄) 위를 빨간 공이 왼쪽에서 오른쪽으로 굴러간다.
+// 조각 특징 x = [R, G, B, 공 포함도, 위치 x, 위치 y, 시간 cos, 시간 sin] — 화면의 모든 숫자는 여기서 계산된다.
+// ═══════════════════════════════════════════════════════════════════════════
+const F=4,N=4,P=F*N*N,DK=6;
+const SKY=[.30,.56,.95],GRASS=[.27,.66,.30],BALL=[.95,.20,.18];
+const BALL_R=.62;                                  // 공 반지름(조각 단위) — 중심 조각을 약 85% 덮고 이웃은 조금만 덮는다
+const ballCenter=f=>[1+f*2/3,2.5];                 // 프레임 f에서 공 중심(조각 좌표, 0~4) — 3행(잔디 첫 줄)을 따라 오른쪽으로 2/3칸씩. 공이 이웃 두 조각에 걸쳐 공간·시간 어텐션이 이웃을 보게 된다
+function coverage(f,r,c){                          // 조각 (r,c) 안에서 공이 차지하는 비율 — 6×6 표본점
+  const [bx,by]=ballCenter(f);let n=0;
+  for(let i=0;i<6;i++)for(let j=0;j<6;j++){const x=c+(j+.5)/6,y=r+(i+.5)/6;if((x-bx)**2+(y-by)**2<=BALL_R*BALL_R)n++;}
+  return n/36;
+}
+const idx=(f,r,c)=>f*N*N+r*N+c;
+const PATCHES=[];
+for(let f=0;f<F;f++)for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+  const bg=r<2?SKY:GRASS,cov=coverage(f,r,c);
+  const rgb=bg.map((v,k)=>v*(1-cov)+BALL[k]*cov);
+  const px=(c-(N-1)/2)/((N-1)/2),py=((N-1)/2-r)/((N-1)/2),th=PI*f/(F-1);
+  PATCHES.push({i:PATCHES.length,f,r,c,cov,rgb,x:[...rgb,cov,px,py,Math.cos(th),Math.sin(th)],name:cov>.35?'공 조각':cov>0?'공 가장자리':(r<2?'하늘 조각':'잔디 조각')});
+}
+// 프롬프트 낱말 — 교차 어텐션의 키. 조각과 같은 특징 공간에 손으로 놓았다.
+const WORDS=[
+  {name:'빨간 공',x:[.95,.20,.18,1,0,0,0,0],rgb:BALL},
+  {name:'오른쪽으로 굴러간다',x:[.95,.20,.18,1,.9,0,0,0],rgb:[.98,.45,.30]},
+  {name:'파란 하늘',x:[.30,.56,.95,0,0,.8,0,0],rgb:SKY},
+  {name:'초록 잔디',x:[.27,.66,.30,0,0,-.8,0,0],rgb:GRASS},
+];
+// 어텐션 종류 — 다른 것은 (1) 누구를 볼 수 있는가 (2) q·k가 무엇을 비교하는가
+const HEADS=[
+  {id:'SPACE',label:'공간',full:'공간 어텐션(자기 어텐션) · 같은 프레임 안',ask:'"같은 프레임에서 나와 닮은 조각은 어디 있나?"',
+   note:'같은 프레임의 16조각만 볼 수 있습니다(영상 조각끼리의 자기 어텐션에 범위를 정한 것). 색과 공 포함도가 닮고 자리가 가까운 조각에 점수가 높습니다. 자기 자신도 참고 대상이라 가중치가 가장 클 수 있으니 다른 조각의 가중치를 함께 읽으세요.',
+   allow:(q,k)=>k.f===q.f,
+   WQ:x=>[1.6*x[0],1.6*x[1],1.6*x[2],3.0*x[3],1.8*x[4],1.8*x[5]],WK:x=>[1.6*x[0],1.6*x[1],1.6*x[2],3.0*x[3],1.8*x[4],1.8*x[5]]},
+  {id:'TIME',label:'시간',full:'시간 어텐션(자기 어텐션) · 같은 자리, 앞뒤 프레임',ask:'"앞뒤 프레임의 이 자리에는 무엇이 있었나?"',
+   note:'같은 자리(같은 행·열)의 4프레임만 볼 수 있습니다 — 같은 자리를 비교하는 한 가지 설계입니다. 옆 칸으로 옮겨 간 공은 이 범위로는 직접 보지 못하니, 3 전체와 비교해 보세요.',
+   allow:(q,k)=>k.r===q.r&&k.c===q.c,
+   WQ:x=>[1.6*x[0],1.6*x[1],1.6*x[2],3.0*x[3],1.9*x[6],1.9*x[7]],WK:x=>[1.6*x[0],1.6*x[1],1.6*x[2],3.0*x[3],1.9*x[6],1.9*x[7]]},
+  {id:'FULL',label:'전체',full:'전체 시공간 자기 어텐션(3D) · 블록의 모든 조각',ask:'"블록 전체에서 나와 이어지는 조각은 어디 있나?"',
+   note:'64조각 전부를 볼 수 있습니다 — 다른 프레임의 다른 자리까지 한 번의 소프트맥스로 봅니다(공간·시간을 따로 계산해 잇는 것과 다릅니다). 밝은 공 조각의 위치를 프레임 1→4 순서로 읽으면 공의 방향이 보입니다. 이 지도는 손으로 설계한 예입니다.',
+   allow:()=>true,
+   WQ:x=>[1.6*x[0],1.6*x[1],1.6*x[2],3.4*x[3],1.5*x[6],1.5*x[7]],WK:x=>[1.6*x[0],1.6*x[1],1.6*x[2],3.4*x[3],1.5*x[6],1.5*x[7]]},
+  {id:'CROSS',label:'교차',full:'교차 어텐션 · 조각 → 프롬프트 구절(키가 텍스트에서 온다)',ask:'"프롬프트의 어느 낱말이 나를 설명하나?"',
+   note:'키가 조각이 아니라 프롬프트 구절 4개입니다(실제 토큰 나누기와는 다릅니다). 조각의 색·공 포함도·자리와 낱말의 뜻을 비교합니다. 조건을 붙이는 방법의 하나이며, 그림 수업의 조건(프롬프트)이 여기서 붙습니다.',
+   allow:()=>true,cross:true,
+   WQ:x=>[1.8*x[0],1.8*x[1],1.8*x[2],2.6*x[3],1.5*x[4],1.5*x[5]],WK:x=>[1.8*x[0],1.8*x[1],1.8*x[2],2.6*x[3],1.5*x[4],1.5*x[5]]},
+];
+const WV=x=>[x[0],x[1],x[2]];                      // 값 v = 조각(또는 낱말)의 색
+const ballIndex=f=>{let b=0,bv=-1;for(let r=0;r<N;r++)for(let c=0;c<N;c++){const p=PATCHES[idx(f,r,c)];if(p.cov>bv){bv=p.cov;b=p.i;}}return b;};
+
+// ───────────────────────── 상태 — t 하나가 주인이다 ─────────────────────────
+const params=new URLSearchParams(location.search);
+const state={head:0,scale:1,query:ballIndex(1),key:-1,t:0,playing:true,speed:4,camera:'HERO',mode:'interactive',overlays:{CALLOUTS:false,CHARTS:true,LABELS:true}};
+if(params.has('head')){const i=HEADS.findIndex(h=>h.id===params.get('head').toUpperCase());if(i>=0)state.head=i;}
+if(params.has('query'))state.query=clamp(Number(params.get('query'))|0,0,P-1);
+if(params.has('scale'))state.scale=Number(params.get('scale'))||1;
+if(params.has('t'))state.t=clamp(Number(params.get('t')),0,1);
+if(params.get('paused')==='1')state.playing=false;
+if(params.get('mode')==='demo')state.mode='demo';
+const EMBED=params.get('embed')==='1';if(EMBED){document.body.classList.add('embed');}
+
+// ───────────────────────── 어텐션 계산 (화면의 모든 숫자는 여기서 나온다) ─────────────────────────
+let A=null;
+const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0);
+function keysOf(H){return H.cross?WORDS.map((w,j)=>({j,f:-1,r:-1,c:-1,x:w.x,rgb:w.rgb,name:w.name,word:true})):PATCHES.map(p=>({j:p.i,f:p.f,r:p.r,c:p.c,x:p.x,rgb:p.rgb,name:p.name}));}
+function computeAttention(){
+  const H=HEADS[state.head],q=PATCHES[state.query],keys=keysOf(H);
+  const qv=H.WQ(q.x),K=keys.map(k=>H.WK(k.x)),Vv=keys.map(k=>WV(k.x));
+  const allowed=keys.map(k=>k.word?true:H.allow(q,k));
+  const raw=K.map(k=>dot(qv,k)),scaled=raw.map(v=>v/Math.sqrt(DK)*state.scale);
+  let m=-Infinity;scaled.forEach((v,j)=>{if(allowed[j])m=Math.max(m,v);});
+  const expo=scaled.map((v,j)=>allowed[j]?Math.exp(v-m):0),sum=expo.reduce((a,b)=>a+b,0),W=expo.map(e=>e/sum);
+  const O=[0,1,2].map(ch=>W.reduce((s,w,j)=>s+w*Vv[j][ch],0));
+  A={H,q,keys,qv,K,V:Vv,allowed,raw,scaled,expo,sumE:sum,W,O,count:allowed.filter(Boolean).length};
+  if(state.key<0||state.key>=keys.length||!allowed[state.key]||(!H.cross&&state.key===state.query))state.key=argmaxKey();
+}
+function argmaxKey(){let best=-1,bv=-1;A.W.forEach((w,j)=>{if(A.allowed[j]&&(A.H.cross||j!==state.query)&&w>bv){bv=w;best=j;}});return best<0?(A.H.cross?0:state.query):best;}
+const rgbColor=a=>new THREE.Color().setRGB(a[0],a[1],a[2],THREE.SRGBColorSpace);
+const cssRgb=a=>`rgb(${a.map(v=>Math.round(clamp(v,0,1)*255)).join(',')})`;
+
+// ───────────────────────── 렌더러·환경·조명·바닥 ─────────────────────────
+const stage=$('stage');let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:true});}
+catch(e){$('loading-msg').innerHTML='<b>WebGL을 사용할 수 없습니다.</b><br>브라우저의 하드웨어 가속을 켜고 다시 열어 주세요.';console.error(e);throw e;}
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setClearColor(0x0b0d12,0);
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.domElement.tabIndex=0;stage.append(renderer.domElement);
+const canvas=renderer.domElement,scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(32,16/9,.05,120);
+const target=V(0,1.6,0),targetGoal=target.clone(),spherical=new THREE.Spherical(),sphericalGoal=new THREE.Spherical();
+{ // 어두운 스튜디오 — 판 광량을 낮춰 금속 광택만 살린다
+  const studio=new THREE.Scene();studio.background=new THREE.Color(0x1a1f2b);
+  studio.add(new THREE.Mesh(new THREE.BoxGeometry(26,20,26),new THREE.MeshBasicMaterial({color:0x151a24,side:THREE.BackSide})));
+  for(const [x,y,z,w,h,k] of [[-6,7,4,5,9,2.2],[6,6,-2,4,8,1.8],[0,10,-5,9,4,1.6],[2,2,9,3,6,1.0]]){const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(0xffffff).multiplyScalar(k),side:THREE.DoubleSide}));p.position.set(x,y,z);p.lookAt(0,.5,0);studio.add(p);}
+  const pmrem=new THREE.PMREMGenerator(renderer),env=pmrem.fromScene(studio,.02,.1,60);scene.environment=env.texture;pmrem.dispose();studio.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
+}
+scene.add(new THREE.HemisphereLight(0xdfe8ff,0x2a2f3a,1.1));
+const keyLight=new THREE.DirectionalLight(0xffffff,2.2);keyLight.position.set(-6,11,7);keyLight.castShadow=true;
+keyLight.shadow.mapSize.set(2048,2048);Object.assign(keyLight.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:.5,far:40});keyLight.shadow.bias=-.0004;keyLight.shadow.normalBias=.02;
+scene.add(keyLight,keyLight.target);
+const fill=new THREE.DirectionalLight(0xffd0e8,.7);fill.position.set(7,4,-5);scene.add(fill);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.35}));floor.rotation.x=-PI/2;floor.position.y=-.141;floor.receiveShadow=true;scene.add(floor);
+const blob=new THREE.Mesh(new THREE.PlaneGeometry(16,12),new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{strength:{value:.5}},
+  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  fragmentShader:'varying vec2 vUv;uniform float strength;void main(){vec2 p=(vUv-.5)*2.;float a=exp(-3.2*dot(p,p))*(1.-smoothstep(.6,1.,length(p)));gl_FragColor=vec4(.0,.0,.02,a*strength);}'}));
+blob.rotation.x=-PI/2;blob.position.y=-.143;scene.add(blob);
+
+// ───────────────────────── 카메라 ─────────────────────────
+const preset={
+  HERO:{radius:25,phi:58,theta:-34,target:[0,2.2,-1.4]},
+  FRONT:{radius:21,phi:72,theta:0,target:[0,2.6,-1]},
+  SIDE:{radius:20,phi:66,theta:-84,target:[0,2.2,-.8]},
+  TOP:{radius:27,phi:30,theta:-18,target:[0,1.6,-1.6]},
+};
+function setCamera(name,immediate=false){state.camera=name;const p=preset[name];targetGoal.set(...p.target);sphericalGoal.set(p.radius,p.phi*DEG,p.theta*DEG);if(immediate){target.copy(targetGoal);spherical.copy(sphericalGoal);moveCamera(0,true);}syncControls();}
+function moveCamera(dt=0,immediate=false){const k=immediate?1:1-Math.exp(-dt*6);target.lerp(targetGoal,k);spherical.radius+=(sphericalGoal.radius-spherical.radius)*k;spherical.phi+=(sphericalGoal.phi-spherical.phi)*k;const delta=((sphericalGoal.theta-spherical.theta+PI)%TAU+TAU)%TAU-PI;spherical.theta+=delta*k;camera.position.setFromSpherical(spherical).add(target);camera.lookAt(target);camera.updateMatrixWorld();}
+let pointer=null,moved=0;const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;manual();canvas.setPointerCapture(e.pointerId);pointer={x:e.clientX,y:e.clientY};moved=0;sphericalGoal.copy(spherical);targetGoal.copy(target);});
+canvas.addEventListener('pointermove',e=>{if(!pointer)return;const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;moved+=Math.abs(dx)+Math.abs(dy);sphericalGoal.theta-=dx*.006;sphericalGoal.phi=clamp(sphericalGoal.phi-dy*.006,.05,PI/2-.02);pointer={x:e.clientX,y:e.clientY};});
+canvas.addEventListener('pointerup',e=>{if(pointer&&moved<6){const r=canvas.getBoundingClientRect();ndc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);raycaster.setFromCamera(ndc,camera);pick(raycaster);}pointer=null;});
+for(const n of ['pointercancel','lostpointercapture'])canvas.addEventListener(n,()=>pointer=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();manual();sphericalGoal.radius=clamp(sphericalGoal.radius*Math.exp(e.deltaY*.001),5,40);},{passive:false});
+
+// ───────────────────────── 아트보드 투영·SVG·라벨·콜아웃 헬퍼 ─────────────────────────
+let artScale=1,viewport={width:1,height:1};
+function project(v){const p=v.clone().project(camera);return{x:((p.x+1)*viewport.width/2-(viewport.width-1672*artScale)/2)/artScale,y:((-p.y+1)*viewport.height/2-(viewport.height-941*artScale)/2)/artScale};}
+function resize(){const r=stage.getBoundingClientRect();viewport.width=r.width;viewport.height=r.height;renderer.setSize(r.width,r.height);camera.aspect=r.width/r.height;artScale=Math.min(innerWidth/1672,innerHeight/941);camera.fov=r.width<700?54:2*Math.atan(Math.tan(16*DEG)*r.height/(941*artScale))/DEG;camera.updateProjectionMatrix();document.documentElement.style.setProperty('--scale',artScale);}
+addEventListener('resize',resize);resize();
+const xmlns='http://www.w3.org/2000/svg';
+function el(tag,attrs={},parent){const o=document.createElementNS(xmlns,tag);for(const [k,v] of Object.entries(attrs))o.setAttribute(k,v);if(parent)parent.append(o);return o;}
+const textEl=(parent,x,y,text,attrs={})=>{const o=el('text',{x,y,...attrs},parent);o.textContent=text;return o;};
+function clearSvg(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+const labels=[];
+function addLabel(text,point,cls='',onClick){const d=document.createElement('div');d.className='lbl '+cls;d.textContent=text;if(onClick)d.onclick=onClick;$('labels').append(d);const L={el:d,point};labels.push(L);return L;}
+function updateLabels(){const on=state.overlays.LABELS;$('labels').style.display=on?'':'none';if(!on)return;for(const L of labels){const pt=L.hidden?null:L.point();if(!pt){L.el.style.display='none';continue;}L.el.style.display='';const p=project(pt);L.el.style.left=`${p.x}px`;L.el.style.top=`${p.y}px`;}}
+let calloutNodes=[];
+function buildCallouts(specs){$('callouts').innerHTML='';calloutNodes=specs.map(s=>{const g=el('g',{},$('callouts'));const back=el('rect',{class:'callout-back',rx:3},g);return{spec:s,group:g,back,line:el('path',{class:'callout-line'},g),dot:el('circle',{r:2.4,fill:'var(--accent)'},g),text:textEl(g,s.label[0],s.label[1],s.text,{class:'callout-text'}),small:textEl(g,s.label[0],s.label[1]+15,s.detail,{class:'callout-small'}),sized:false,underY:s.label[1]+21};});}
+function updateCallouts(){const on=state.overlays.CALLOUTS;$('callouts').style.display=on?'':'none';if(!on)return;
+  for(const n of calloutNodes){const pt=n.spec.point(),[lx,ly]=n.spec.label;n.group.style.display=pt?'':'none';if(!pt)continue;
+    if(!n.sized){try{const b1=n.text.getBBox(),b2=n.small.getBBox();const x=Math.min(b1.x,b2.x)-7,y=b1.y-4,w=Math.max(b1.width,b2.width)+14,h=b2.y+b2.height-b1.y+8;if(w>14){n.back.setAttribute('x',x);n.back.setAttribute('y',y);n.back.setAttribute('width',w);n.back.setAttribute('height',h);n.underY=y+h+2;n.sized=true;}}catch(e){}}
+    const p=project(pt);n.dot.setAttribute('cx',p.x);n.dot.setAttribute('cy',p.y);n.line.setAttribute('d',`M${p.x.toFixed(1)} ${p.y.toFixed(1)} L${lx-14} ${n.underY} H${lx+150}`);}}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ▼▼ 모형 고유 — 무대: 필름 블록(프레임 4장 × 4×4 조각 큐브) · 낱말 레일 · 빔·튜브·꾸러미 · 출력 구슬 ▼▼
+// ═══════════════════════════════════════════════════════════════════════════
+const CELL=.86,GAP=.22,STEP=CELL+GAP,DEPTH=3.0,BASE_Y=.6;
+const posOf=p=>V((p.c-(N-1)/2)*STEP,BASE_Y+((N-1)-p.r)*STEP,-(p.f-(F-1)/2)*DEPTH);   // 프레임 1이 앞(+z), 프레임 4가 뒤
+const WORD_Z=-(F-1)/2*DEPTH-2.4;                    // 프롬프트 낱말은 블록 뒤, 높은 선반 위에 나란히
+const wordPos=j=>V((j-(WORDS.length-1)/2)*2.3,BASE_Y+5.1,WORD_Z);
+const AMBER=new THREE.Color(0xf5a524),MAGENTA=new THREE.Color(0xff4fa3),GRAY=new THREE.Color(0x3a4353);
+const stageGroup=new THREE.Group();scene.add(stageGroup);
+let cubes,frames=[],queryBox,keyBox,orb,orbHalo,lines=[],tubes=[],packets=[],curves=[],wordPosts=[];
+const cubeGeom=new THREE.BoxGeometry(CELL,CELL,CELL*.55),packetGeom=new THREE.SphereGeometry(.11,16,12);
+const orbPos=()=>{const p=posOf(A.q);return V(p.x,BASE_Y+(N-1)*STEP+CELL/2+1.1,p.z);};   // 항상 블록 꼭대기 위 — 아래 조각을 골라도 위 조각과 겹치지 않는다
+function buildStage(){
+  stageGroup.clear();lines=[];tubes=[];packets=[];frames=[];wordPosts=[];
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(N*STEP+2.2,.14,F*DEPTH+1.2),new THREE.MeshStandardMaterial({color:0x151a24,roughness:.7,metalness:.1,envMapIntensity:.4}));plate.position.y=-.07;plate.receiveShadow=true;stageGroup.add(plate);
+  cubes=new THREE.InstancedMesh(cubeGeom,new THREE.MeshStandardMaterial({roughness:.42,metalness:.05,envMapIntensity:.9}),P);
+  cubes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);cubes.castShadow=true;cubes.receiveShadow=true;
+  const m=new THREE.Matrix4();
+  for(const p of PATCHES){m.makeTranslation(...posOf(p).toArray());cubes.setMatrixAt(p.i,m);cubes.setColorAt(p.i,rgbColor(p.rgb));}
+  cubes.instanceColor.setUsage(THREE.DynamicDrawUsage);stageGroup.add(cubes);
+  // 프레임 테두리(필름 프레임)
+  for(let f=0;f<F;f++){const fr=new THREE.Mesh(new THREE.BoxGeometry(N*STEP+.3,N*STEP+.3,.06),new THREE.MeshStandardMaterial({color:0x2a3140,roughness:.6,metalness:.2,transparent:true,opacity:.75}));fr.position.set(0,BASE_Y+(N-1)*STEP/2,-(f-(F-1)/2)*DEPTH-CELL*.32);fr.receiveShadow=true;stageGroup.add(fr);frames.push(fr);}
+  // 낱말 레일(교차 어텐션의 키가 앉는 기둥)
+  for(let j=0;j<WORDS.length;j++){const post=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.34,20),new THREE.MeshStandardMaterial({color:rgbColor(WORDS[j].rgb),roughness:.4,envMapIntensity:.8}));post.position.copy(wordPos(j)).add(V(0,-.4,0));post.castShadow=true;stageGroup.add(post);wordPosts.push(post);}
+  const rail=new THREE.Mesh(new THREE.BoxGeometry(WORDS.length*2.3+.6,.12,.7),new THREE.MeshStandardMaterial({color:0x1b2130,roughness:.7,metalness:.2,transparent:true,opacity:.85}));rail.position.set(0,BASE_Y+5.1-.58,WORD_Z);stageGroup.add(rail);
+  for(const x of [-(WORDS.length*2.3)/2,(WORDS.length*2.3)/2]){const leg=new THREE.Mesh(new THREE.BoxGeometry(.14,BASE_Y+5.1-.58,.14),new THREE.MeshStandardMaterial({color:0x1b2130,roughness:.7,transparent:true,opacity:.7}));leg.position.set(x,(BASE_Y+5.1-.58)/2-.14,WORD_Z);stageGroup.add(leg);}
+  queryBox=new THREE.Mesh(new THREE.BoxGeometry(CELL+.16,CELL+.16,CELL*.55+.16),new THREE.MeshBasicMaterial({color:0xf5a524,wireframe:true}));stageGroup.add(queryBox);
+  keyBox=new THREE.Mesh(new THREE.BoxGeometry(CELL+.1,CELL+.1,CELL*.55+.1),new THREE.MeshBasicMaterial({color:0xff4fa3,wireframe:true}));stageGroup.add(keyBox);
+  orb=new THREE.Mesh(new THREE.SphereGeometry(.34,32,24),new THREE.MeshPhysicalMaterial({color:0x3a4353,roughness:.22,clearcoat:.6,clearcoatRoughness:.2,envMapIntensity:1}));orb.castShadow=true;stageGroup.add(orb);
+  orbHalo=new THREE.Mesh(new THREE.TorusGeometry(.46,.014,8,48),new THREE.MeshBasicMaterial({color:0xf5a524}));stageGroup.add(orbHalo);
+  for(let j=0;j<P;j++){const pk=new THREE.Mesh(packetGeom,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.3,envMapIntensity:.9}));pk.visible=false;stageGroup.add(pk);packets.push(pk);lines.push(null);tubes.push(null);}
+  // HTML 라벨: 프레임 번호 · 낱말
+  labels.length=0;$('labels').innerHTML='';
+  for(let f=0;f<F;f++){const ff=f;addLabel(`프레임 ${f+1}`,()=>state.camera==='FRONT'?null:V(-(N-1)/2*STEP-CELL*.9,BASE_Y-CELL*.75,-(ff-(F-1)/2)*DEPTH),'frame');}
+  WORDS.forEach((w,j)=>{const L=addLabel(w.name,()=>wordPos(j),'word',()=>{manual();if(A.H.cross){state.key=j;refreshAll();}else{state.head=3;state.key=j;state.t=0;state.playing=true;refreshAll();}});L.word=j;});
+  buildCallouts([
+    {text:'기준 조각 Q · 정보를 모으는 곳',detail:'빔 = 참고 대상 → 기준 조각, 굵기 = 가중치',label:[560,86],point:()=>posOf(A.q).add(V(0,CELL*.6,CELL*.3))},
+    {text:'어텐션 출력 · 값 벡터의 가중합',detail:'이 모형에서는 색으로 표시',label:[870,86],point:()=>orbPos().add(V(0,.4,0))},
+    {text:'프롬프트 낱말 · 교차 어텐션의 키',detail:'조각 대신 낱말을 본다',label:[1080,86],point:()=>A.H.cross?wordPos(0).add(V(0,.45,0)):null},
+  ]);
+}
+// 빔·튜브는 읽는 조각·어텐션 종류가 바뀔 때만 다시 만든다
+function disposeArcs(){for(let j=0;j<lines.length;j++){if(lines[j]){stageGroup.remove(lines[j]);lines[j].geometry.dispose();lines[j].material.dispose();lines[j]=null;}if(tubes[j]){stageGroup.remove(tubes[j]);tubes[j].geometry.dispose();tubes[j].material.dispose();tubes[j]=null;}}}
+function buildArcs(){
+  disposeArcs();curves=[];const orbP=orbPos(),qP=posOf(A.q);
+  for(let j=0;j<A.keys.length;j++){
+    const k=A.keys[j];const kP=k.word?wordPos(j):posOf(PATCHES[j]);
+    let curve;
+    if(!k.word&&j===state.query)curve=new THREE.LineCurve3(kP.clone().add(V(0,CELL*.5,0)),orbP.clone().add(V(0,-.36,0)));
+    else{const mid=kP.clone().lerp(orbP,.5);mid.y+=.9+.35*kP.distanceTo(orbP)*.25;curve=new THREE.QuadraticBezierCurve3(kP.clone().add(V(0,CELL*.45,0)),mid,orbP.clone().add(V(0,-.08,0)));}
+    curves.push(curve);
+    if(!A.allowed[j])continue;
+    const w=A.W[j];if(w<.004&&(!k.word&&j!==state.query))continue;         // 아주 작은 가중치는 선을 생략해 무대를 읽기 쉽게 (지도 차트에는 전부 표시)
+    const pts=curve.getPoints(40).reverse();
+    const lg=new THREE.BufferGeometry().setFromPoints(pts);
+    const line=new THREE.Line(lg,new THREE.LineBasicMaterial({color:0xf5a524,transparent:true,opacity:.85}));line.frustumCulled=false;stageGroup.add(line);lines[j]=line;
+    const tube=new THREE.Mesh(new THREE.TubeGeometry(curve,28,.012+.13*w,8,false),new THREE.MeshStandardMaterial({color:0xf5a524,emissive:0xf5a524,emissiveIntensity:.35,roughness:.35,transparent:true,opacity:0,envMapIntensity:.8}));tube.frustumCulled=false;stageGroup.add(tube);tubes[j]=tube;
+  }
+}
+const phaseOf=t=>({a:t>=.34?1:clamp(t/.34,0,1),b:t>=.67?1:clamp((t-.34)/.33,0,1),c:t>=1?1:clamp((t-.67)/.33,0,1)});
+const tmpColor=new THREE.Color(),tmpM=new THREE.Matrix4();
+function updateStage(){
+  const {a,b,c}=phaseOf(state.t),orbP=orbPos(),H=A.H;
+  // 조각 색: 볼 수 없는 조각은 어둡게, 읽는 조각은 살짝 띄운다
+  for(const p of PATCHES){
+    const allowed=H.cross?true:A.allowed[p.i];
+    tmpColor.copy(rgbColor(p.rgb));if(!allowed)tmpColor.lerp(GRAY,.72);
+    cubes.setColorAt(p.i,tmpColor);
+    const pos=posOf(p);if(p.i===state.query)pos.z+=CELL*.35;tmpM.makeTranslation(pos.x,pos.y,pos.z);cubes.setMatrixAt(p.i,tmpM);
+  }
+  cubes.instanceColor.needsUpdate=true;cubes.instanceMatrix.needsUpdate=true;
+  queryBox.position.copy(posOf(A.q)).add(V(0,0,CELL*.35));
+  const kk=A.keys[state.key];keyBox.visible=!!kk&&!kk.word&&state.key!==state.query;if(keyBox.visible)keyBox.position.copy(posOf(PATCHES[state.key]));
+  for(let j=0;j<A.keys.length;j++){
+    const line=lines[j],tube=tubes[j],pk=packets[j],w=A.W[j];
+    if(line){line.visible=a>0&&c<1;line.geometry.setDrawRange(0,Math.max(2,Math.round(41*a)));line.material.opacity=.85*(1-b*.7);}
+    if(tube){tube.visible=b>0;tube.material.opacity=Math.min(1,b*1.2)*(1-c*.35);}
+    if(pk){pk.visible=!!(line||tube)&&c>0&&c<1;if(pk.visible){pk.position.copy(curves[j].getPoint(c));pk.scale.setScalar(.4+2.2*w);pk.material.color.copy(rgbColor(A.keys[j].rgb));}}
+  }
+  wordPosts.forEach((post,j)=>{post.material.emissive.set(H.cross&&j===state.key?0xf5a524:0x000000);post.material.emissiveIntensity=.5;});
+  orb.position.copy(orbP);orbHalo.position.copy(orbP);orbHalo.rotation.x=PI/2;
+  orb.material.color.copy(GRAY).lerp(rgbColor(A.O),c);orb.scale.setScalar(.6+.4*c);orbHalo.visible=c>=1;
+  stageGroup.updateMatrixWorld(true);
+}
+// ── 어텐션 지도(프레임별 4×4) ──
+const mapsSvg=$('maps-chart');let mapCells=[],mapGeo=null,wordBars=[];
+function buildMaps(){
+  clearSvg(mapsSvg);mapCells=[];wordBars=[];
+  const defs=el('defs',{},mapsSvg);const pat=el('pattern',{id:'hatch',width:6,height:6,patternUnits:'userSpaceOnUse',patternTransform:'rotate(45)'},defs);el('rect',{width:6,height:6,fill:'#151a24'},pat);el('line',{x1:0,y1:0,x2:0,y2:6,stroke:'#3a4353','stroke-width':1.5},pat);
+  if(A.H.cross){
+    WORDS.forEach((w,j)=>{const y=14+j*26;const g=el('g',{},mapsSvg);textEl(g,4,y+13,w.name,{'font-size':9,fill:'#f2f4f8','font-weight':700});const bg=el('rect',{x:120,y:y+2,width:170,height:16,fill:'#151a24',rx:2},g);const bar=el('rect',{x:120,y:y+2,width:0,height:16,fill:'#f5a524',rx:2},g);const val=textEl(g,292,y+14,'',{'text-anchor':'end','font-size':8.5,fill:'#0b0d12','font-weight':700});const frame=el('rect',{x:2,y:y,width:294,height:22,fill:'none',stroke:'#ff4fa3','stroke-width':1.2,rx:2,opacity:0},g);g.style.cursor='pointer';g.addEventListener('click',()=>{manual();state.key=j;refreshAll();});wordBars.push({bar,val,frame,bg});});
+    return;
+  }
+  const size=16,gapF=8,left=8,top=16,fw=size*N;mapGeo={size,left,top,fw,gapF};
+  for(let f=0;f<F;f++){
+    const x0=left+f*(fw+gapF);
+    textEl(mapsSvg,x0+fw/2,top-5,`프레임 ${f+1}`,{'text-anchor':'middle','font-size':8,fill:'#9aa3b2','font-weight':700});
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      const i=idx(f,r,c);
+      const rect=el('rect',{x:x0+c*size+.5,y:top+r*size+.5,width:size-1,height:size-1,fill:'#f5a524','fill-opacity':0,stroke:'#2a3140','stroke-width':.6},mapsSvg);
+      rect.style.cursor='pointer';rect.addEventListener('click',()=>{manual();setQuery(i,true);refreshAll();});
+      mapCells.push({rect,i});
+    }
+  }
+  const qFrame=el('rect',{fill:'none',stroke:'#f5a524','stroke-width':1.6},mapsSvg),kFrame=el('rect',{fill:'none',stroke:'#ff4fa3','stroke-width':1.4},mapsSvg);
+  mapGeo.qFrame=qFrame;mapGeo.kFrame=kFrame;
+}
+function cellXY(i){const p=PATCHES[i],{size,left,top,fw,gapF}=mapGeo;return[left+p.f*(fw+gapF)+p.c*size,top+p.r*size];}
+function updateMaps(){
+  let sum=0;A.W.forEach((w,j)=>{if(A.allowed[j])sum+=w;});$('w-sum').textContent=sum.toFixed(2);$('w-count').textContent=String(A.count);
+  if(A.H.cross){wordBars.forEach((n,j)=>{const w=A.W[j];n.bar.setAttribute('width',170*w);n.val.textContent=w.toFixed(2);n.val.setAttribute('fill',w>.5?'#0b0d12':'#f2f4f8');n.val.setAttribute('x',w>.5?120+170*w-4:292);n.frame.setAttribute('opacity',j===state.key?1:0);});$('maps-note').textContent='막대 = 프롬프트 구절별 가중치(합 1). 구절을 클릭하면 그 구절과의 계산을 보여 줍니다.';return;}
+  $('maps-note').textContent='밝기 = 가중치. 빗금 = 이 어텐션이 볼 수 없는 조각. 칸을 클릭하면 그 조각을 읽는 조각으로 바꿉니다.';
+  for(const c of mapCells){const w=A.W[c.i],allowed=A.allowed[c.i];c.rect.setAttribute('fill',allowed?'#f5a524':'url(#hatch)');c.rect.setAttribute('fill-opacity',allowed?.06+.94*Math.min(1,w*1.6):1);}
+  const [qx,qy]=cellXY(state.query),s=mapGeo.size;mapGeo.qFrame.setAttribute('x',qx-.5);mapGeo.qFrame.setAttribute('y',qy-.5);mapGeo.qFrame.setAttribute('width',s+1);mapGeo.qFrame.setAttribute('height',s+1);
+  const showK=state.key!==state.query&&A.allowed[state.key];mapGeo.kFrame.style.display=showK?'':'none';if(showK){const [kx,ky]=cellXY(state.key);mapGeo.kFrame.setAttribute('x',kx);mapGeo.kFrame.setAttribute('y',ky);mapGeo.kFrame.setAttribute('width',s);mapGeo.kFrame.setAttribute('height',s);}
+}
+// ── 계산 카드 ──
+function updateCalc(){
+  const q=A.q,j=state.key,k=A.keys[j];if(!k)return;
+  const qq=A.qv,kk=A.K[j],terms=qq.map((v,i)=>v*kk[i]),raw=A.raw[j],s=A.scaled[j],w=A.W[j],o=A.O;
+  // 표시용 e^s는 최댓값을 빼지 않은 실제 값 — 계산은 안정성을 위해 e^(s−max)를 쓰지만 비율은 같다
+  const e=Math.exp(s),sumE=A.scaled.reduce((acc,v,jj)=>acc+(A.allowed[jj]?Math.exp(v):0),0);
+  const kname=k.word?`「${k.name}」`:`${k.name}(프레임 ${k.f+1} · ${k.r+1}행 ${k.c+1}열)`;
+  $('calc-pair').textContent=`${q.name} → ${k.word?k.name:`프레임 ${k.f+1} · ${k.r+1}행 ${k.c+1}열`}`;
+  const vec=a=>'[ '+a.map(v=>fmt(v)).join(', ')+' ]';
+  const sw=col=>`<span class="swatch" style="background:${col}"></span>`;
+  $('calc').innerHTML=[
+    `<div><span class="lbl2">x</span>(Q) = [ ${q.x.slice(0,4).map(v=>fmt(v)).join(', ')} | 자리 ${fmt(q.x[4],1)}, ${fmt(q.x[5],1)} | 시간 ${fmt(q.x[6],1)}, ${fmt(q.x[7],1)} ]</div>`,
+    `<div><span class="lbl2">q</span> = x·W<sub>Q</sub> = ${vec(qq)}</div>`,
+    `<div><span class="lbl2">k</span>${k.word?'(낱말)':''} = x·W<sub>K</sub> = ${vec(kk)}</div>`,
+    `<div>q·k = ${terms.map(v=>fmt(v)).join(' + ').replace(/\+ −/g,'− ')} = <b>${fmt(raw)}</b></div>`,
+    `<div>÷ √${DK}${state.scale!==1?` × ${state.scale}`:''} → 점수 s = <b>${fmt(s)}</b></div>`,
+    `<div>w = e<sup>s</sup> ÷ Σe<sup>s</sup> = ${fmt(e)} ÷ ${fmt(sumE)} = <b>${w.toFixed(3)}</b> <span class="subtle">(볼 수 있는 ${A.count}개 중)</span></div>`,
+    `<div class="out">${sw(cssRgb(k.rgb))}값 벡터 v (이 모형에서는 색) = ${vec(A.V[j])} ${kname.length>28?'':`<span class="subtle">${kname}</span>`}</div>`,
+    `<div>${sw(cssRgb(o))}어텐션 출력 out = Σ w·v = ${vec(o)}</div>`,
+  ].join('');
+}
+function updateCurrent(){
+  const q=A.q,H=A.H,{a,b,c}=phaseOf(state.t);
+  $('q-word').textContent=q.name;$('q-pos').textContent=`프레임 ${q.f+1} · ${q.r+1}행 ${q.c+1}열`;$('q-ask').textContent=H.ask;$('head-note').textContent=H.note;
+  $('mask-note').textContent=`${H.full} — 볼 수 있는 키 ${A.count}개. 계산 형식은 같지만 범위와 W 행렬(Q·K를 만드는 방식)도 종류마다 다릅니다.`;
+  [[a,'ph-0'],[b,'ph-1'],[c,'ph-2']].forEach(([p,id])=>{const n=$(id);n.querySelector('i').style.width=`${p*100}%`;n.classList.toggle('done',p>=1);});
+  labels.forEach(L=>{if(L.word===undefined)return;L.el.classList.toggle('key',H.cross&&L.word===state.key);L.el.classList.toggle('dim',!H.cross);L.hidden=!H.cross;});
+}
+function updateUI(){updateCurrent();updateMaps();updateCalc();}
+function pick(ray){
+  const hit=ray.intersectObject(cubes,false)[0];
+  if(hit&&hit.instanceId!==undefined){const i=hit.instanceId;if(A.H.cross){setQuery(i,true);}else if(i===state.query){return;}else if(!A.allowed[i]){setQuery(i,true);}else{state.key=i;}refreshAll();return;}
+}
+function setQuery(i,resetT){state.query=clamp(i,0,P-1);state.key=-1;if(resetT){state.t=0;state.playing=true;}}
+function extraSnapshot(){
+  const H=A.H,rowSums=[],argmax=[];
+  // 모든 조각을 읽는 조각으로 두었을 때 행 합과 argmax — 검산용 (현재 헤드)
+  const saveQ=state.query,saveK=state.key;
+  for(let i=0;i<P;i++){state.query=i;state.key=-1;computeAttention();rowSums.push(+A.W.reduce((s,w)=>s+w,0).toFixed(6));const j=argmaxKey();const k=A.keys[j];argmax.push({i,f:PATCHES[i].f,r:PATCHES[i].r,c:PATCHES[i].c,name:PATCHES[i].name,j,key:k.word?k.name:`f${k.f}r${k.r}c${k.c}`,w:+A.W[j].toFixed(3)});}
+  state.query=saveQ;state.key=saveK;computeAttention();
+  return{head:H.id,query:{i:A.q.i,f:A.q.f,r:A.q.r,c:A.q.c,name:A.q.name},key:state.key,count:A.count,rowSum:+A.W.reduce((s,w)=>s+w,0).toFixed(6),rowSumsAll:rowSums,argmaxAll:argmax,weights:A.W.map(v=>+v.toFixed(4)),output:A.O.map(v=>+v.toFixed(3)),ballIndex:[0,1,2,3].map(ballIndex)};
+}
+function applyState(p){
+  if(p.head!==undefined){const i=typeof p.head==='number'?p.head:HEADS.findIndex(h=>h.id===String(p.head).toUpperCase());if(HEADS[i])state.head=i;}
+  if(p.query!==undefined){if(typeof p.query==='object')state.query=idx(p.query.f|0,p.query.r|0,p.query.c|0);else state.query=clamp(Number(p.query)|0,0,P-1);state.key=-1;}
+  if(p.key!==undefined)state.key=Number(p.key)|0;
+  if(p.scale!==undefined)state.scale=Number(p.scale)||1;
+  computeAttention();buildArcs();buildMaps();
+}
+const demo={hold:0,step:0};
+const DEMO_STEPS=[{head:0,f:1,cam:'HERO'},{head:1,f:1,cam:'SIDE'},{head:2,f:1,cam:'HERO'},{head:3,f:1,cam:'FRONT'},{head:2,f:2,cam:'TOP'},{head:2,f:3,cam:'HERO'}];
+function applyDemoStep(){const s=DEMO_STEPS[demo.step%DEMO_STEPS.length];state.head=s.head;state.query=ballIndex(s.f);state.key=-1;state.t=0;state.playing=true;computeAttention();buildArcs();buildMaps();setCamera(s.cam);refreshAll();}
+function startDemo(){state.mode='demo';demo.hold=0;demo.step=0;applyDemoStep();syncControls();}
+function demoTick(dt){if(state.camera!=='FRONT')sphericalGoal.theta+=dt*.05;if(state.playing)return;demo.hold+=dt;if(demo.hold<1.6)return;demo.hold=0;demo.step++;applyDemoStep();}
+// ═══════════════════════════════════════════════════════════════════════════
+// ▲▲ 모형 고유 ▲▲
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ───────────────────────── 조작·재생·키보드 ─────────────────────────
+function controls(container,items,onClick){for(const it of items){const b=document.createElement('button');b.textContent=it.label;b.dataset.value=it.value;b.setAttribute('aria-pressed','false');if(it.cls)b.classList.add(it.cls);b.onclick=()=>{manual();onClick(it.value);syncControls();};$(container).append(b);}}
+controls('head-controls',HEADS.map((h,i)=>({label:`${i+1} ${h.label}`,value:i,cls:'amber'})),i=>{state.head=Number(i);state.key=-1;state.t=0;state.playing=true;computeAttention();buildArcs();buildMaps();refreshAll();});
+controls('camera-controls',[['HERO','입체'],['FRONT','정면'],['SIDE','옆에서 · 시간축'],['TOP','높이서 · 전체']].map(([value,label])=>({value,label})),v=>setCamera(v));
+controls('overlay-controls',[['LABELS','라벨'],['CALLOUTS','콜아웃'],['CHARTS','차트']].map(([value,label])=>({value,label})),v=>{state.overlays[v]=!state.overlays[v];applyVisibility();});
+$('scale').onchange=e=>{manual();state.scale=Number(e.target.value);computeAttention();buildArcs();refreshAll();};
+$('frame-pick').onchange=e=>{manual();setQuery(ballIndex(Number(e.target.value)),true);refreshAll();};
+function applyVisibility(){for(const c of ['maps','tasks'])document.querySelector('.'+c).style.visibility=state.overlays.CHARTS?'visible':'hidden';$('callouts').style.display=state.overlays.CALLOUTS?'':'none';$('labels').style.display=state.overlays.LABELS?'':'none';}
+function syncControls(){for(const b of $('head-controls').children)b.setAttribute('aria-pressed',Number(b.dataset.value)===state.head);for(const b of $('camera-controls').children)b.setAttribute('aria-pressed',b.dataset.value===state.camera);for(const b of $('overlay-controls').children)b.setAttribute('aria-pressed',!!state.overlays[b.dataset.value]);
+  $('play').setAttribute('aria-pressed',state.playing);$('play').textContent=state.playing?'Ⅱ 정지':(state.t>=1?'↺ 다시 재생':'▶ 계산 재생');$('demo-mode').setAttribute('aria-pressed',state.mode==='demo');$('interactive-mode').setAttribute('aria-pressed',state.mode==='interactive');$('speed').value=String(state.speed);$('scale').value=String(state.scale);
+  const q=PATCHES[state.query];$('frame-pick').value=String(q.i===ballIndex(q.f)?q.f:$('frame-pick').value);}
+const range=$('t-range');let scrubbing=false,uiDirty=true;
+function manual(){state.mode='interactive';}
+function refreshAll(){computeAttention();buildArcs();updateStage();updateUI();updateLabels();syncControls();uiDirty=false;}
+$('play').onclick=()=>{manual();if(state.playing)state.playing=false;else{if(state.t>=1)state.t=0;state.playing=true;}syncControls();};
+$('prev-frame').onclick=()=>{manual();const q=A.q;setQuery(idx((q.f+F-1)%F,q.r,q.c),true);refreshAll();};
+$('next-frame').onclick=()=>{manual();const q=A.q;setQuery(idx((q.f+1)%F,q.r,q.c),true);refreshAll();};
+$('speed').onchange=e=>{manual();state.speed=Number(e.target.value);};
+range.addEventListener('pointerdown',()=>{scrubbing=true;manual();state.playing=false;syncControls();});
+range.addEventListener('input',()=>{state.t=Number(range.value)/1000;uiDirty=true;});
+for(const n of ['pointerup','pointercancel','blur'])range.addEventListener(n,()=>scrubbing=false);
+function hideUI(){document.body.classList.toggle('hidden-overlays');}$('restore').onclick=hideUI;
+addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;const key=e.key.toLowerCase();
+  if(key==='h')hideUI();else if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();$('play').click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();$('prev-frame').click();}else if(e.key==='ArrowRight'){e.preventDefault();$('next-frame').click();}
+  else if(/^[1-4]$/.test(e.key)){manual();state.head=Number(e.key)-1;state.key=-1;state.t=0;state.playing=true;computeAttention();buildArcs();buildMaps();refreshAll();}});
+$('demo-mode').onclick=startDemo;$('interactive-mode').onclick=()=>{manual();syncControls();};
+
+// ───────────────────────── 프레임 루프 ─────────────────────────
+const frameDurations=[];let previous=performance.now(),uiElapsed=0,renderCount=0;
+function renderFrame(now){const raw=(now-previous)/1000,dt=Math.min(raw,.1);previous=now;if(document.hidden){requestAnimationFrame(renderFrame);return;}
+  if(state.mode==='demo')demoTick(dt);
+  if(state.playing){const nt=clamp(state.t+dt/state.speed,0,1);if(nt!==state.t){state.t=nt;uiDirty=true;}if(nt>=1){state.playing=false;syncControls();}}
+  updateStage();moveCamera(dt);updateLabels();
+  uiElapsed+=dt;if(uiElapsed>.05){if(uiDirty){updateUI();if(!scrubbing)range.value=String(Math.round(state.t*1000));uiDirty=false;}updateCallouts();uiElapsed=0;}
+  renderer.render(scene,camera);if(raw>0&&raw<1){frameDurations.push(raw*1000);if(frameDurations.length>180)frameDurations.shift();}renderCount++;requestAnimationFrame(renderFrame);}
+
+// ───────────────────────── 자가 점검 API ─────────────────────────
+function bounds(){const b=new THREE.Box3().setFromObject(stageGroup),pts=[];for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z]){const p=V(x,y,z).project(camera);pts.push([(p.x+1)*viewport.width/2,(-p.y+1)*viewport.height/2]);}return{minX:Math.min(...pts.map(p=>p[0])),maxX:Math.max(...pts.map(p=>p[0])),minY:Math.min(...pts.map(p=>p[1])),maxY:Math.max(...pts.map(p=>p[1]))};}
+function snapshot(){return{state:JSON.parse(JSON.stringify(state)),...extraSnapshot(),renderer:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frames:renderCount,meanFrameMs:frameDurations.length?frameDurations.reduce((a,b)=>a+b)/frameDurations.length:0,dpr:renderer.getPixelRatio()},camera:{position:camera.position.toArray(),target:target.toArray()},bounds:bounds()};}
+function refresh(){updateStage();updateUI();updateLabels();updateCallouts();syncControls();renderer.render(scene,camera);}
+window[APP]={snapshot,
+  setState(p={}){if(p.t!==undefined)state.t=clamp(Number(p.t),0,1);if(p.playing!==undefined)state.playing=Boolean(p.playing);if(p.speed!==undefined)state.speed=Number(p.speed);
+    if(p.overlays)for(const k of Object.keys(state.overlays))if(p.overlays[k]!==undefined)state.overlays[k]=Boolean(p.overlays[k]);if(['demo','interactive'].includes(p.mode))state.mode=p.mode;
+    applyState(p);applyVisibility();if(p.camera in preset)setCamera(p.camera,true);else setCamera(state.camera,true);refresh();return snapshot();},
+  advance(seconds){if(state.playing)state.t=clamp(state.t+seconds/state.speed,0,1);refresh();return snapshot();},
+  capture(){renderer.render(scene,camera);return canvas.toDataURL('image/png');}};
+
+// ───────────────────────── 시작 ─────────────────────────
+if(EMBED){const bar=$('embed-bar');bar.append($('head-controls'),$('frame-pick'));const demoBtn=document.createElement('button');demoBtn.textContent='↻ 자동 시연';demoBtn.onclick=()=>{if(state.mode==='demo'){manual();}else startDemo();syncControls();};bar.append(demoBtn);}
+computeAttention();buildStage();buildArcs();buildMaps();applyVisibility();setCamera('HERO',true);refresh();
+$('loading').hidden=true;if(state.mode==='demo')startDemo();requestAnimationFrame(renderFrame);
+</script>
+</body>
+</html>

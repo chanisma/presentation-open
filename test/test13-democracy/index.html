@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>민주주의와 시민 참여</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" rel="stylesheet">
+  <style>
+    /* 1. Reset & CSS Variables */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --style-bg: #FFFFFF;
+      --style-primary: #1A1A1A;
+      --style-accent: #E63030;
+      --style-text: #1A1A1A;
+      --style-text-secondary: #BBBBBB;
+      --style-dark-block: #1A1A1A;
+      --style-dark-text: #FFFFFF;
+
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-mono: 'Space Mono', monospace;
+      --font-body: 'Pretendard Variable', 'Pretendard', sans-serif;
+    }
+
+    /* 2. Base Typography */
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: var(--font-body);
+      background: #111;
+      color: var(--style-text);
+      overflow: hidden;
+      height: 100%;
+    }
+
+    h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.15; }
+    h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+    h3 { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
+    p  { font-size: 1rem; line-height: 1.7; }
+
+    /* 3. Slide Container & Navigation */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--style-accent);
+      z-index: 1000;
+      transition: width 0.3s ease;
+    }
+
+    .presentation {
+      height: calc(100vh - 42px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      background: var(--style-bg);
+      transition: opacity 0.4s ease;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* 4. Browser Card Chrome */
+    .browser-card {
+      width: 100%;
+      max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--style-bg);
+      border-radius: 0.6rem;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.12);
+    }
+
+    .browser-card--editorial {
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: #F5F5F5;
+      border-bottom: 1px solid #E0E0E0;
+      min-height: 2rem;
+      flex-shrink: 0;
+    }
+    .dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FEBC2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #888;
+      margin: 0 auto;
+      letter-spacing: 0.05em;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    /* 5. Editorial Magazine Layout Components */
+
+    /* --- Magazine Split Layout --- */
+    .editorial-split {
+      display: flex;
+      height: 100%;
+      min-height: 0;
+    }
+    .editorial-left {
+      flex: 0 0 55%;
+      padding: 1.6rem 1.8rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--style-bg);
+      position: relative;
+    }
+    .editorial-right {
+      flex: 0 0 45%;
+      background: var(--style-dark-block);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 1.6rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Red rule under title */
+    .red-rule {
+      width: 3.5rem;
+      height: 2px;
+      background: var(--style-accent);
+      margin: 0.5rem 0 0.8rem;
+    }
+
+    /* Rotated vertical label in dark zone */
+    .vertical-label {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* Section label (mono, small caps) */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--style-accent);
+      margin-bottom: 0.4rem;
+    }
+
+    /* Cover display title */
+    .cover-display-title {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: var(--style-primary);
+      line-height: 1.1;
+    }
+
+    .cover-subtitle-text {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: #555;
+      margin-top: 0.6rem;
+      line-height: 1.6;
+    }
+
+    .cover-meta-row {
+      display: flex;
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+    .cover-meta-item {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.08em;
+    }
+
+    /* Dark zone content */
+    .dark-quote {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1.3rem;
+      color: #FFFFFF;
+      line-height: 1.4;
+      margin-bottom: 0.8rem;
+    }
+    .dark-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      color: rgba(255,255,255,0.5);
+      text-transform: uppercase;
+    }
+    .dark-stat {
+      font-family: var(--font-display);
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--style-accent);
+      line-height: 1;
+    }
+    .dark-stat-label {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.1em;
+      margin-top: 0.3rem;
+    }
+    .dark-list {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+    .dark-list li {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.8);
+      padding: 0.3rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .dark-list li::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: var(--style-accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Section title area */
+    .section-header {
+      margin-bottom: 0.8rem;
+    }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-style: italic;
+      color: var(--style-primary);
+    }
+
+    /* Content blocks for left column */
+    .body-text {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #333;
+      margin-bottom: 0.6rem;
+    }
+
+    /* Highlight box — editorial style */
+    .highlight-box {
+      border-left: 3px solid var(--style-accent);
+      padding: 0.6rem 0.9rem;
+      background: #FFF8F8;
+      margin: 0.6rem 0;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--style-primary);
+    }
+
+    /* Card grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.6rem;
+    }
+    .card {
+      background: #FAFAFA;
+      border: 1px solid #E8E8E8;
+      border-radius: 0.4rem;
+      padding: 0.8rem 1rem;
+    }
+    .card-icon {
+      font-size: 1.2rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--style-primary);
+    }
+    .card-desc {
+      font-size: 0.88rem;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    /* TOC list */
+    .toc-list {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.55rem 0.6rem;
+      border-bottom: 1px solid #EEE;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toc-item:hover { background: #FFF5F5; }
+    .toc-num {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--style-accent);
+      min-width: 1.8rem;
+      font-weight: 700;
+    }
+    .toc-text {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--style-primary);
+      flex: 1;
+    }
+    .toc-arrow {
+      font-family: var(--font-mono);
+      color: var(--style-text-secondary);
+      font-size: 0.82rem;
+    }
+
+    /* Activity list */
+    .activity-list { list-style: none; }
+    .activity-item {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-start;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #EEE;
+    }
+    .activity-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .activity-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--style-primary);
+    }
+    .activity-desc {
+      font-size: 0.88rem;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      background: var(--style-primary);
+      color: #FFF;
+      text-transform: uppercase;
+    }
+    .badge-red { background: var(--style-accent); }
+    .badge-outline {
+      background: transparent;
+      border: 1px solid var(--style-accent);
+      color: var(--style-accent);
+    }
+
+    /* Closing slide */
+    .closing-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--style-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .closing-title {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 2.4rem;
+      color: #FFFFFF;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .closing-rule {
+      width: 4rem;
+      height: 2px;
+      background: var(--style-accent);
+      margin: 0.6rem auto;
+    }
+    .closing-sub {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* Step items (2x2 grid) */
+    .step-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .step-item {
+      background: #FAFAFA;
+      border: 1px solid #E8E8E8;
+      border-top: 2px solid var(--style-accent);
+      border-radius: 0.3rem;
+      padding: 0.7rem 0.9rem;
+    }
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-accent);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.2rem;
+    }
+    .step-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--style-primary);
+      margin-bottom: 0.2rem;
+    }
+    .step-desc {
+      font-size: 0.85rem;
+      color: #555;
+      line-height: 1.55;
+    }
+
+    /* 6. Slide-type-specific styles */
+    .slide--cover .browser-content,
+    .slide--closing .browser-content {
+      padding: 0;
+    }
+    .slide--cover .browser-card,
+    .slide--closing .browser-card {
+      max-width: 100%;
+      height: calc(100vh - 4.8rem);
+    }
+
+    /* stat row in dark zone */
+    .dark-stats-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 0.4rem;
+    }
+    .dark-stat-block { }
+
+    /* 6b. Utility classes replacing inline styles */
+    .font-display-italic {
+      font-family: var(--font-display);
+      font-style: italic;
+    }
+    .mt-sm { margin-top: 0.5rem; }
+    .mt-md { margin-top: 0.6rem; }
+    .mt-lg { margin-top: 0.9rem; }
+    .mb-sm { margin-bottom: 0.5rem; }
+    .mb-md { margin-bottom: 0.6rem; }
+    .text-center { text-align: center; }
+    .dark-label--mb { margin-bottom: 0.5rem; }
+    .dark-label--mb-lg { margin-bottom: 0.6rem; }
+    .highlight-box--danger {
+      background: rgba(230,48,48,0.12);
+      border-left-color: var(--style-accent);
+      color: #FFD0D0;
+    }
+    .dark-quote--sm { font-size: 1rem; }
+    .dark-quote--lg { font-size: 1.4rem; }
+    .closing-rule--auto { margin: 0.7rem auto; }
+    .editorial-left--top {
+      justify-content: flex-start;
+      padding-top: 1.4rem;
+    }
+    .editorial-right--center {
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 7. Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 42px;
+      background: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      z-index: 999;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      color: #CCC;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) { background: #333; color: #FFF; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn svg { width: 1.2rem; height: 1.2rem; fill: currentColor; }
+    .nav-counter {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #CCC;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .slide-input {
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 3px;
+      color: #FFF;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      width: 2.2rem;
+      text-align: center;
+      padding: 0.1rem 0.2rem;
+    }
+
+    /* 8. Accessibility */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute;
+      top: -40px; left: 0;
+      background: var(--style-accent);
+      color: #FFF;
+      padding: 8px 16px;
+      z-index: 9999;
+      font-size: 14px;
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    /* 9. Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .editorial-split { flex-direction: column; }
+      .editorial-left, .editorial-right { flex: 0 0 50%; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .step-grid { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    @media (prefers-contrast: high) {
+      :root {
+        --style-accent: #CC0000;
+        --style-text: #000000;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="10"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: 표지 -->
+    <div class="slide slide--cover active" data-slide="0"
+         role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">민주주의와 시민 참여</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">고등학교 사회 · 2026학년도</div>
+              <h1 class="cover-display-title">민주주의와<br>시민 참여</h1>
+              <div class="red-rule"></div>
+              <p class="cover-subtitle-text">민주주의의 원리를 이해하고,<br>능동적 시민으로서의 역할을 탐구합니다.</p>
+              <div class="cover-meta-row">
+                <span class="cover-meta-item">고등학교 사회</span>
+                <span class="cover-meta-item">10 Slides</span>
+                <span class="cover-meta-item">2026.03</span>
+              </div>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-quote">"민주주의는 최선의 제도가 아니라,<br>우리가 끊임없이 가꾸어 가는 과정이다."</div>
+              <div class="dark-label">— 시민 민주주의 원칙</div>
+              <div class="vertical-label">Democracy &amp; Citizenship</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 목차 -->
+    <div class="slide" data-slide="1"
+         role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">목차</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">Contents</div>
+              <h2 class="section-header">
+                <span class="font-display-italic">강의 목차</span>
+              </h2>
+              <div class="red-rule"></div>
+              <nav aria-label="슬라이드 목차">
+                <ol class="toc-list">
+                  <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0"
+                      aria-label="3번 슬라이드로 이동: 민주주의의 의미"
+                      onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                    <span class="toc-num" aria-hidden="true">01</span>
+                    <span class="toc-text">민주주의의 의미와 기본 원리</span>
+                    <span class="toc-arrow" aria-hidden="true">→</span>
+                  </li>
+                  <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                      aria-label="4번 슬라이드로 이동: 민주주의의 역사"
+                      onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                    <span class="toc-num" aria-hidden="true">02</span>
+                    <span class="toc-text">민주주의의 역사적 발전</span>
+                    <span class="toc-arrow" aria-hidden="true">→</span>
+                  </li>
+                  <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                      aria-label="5번 슬라이드로 이동: 시민의 권리와 의무"
+                      onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                    <span class="toc-num" aria-hidden="true">03</span>
+                    <span class="toc-text">시민의 권리와 의무</span>
+                    <span class="toc-arrow" aria-hidden="true">→</span>
+                  </li>
+                  <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                      aria-label="6번 슬라이드로 이동: 시민 참여의 형태"
+                      onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                    <span class="toc-num" aria-hidden="true">04</span>
+                    <span class="toc-text">시민 참여의 형태</span>
+                    <span class="toc-arrow" aria-hidden="true">→</span>
+                  </li>
+                  <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                      aria-label="7번 슬라이드로 이동: 선거와 투표"
+                      onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                    <span class="toc-num" aria-hidden="true">05</span>
+                    <span class="toc-text">선거와 투표의 중요성</span>
+                    <span class="toc-arrow" aria-hidden="true">→</span>
+                  </li>
+                  <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0"
+                      aria-label="8번 슬라이드로 이동: 시민 불복종"
+                      onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                    <span class="toc-num" aria-hidden="true">06</span>
+                    <span class="toc-text">시민 불복종과 저항권</span>
+                    <span class="toc-arrow" aria-hidden="true">→</span>
+                  </li>
+                  <li class="toc-item" onclick="goToSlide(8)" role="button" tabindex="0"
+                      aria-label="9번 슬라이드로 이동: 디지털 민주주의"
+                      onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(8)">
+                    <span class="toc-num" aria-hidden="true">07</span>
+                    <span class="toc-text">디지털 시대의 시민 참여</span>
+                    <span class="toc-arrow" aria-hidden="true">→</span>
+                  </li>
+                </ol>
+              </nav>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb-lg">핵심 질문</div>
+              <ul class="dark-list">
+                <li>민주주의란 무엇인가?</li>
+                <li>시민으로서 나는 어떤 권리를 갖는가?</li>
+                <li>사회 변화는 어떻게 이루어지는가?</li>
+                <li>디지털 시대의 참여는 어떻게 달라지는가?</li>
+              </ul>
+              <div class="vertical-label">Table of Contents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 민주주의의 의미와 기본 원리 -->
+    <div class="slide" data-slide="2"
+         role="region" aria-label="슬라이드 3: 민주주의의 의미와 기본 원리">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">01 · 민주주의의 의미와 기본 원리</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">01 / Definition</div>
+              <h2><span class="font-display-italic">민주주의란 무엇인가?</span></h2>
+              <div class="red-rule"></div>
+              <p class="body-text">민주주의(Democracy)는 그리스어 <em>demos</em>(인민)와 <em>kratos</em>(지배)에서 유래한 개념으로, <strong>국민이 스스로 통치하는 정치 체제</strong>를 의미합니다.</p>
+              <div class="highlight-box" role="note">
+                링컨은 민주주의를 "국민의, 국민에 의한, 국민을 위한 정부"라 정의했습니다. 이는 주권이 국민에게 있음을 명확히 합니다.
+              </div>
+              <div class="grid-2 card-grid mt-md" role="list">
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">⚖️</span>
+                  <h3 class="card-title">직접 민주주의</h3>
+                  <p class="card-desc">시민이 직접 정책 결정에 참여 — 고대 아테네 방식</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">🏛️</span>
+                  <h3 class="card-title">간접 민주주의</h3>
+                  <p class="card-desc">선출된 대표자를 통해 국민 의사 반영 — 현대 대의제</p>
+                </div>
+              </div>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb">민주주의 3대 원리</div>
+              <ul class="dark-list">
+                <li>국민 주권 — 모든 권력은 국민으로부터</li>
+                <li>기본권 보장 — 인간의 존엄과 자유</li>
+                <li>권력 분립 — 입법·행정·사법의 견제</li>
+              </ul>
+              <div class="mt-lg">
+                <div class="dark-stat">3권</div>
+                <div class="dark-stat-label">분립으로 권력 남용 방지</div>
+              </div>
+              <div class="vertical-label">Democracy Principles</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 민주주의의 역사적 발전 -->
+    <div class="slide" data-slide="3"
+         role="region" aria-label="슬라이드 4: 민주주의의 역사적 발전">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">02 · 민주주의의 역사적 발전</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">02 / History</div>
+              <h2><span class="font-display-italic">민주주의의 역사</span></h2>
+              <div class="red-rule"></div>
+              <div class="step-grid">
+                <div class="step-item">
+                  <div class="step-num">BC 5C</div>
+                  <div class="step-title">아테네 민주정</div>
+                  <div class="step-desc">세계 최초 직접 민주주의, 성인 남성 시민권</div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">1215년</div>
+                  <div class="step-title">마그나 카르타</div>
+                  <div class="step-desc">왕권 제한, 법치주의의 시초</div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">1776년</div>
+                  <div class="step-title">미국 독립선언</div>
+                  <div class="step-desc">천부인권·저항권·국민주권 명시</div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">20세기</div>
+                  <div class="step-title">보통선거권 확대</div>
+                  <div class="step-desc">여성·노동자·식민지 민중으로 참정권 확장</div>
+                </div>
+              </div>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb">한국 민주주의</div>
+              <ul class="dark-list">
+                <li>1948년 대한민국 헌법 제정</li>
+                <li>1960년 4·19 혁명 — 학생·시민 봉기</li>
+                <li>1987년 6월 민주항쟁 — 직선제 쟁취</li>
+                <li>2016~17년 촛불집회 — 평화적 시민 참여</li>
+              </ul>
+              <div class="mt-lg">
+                <div class="dark-stat">1987</div>
+                <div class="dark-stat-label">직선제 개헌 — 민주화 분수령</div>
+              </div>
+              <div class="vertical-label">Historical Development</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 시민의 권리와 의무 -->
+    <div class="slide" data-slide="4"
+         role="region" aria-label="슬라이드 5: 시민의 권리와 의무">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">03 · 시민의 권리와 의무</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">03 / Rights &amp; Duties</div>
+              <h2><span class="font-display-italic">권리와 의무의 균형</span></h2>
+              <div class="red-rule"></div>
+              <p class="body-text">민주 사회의 시민은 헌법이 보장하는 <strong>기본권</strong>을 누리는 동시에, 공동체 유지를 위한 <strong>의무</strong>를 다해야 합니다.</p>
+              <div class="grid-2 card-grid mt-md" role="list">
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">✅</span>
+                  <h3 class="card-title">자유권</h3>
+                  <p class="card-desc">신체·사상·표현·집회의 자유 보장</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">✅</span>
+                  <h3 class="card-title">평등권</h3>
+                  <p class="card-desc">차별 없는 법 앞의 평등한 지위</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">✅</span>
+                  <h3 class="card-title">참정권</h3>
+                  <p class="card-desc">선거권·피선거권·국민투표권</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">✅</span>
+                  <h3 class="card-title">사회권</h3>
+                  <p class="card-desc">교육·노동·복지에 대한 권리</p>
+                </div>
+              </div>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb">시민의 4대 의무</div>
+              <ul class="dark-list">
+                <li>납세의 의무 — 공공 재정 지원</li>
+                <li>국방의 의무 — 국가 안전 보장</li>
+                <li>교육의 의무 — 자녀 교육권 보장</li>
+                <li>환경 보전의 의무 — 미래세대 책임</li>
+              </ul>
+              <div class="highlight-box highlight-box--danger mt-md">
+                권리와 의무는 동전의 양면 — 하나를 주장하려면 다른 하나도 이행해야 합니다.
+              </div>
+              <div class="vertical-label">Rights &amp; Duties</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 시민 참여의 형태 -->
+    <div class="slide" data-slide="5"
+         role="region" aria-label="슬라이드 6: 시민 참여의 형태">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">04 · 시민 참여의 형태</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">04 / Participation</div>
+              <h2><span class="font-display-italic">어떻게 참여할 수 있나?</span></h2>
+              <div class="red-rule"></div>
+              <ul class="activity-list" role="list">
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" aria-hidden="true">🗳️</span>
+                  <div class="activity-body">
+                    <h3 class="activity-title">선거 참여</h3>
+                    <p class="activity-desc">투표는 가장 기본적인 시민 참여로, 대표자 선택을 통해 국정에 의견을 반영합니다.</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" aria-hidden="true">📢</span>
+                  <div class="activity-body">
+                    <h3 class="activity-title">청원·민원 제출</h3>
+                    <p class="activity-desc">국민청원, 공청회, 민원을 통해 정책 입안 과정에 직접 의견을 제시합니다.</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" aria-hidden="true">🤝</span>
+                  <div class="activity-body">
+                    <h3 class="activity-title">시민 단체 활동</h3>
+                    <p class="activity-desc">NGO, 지역 사회 조직, 봉사 활동을 통해 공동체 문제를 함께 해결합니다.</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" aria-hidden="true">✊</span>
+                  <div class="activity-body">
+                    <h3 class="activity-title">집회·시위</h3>
+                    <p class="activity-desc">헌법이 보장하는 집회의 자유를 통해 의견을 공개적으로 표명합니다.</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb">참여 단계별 분류</div>
+              <ul class="dark-list">
+                <li>정보 접근 — 알 권리 행사</li>
+                <li>의견 표명 — 공론장 참여</li>
+                <li>의사 결정 — 직접 영향력 행사</li>
+                <li>정책 감시 — 비판과 견제</li>
+              </ul>
+              <div class="mt-lg">
+                <div class="dark-stat">4단계</div>
+                <div class="dark-stat-label">참여 사다리 (Arnstein, 1969)</div>
+              </div>
+              <div class="vertical-label">Forms of Participation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 선거와 투표의 중요성 -->
+    <div class="slide" data-slide="6"
+         role="region" aria-label="슬라이드 7: 선거와 투표의 중요성">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">05 · 선거와 투표의 중요성</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">05 / Elections</div>
+              <h2><span class="font-display-italic">한 표의 무게</span></h2>
+              <div class="red-rule"></div>
+              <p class="body-text">선거는 국민이 <strong>주권을 직접 행사</strong>하는 가장 강력한 수단입니다. 보통·평등·직접·비밀 선거의 4대 원칙이 이를 뒷받침합니다.</p>
+              <div class="highlight-box" role="note">
+                투표율이 낮아지면 소수 집단의 이익만 반영될 위험이 커집니다. 모든 시민의 참여가 민주주의를 건강하게 유지합니다.
+              </div>
+              <div class="grid-2 card-grid mt-md" role="list">
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">📊</span>
+                  <h3 class="card-title">한국 투표율</h3>
+                  <p class="card-desc">2022년 대선 77.1% — 선거마다 차이 있음</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">🌍</span>
+                  <h3 class="card-title">OECD 평균</h3>
+                  <p class="card-desc">선진국 평균 68% — 젊은 층 참여 저조가 과제</p>
+                </div>
+              </div>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb">선거의 4대 원칙</div>
+              <ul class="dark-list">
+                <li>보통 선거 — 모든 성인 시민에게 투표권</li>
+                <li>평등 선거 — 1인 1표, 동등한 가치</li>
+                <li>직접 선거 — 대리인 없이 직접 투표</li>
+                <li>비밀 선거 — 투표 내용 비공개 보장</li>
+              </ul>
+              <div class="mt-lg">
+                <div class="dark-stat">18세</div>
+                <div class="dark-stat-label">한국 선거 연령 기준 (2020년 개정)</div>
+              </div>
+              <div class="vertical-label">Elections &amp; Voting</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 시민 불복종과 저항권 -->
+    <div class="slide" data-slide="7"
+         role="region" aria-label="슬라이드 8: 시민 불복종과 저항권">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">06 · 시민 불복종과 저항권</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">06 / Civil Disobedience</div>
+              <h2><span class="font-display-italic">부당함에 맞서는 방법</span></h2>
+              <div class="red-rule"></div>
+              <p class="body-text">소로우와 간디, 마틴 루터 킹 Jr.가 실천한 <strong>시민 불복종</strong>은 부당한 법이나 정책에 비폭력적으로 저항하는 행위입니다.</p>
+              <div class="step-grid">
+                <div class="step-item">
+                  <div class="step-num">조건 1</div>
+                  <div class="step-title">공개성</div>
+                  <div class="step-desc">비밀이 아닌 공개적 행동으로 사회에 호소</div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">조건 2</div>
+                  <div class="step-title">비폭력성</div>
+                  <div class="step-desc">어떠한 폭력도 사용하지 않는 원칙 준수</div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">조건 3</div>
+                  <div class="step-title">정의 목적</div>
+                  <div class="step-desc">보편적 정의와 인권 실현을 위한 목적</div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">조건 4</div>
+                  <div class="step-title">법적 책임</div>
+                  <div class="step-desc">처벌 감수 — 법 체계 자체는 인정</div>
+                </div>
+              </div>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb">역사적 사례</div>
+              <ul class="dark-list">
+                <li>간디의 소금 행진 (1930, 인도)</li>
+                <li>로자 파크스 버스 거부 (1955, 미국)</li>
+                <li>한국 4·19 혁명 (1960)</li>
+                <li>광주 민주화 운동 (1980)</li>
+              </ul>
+              <div class="mt-lg">
+                <div class="dark-quote dark-quote--sm">"불의한 법에 복종하는 것도<br>하나의 불의입니다."</div>
+                <div class="dark-label">— 마틴 루터 킹 Jr.</div>
+              </div>
+              <div class="vertical-label">Civil Disobedience</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: 디지털 시대의 시민 참여 -->
+    <div class="slide" data-slide="8"
+         role="region" aria-label="슬라이드 9: 디지털 시대의 시민 참여">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">07 · 디지털 시대의 시민 참여</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left">
+              <div class="section-label">07 / Digital Democracy</div>
+              <h2><span class="font-display-italic">연결된 시민의 힘</span></h2>
+              <div class="red-rule"></div>
+              <p class="body-text">소셜 미디어와 인터넷은 시민 참여의 장벽을 낮추었지만, 동시에 <strong>가짜 뉴스·필터 버블</strong> 같은 새로운 위험도 만들어냈습니다.</p>
+              <div class="grid-2 card-grid mt-md" role="list">
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">💻</span>
+                  <h3 class="card-title">온라인 청원</h3>
+                  <p class="card-desc">국민청원 플랫폼으로 20만 명 동의 시 정부 답변 의무화</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">📱</span>
+                  <h3 class="card-title">SNS 공론화</h3>
+                  <p class="card-desc">해시태그 운동, 실시간 이슈 공유로 여론 형성</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">🔍</span>
+                  <h3 class="card-title">팩트체크 문화</h3>
+                  <p class="card-desc">미디어 리터러시로 허위 정보를 판별하는 능력</p>
+                </div>
+                <div class="card" role="listitem">
+                  <span class="card-icon" aria-hidden="true">🌐</span>
+                  <h3 class="card-title">글로벌 연대</h3>
+                  <p class="card-desc">국경 초월 시민 네트워크와 국제 인권 캠페인</p>
+                </div>
+              </div>
+            </div>
+            <div class="editorial-right">
+              <div class="dark-label dark-label--mb">디지털 시민의 과제</div>
+              <ul class="dark-list">
+                <li>가짜 뉴스 식별 — 비판적 미디어 리터러시</li>
+                <li>개인 정보 보호 — 디지털 권리 인식</li>
+                <li>알고리즘 편향 — 다양한 시각 접하기</li>
+                <li>혐오 표현 대응 — 책임 있는 온라인 참여</li>
+              </ul>
+              <div class="mt-lg">
+                <div class="dark-stat">2,400만</div>
+                <div class="dark-stat-label">한국 국민청원 누적 참여 수</div>
+              </div>
+              <div class="vertical-label">Digital Participation</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: 마무리 -->
+    <div class="slide slide--closing" data-slide="9"
+         role="region" aria-label="슬라이드 10: 마무리">
+      <div class="browser-card browser-card--editorial">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">민주주의와 시민 참여</span>
+        </div>
+        <div class="browser-content">
+          <div class="editorial-split">
+            <div class="editorial-left editorial-left--top">
+              <div class="section-label">Summary</div>
+              <h2><span class="font-display-italic">오늘의 핵심 정리</span></h2>
+              <div class="red-rule"></div>
+              <ul class="activity-list" role="list">
+                <li class="activity-item" role="listitem">
+                  <div class="activity-body">
+                    <h3 class="activity-title">민주주의는 과정이다</h3>
+                    <p class="activity-desc">완성된 제도가 아니라 시민이 끊임없이 참여해야 유지되는 살아있는 체제</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <div class="activity-body">
+                    <h3 class="activity-title">권리와 의무는 함께</h3>
+                    <p class="activity-desc">자유와 평등을 누리는 만큼 공동체에 대한 책임도 함께 따릅니다</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <div class="activity-body">
+                    <h3 class="activity-title">다양한 참여 방법</h3>
+                    <p class="activity-desc">투표부터 청원, SNS, 시민 단체 활동까지 — 일상이 민주주의입니다</p>
+                  </div>
+                </li>
+              </ul>
+              <div class="highlight-box mt-sm" role="note">
+                여러분 한 명 한 명이 민주주의의 주인공입니다. 지금 바로 참여를 시작하세요.
+              </div>
+            </div>
+            <div class="editorial-right editorial-right--center">
+              <div class="text-center">
+                <div class="dark-label dark-label--mb text-center">민주주의 핵심 가치</div>
+                <div class="dark-quote dark-quote--lg text-center">"민주주의는<br>구경하는 것이 아니라<br>참여하는 것이다."</div>
+                <div class="closing-rule closing-rule--auto"></div>
+                <div class="dark-label text-center">고등학교 사회 · 민주주의와 시민 참여</div>
+              </div>
+              <div class="vertical-label">Civic Engagement</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled
+            aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">10</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()"
+            aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const TOTAL = 10;
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    const announce = document.getElementById('slideAnnounce');
+
+    function updateSlide(idx) {
+      slides[current].classList.remove('active');
+      current = Math.max(0, Math.min(TOTAL - 1, idx));
+      slides[current].classList.add('active');
+      progressBar.style.width = ((current + 1) / TOTAL * 100) + '%';
+      progressBar.setAttribute('aria-valuenow', current + 1);
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === TOTAL - 1;
+      slideInput.value = current + 1;
+      announce.textContent = '슬라이드 ' + (current + 1) + ' / ' + TOTAL;
+    }
+
+    function nextSlide() { if (current < TOTAL - 1) updateSlide(current + 1); }
+    function prevSlide() { if (current > 0) updateSlide(current - 1); }
+    function goToSlide(idx) { updateSlide(idx); }
+
+    slideInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const v = parseInt(slideInput.value, 10);
+        if (!isNaN(v) && v >= 1 && v <= TOTAL) updateSlide(v - 1);
+        else slideInput.value = current + 1;
+      }
+    });
+    slideInput.addEventListener('blur', () => { slideInput.value = current + 1; });
+
+    document.addEventListener('keydown', e => {
+      if (document.activeElement === slideInput) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); prevSlide(); }
+      if (e.key === 'Home') { e.preventDefault(); updateSlide(0); }
+      if (e.key === 'End')  { e.preventDefault(); updateSlide(TOTAL - 1); }
+    });
+
+    function toggleFullscreen() {
+      const exp = document.getElementById('fsExpand');
+      const cmp = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          exp.style.display = 'none'; cmp.style.display = '';
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          exp.style.display = ''; cmp.style.display = 'none';
+        }).catch(() => {});
+      }
+    }
+    document.addEventListener('fullscreenchange', () => {
+      const exp = document.getElementById('fsExpand');
+      const cmp = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) { exp.style.display = ''; cmp.style.display = 'none'; }
+      else { exp.style.display = 'none'; cmp.style.display = ''; }
+    });
+
+    updateSlide(0);
+  </script>
+</body>
+</html>

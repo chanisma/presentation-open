@@ -1,0 +1,215 @@
+{
+  "project_id": "pd-data-first-lesson-design",
+  "total_beats": 24,
+  "total_scenes": 13,
+  "plans": [
+    {
+      "scene_index": 1, "beat_range": [1, 2], "sentence_range": [1, 4],
+      "title": "6주 차에 사라진 석 달",
+      "form": "scene", "intent": "emphasize",
+      "metaphor": "16주 학기 막대 두 줄 — 위 막대는 6주에서 톱니로 끊기고 그 자리에 '데이터가 없다'가 붙는다",
+      "emotion": "아찔함",
+      "jsx_plan": "주차 눈금 위에 막대 하나가 자라다 6주 지점에서 뚝 끊긴다. 끊긴 단면 옆에 '6팀 중 2팀'. 아래 줄은 비워 둔다 — 다음 씬이 채운다",
+      "visual_plan": {
+        "pattern_ref": "P01_mega_number", "relationship": "metric",
+        "focal": { "type": "ImpactStat", "value": "6팀 중 2팀", "label": "6주차" },
+        "subline": "석 달이 그 자리에서 없어졌다",
+        "support": [{ "type": "Kicker", "text": "작년" }],
+        "accent_color": "primary", "recommended_container": null,
+        "rationale": "role=declaration evidence=statistic → 메가 숫자 + 시간 축 위 끊김"
+      }
+    },
+    {
+      "scene_index": 2, "beat_range": [3, 3], "sentence_range": [5, 6],
+      "title": "첫 차시를 여기서 시작한다",
+      "form": "static", "intent": "define",
+      "metaphor": "두 단어가 자리를 바꾸는 순서도 — '문제 → 데이터'가 흐려지고 '데이터 → 문제'가 또렷해진다",
+      "emotion": "결단",
+      "jsx_plan": "화살표 두 줄을 세로로 쌓되 위 줄은 회색·작게, 아래 줄은 액센트·크게. 제안 문장은 화면에 없다 — 발표자가 말한다",
+      "visual_plan": {
+        "pattern_ref": "P38_hero_wordmark", "relationship": "pause",
+        "focal": { "type": "MarkerHighlight", "label": "데이터 찾기" },
+        "subline": "첫 차시",
+        "support": [{ "type": "Kicker", "text": "문제 정하기" }],
+        "accent_color": "primary", "recommended_container": null,
+        "rationale": "role=declaration shape=contrast, 제안 한 단어가 화면을 지배 → 거대 wordmark"
+      }
+    },
+    {
+      "scene_index": 3, "beat_range": [4, 5], "sentence_range": [7, 12],
+      "title": "간격",
+      "form": "scene", "intent": "compare",
+      "metaphor": "절벽 사이의 틈 — 왼쪽 절벽 '풀고 싶은 문제', 오른쪽 절벽 '손에 넣을 데이터', 학생이 건너뛸 수 없는 폭",
+      "emotion": "막막함",
+      "jsx_plan": "좌우 두 덩어리 사이에 빈 공간을 넓게 두고, 그 틈 위로 다리를 놓으려다 끊기는 점선. 행정 자료·공공 통계는 오른쪽 절벽에 작은 라벨",
+      "visual_plan": {
+        "pattern_ref": "P19_two_col_contrast", "relationship": "contrast",
+        "focal": { "type": "VersusCard", "label": "간격" },
+        "subline": "학생이 메울 수 없는 폭",
+        "support": [{ "type": "Kicker", "text": "풀고 싶은 것" }, { "type": "Kicker", "text": "손에 넣을 것" }],
+        "accent_color": "primary", "recommended_container": "Split",
+        "rationale": "role=comparison shape=contrast → 좌우 대비, 가운데가 비어 있는 것이 메시지"
+      }
+    },
+    {
+      "scene_index": 4, "beat_range": [6, 6], "sentence_range": [13, 14],
+      "title": "순서를 뒤집는다",
+      "form": "build", "intent": "emphasize",
+      "metaphor": "앞 씬의 틈이 닫힌다 — 오른쪽 절벽(데이터)에서 출발하는 다리는 끊기지 않고 왼쪽까지 닿는다",
+      "emotion": "안도",
+      "jsx_plan": "S3와 같은 두 덩어리 구도를 유지하되 이번엔 다리가 오른쪽에서 왼쪽으로 완성된다. Build at=1에서 '구조적으로 사라진다' 한 줄",
+      "visual_plan": {
+        "pattern_ref": "P20_mini_flow", "relationship": "flow",
+        "focal": { "type": "FlowDiagram", "label": "데이터 → 문제" },
+        "subline": "멈추는 일이 구조적으로 사라진다",
+        "support": [],
+        "accent_color": "primary", "recommended_container": "Stack",
+        "rationale": "role=payoff shape=transformation → 미니 플로우, 방향 반전이 핵심"
+      }
+    },
+    {
+      "scene_index": 5, "beat_range": [7, 10], "sentence_range": [15, 24],
+      "title": "세 갈래",
+      "form": "build", "intent": "explain",
+      "metaphor": "2축 좌표 위 원 세 개 — 가로축 '나와의 거리', 세로축 '정리된 정도'. 대각선 위에 공개·학교 안·직접이 놓인다",
+      "emotion": "정돈",
+      "jsx_plan": "좌표축 먼저, Build at=1·2·3으로 원이 하나씩 앉는다. 원 안에는 갈래 이름만. 장단점은 발표자가 말한다. 축 라벨이 헤드라인 밴드를 침범하지 않게 상단 여백",
+      "visual_plan": {
+        "pattern_ref": "P10_hub_satellite", "relationship": "case",
+        "focal": { "type": "CycleDiagram", "label": "세 갈래" },
+        "subline": "거리와 정리 정도의 좌표",
+        "support": [{ "type": "IconCard", "items": ["공개", "학교 안", "직접"] }],
+        "accent_color": "primary", "recommended_container": null,
+        "rationale": "role=cluster shape=hierarchy, 세 항목이 한 평면 위 관계 → 좌표형 허브"
+      }
+    },
+    {
+      "scene_index": 6, "beat_range": [11, 11], "sentence_range": [25, 26],
+      "title": "셋 다",
+      "form": "static", "intent": "emphasize",
+      "metaphor": "체크박스 세 칸이 나란히 — 두 칸만 찬 상태와 세 칸 다 찬 상태의 대비",
+      "emotion": "단호함",
+      "jsx_plan": "앞 씬 원 세 개를 작게 줄여 상단에 두고, 화면 중앙에 거대한 '셋 다'. 두 칸만 찬 체크박스는 흐리게 옆에",
+      "visual_plan": {
+        "pattern_ref": "P16_warning_triangle", "relationship": "pause",
+        "focal": { "type": "SvgGraphic", "label": "셋 다" },
+        "subline": "한 갈래에만 몰리면 막힌다",
+        "support": [],
+        "accent_color": "primary", "recommended_container": null,
+        "rationale": "role=declaration shape=summary, 규칙 선언 한 단어 → 경고형 심볼 하나"
+      }
+    },
+    {
+      "scene_index": 7, "beat_range": [12, 14], "sentence_range": [27, 35],
+      "title": "체를 세 번 친다",
+      "form": "scene", "intent": "explain",
+      "metaphor": "눈이 점점 촘촘해지는 체 세 개 — 후보 14알이 떨어지며 9·6·3으로 걸러지고 마지막 셋이 접시에 담긴다",
+      "emotion": "후련함",
+      "jsx_plan": "알이 t에 따라 낙하, 체마다 걸린 알은 회색으로 굳는다. 조건은 '행 ≥ 30 · 열 ≥ 3 · 직접 연다' 기호로만, 체 도형 bbox 밖 오른쪽에. 접시의 세 알은 겹치지 않게",
+      "visual_plan": {
+        "pattern_ref": "P09_number_chain_arrow", "relationship": "flow",
+        "focal": { "type": "FlowDiagram", "label": "14 → 9 → 6 → 3" },
+        "subline": "하나라도 걸리면 후보에서 뺀다",
+        "support": [{ "type": "Kicker", "items": ["행 ≥ 30", "열 ≥ 3", "직접 연다"] }],
+        "accent_color": "primary", "recommended_container": null,
+        "rationale": "role=sequence shape=flow, 세 관문 순차 통과 → 숫자 체인"
+      }
+    },
+    {
+      "scene_index": 8, "beat_range": [15, 16], "sentence_range": [36, 40],
+      "title": "빈칸 넷",
+      "form": "build", "intent": "define",
+      "metaphor": "문장 틀 하나가 폼처럼 놓이고 빈칸 네 개에 밑줄 — 급식 예시가 Build로 아래에 붙는다",
+      "emotion": "명료함",
+      "jsx_plan": "틀은 카드 하나에 크게, 빈칸은 밑줄 위 라벨. Build at=1에서 좌 1:우 2 비대칭으로 '가진 데이터'와 '채운 문장'. 빈칸이 저절로 채워지는 모션은 넣지 않는다",
+      "visual_plan": {
+        "pattern_ref": "P12_doc_split", "relationship": "evidence",
+        "focal": { "type": "SvgGraphic", "label": "누가 · 어떤 상황 · 무엇을 몰라서 · 무엇을 안다" },
+        "subline": "틀은 하나",
+        "support": [{ "type": "Stack", "text": "급식 메뉴와 잔반량" }],
+        "accent_color": "primary", "recommended_container": "Split",
+        "rationale": "role=declaration shape=transformation, 문서형 틀 + 예시 분할 → doc split"
+      }
+    },
+    {
+      "scene_index": 9, "beat_range": [17, 17], "sentence_range": [41, 43],
+      "title": "3.7점. 그래서?",
+      "form": "static", "intent": "emphasize",
+      "metaphor": "거대한 회색 수치 하나와 그 아래 되묻는 두 글자 — 판정 문장은 화면에 없다",
+      "emotion": "정적",
+      "jsx_plan": "'3.7점'을 화면 폭의 절반 크기로 흐리게, 그 아래 '그래서?'를 흰색으로. 급식 예시 문장은 액센트 틴트 카드로 Build at=1",
+      "visual_plan": {
+        "pattern_ref": "P32_big_ratio_contrast", "relationship": "contrast",
+        "focal": { "type": "ImpactStat", "value": "3.7점", "label": "그래서?" },
+        "subline": "곤란한 사람이 있는가",
+        "support": [{ "type": "Kicker", "text": "만족도 조사" }],
+        "accent_color": "primary", "recommended_container": "Split",
+        "rationale": "role=comparison shape=contrast, 수치 하나 vs 되묻기 → 거대 수치 대비"
+      }
+    },
+    {
+      "scene_index": 10, "beat_range": [18, 19], "sentence_range": [44, 48],
+      "title": "같은 데이터, 다른 사람",
+      "form": "build", "intent": "explain",
+      "metaphor": "뿌리 하나에서 세 가지가 갈라지는 분기 트리 — 가지 끝이 처음엔 비어 있다가 사람 이름이 하나씩 들어온다",
+      "emotion": "확장",
+      "jsx_plan": "왼쪽 데이터 덩어리, 오른쪽으로 곡선 가지 셋. 선은 도형 가장자리에서 출발해 가장자리로. Build at=1·2·3에서 영양사·학생회·행정실. 산식 '3 × 3 = 9'는 헤드라인에",
+      "visual_plan": {
+        "pattern_ref": "P13_radial_people", "relationship": "case",
+        "focal": { "type": "SvgGraphic", "label": "급식 데이터 하나" },
+        "subline": "사람을 바꾸면 문장이 바뀐다",
+        "support": [{ "type": "IconCard", "items": ["영양사", "학생회", "행정실"] }],
+        "accent_color": "primary", "recommended_container": null,
+        "rationale": "role=evidence shape=hierarchy, 중심 하나 + 주변 셋 → 방사형 인물"
+      }
+    },
+    {
+      "scene_index": 11, "beat_range": [20, 21], "sentence_range": [49, 55],
+      "title": "매년 나오는 셋",
+      "form": "static", "intent": "compare",
+      "metaphor": "장애와 대처가 마주 보는 세 줄 — 왼쪽 증상은 회색, 오른쪽 대처는 액센트, 가운데 화살표",
+      "emotion": "대비",
+      "jsx_plan": "세 줄을 세로로 쌓되 좌측 여백을 0·24·48px 계단으로. 각 줄은 '증상 → 대처' 한 쌍. 카드 없이 얇은 액센트 세로선으로만 묶는다",
+      "visual_plan": {
+        "pattern_ref": "P18_vertical_dual_bar", "relationship": "contrast",
+        "focal": { "type": "CompareBars", "label": "장애 → 대처" },
+        "subline": "셋 다 대처가 하나씩 있다",
+        "support": [{ "type": "Kicker", "items": ["예비 카드", "지역 필터", "URL 확인"] }],
+        "accent_color": "primary", "recommended_container": null,
+        "rationale": "role=comparison shape=contrast, 세 쌍의 do-dont → 듀얼 바"
+      }
+    },
+    {
+      "scene_index": 12, "beat_range": [22, 23], "sentence_range": [56, 59],
+      "title": "장치 넷",
+      "form": "build", "intent": "emphasize",
+      "metaphor": "키스톤 — 아치 꼭대기 돌 하나(첫 차시)가 빠지면 무너지고, 그 아래 네 돌이 장치 넷",
+      "emotion": "확신",
+      "jsx_plan": "아치 도식: 꼭대기에 '첫 차시', 좌우 네 돌에 세 갈래·조건 셋·틀 하나·누가. Build at=1에서 하단에 '3 + 9' 산출물",
+      "visual_plan": {
+        "pattern_ref": "P07_tile_triplet", "relationship": "enumerate",
+        "focal": { "type": "Grid", "label": "첫 차시" },
+        "subline": "50분 안에 데이터 셋과 문제 아홉",
+        "support": [{ "type": "Grid", "items": ["세 갈래 강제", "조건 셋", "틀 하나", "누가 바꾸기"] }],
+        "accent_color": "primary", "recommended_container": "Grid",
+        "rationale": "role=payoff+cluster shape=summary, 장치 4개 요약 → 타일"
+      }
+    },
+    {
+      "scene_index": 13, "beat_range": [24, 24], "sentence_range": [60, 61],
+      "title": "공유 폴더",
+      "form": "static", "intent": "list",
+      "metaphor": "폴더 아이콘 하나와 그 안에서 나온 두 장 — 학습지와 덱",
+      "emotion": "여운",
+      "jsx_plan": "중앙에 작은 폴더 도식, 양옆으로 '학습지'·'덱' 두 장. 아래 한 줄 '써 보고 결과를 나눠 주세요'. 링크 자리는 클릭 가능한 버튼으로",
+      "visual_plan": {
+        "pattern_ref": "P17_icon_title_sub_badge", "relationship": "case",
+        "focal": { "type": "IconCard", "label": "공유 폴더" },
+        "subline": "다음 학기 첫 시간에",
+        "support": [{ "type": "Badge", "items": ["학습지", "덱"] }],
+        "accent_color": "primary", "recommended_container": "FrameBox",
+        "rationale": "role=support shape=symbol, 마무리 CTA → 아이콘 카드"
+      }
+    }
+  ]
+}

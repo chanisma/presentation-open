@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "activities": [
+    {
+      "id": "q-def-call",
+      "slide": 2,
+      "kind": "choice",
+      "prompt": "아래 코드를 실행하면 화면에 무엇이 나올까?\ndef greet():\n    print(\"안녕!\")",
+      "options": [
+        "안녕! 이 출력된다",
+        "아무것도 출력되지 않는다",
+        "오류가 발생한다",
+        "greet 라는 글자가 출력된다"
+      ],
+      "answer": 1,
+      "misconceptions": {
+        "0": "정의(def)만 해도 실행된다고 착각 — 호출 개념 부재",
+        "2": "정의만 있으면 문법 오류라고 생각",
+        "3": "함수 이름 자체가 출력된다고 생각"
+      }
+    },
+    {
+      "id": "practice-average",
+      "slide": 3,
+      "kind": "code",
+      "prompt": "두 수의 평균을 '돌려주는' 함수 average(a, b)를 완성하세요. (print가 아니라 return!)",
+      "language": "python",
+      "starter": "def average(a, b):\n    return 0",
+      "tests": [
+        { "call": "average(2, 4)", "expected": "3.0" },
+        { "call": "average(1, 2)", "expected": "1.5" },
+        { "call": "average(10, 0)", "expected": "5.0" }
+      ]
+    },
+    {
+      "id": "q-print-return",
+      "slide": 4,
+      "kind": "ox",
+      "prompt": "print(\"안녕\")이 들어 있는 함수는 return이 없어도 값을 '돌려준다'.",
+      "answer": false,
+      "misconceptions": {
+        "true": "print(화면 출력)와 return(값 반환)의 역할 혼동"
+      }
+    },
+    {
+      "id": "exit",
+      "slide": "last",
+      "kind": "exit",
+      "prompt": "오늘 배운 함수, 얼마나 이해했나요?"
+    }
+  ]
+}

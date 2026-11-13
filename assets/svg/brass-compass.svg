@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 420" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 위에서 내려다본 황동 나침반. 바늘은 오른쪽 위(북동, 45°)를 가리킨 채 고정.
+       「도구는 바뀌어도 방향은 교사가」 마무리 장면의 dominant 소품 (ai-era-teacher 17쪽).
+       바깥 궤도(덱이 HTML 라벨을 돌린다)는 그리지 않는다. 밝은 배경용 잉크. 텍스트 없음.
+       팔레트: ink #1b2133 · brass #c9a04a · brassDark #a87f2e · brassLight #e6c983 · dial #f8f2df · tick #1b2133 · needleN #d9673f · needleS #3b4cc0
+       앵커: 중심 viewBox (200, 230) · 문자판 반지름 132 · 바늘 끝(북동) (283, 147) · 고리 꼭대기 (200, 16) -->
+
+  <!-- 그림자 -->
+  <ellipse cx="208" cy="402" rx="150" ry="12" fill="#1b2133" opacity=".07" />
+
+  <!-- 고리(걸쇠) -->
+  <path d="M176 66 L176 50 C176 30 186 16 200 16 C214 16 224 30 224 50 L224 66" stroke="#1b2133" stroke-width="16" />
+  <path d="M176 66 L176 50 C176 30 186 16 200 16 C214 16 224 30 224 50 L224 66" stroke="#c9a04a" stroke-width="10.5" />
+  <path d="M184 44 C186 32 192 25 200 24" stroke="#ffffff" stroke-width="2.4" opacity=".4" />
+  <!-- 꼭지 -->
+  <path d="M182 62 L218 62 C222 62 224 65 224 69 L224 82 L176 82 L176 69 C176 65 178 62 182 62 Z" fill="#a87f2e" stroke="#1b2133" stroke-width="2.2" />
+  <path d="M184 68 L216 68" stroke="#ffffff" stroke-width="2" opacity=".35" />
+
+  <!-- 바깥 테두리(두께감: 아래쪽 어두운 면) -->
+  <circle cx="200" cy="236" r="166" fill="#a87f2e" stroke="#1b2133" stroke-width="2.4" />
+  <circle cx="200" cy="230" r="166" fill="#c9a04a" stroke="#1b2133" stroke-width="2.4" />
+  <!-- 테두리 윗면 밝은 띠 -->
+  <path d="M62 170 C84 118 136 80 200 80 C264 80 316 118 338 170" stroke="#e6c983" stroke-width="10" opacity=".9" />
+  <path d="M96 128 C124 102 160 90 196 88" stroke="#ffffff" stroke-width="3" opacity=".35" />
+  <!-- 테두리 안쪽 홈 -->
+  <circle cx="200" cy="230" r="146" fill="#a87f2e" stroke="#1b2133" stroke-width="2" />
+
+  <!-- 문자판 -->
+  <circle cx="200" cy="230" r="136" fill="#f8f2df" stroke="#1b2133" stroke-width="2.2" />
+  <circle cx="200" cy="230" r="112" stroke="#1b2133" stroke-width="1.4" opacity=".35" />
+  <!-- 눈금: 큰 눈금 4 + 작은 눈금 -->
+  <g stroke="#1b2133" stroke-width="2.4">
+    <path d="M200 96 L200 120" /><path d="M200 340 L200 364" /><path d="M66 230 L90 230" /><path d="M310 230 L334 230" />
+  </g>
+  <g stroke="#1b2133" stroke-width="1.4" opacity=".55">
+    <path d="M294.8 135.2 L284.9 145.1" /><path d="M105.2 135.2 L115.1 145.1" />
+    <path d="M294.8 324.8 L284.9 314.9" /><path d="M105.2 324.8 L115.1 314.9" />
+    <path d="M251.4 105.9 L247.5 115.2" /><path d="M148.6 105.9 L152.5 115.2" />
+    <path d="M324.1 178.6 L314.8 182.5" /><path d="M75.9 178.6 L85.2 182.5" />
+    <path d="M324.1 281.4 L314.8 277.5" /><path d="M75.9 281.4 L85.2 277.5" />
+    <path d="M251.4 354.1 L247.5 344.8" /><path d="M148.6 354.1 L152.5 344.8" />
+  </g>
+  <!-- 북쪽 표식 (작은 삼각) -->
+  <path d="M200 124 L192 140 L208 140 Z" fill="#d9673f" stroke="#1b2133" stroke-width="1.6" />
+  <!-- 장식 장미(옅은 십자 마름모) -->
+  <path d="M200 160 L212 230 L200 300 L188 230 Z" fill="#1b2133" opacity=".06" />
+  <path d="M130 230 L200 218 L270 230 L200 242 Z" fill="#1b2133" opacity=".06" />
+
+  <!-- 바늘: 북동(코랄) ↔ 남서(인디고). 중심 (200,230), 폭 방향 ±(10,10) -->
+  <path d="M283 147 L210 240 L190 220 Z" fill="#d9673f" stroke="#1b2133" stroke-width="2" />
+  <path d="M283 147 L200 230 L210 240 Z" fill="#b8532f" />
+  <path d="M117 313 L190 220 L210 240 Z" fill="#3b4cc0" stroke="#1b2133" stroke-width="2" />
+  <path d="M117 313 L200 230 L190 220 Z" fill="#2c3a96" />
+  <!-- 바늘 축 -->
+  <circle cx="200" cy="230" r="11" fill="#c9a04a" stroke="#1b2133" stroke-width="2.2" />
+  <circle cx="197" cy="227" r="3" fill="#ffffff" opacity=".6" />
+
+  <!-- 유리 반사 -->
+  <path d="M110 170 C126 140 152 118 184 108" stroke="#ffffff" stroke-width="7" opacity=".32" />
+  <path d="M118 192 C124 180 130 172 138 164" stroke="#ffffff" stroke-width="4" opacity=".25" />
+</svg>

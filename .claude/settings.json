@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=$(jq -r '.tool_input.file_path // empty' 2>/dev/null); f=$(printf '%s' \"$f\" | tr '\\134' '/'); case \"$f\" in */apps-script.js) ;; *) exit 0 ;; esac; d=$(dirname \"$f\"); cd \"$d\" || exit 0; command -v clasp >/dev/null 2>&1 || { echo '{\"systemMessage\":\"clasp 미설치 — Apps Script 자동 반영 건너뜀 (npm i -g @google/clasp 후 clasp login)\"}'; exit 0; }; [ -f .clasp.json ] || exit 0; if clasp push -f >/dev/null 2>&1; then if [ -f .clasp-deployment ]; then dep=$(tr -d '[:space:]' < .clasp-deployment); if clasp redeploy \"$dep\" -d auto-sync >/dev/null 2>&1; then echo '{\"systemMessage\":\"Apps Script 자동 반영 완료 — clasp push + 같은 URL 재배포\"}'; else echo '{\"systemMessage\":\"clasp push 성공, 재배포 실패 — clasp redeploy 수동 확인 필요\"}'; fi; else echo '{\"systemMessage\":\"clasp push 완료 (.clasp-deployment 없음 — 재배포 생략)\"}'; fi; else echo '{\"systemMessage\":\"clasp push 실패 — Apps Script 수동 반영 필요\"}'; fi",
+            "timeout": 180,
+            "statusMessage": "Apps Script 동기화 중 (clasp push + redeploy)…"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "humanize-korean@im-not-ai": true,
+    "fluent-korean@fluent-korean": true
+  }
+}

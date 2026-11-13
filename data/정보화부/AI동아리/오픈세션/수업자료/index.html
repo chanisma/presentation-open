@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+<title>클로드 코드로 생활기록부 작업하기 — AI 동아리 오픈세션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FFFFFF;          /* 순백 배경 */
+    --stage-bg:#EEF1F6;       /* 무대 바깥 옅은 회색 */
+    --ink:#111827;            /* 본문 텍스트 */
+    --ink-soft:#6B7280;       /* 보조 텍스트, ribbon meta */
+    --rule:#E5E7EB;           /* 프레임·테두리·구분선 */
+    --wash:rgba(79,70,229,0.06); /* 호버 배경 */
+    --indigo:#4F46E5;         /* 주 포인트 (progress, dot) */
+    --amber:#F59E0B;          /* 보조 포인트 */
+    --green:#059669;          /* 성공 */
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;overflow:hidden;}
+  body{
+    background:var(--stage-bg);
+    color:var(--ink);
+    font-family:'Inter','Noto Sans KR',-apple-system,'Malgun Gothic',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  /* Top progress bar — hairline */
+  .progress{
+    position:fixed;top:0;left:0;height:3px;width:0%;
+    background:linear-gradient(90deg,var(--indigo),var(--amber));
+    transition:width .35s ease;z-index:20;
+  }
+
+  /* Frame */
+  .stage{
+    position:fixed;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    padding:32px 56px 64px;
+  }
+
+  /* Slide area — 16:9 letterboxed */
+  .slide-frame{
+    position:relative;
+    width:min(100%, calc((100vh - 96px) * 16 / 9));
+    aspect-ratio:16/9;
+    background:var(--paper);
+    border:1px solid var(--rule);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:
+      0 1px 2px rgba(17,24,39,0.04),
+      0 12px 32px rgba(17,24,39,0.10);
+  }
+
+  .slide{
+    position:absolute;inset:0;
+    opacity:0;transition:opacity .45s ease;
+    display:flex;align-items:center;justify-content:center;
+    pointer-events:none;
+  }
+  .slide.active{opacity:1;pointer-events:auto;}
+  .slide img{
+    width:100%;height:100%;
+    object-fit:contain;
+    display:block;
+    user-select:none;-webkit-user-drag:none;
+  }
+
+  /* Slide-08 SKILL 다운로드 버튼 오버레이 (슬라이드와 함께 letterbox/scale) */
+  .skill-dl{
+    position:absolute;
+    left:50%;bottom:4.5%;
+    transform:translateX(-50%);
+    display:inline-flex;align-items:center;gap:0.5em;
+    padding:0.72em 1.4em;
+    background:var(--indigo);
+    color:#fff;
+    font:700 clamp(13px,1.45vw,20px)/1 'Inter','Noto Sans KR',sans-serif;
+    letter-spacing:0.01em;
+    text-decoration:none;
+    border-radius:999px;
+    box-shadow:0 6px 18px rgba(79,70,229,0.38);
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .2s ease, background .2s ease;
+    white-space:nowrap;
+    z-index:5;
+  }
+  .skill-dl:hover{
+    background:#4338CA;
+    transform:translateX(-50%) translateY(-2px);
+    box-shadow:0 10px 26px rgba(79,70,229,0.46);
+  }
+  .skill-dl:active{transform:translateX(-50%) translateY(0) scale(0.98);}
+  .skill-dl svg{width:1.2em;height:1.2em;flex:none;}
+  .skill-dl .pulse{
+    position:absolute;inset:0;border-radius:999px;
+    box-shadow:0 0 0 0 rgba(79,70,229,0.45);
+    animation:skillPulse 2.2s ease-out infinite;
+    pointer-events:none;
+  }
+  @keyframes skillPulse{
+    0%{box-shadow:0 0 0 0 rgba(79,70,229,0.40);}
+    70%{box-shadow:0 0 0 14px rgba(79,70,229,0);}
+    100%{box-shadow:0 0 0 0 rgba(79,70,229,0);}
+  }
+  @media (prefers-reduced-motion: reduce){ .skill-dl .pulse{animation:none;} }
+
+  /* Footer ribbon — pagination + caption */
+  .ribbon{
+    position:fixed;left:0;right:0;bottom:0;
+    height:48px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;
+    background:var(--paper);
+    border-top:1px solid var(--rule);
+    z-index:15;
+  }
+  .ribbon .meta{color:var(--ink-soft);font-size:13px;letter-spacing:0.01em;font-weight:500;}
+  .ribbon .meta em{font-style:normal;color:var(--ink);font-weight:700;}
+  .ribbon .counter{font-variant-numeric:tabular-nums;letter-spacing:0.12em;font-size:13px;color:var(--ink);font-weight:600;}
+  .ribbon .center{
+    position:absolute;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:14px;
+    font-size:11px;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:0.22em;font-weight:600;
+  }
+  .ribbon .em-rule{display:inline-block;width:22px;height:1px;background:var(--rule);vertical-align:middle;}
+  .ribbon .marker-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--indigo);vertical-align:middle;margin:0 2px;}
+  .ribbon .marker-dot.amber{background:var(--amber);}
+
+  /* Side nav buttons */
+  .nav-btn{
+    position:fixed;top:50%;transform:translateY(-50%);
+    width:44px;height:44px;
+    background:var(--paper);border:1px solid var(--rule);
+    border-radius:50%;
+    color:var(--ink);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s ease, transform .15s ease, box-shadow .2s ease;
+    z-index:18;
+    box-shadow:0 2px 8px rgba(17,24,39,0.08);
+  }
+  .nav-btn:hover{background:var(--wash);border-color:var(--indigo);color:var(--indigo);}
+  .nav-btn:active{transform:translateY(-50%) scale(0.94);}
+  .nav-btn.prev{left:16px;}
+  .nav-btn.next{right:16px;}
+  .nav-btn svg{width:18px;height:18px;}
+  .nav-btn:disabled{opacity:0.25;cursor:default;box-shadow:none;}
+
+  /* Index toggle + panel */
+  .index-toggle{
+    position:fixed;top:16px;right:16px;
+    background:var(--paper);border:1px solid var(--rule);color:var(--ink);
+    border-radius:8px;
+    padding:7px 14px;font:600 12px/1 'Inter','Noto Sans KR',sans-serif;
+    letter-spacing:0.04em;cursor:pointer;z-index:18;
+    box-shadow:0 2px 8px rgba(17,24,39,0.06);
+    transition:background .2s ease,border-color .2s ease,color .2s ease;
+  }
+  .index-toggle:hover{background:var(--wash);border-color:var(--indigo);color:var(--indigo);}
+  .index-panel{
+    position:fixed;inset:0;
+    background:rgba(238,241,246,0.97);
+    backdrop-filter:blur(4px);
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    z-index:25;padding:48px;
+  }
+  .index-panel.open{display:flex;}
+  .index-panel h2{font:800 26px 'Inter','Noto Sans KR',sans-serif;margin-bottom:6px;color:var(--ink);letter-spacing:-0.01em;}
+  .index-panel .sub{font:600 12px 'Inter','Noto Sans KR',sans-serif;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:24px;}
+  .index-grid{
+    display:grid;grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));gap:14px;
+    width:min(1100px,90%);max-height:70vh;overflow-y:auto;padding:8px 4px;
+  }
+  .thumb{position:relative;border:1px solid var(--rule);border-radius:10px;aspect-ratio:16/9;background:var(--paper);cursor:pointer;overflow:hidden;transition:transform .15s ease, box-shadow .2s ease, border-color .2s ease;}
+  .thumb:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(17,24,39,0.12);border-color:var(--indigo);}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .thumb .num{position:absolute;bottom:5px;right:6px;font:600 11px 'Inter',sans-serif;font-variant-numeric:tabular-nums;color:var(--ink-soft);background:rgba(255,255,255,0.9);padding:1px 6px;border-radius:5px;border:1px solid var(--rule);}
+  .index-close{position:absolute;top:24px;right:24px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;cursor:pointer;font:600 13px 'Inter','Noto Sans KR',sans-serif;color:var(--ink);letter-spacing:0.04em;padding:7px 14px;}
+  .index-close:hover{background:var(--wash);color:var(--indigo);}
+
+  /* Corner caption */
+  .corner-note{position:fixed;top:18px;left:24px;font:600 12px 'Inter','Noto Sans KR',sans-serif;color:var(--ink-soft);letter-spacing:0.02em;z-index:18;}
+  .corner-note .badge{display:inline-block;background:var(--indigo);color:#fff;border-radius:6px;padding:2px 8px;margin-right:8px;letter-spacing:0.06em;}
+
+  @media print{
+    body{background:white;}
+    .ribbon,.nav-btn,.index-toggle,.corner-note,.progress{display:none;}
+    .stage{padding:0;}
+    .slide-frame{border:none;box-shadow:none;border-radius:0;width:100%;height:100vh;}
+  }
+
+  @media (max-width: 720px){
+    .stage{padding:14px 14px 56px;}
+    .nav-btn{width:36px;height:36px;}
+    .nav-btn.prev{left:8px;}.nav-btn.next{right:8px;}
+    .ribbon{height:42px;padding:0 14px;font-size:12px;}
+    .ribbon .center{display:none;}
+    .corner-note{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<aside class="corner-note">
+  <span class="badge">오픈세션</span> 클로드 코드 × 생활기록부 자동화
+</aside>
+
+<button class="index-toggle" id="indexToggle">목차</button>
+
+<div class="stage">
+  <div class="slide-frame" id="frame" aria-roledescription="presentation"></div>
+</div>
+
+<button class="nav-btn prev" id="prev" aria-label="이전 슬라이드">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+</button>
+<button class="nav-btn next" id="next" aria-label="다음 슬라이드">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+
+<footer class="ribbon">
+  <div class="meta"><em>클로드 코드로 생활기록부 작업하기</em> — 한 명씩의 품질, 반 전체의 속도</div>
+  <div class="center">
+    <span class="em-rule"></span>
+    <span>AI Club · Open Session</span>
+    <span class="marker-dot"></span><span class="marker-dot amber"></span>
+    <span class="em-rule"></span>
+  </div>
+  <div class="counter" id="counter">01 / 14</div>
+</footer>
+
+<div class="index-panel" id="indexPanel" role="dialog" aria-modal="true" aria-label="슬라이드 목차">
+  <button class="index-close" id="indexClose">닫기</button>
+  <h2>슬라이드 목차</h2>
+  <div class="sub">클로드 코드 × 생활기록부 · 14 slides</div>
+  <div class="index-grid" id="indexGrid"></div>
+</div>
+
+<script>
+  const TOTAL = 14;
+  const frame = document.getElementById('frame');
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const indexToggle = document.getElementById('indexToggle');
+  const indexPanel = document.getElementById('indexPanel');
+  const indexClose = document.getElementById('indexClose');
+  const indexGrid = document.getElementById('indexGrid');
+
+  let current = 0;
+  function pad(n){return String(n).padStart(2,'0');}
+
+  // 8번 슬라이드(SKILL 소개)에 올릴 다운로드 버튼 설정
+  const SKILL_DL_SLIDE = 8;
+  const SKILL_DL_URL = 'https://drive.google.com/uc?export=download&id=1dSOipH1fRObUemVLoO2URd6xGMrD3Lw3';
+
+  for (let i = 1; i <= TOTAL; i++) {
+    const num = pad(i);
+    const div = document.createElement('div');
+    div.className = 'slide' + (i === 1 ? ' active' : '');
+    div.dataset.idx = i - 1;
+    const img = document.createElement('img');
+    img.src = 'images/slide-' + num + '.png';
+    img.alt = '슬라이드 ' + i;
+    img.loading = i <= 2 ? 'eager' : 'lazy';
+    div.appendChild(img);
+
+    if (i === SKILL_DL_SLIDE) {
+      const a = document.createElement('a');
+      a.className = 'skill-dl';
+      a.href = SKILL_DL_URL;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.setAttribute('aria-label', 'saenggibu-writer 스킬 다운로드');
+      a.innerHTML =
+        '<span class="pulse"></span>' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>' +
+        '<span>saenggibu-writer 스킬 다운로드</span>';
+      // 슬라이드 클릭(좌/우 이동)으로 전파되지 않게 차단 → 버튼은 다운로드만
+      a.addEventListener('click', (e) => { e.stopPropagation(); });
+      div.appendChild(a);
+    }
+
+    frame.appendChild(div);
+  }
+
+  for (let i = 1; i <= TOTAL; i++) {
+    const num = pad(i);
+    const t = document.createElement('div');
+    t.className = 'thumb';
+    t.dataset.idx = i - 1;
+    const tImg = document.createElement('img');
+    tImg.src = 'images/slide-' + num + '.png';
+    tImg.alt = '슬라이드 ' + i;
+    tImg.loading = 'lazy';
+    const n = document.createElement('span');
+    n.className = 'num';
+    n.textContent = num;
+    t.appendChild(tImg);
+    t.appendChild(n);
+    indexGrid.appendChild(t);
+  }
+
+  const slides = Array.from(frame.querySelectorAll('.slide'));
+
+  function show(idx){
+    if (idx < 0) idx = 0;
+    if (idx > TOTAL - 1) idx = TOTAL - 1;
+    slides[current].classList.remove('active');
+    slides[idx].classList.add('active');
+    current = idx;
+    counter.textContent = pad(current+1) + ' / ' + pad(TOTAL);
+    progress.style.width = ((current+1)/TOTAL*100) + '%';
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === TOTAL - 1);
+  }
+
+  function next(){ show(current + 1); }
+  function prev(){ show(current - 1); }
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  document.addEventListener('keydown', (e) => {
+    if (indexPanel.classList.contains('open')) {
+      if (e.key === 'Escape') closeIndex();
+      return;
+    }
+    if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(TOTAL - 1);
+    else if (e.key === 'Escape') closeIndex();
+    else if (e.key === 'g' || e.key === 'G') openIndex();
+  });
+
+  let wheelLock = false;
+  window.addEventListener('wheel', (e) => {
+    if (wheelLock) return;
+    if (Math.abs(e.deltaY) < 8) return;
+    wheelLock = true;
+    setTimeout(() => wheelLock = false, 420);
+    if (e.deltaY > 0) next(); else prev();
+  }, { passive: true });
+
+  let tx = null, ty = null;
+  window.addEventListener('touchstart', e => { const t = e.changedTouches[0]; tx = t.clientX; ty = t.clientY; }, { passive: true });
+  window.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { if (dx < 0) next(); else prev(); }
+    tx = ty = null;
+  }, { passive: true });
+
+  frame.addEventListener('click', (e) => {
+    const rect = frame.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width / 3) prev(); else next();
+  });
+
+  function openIndex(){ indexPanel.classList.add('open'); }
+  function closeIndex(){ indexPanel.classList.remove('open'); }
+  indexToggle.addEventListener('click', openIndex);
+  indexClose.addEventListener('click', closeIndex);
+  indexGrid.addEventListener('click', (e) => {
+    const t = e.target.closest('.thumb');
+    if (!t) return;
+    show(parseInt(t.dataset.idx, 10));
+    closeIndex();
+  });
+
+  show(0);
+</script>
+  <script type="module" src="../../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

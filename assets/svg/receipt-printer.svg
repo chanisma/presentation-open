@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 비스듬히 위에서 본 영수증 프린터. 종이가 앞면 아래 배출구(y≈172, x 50~490)로 나온다
+       (교사중심-AI지원체계 2장 「선도학교 과제의 영수증」). 완성도 높은 손그림 — 선 흔들림 최소,
+       윗면·앞면을 명도로 나누고 결 스트로크로만 손맛. 밝은 배경용 잉크 #16201b. 텍스트 없음.
+       팔레트: ink #16201b · front #27322d · top #3b4842 · window #dfe6e1 · base #46524b · slot #0b110e
+       앵커: 배출구 y≈172, x 50~490 · 상태 LED 자리 (60,112) -->
+
+  <!-- 윗면 (사다리꼴) -->
+  <path d="M70 18 C72 12 76 10 84 10 L456 10 C464 10 468 12 470 18 L516 88 L24 88 Z"
+        fill="#3b4842" stroke="#16201b" stroke-width="2.4" />
+  <!-- 용지 덮개 이음선과 롤 창 -->
+  <path d="M60 60 L480 60" stroke="#16201b" stroke-width="1.6" opacity=".7" />
+  <path d="M200 26 C220 20 320 20 340 26 L346 46 C326 52 214 52 194 46 Z" fill="#dfe6e1" stroke="#16201b" stroke-width="1.8" />
+  <path d="M214 34 C240 30 300 30 326 34" stroke="#16201b" stroke-width="1.2" opacity=".4" />
+  <!-- 윗면 반사 -->
+  <path d="M96 22 L180 22" stroke="#ffffff" stroke-width="3" opacity=".2" />
+  <path d="M370 22 L440 22" stroke="#ffffff" stroke-width="3" opacity=".14" />
+  <!-- 뚜껑 여는 단추 -->
+  <path d="M430 70 L470 70 C474 70 476 72 476 76 L476 80 L424 80 L424 76 C424 72 426 70 430 70 Z" fill="#6b776f" stroke="#16201b" stroke-width="1.6" />
+
+  <!-- 앞면 -->
+  <path d="M24 88 L516 88 L516 164 C516 172 510 176 502 176 L38 176 C30 176 24 172 24 164 Z"
+        fill="#27322d" stroke="#16201b" stroke-width="2.4" />
+  <!-- 톱니 절단 날 -->
+  <path d="M50 142 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8 l8 -8 l8 8"
+        stroke="#9aa39d" stroke-width="1.6" />
+  <!-- 배출구 -->
+  <path d="M46 152 L494 152 L494 172 L46 172 Z" fill="#0b110e" stroke="#16201b" stroke-width="2" />
+  <!-- 상태 표시 자리 (덱이 LED를 덮어 그린다) -->
+  <circle cx="60" cy="112" r="7" fill="#46524b" stroke="#16201b" stroke-width="1.6" />
+  <!-- 앞면 통풍 결 -->
+  <g stroke="#ffffff" stroke-width="1.6" opacity=".14">
+    <path d="M404 104 L404 124" /><path d="M416 104 L416 124" /><path d="M428 104 L428 124" /><path d="M440 104 L440 124" /><path d="M452 104 L452 124" /><path d="M464 104 L464 124" />
+  </g>
+  <!-- 받침 -->
+  <path d="M40 176 L54 186 L486 186 L500 176" fill="#46524b" stroke="#16201b" stroke-width="2" />
+</svg>

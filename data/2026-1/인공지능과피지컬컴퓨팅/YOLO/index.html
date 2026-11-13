@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO - 인공지능과 피지컬컴퓨팅</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- ml5.js for YOLO Demo -->
+    <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
+
+    <style>
+
+        :root {
+            --main: #3aaa5c;
+            --dark: #2d8a49;
+            --light: #e8f5e9;
+            --accent: #43b867;
+            --white: #ffffff;
+            --black: #333333;
+            --gray-100: #f5f5f5;
+            --gray-200: #eeeeee;
+            --gray-500: #9e9e9e;
+            --gray-600: #757575;
+            --gray-700: #616161;
+            font-size: clamp(16px, 1.5vw, 28px);
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0; padding: 0;
+            background-color: var(--gray-100);
+            color: var(--black);
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden; 
+            line-height: 1.6;
+        }
+
+        /* Typography */
+        h1, h2, h3 { font-family: 'Noto Sans KR', sans-serif; font-weight: 700; color: var(--black); margin-top: 0; word-break: keep-all; }
+        h1 { font-size: 2.2rem; margin-bottom: 0.4rem; line-height: 1.2;}
+        h2 { font-size: 1.5rem; margin-bottom: 0.8rem; }
+        h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+        p { font-size: 1rem; line-height: 1.5; margin-top: 0; margin-bottom: 0.4rem; word-break: keep-all;}
+        .font-mono { font-family: 'Space Mono', monospace; }
+
+        .text-gradient {
+            background: linear-gradient(90deg, var(--main), var(--dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--main);
+            display: inline-block;
+        }
+
+        /* 3. Slide Layouts */
+        .presentation { width: 100vw; height: 100vh; position: relative; }
+        .slide {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            padding: 2vh 3vw 6vh 3vw; /* 하단 네비게이션 공간 확보 */
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .slide.active { display: block; opacity: 1; }
+
+        .browser-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex; flex-direction: column;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .browser-topbar {
+            height: 2.5rem; background: var(--gray-100); border-bottom: 1px solid var(--gray-200);
+            display: flex; align-items: center; padding: 0 1rem; gap: 0.5rem;
+        }
+        .browser-topbar::before {
+            content: ''; display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+            background: #ff5f56; box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+        }
+
+        .browser-content { padding: 1.5rem 2rem; flex: 1; overflow-y: hidden; display: flex; flex-direction: column; justify-content: center; }
+
+        /* 4. Navigation Bar */
+        .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: linear-gradient(90deg, var(--main), var(--accent)); z-index: 1000; width: 0%; transition: width 0.3s linear; }
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 1rem; padding: 0.35rem 1.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--gray-200);
+            z-index: 999;
+        }
+        .nav-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 1.8rem; height: 1.8rem; border-radius: 50%;
+            background: transparent; border: 1.5px solid var(--gray-200); color: var(--gray-700);
+            cursor: pointer; transition: 0.2s; padding: 0;
+        }
+        .nav-btn:hover:not(:disabled) { background: var(--main); border-color: var(--main); color: var(--white); }
+        .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .nav-btn svg { width: 0.8rem; height: 0.8rem; fill: currentColor; }
+        .nav-counter { font-size: 14px; color: var(--gray-600); font-family: 'Space Mono'; display: flex; align-items: center; font-weight: bold;}
+        .slide-input { background: none; border: none; border-bottom: 1px solid transparent; color: inherit; font-family: inherit; font-weight: bold; width: 1.5rem; text-align: center; font-size: 14px; outline: none; }
+        .slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px;}
+
+        /* 5. Utility Components */
+        .center-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: center; height: 100%; }
+        
+        .badge {
+            display: inline-block; padding: 0.4em 1em; border-radius: 20px; font-size: 0.82rem; font-weight: bold;
+            background: var(--light); color: var(--dark);
+            border: 1px solid var(--main); margin-bottom: 1rem;
+        }
+
+        .highlight-box {
+            background: var(--gray-100); border-left: 4px solid var(--main);
+            padding: 1rem; border-radius: 0 8px 8px 0; margin-bottom: 0.8rem;
+        }
+
+        .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .info-card {
+            background: var(--white); padding: 1rem; border-radius: 12px;
+            border: 1px solid var(--gray-200); box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s;
+        }
+        .info-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: var(--main);}
+        .info-card .emoji { font-size: 1.8rem; margin-bottom: 0.2rem; display: block; }
+
+        /* Mockup for image */
+        .image-mockup { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; border: 1px solid var(--gray-200); }
+
+        /* ml5.js Demo Section */
+        .demo-layout { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; width: 100%;}
+        .canvas-container { 
+            position: relative; margin: 1.5rem 0; width: 100%; max-width: 800px; 
+            border: 2px solid var(--gray-200); border-radius: 12px; overflow: hidden; background: #000;
+            display: flex; justify-content: center; align-items: center; min-height: 400px;
+        }
+        #demoImage { display: none; }
+        #demoCanvas { max-width: 100%; display: block; object-fit: contain; }
+        .control-panel { 
+            display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px;
+            background: var(--gray-100); padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200);
+        }
+        .btn-neon {
+            background: var(--main); color: var(--white); border: none;
+            padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
+        }
+        .btn-neon:hover { background: var(--dark); }
+        .status-text { color: var(--gray-600); font-weight: bold; font-size: 0.9rem;}
+        
+        /* Normal List */
+        .timeline-list { list-style-type: disc; padding-left: 1.5rem; margin: 0.5rem 0; }
+        .timeline-list li { padding-bottom: 0.6rem; line-height: 1.4; }
+        .timeline-list li::marker { color: var(--main); }
+        .timeline-list li:last-child { padding-bottom: 0; }
+
+        /* Keyframes */
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(5%, 5%); } }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    
+        <div class="glow-blob blob-2"></div>
+        <div class="glow-blob blob-3"></div>
+    </div>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="presentation" id="presentation">
+        
+        <!-- Slide 1: Cover -->
+        <div class="slide active" id="slide1">
+            <div class="center-slide" style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div class="badge">인공지능과 피지컬컴퓨팅</div>
+                <h1 class="text-gradient" style="font-size: 5rem; margin-bottom: 0.5rem; margin-top:0;">YOLO</h1>
+                <h2 style="border: none; color: var(--gray-600); font-family: 'Noto Sans KR'; font-size: 1.8rem; font-weight: 300;">You Only Look Once:<br>한 번만 보고 다 아는 객체 인식의 마법</h2>
+            </div>
+        </div>
+
+        <!-- Slide 2: 목차 (TOC) -->
+        <div class="slide" id="slide2">
+            <div class="browser-card">
+                <div class="browser-topbar"></div>
+                <div class="browser-content">
+                    <h2>오늘의 <span class="text-gradient">학습 여정</span></h2>
+                    <ul class="toc-list" style="list-style: none; max-width: 800px; margin: 2rem auto;">
+                        <li class="toc-item" onclick="goToSlide(2)">
+                            <div class="toc-num">1</div>
+                            <div>
+                                <h3 style="margin-bottom:0.2rem; font-family:'Noto Sans KR';">YOLO의 등장!</h3>
+                                <div style="font-size: 0.9rem; color: var(--gray-600); opacity: 0.8;">분류를 넘어 위치까지 찾아내는 AI 모델</div>
+                            </div>
+                        </li>
+                        <li class="toc-item" onclick="goToSlide(4)">
+                            <div class="toc-num">2</div>
+                            <div>
+                                <h3 style="margin-bottom:0.2rem; font-family:'Noto Sans KR';">사각형 상자의 비밀</h3>
+                                <div style="font-size: 0.9rem; color: var(--gray-600); opacity: 0.8;">Bounding Box는 어떻게 만들어지는가?</div>
+                            </div>
+                        </li>
+                        <li class="toc-item" onclick="goToSlide(7)">
+                            <div class="toc-num">3</div>
+                            <div>
+                                <h3 style="margin-bottom:0.2rem; font-family:'Noto Sans KR';">실전! YOLO 실습</h3>
+                                <div style="font-size: 0.9rem; color: var(--gray-600); opacity: 0.8;">웹 브라우저에서 실시간 객체 탐지 구동하기</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Slide 3: YOLO 개요 (section-overview) -->
+        <div class="slide" id="slide3">
+            <div class="browser-card">
+                <div class="browser-topbar"></div>
+                <div class="browser-content">
+                    <h2><span style="color:var(--glow-3);">1.</span> YOLO란 무슨 뜻일까?</h2>
+                    
+                    <div style="text-align: center; margin: 1.5rem 0 2.5rem 0;">
+                        <h1 class="text-gradient" style="font-size: 3.5rem;">You Only Look Once</h1>
+                        <p style="font-size: 1.2rem; opacity: 0.9;">"너는 한 번만 본다" — <strong>단 한 번의 신경망 계산으로</strong> 전체 이미지를 파악함</p>
+                    </div>
+
+                    <div class="card-grid">
+                        <div class="info-card">
+                            <span class="emoji">⚡</span>
+                            <h3>엄청 빠른 속도</h3>
+                            <p>기존 방식은 물체가 있을 법한 곳을 수천 번 탐색했지만, YOLO는 이미지를 한 번에 쓱 훑어보고 계산을 끝냅니다.</p>
+                        </div>
+                        <div class="info-card">
+                            <span class="emoji">🎯</span>
+                            <h3>위치와 종류 동시 파악</h3>
+                            <p>이미지가 <strong>무엇(Classification)</strong>인지와 <strong>어디(Localization)</strong>에 있는지를 동시에 예측합니다.</p>
+                        </div>
+                        <div class="info-card">
+                            <span class="emoji">🚗</span>
+                            <h3>실시간 활용</h3>
+                            <p>동영상이나 자율주행 자동차, CCTV 시스템에서도 끊기지 않고 부드럽게 돌아갈 만큼 빠릅니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: YOLO 기반 CNN (Card Grid) -->
+        <div class="slide" id="slide4">
+            <div class="browser-card">
+                <div class="browser-topbar"></div>
+                <div class="browser-content">
+                    <h2><span style="color:var(--glow-3);">2.</span> YOLO에서 CNN은 어떻게 쓰일까?</h2>
+                    <p style="margin-bottom: 2rem;">YOLO의 뼈대(Backbone)는 <strong>우리가 지난 시간에 배운 CNN</strong>으로 이루어져 있습니다!</p>
+
+                    <div class="grid-2" style="align-items: start;">
+                        <div class="highlight-box" style="border-color: var(--main); background: var(--light)">
+                            <h3 style="color: var(--main); margin-top:0;">CNN (입력 → 특징 추출)</h3>
+                            <p>카메라에서 들어온 거대한 이미지 데이터를 여러 번의 합성곱과 풀링을 거쳐 작은 크기의 특징 지도(Feature Map)로 압축합니다.</p>
+                            <div style="font-size:3rem; text-align:center; padding:1rem 0;">🖼️ ➡️ 🧩</div>
+                        </div>
+                        <div class="highlight-box">
+                            <h3 style="margin-top:0;">YOLO Layer (출력 → 위치 찾기)</h3>
+                            <p>CNN이 찾아낸 퍼즐 조각(특징)들을 바탕으로, 이미지를 격자(Grid)로 나누고 사물이 있는 <strong style="color: var(--main)">중심점과 상자 크기</strong>를 추리합니다.</p>
+                            <div style="font-size:3rem; text-align:center; padding:1rem 0;">🧩 ➡️ 📦</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <span class="badge" style="font-size: 1rem;">결론: CNN 기술이 없었으면 YOLO도 탄생할 수 없었습니다!</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: 바운딩 박스 만들어지는 원리 (image-focus) -->
+        <div class="slide" id="slide5">
+            <div class="browser-card">
+                <div class="browser-topbar"></div>
+                <div class="browser-content">
+                    <h2><span style="color:var(--glow-3);">3.</span> 사각형 상자(Bounding Box)는 어떻게 그려질까?</h2>
+                    
+                    <div class="grid-2">
+                        <div class="center-slide">
+                            <!-- Wrap the image tightly so inset:0 for the grid exactly matches the image dimensions -->
+                            <div style="position: relative; display: inline-block; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=400&q=80" alt="Cat Example" style="max-height: 480px; width: auto; display: block;">
+                                
+                                <!-- 3x3 Grid Overlay -->
+                                <div style="display:grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); position:absolute; inset:0; z-index: 5;">
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                    <div style="border: 1px dashed rgba(255,255,255,0.7);"></div>
+                                </div>
+
+                                <!-- Bounding Box -->
+                                <div style="position:absolute; width: 68%; height: 86%; border: 3px solid var(--main); left: 15%; top: 9%; display:flex; flex-direction:column; justify-content:space-between; z-index: 10;">
+                                    <span style="background:var(--main); color:#fff; font-family:'Space Mono'; font-size:0.85rem; font-weight:bold; padding:2px 6px; align-self:flex-start;">cat 99%</span>
+                                    <!-- Center Dot -->
+                                    <div style="position:absolute; top: 50%; left: 50%; width:6px; height:6px; background:var(--white); border-radius:50%; transform:translate(-50%, -50%); box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <ul class="timeline-list">
+                                <li><strong>1. 이미지 분할 (Grid 시스템)</strong><br>전체를 바둑판(Grid) 형태로 나눕니다.</li>
+                                <li><strong>2. 중심점 확인</strong><br>물체의 중심이 어느 특정 격자(Grid cell) 안에 존재하는지 찾고, 그 격자가 예측을 책임집니다.</li>
+                                <li><strong>3. 기준 상자 (Anchor Box)</strong><br>대략적인 크기(예: 길쭉한 사람, 납작한 자동차)를 기준으로 상자를 늘립니다.</li>
+                                <li><strong>4. 신뢰도 판별 (Confidence Score)</strong><br>"이 안에 물체가 확실히 있는가?", "그 물체가 고양이일 확률"을 더해 최종 라벨을 박스 위에 띄웁니다!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <!-- Slide 6: YOLO 활용 사례 -->
+        <div class="slide" id="slide6">
+            <div class="browser-card">
+                <div class="browser-topbar"></div>
+                <div class="browser-content">
+                    <h2><span style="color:var(--main);">4.</span> YOLO는 언제 어디에 쓰일까?</h2>
+                    <p style="margin-bottom: 1rem;">"한 번만 봐도 아는" 엄청난 눈치와 스피드 덕분에 우리 주변 곳곳에서 활약하고 있습니다.</p>
+
+                    <div>
+                        <ul class="timeline-list">
+                            <li>
+                                <strong style="color: var(--main); font-size: 1.1em;">자율주행 자동차 🚗</strong><br>
+                                도로 위의 앞차, 신호등, 보행자를 빛의 속도로 파악해서 피하거나 멈춰야 합니다.
+                            </li>
+                            <li>
+                                <strong style="color: var(--main); font-size: 1.1em;">무인 매장 (ex. 아마존 고) 🛒</strong><br>
+                                고객이 어떤 물건을 집어 들었는지 천장에 달린 수십 대의 카메라가 즉시 인식해서 지갑 없이 결제되도록 돕습니다.
+                            </li>
+                            <li>
+                                <strong style="color: var(--main); font-size: 1.1em;">스마트 CCTV & 방범 🚨</strong><br>
+                                도둑이나 위험한 무기(칼 등)를 들고 있는 사람을 화면 안에서 발견 즉시 경찰에 알려줍니다.
+                            </li>
+                            <li>
+                                <strong style="color: var(--main); font-size: 1.1em;">불량품 검사 과정 🏭</strong><br>
+                                초고속으로 움직이는 공장 컨베이어 벨트 위에서 불량 사과나 부서진 플라스틱을 골라내는 데 쓰입니다.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: 실습 도구 소개 (활동 리스트) -->
+        <div class="slide" id="slide7">
+            <div class="browser-card">
+                <div class="browser-topbar"></div>
+                <div class="browser-content">
+                    <h2><span style="color:var(--glow-3);">5.</span> 오늘 우리가 사용할 마법 도구 (ml5.js)</h2>
+                    
+                    <div class="highlight-box" style="text-align:center;">
+                        <h3 style="margin-top:0;">ml5.js 란? 🤔</h3>
+                        <p style="font-size:1rem;">"누구나 웹 브라우저에서 인공지능을 쉽게 접근할 수 있게 하자!"</p>
+                    </div>
+
+                    <div class="card-grid" style="margin-top: 1rem;">
+                        <div class="info-card" style="border-color: var(--main);">
+                            <span class="emoji">🌐</span>
+                            <h3 style="color:var(--black);">설치가 필요 없어요</h3>
+                            <p>파이썬이나 무거운 라이브러리를 설치할 필요 없이 웹 브라우저 하나만 있으면 준비 끝!</p>
+                        </div>
+                        <div class="info-card" style="border-color: var(--dark);">
+                            <span class="emoji">🧠</span>
+                            <h3 style="color:var(--black);">미리 학습된 모델 (Pre-trained)</h3>
+                            <p>수백만 장의 사진을 훈련한 <strong>COCO-SSD 모델</strong>을 사용합니다. 80종류의 흔한 사물을 찾을 수 있어요.</p>
+                        </div>
+                        <div class="info-card" style="border-color: var(--main);">
+                            <span class="emoji">🎨</span>
+                            <h3 style="color:var(--black);">자바스크립트 활용</h3>
+                            <p>AI가 찾아낸 특징과 위치 정보를 이용해, 이미지 위에 직접 네온 박스(Bounding Box)를 그려보는 실습입니다.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align:center; margin-top: 1.5rem;">
+                        <p style="font-size: 1.1rem; font-weight: bold; color: var(--dark);">다음 슬라이드에서 직접 경험해 봅시다!</p>
+                        <p style="font-size: 0.9rem;">(다음 페이지를 넘기면 인공지능 모델 다운로드 시간이 1~3초 가량 필요합니다)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Interactive Demo (JavaScript 기반) -->
+        <div class="slide" id="slide8">
+            <div class="browser-card">
+                <div class="browser-topbar"></div>
+                <div class="browser-content">
+                    <h2><span style="color:var(--glow-3);">실습:</span> 인공지능으로 사진 속 사물 찾기</h2>
+                    
+                    <div class="demo-layout">
+                        <div class="control-panel">
+                            <div>
+                                <label for="imageUpload" class="btn-neon">새 사진 올리기 📸</label>
+                                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="status-text" id="aiStatus">🤖 현재 페이지에서 모델이 로딩 중입니다...</div>
+                        </div>
+                        
+                        <div class="canvas-container" style="margin: 0.5rem 0;">
+                            <canvas id="demoCanvas"></canvas>
+                            <!-- Use a placeholder image initially -->
+                            <img id="demoImage" src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=800&q=80" crossorigin="anonymous">
+                            
+                            <div id="loadingOverlay" style="position:absolute; inset:0; background:rgba(255,255,255,0.9); display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:100; display:none;">
+                                <div style="width: 40px; height: 40px; border: 4px solid rgba(0,255,136,0.2); border-top: 4px solid var(--glow-1); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+                                <span style="color:var(--glow-1); font-family:'Space Mono';" id="loadingText">AI 모델 로딩 중...</span>
+                            </div>
+                        </div>
+                        <p style="font-size:0.9rem; color:var(--text-body); max-width: 800px; text-align:center;">
+                            * COCO-SSD 모델은 80가지 종류의 일반적인 사물(cat, dog, car, person 등)을 구분할 수 있습니다.<br>위에 있는 버튼을 눌러 본인의 사진이나 저장된 이미지로 테스트해 보세요!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: 마무리 -->
+        <div class="slide" id="slide9">
+            <div class="center-slide">
+                <div style="margin-bottom: 2rem;">
+                    <span style="font-size: 5rem;">🚀</span>
+                </div>
+                <h1 class="text-gradient">수고하셨습니다!</h1>
+                <div class="highlight-box" style="text-align:left; display:inline-block; max-width:800px; margin-top:2rem;">
+                    <h3 style="color: var(--main); margin-top:0;">오늘의 핵심 3가지</h3>
+                    <ul class="timeline-list">
+                        <li><strong>YOLO의 뜻:</strong> 분류와 위치 찾기를 단 한 번의 과정으로 끝내는 똑똑한 AI 모델</li>
+                        <li><strong>CNN 뼈대(Backbone):</strong> 이미지 데이터에서 거시적 특징을 뽑아내는 핵심 도구</li>
+                        <li><strong>가상의 바둑판 표(Grid):</strong> 각 셀(Cell)마다 자신에게 속한 물체의 Bounding Box를 계산하기 위해 협동</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 3rem; font-family:'Space Mono'; color:var(--text-body); font-size: 0.9rem;">
+                    [인공지능과 피지컬컴퓨팅] 수업 자료 END.
+                </div>
+            </div>
+        </div>
+      <style>
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(5%, 5%); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      </style>
+
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전">
+            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        </button>
+        <div class="nav-counter">
+            <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력">
+            <span>&nbsp;/ <span id="totalSlides">0</span></span>
+        </div>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음">
+            <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+        </button>
+    </div>
+
+    <script>
+        // Navigation Logic
+        let currentSlide = 0;
+        let slides = [];
+        let slideInput = document.getElementById('slideInput');
+        let totalCountElem = document.getElementById('totalSlides');
+        
+        function initNav() {
+            slides = document.querySelectorAll('.slide');
+            totalCountElem.textContent = slides.length;
+            updateSlides();
+        }
+
+        function updateSlides() {
+            slides.forEach((s, i) => {
+                if(i === currentSlide) s.classList.add('active');
+                else s.classList.remove('active');
+            });
+            
+            document.getElementById('prevBtn').disabled = (currentSlide === 0);
+            document.getElementById('nextBtn').disabled = (currentSlide === slides.length - 1);
+            
+            slideInput.value = currentSlide + 1;
+            document.getElementById('progressBar').style.width = ((currentSlide) / (slides.length - 1 || 1) * 100) + '%';
+        }
+
+        function nextSlide() { if(currentSlide < slides.length - 1) { currentSlide++; updateSlides(); } }
+        function prevSlide() { if(currentSlide > 0) { currentSlide--; updateSlides(); } }
+        function goToSlide(index) { if(index >= 0 && index < slides.length) { currentSlide = index; updateSlides(); } }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target === slideInput) {
+                if(e.key === 'Enter') {
+                    let val = parseInt(slideInput.value) - 1;
+                    if(!isNaN(val)) goToSlide(val);
+                    slideInput.blur();
+                } else if(e.key === 'Escape') {
+                    slideInput.value = currentSlide + 1;
+                    slideInput.blur();
+                }
+                e.stopPropagation();
+                return;
+            }
+            if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+            else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+            else if (e.key === 'End')  { e.preventDefault(); goToSlide(slides.length - 1); }
+        });
+
+        // Wheel navigation (debounce)
+        let wheelLocked = false;
+        document.addEventListener('wheel', (e) => {
+            if (wheelLocked || e.target.closest('.browser-content:not(:hover)')) return; 
+            // Only trigger if not scrolling inner content
+            let contentDiv = e.target.closest('.browser-content');
+            if(contentDiv && (contentDiv.scrollHeight > contentDiv.clientHeight)) {
+                // If content is scrollable and not at boundaries, let it scroll
+                let isAtBottom = contentDiv.scrollTop + contentDiv.clientHeight >= contentDiv.scrollHeight - 1;
+                let isAtTop = contentDiv.scrollTop <= 0;
+                if((e.deltaY > 0 && !isAtBottom) || (e.deltaY < 0 && !isAtTop)) return;
+            }
+
+            wheelLocked = true;
+            if (e.deltaY > 0) nextSlide();
+            else if (e.deltaY < 0) prevSlide();
+            setTimeout(() => { wheelLocked = false; }, 600);
+        });
+
+        window.onload = () => { 
+            initNav(); 
+            // 프레젠테이션 시작시 백그라운드 모델 로딩 시작
+            if (!modelInitialized) {
+                modelInitialized = true;
+                initModel();
+            }
+        };
+
+        // ml5.js Object Detection Logic
+        let objectDetector;
+        let imgElem = document.getElementById('demoImage');
+        let canvasElem = document.getElementById('demoCanvas');
+        let ctx = canvasElem ? canvasElem.getContext('2d', { willReadFrequently: true }) : null;
+        let aiStatus = document.getElementById('aiStatus');
+        let loadingOverlay = document.getElementById('loadingOverlay');
+        let isModelLoaded = false;
+        let modelInitialized = false;
+
+        function checkDemoSlide() {
+            if(slides && slides[currentSlide] && slides[currentSlide].id === 'slide8') {
+                if(!isModelLoaded) {
+                    if(loadingOverlay) loadingOverlay.style.display = 'flex';
+                } else {
+                    // 모델이 이미 로드되었으면 바로 오브젝트 디텍션
+                    detectObjects();
+                }
+            }
+        }
+
+        // Hack into updateSlides to trigger checkDemoSlide
+        const oldUpdateSlides = updateSlides;
+        updateSlides = function() {
+            oldUpdateSlides();
+            checkDemoSlide();
+        };
+
+        function initModel() {
+            if(aiStatus && aiStatus.closest('.slide').classList.contains('active')) {
+                // UI status update mainly if we are on slide 9 initially
+            }
+            if (window.ml5 && ml5.objectDetector) {
+                objectDetector = ml5.objectDetector('cocossd', modelLoaded);
+            } else {
+                if(aiStatus) aiStatus.textContent = "❌ 인터넷 속도가 느려 ml5.js 로드 실패";
+                if(loadingOverlay) loadingOverlay.style.display = 'none';
+            }
+        }
+
+        function modelLoaded() {
+            isModelLoaded = true;
+            if(aiStatus) aiStatus.textContent = "✨ AI 모델 준비 완료!";
+            if(loadingOverlay) loadingOverlay.style.display = 'none';
+            detectObjects();
+        }
+
+        function resizeCanvas() {
+            if(!canvasElem || !imgElem) return;
+            // Get original natural dimensions
+            let nw = imgElem.naturalWidth;
+            let nh = imgElem.naturalHeight;
+            if(nw === 0 || nh === 0) return;
+            
+            // Set canvas size back to 0 temporarily to get image displayed size
+            canvasElem.style.width = '100%';
+            canvasElem.style.height = 'auto';
+            let ratio = nw / nh;
+            
+            let containerWidth = canvasElem.parentElement ? canvasElem.parentElement.clientWidth : nw;
+            let displayHeight = Math.min(containerWidth / ratio, 400); 
+            
+            // Set actual canvas bounds to natural for high resolution drawing
+            canvasElem.width = nw;
+            canvasElem.height = nh;
+            ctx.drawImage(imgElem, 0, 0, canvasElem.width, canvasElem.height);
+            
+            // Set inline display size
+            canvasElem.style.maxHeight = '50vh';
+        }
+
+        function detectObjects() {
+            if (!isModelLoaded) return;
+            if(aiStatus) aiStatus.textContent = "🔍 화면 내 사물 탐색 중...";
+            if(loadingOverlay) { loadingOverlay.style.display = 'flex'; document.getElementById('loadingText').textContent = '분석 중...'; }
+            
+            // Make sure the image is drawn first
+            resizeCanvas();
+            
+            if(objectDetector) {
+                objectDetector.detect(canvasElem, (err, results) => {
+                    if(loadingOverlay) loadingOverlay.style.display = 'none';
+                    if (err) { console.error(err); return; }
+                    
+                    drawResults(results);
+                    if(aiStatus) aiStatus.innerHTML = `✅ 분석 완료 (찾아낸 사물: <strong style="color:var(--dark); font-size:1.2em;">${results.length}</strong>개)`;
+                });
+            }
+        }
+
+        function drawResults(results) {
+            ctx.drawImage(imgElem, 0, 0, canvasElem.width, canvasElem.height);
+            for (let i = 0; i < results.length; i++) {
+                let object = results[i];
+                // Draw bound box
+                ctx.strokeStyle = '#3aaa5c'; // Neon Green
+                ctx.lineWidth = Math.max(3, canvasElem.width * 0.005);
+                ctx.strokeRect(object.x, object.y, object.width, object.height);
+                
+                // Draw text bg
+                ctx.fillStyle = '#3aaa5c'; // panel bg
+                let text = object.label + " " + Math.round(object.confidence * 100) + "%";
+                ctx.font = `bold ${Math.max(20, canvasElem.width * 0.03)}px "Space Mono", Noto Sans KR`;
+                let textWidth = ctx.measureText(text).width;
+                let textHeight = Math.max(30, canvasElem.width * 0.04);
+                
+                ctx.fillRect(object.x, object.y - textHeight, textWidth + parseInt(textHeight*0.4), textHeight);
+                
+                // Draw label text
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(text, object.x + parseInt(textHeight*0.2), object.y - parseInt(textHeight*0.2));
+            }
+        }
+
+        // Image upload handling
+        let uploadBtn = document.getElementById('imageUpload');
+        if(uploadBtn) {
+            uploadBtn.addEventListener('change', function(e) {
+                let file = e.target.files[0];
+                if(!file) return;
+                let reader = new FileReader();
+                reader.onload = function(event) {
+                    imgElem.crossOrigin = "anonymous";
+                    imgElem.onload = function() {
+                        if(isModelLoaded) setTimeout(detectObjects, 50);
+                    }
+                    imgElem.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Connect neon button to real file input
+        let neonLabels = document.querySelectorAll('label[for="imageUpload"]');
+        neonLabels.forEach(p => p.addEventListener('click', (e) => {
+             // Since it's a label, clicking it automatically triggers the input, but we can prevent double triggers.
+             // Just let label feature handle it
+        }));
+        
+        // Let's make sure initial image works
+        if(imgElem) {
+            imgElem.onload = () => { if(isModelLoaded) setTimeout(detectObjects, 50); };
+        }
+
+    </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

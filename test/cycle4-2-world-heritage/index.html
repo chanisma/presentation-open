@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>유네스코 세계 문화유산으로 떠나는 여행</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #1A1208;
+      --style-primary: #C9A84C;
+      --style-accent: #8A7340;
+      --style-text: #D4BF9A;
+      --style-text-secondary: #8A7340;
+      --border-gold: #3D2E10;
+      --white: #FFFFFF;
+      --gray-200: #3D2E10;
+      --gray-600: #8A7340;
+      --gray-700: #6B5A30;
+      --main: #C9A84C;
+      --light: rgba(201,168,76,0.1);
+    }
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'EB Garamond', 'Noto Sans KR', Georgia, serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden;
+      height: 100%;
+    }
+    h1, h2, h3 { font-family: 'Playfair Display', 'Noto Sans KR', serif; color: var(--style-primary); }
+    h1 { font-size: 2.4rem; font-weight: 700; font-style: italic; }
+    h2 { font-size: 1.5rem; font-weight: 700; }
+    h3 { font-size: 1.15rem; font-weight: 600; }
+    p { font-size: 1rem; line-height: 1.8; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-primary); color: var(--style-bg); padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; border-radius: 0 0 4px 0; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-contrast: high) {
+      :root { --style-primary: #FFD700; --style-text: #FFFFFF; --style-bg: #000; }
+      .browser-card { border: 2px solid #FFD700; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--style-primary); z-index: 1000; transition: width 0.3s ease; will-change: width; }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0.8rem 1.2rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .browser-content { animation: slideIn 0.35s ease both; }
+
+    /* Dark Academia Browser Card */
+    .browser-card {
+      width: 100%; max-width: 1200px; max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column; overflow: hidden;
+      background: rgba(26,18,8,0.95); border: 2px solid var(--border-gold);
+      border-radius: 0.6rem; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .browser-card::before {
+      content: ''; position: absolute; inset: 6px; border: 1px solid rgba(201,168,76,0.15); border-radius: 0.4rem; pointer-events: none; z-index: 1;
+    }
+    .browser-topbar { display: flex; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--border-gold); position: relative; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .dot.red { background: #8B4513; }
+    .dot.yellow { background: #C9A84C; }
+    .dot.green { background: #6B8E23; }
+    .topbar-title { font-family: 'Space Mono', monospace; font-size: 0.82rem; color: var(--style-accent); font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; position: absolute; left: 50%; transform: translateX(-50%); }
+    .browser-content { flex: 1; overflow-y: auto; padding: 1.2rem 2rem 1rem; position: relative; z-index: 2; }
+
+    /* Decorative rule */
+    .ornament-rule { width: 80px; height: 1px; background: var(--style-primary); margin: 0.5rem auto 0.8rem; position: relative; }
+    .ornament-rule::before, .ornament-rule::after { content: ''; position: absolute; top: -2px; width: 5px; height: 5px; background: var(--style-primary); border-radius: 50%; }
+    .ornament-rule::before { left: -8px; }
+    .ornament-rule::after { right: -8px; }
+
+    /* Cover */
+    .cover-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 60vh; position: relative; }
+    .cover-bg { position: absolute; inset: 0; z-index: 0; }
+    .cover-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.2; }
+    .cover-content { position: relative; z-index: 1; }
+    .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 0; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; border: 1px solid var(--style-primary); }
+    .main-badge { background: transparent; color: var(--style-primary); margin-bottom: 0.8rem; font-family: 'Space Mono', monospace; }
+    .cover-title { margin-bottom: 0.3rem; letter-spacing: 0.03em; }
+    .cover-subtitle { font-size: 1rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; letter-spacing: 0.08em; margin-bottom: 1rem; }
+    .cover-divider { width: 80px; height: 1px; background: var(--style-primary); margin: 0.8rem auto; }
+    .cover-meta { font-size: 0.88rem; color: var(--style-text-secondary); display: flex; gap: 0.5rem; justify-content: center; font-family: 'Space Mono', monospace; letter-spacing: 0.05em; }
+
+    /* Section header */
+    .section-header { margin-bottom: 0.6rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text-secondary); margin-top: 0.2rem; font-style: italic; }
+
+    /* Highlight box */
+    .highlight-box { background: rgba(201,168,76,0.06); border-left: 3px solid var(--style-primary); padding: 0.6rem 1rem; border-radius: 0 0.3rem 0.3rem 0; margin: 0.6rem 0; font-size: 0.95rem; }
+
+    /* Definition card */
+    .definition-card { background: rgba(201,168,76,0.05); border: 1px solid var(--border-gold); border-radius: 0.5rem; padding: 1.2rem 1.5rem; margin: 0.6rem 0; text-align: center; }
+    .definition-term { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-style: italic; color: var(--style-primary); margin-bottom: 0.5rem; }
+    .definition-text { font-size: 1rem; line-height: 1.8; }
+
+    /* Key points */
+    .key-points { list-style: none; padding: 0; }
+    .key-points li { padding: 0.5rem 0.8rem; margin-bottom: 0.4rem; background: rgba(201,168,76,0.05); border: 1px solid var(--border-gold); border-radius: 0.3rem; font-size: 0.95rem; }
+
+    /* Two Column with image */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: start; margin-top: 0.5rem; }
+    .col-image { width: 100%; max-height: 320px; object-fit: cover; border-radius: 0.3rem; box-shadow: 0 4px 16px rgba(0,0,0,0.4); border: 1px solid var(--border-gold); }
+    .col-list { list-style: none; padding: 0; }
+    .col-list li { font-size: 0.95rem; padding: 0.35rem 0; border-bottom: 1px solid var(--border-gold); padding-left: 1.2em; position: relative; }
+    .col-list li::before { content: '\2014'; position: absolute; left: 0; color: var(--style-primary); font-weight: 700; }
+
+    /* Image Focus */
+    .image-focus { text-align: center; margin: 0.5rem 0; }
+    .image-container { max-width: 70%; margin: 0 auto; border-radius: 0.3rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.4); border: 2px solid var(--border-gold); }
+    .image-container img { width: 100%; height: auto; display: block; }
+    .image-caption { margin-top: 0.5rem; font-size: 0.85rem; color: var(--style-text-secondary); font-style: italic; font-family: 'Space Mono', monospace; letter-spacing: 0.03em; }
+    .image-placeholder { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; background: rgba(201,168,76,0.03); border: 2px dashed var(--border-gold); border-radius: 0.3rem; color: var(--style-text-secondary); }
+    .placeholder-icon { font-size: 2rem; }
+    .placeholder-text { font-size: 0.85rem; margin-top: 0.3rem; }
+
+    /* Card Grid */
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.6rem; }
+    .card { background: rgba(201,168,76,0.04); border: 1px solid var(--border-gold); border-radius: 0.4rem; padding: 0.7rem; text-align: center; }
+    .card-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 0.95rem; font-family: 'Playfair Display', serif; color: var(--style-primary); margin-bottom: 0.15rem; }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* Process Steps */
+    .process-steps { list-style: none; padding: 0; counter-reset: step; }
+    .process-steps li { counter-increment: step; position: relative; padding: 0.6rem 0.8rem 0.6rem 2.5rem; margin-bottom: 0.4rem; background: rgba(201,168,76,0.04); border: 1px solid var(--border-gold); border-radius: 0.3rem; font-size: 0.95rem; }
+    .process-steps li::before { content: counter(step, upper-roman); position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); font-family: 'Playfair Display', serif; font-style: italic; color: var(--style-primary); font-size: 1rem; font-weight: 700; }
+
+    /* Comparison Table */
+    .table-wrapper { overflow-x: auto; margin: 0.6rem 0; border-radius: 0.3rem; }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .comparison-table th, .comparison-table td { padding: 0.5rem 0.7rem; border: 1px solid var(--border-gold); text-align: left; }
+    .comparison-table thead th { background: rgba(201,168,76,0.1); color: var(--style-primary); font-family: 'Playfair Display', serif; font-weight: 600; }
+    .comparison-table tbody th { color: var(--style-primary); font-weight: 600; }
+
+    /* End Slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 55vh; }
+    .end-title { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .end-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-top: 0.8rem; font-style: italic; }
+    .end-summary { text-align: left; max-width: 500px; margin-top: 1rem; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 0.25rem 0; font-size: 0.95rem; }
+
+    /* Animations */
+    @keyframes popUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .key-points li { animation: popUp 0.4s ease-out both; }
+    .slide.active .key-points li:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .key-points li:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .process-steps li { animation: popUp 0.4s ease-out both; }
+    .slide.active .process-steps li:nth-child(2) { animation-delay: 0.1s; }
+    .slide.active .process-steps li:nth-child(3) { animation-delay: 0.2s; }
+    .slide.active .process-steps li:nth-child(4) { animation-delay: 0.3s; }
+
+    /* Nav Bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.35rem 1.5rem; background: rgba(26,18,8,0.92); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-gold); z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--border-gold); border-radius: 50%; background: rgba(201,168,76,0.08);
+      cursor: pointer; font-size: 0; color: var(--style-text-secondary); transition: all 0.2s; padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: var(--style-primary); color: var(--style-bg); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--style-bg); }
+    .nav-btn:focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter { font-size: 13px; font-weight: 700; color: var(--gray-600); min-width: 3rem; text-align: center; display: flex; align-items: center; gap: 0.15rem; line-height: 1; }
+    .slide-input { width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent; background: transparent; font-size: 13px; font-weight: 700; color: var(--style-text-secondary); font-family: inherit; padding: 0; outline: none; cursor: pointer; transition: border-color 0.2s; line-height: 1; }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-primary); background: var(--light); border-radius: 4px; }
+
+    /* Responsive */
+    @media (max-width: 1024px) { html, body { font-size: clamp(15px, 2vw, 22px); } .slide { padding: 1.5rem; } .browser-card { border-radius: 0.5rem; } }
+    @media (max-width: 768px) { html, body { font-size: clamp(14px, 3vw, 20px); } .card-grid, .two-col { grid-template-columns: 1fr; } h1 { font-size: 2rem; } h2 { font-size: 1.3rem; } }
+    @media (max-width: 480px) { html, body { font-size: clamp(14px, 3.5vw, 18px); } .nav-btn { width: 1.5rem; height: 1.5rem; } .nav-bar { padding: 0.25rem 0.75rem; } h1 { font-size: 1.7rem; } h2 { font-size: 1.2rem; } .browser-content { padding: 0.8rem; } }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="10" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 세계 문화유산 여행">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">WORLD HERITAGE</span>
+        </div>
+        <div class="browser-content cover-slide" style="overflow:hidden;">
+          <div class="cover-bg">
+            <img src="../cycle4-images/img-2-1-unesco-heritage.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="image-placeholder"><span class="placeholder-icon">🏛</span></div>
+          </div>
+          <div class="cover-content">
+            <div class="badge main-badge">UNESCO</div>
+            <h1 class="cover-title">세계 문화유산 여행</h1>
+            <p class="cover-subtitle">인류가 남긴 위대한 유산을 찾아서</p>
+            <div class="cover-divider" aria-hidden="true"></div>
+            <div class="cover-meta">
+              <span>중학교 역사/문화</span>
+              <span aria-hidden="true">&middot;</span>
+              <span><time datetime="2026-03">2026년 3월</time></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 세계 문화유산이란? (definition-card) -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 세계 문화유산이란?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">정의</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📖</span> 세계 문화유산이란?</h2>
+          </div>
+          <div class="definition-card">
+            <p class="definition-term">World Heritage Site</p>
+            <div class="ornament-rule" aria-hidden="true"></div>
+            <p class="definition-text">유네스코(UNESCO)가 인류 전체를 위해 보호해야 할 <strong>탁월한 보편적 가치</strong>(Outstanding Universal Value)가 있다고 인정한 문화적, 자연적 유산을 말합니다.</p>
+          </div>
+          <div class="highlight-box" role="note">
+            2024년 기준, 전 세계 168개국에 걸쳐 총 1,199건의 세계유산이 등재되어 있습니다. 이 중 문화유산 933건, 자연유산 227건, 복합유산 39건으로 구성됩니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 경복궁 (two-column) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 한국의 문화유산 경복궁">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">한국</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🏯</span> 한국의 문화유산: 경복궁</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <img src="../cycle4-images/img-2-3-gyeongbokgung.jpg" alt="경복궁 광화문 월대 전경" class="col-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder"><span class="placeholder-icon">🏯</span><span class="placeholder-text">경복궁</span></div>
+            </div>
+            <div class="col-right">
+              <h3>경복궁 주요 정보</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">1395년(태조 4년) 조선 건국 후 최초의 궁궐로 창건</li>
+                <li role="listitem">조선 왕조의 법궁(정궁)으로 약 500년간 사용</li>
+                <li role="listitem">근정전, 경회루, 향원정 등 뛰어난 건축미를 자랑</li>
+                <li role="listitem">일제강점기에 대부분 파괴, 현재 복원 진행 중</li>
+                <li role="listitem">연간 방문객 약 500만 명의 대표적 관광 명소</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 석굴암과 불국사 (two-column) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 석굴암과 불국사">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">한국</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🛕</span> 석굴암과 불국사</h2>
+            <p class="section-subtitle">1995년 유네스코 세계문화유산 등재</p>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <img src="../cycle4-images/img-2-4-bulguksa.jpg" alt="불국사 청운교와 백운교" class="col-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder"><span class="placeholder-icon">🛕</span><span class="placeholder-text">불국사</span></div>
+            </div>
+            <div class="col-right">
+              <h3>핵심 가치</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">신라 경덕왕(751년) 때 김대성이 창건</li>
+                <li role="listitem">석굴암 본존불상은 동아시아 불교 조각의 걸작</li>
+                <li role="listitem">불국사의 다보탑, 석가탑은 신라 석조미술의 정수</li>
+                <li role="listitem">과학적 설계와 예술적 아름다움의 조화</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 아시아의 문화유산 (grid-cards) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 아시아의 문화유산">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">아시아</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🌏</span> 아시아의 문화유산</h2>
+          </div>
+          <div class="card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🇰🇭</span>
+              <h3 class="card-title">앙코르 와트</h3>
+              <p class="card-desc">캄보디아. 12세기 크메르 제국이 건설한 세계 최대의 종교 건축물</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🇮🇳</span>
+              <h3 class="card-title">타지마할</h3>
+              <p class="card-desc">인도. 무굴 황제 샤자한이 왕비를 위해 건설한 백색 대리석 영묘</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🇨🇳</span>
+              <h3 class="card-title">만리장성</h3>
+              <p class="card-desc">중국. 약 2만 km에 달하는 세계 최장의 방어 성벽</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🇯🇵</span>
+              <h3 class="card-title">히메지 성</h3>
+              <p class="card-desc">일본. '백로성'이라 불리는 일본 성곽 건축의 최고 걸작</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 유럽의 문화유산 (image-focus) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 유럽의 문화유산">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">유럽</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🏛</span> 유럽의 문화유산</h2>
+            <p class="section-subtitle">로마 콜로세움 - 고대 로마 건축의 상징</p>
+          </div>
+          <div class="image-focus">
+            <div class="image-container">
+              <img src="../cycle4-images/img-2-6-colosseum.jpg" alt="로마 콜로세움 전경 사진" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder"><span class="placeholder-icon">🏛</span><span class="placeholder-text">콜로세움</span></div>
+            </div>
+            <p class="image-caption">콜로세움 (Colosseum), 로마, 이탈리아 &mdash; 서기 80년 완공 (출처: Wikimedia)</p>
+          </div>
+          <div class="highlight-box" role="note">
+            약 5만 명을 수용할 수 있었던 원형 경기장으로, 로마 제국의 건축 기술과 문화를 보여주는 대표적 유산입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 문화유산 보존의 중요성 (key-points) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 문화유산 보존의 중요성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">보존</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🔐</span> 문화유산 보존의 중요성</h2>
+          </div>
+          <ul class="key-points" role="list">
+            <li role="listitem">역사적 정체성: 우리 민족과 인류의 역사를 증명하는 살아있는 기록</li>
+            <li role="listitem">교육적 가치: 과거의 기술, 예술, 사상을 직접 체험하며 배울 수 있는 교실</li>
+            <li role="listitem">경제적 효과: 관광 산업의 핵심 자원으로 지역 경제 활성화에 기여</li>
+            <li role="listitem">문화 다양성: 각 문화권의 고유한 가치를 보존하여 세계 문화의 풍요로움 유지</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 등재 기준과 절차 (process-steps) -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 등재 기준과 절차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">등재 절차</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📋</span> 등재 기준과 절차</h2>
+            <p class="section-subtitle">유네스코 세계유산 등재까지의 과정</p>
+          </div>
+          <ol class="process-steps" role="list">
+            <li role="listitem"><strong>잠정목록 등록</strong> &mdash; 각국 정부가 후보 유산을 잠정목록에 등록</li>
+            <li role="listitem"><strong>등재 신청서 제출</strong> &mdash; 최소 1년 전 세계유산센터에 신청서 접수</li>
+            <li role="listitem"><strong>전문기관 현지 조사</strong> &mdash; ICOMOS(문화) 또는 IUCN(자연)이 현지 실사</li>
+            <li role="listitem"><strong>세계유산위원회 심의</strong> &mdash; 21개국 위원으로 구성된 위원회의 최종 결정</li>
+          </ol>
+          <div class="highlight-box" role="note">
+            한국은 현재 16건의 세계유산을 보유하고 있으며, 잠정목록에도 다수의 후보가 등록되어 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: 위험에 처한 문화유산 (comparison) -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 위험에 처한 문화유산">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">위기 유산</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⚠</span> 위험에 처한 문화유산</h2>
+          </div>
+          <div class="table-wrapper" role="region" aria-label="위기 유산 비교 표" tabindex="0">
+            <table class="comparison-table">
+              <caption class="sr-only">문화유산 위협 요인 비교</caption>
+              <thead>
+                <tr>
+                  <th scope="col">위협 요인</th>
+                  <th scope="col">사례</th>
+                  <th scope="col">피해 규모</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">전쟁/분쟁</th>
+                  <td>시리아 팔미라 유적</td>
+                  <td>IS에 의한 주요 신전 파괴</td>
+                </tr>
+                <tr>
+                  <th scope="row">기후변화</th>
+                  <td>베네치아 (이탈리아)</td>
+                  <td>해수면 상승으로 침수 위험 증가</td>
+                </tr>
+                <tr>
+                  <th scope="row">관광 과밀</th>
+                  <td>마추픽추 (페루)</td>
+                  <td>연간 150만 방문객으로 훼손 가속</td>
+                </tr>
+                <tr>
+                  <th scope="row">자연재해</th>
+                  <td>네팔 카트만두 계곡</td>
+                  <td>2015년 대지진으로 사원 다수 붕괴</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: 우리가 할 수 있는 일 (closing) -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 우리가 할 수 있는 일">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">마무리</span>
+        </div>
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <span style="font-size:2.5rem;" aria-hidden="true">🌍</span>
+            <h1 class="end-title">우리가 할 수 있는 일</h1>
+            <p class="end-subtitle">문화유산은 과거의 기록이자 미래 세대를 위한 선물입니다</p>
+          </div>
+          <div class="ornament-rule" aria-hidden="true"></div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="실천 방안">
+            <ul class="summary-list" role="list">
+              <li role="listitem">문화유산 방문 시 규칙을 지키고 보존에 협력하기</li>
+              <li role="listitem">우리 지역의 문화유산에 관심을 갖고 알리기</li>
+              <li role="listitem">문화유산 보호 캠페인이나 봉사활동에 참여하기</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력 (Enter로 이동)" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">10</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '\uC2AC\uB77C\uC774\uB4DC ' + (current + 1) + ' / ' + total;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      const current = slides[currentSlide];
+      const next = slides[index];
+      current.classList.add('will-animate');
+      next.classList.add('will-animate');
+      current.classList.remove('active');
+      currentSlide = index;
+      next.classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      setTimeout(() => { current.classList.remove('will-animate'); next.classList.remove('will-animate'); }, 400);
+      const content = next.querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { if (diff < 0) nextSlide(); else prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); else slideInput.value = currentSlide + 1; });
+
+    updateNav();
+  </script>
+</body>
+</html>

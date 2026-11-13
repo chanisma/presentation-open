@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "activities": [
+    {
+      "id": "assign-score",
+      "slide": 5,
+      "kind": "choice",
+      "prompt": "이 코드를 실행하면 무엇이 출력될까요?\nscore = 10\nscore = score + 5\nprint(score)",
+      "options": [
+        "10",
+        "15",
+        "score + 5",
+        "오류가 난다"
+      ],
+      "answer": 1,
+      "explanation": "오른쪽 score + 5를 먼저 계산해 15를 만든 뒤, score 이름표를 15로 옮깁니다. 10은 더 이상 score가 아닙니다. 따옴표가 없는 score + 5는 글자가 아니라 계산식이고, 코드의 =는 수학의 등호가 아니라서 오류가 나지 않습니다."
+    },
+    {
+      "id": "name-rule",
+      "slide": 8,
+      "kind": "choice",
+      "prompt": "변수 이름으로 쓸 수 있는 것은 무엇일까요?",
+      "options": [
+        "2nd_place",
+        "my-score",
+        "favorite_food",
+        "class"
+      ],
+      "answer": 2,
+      "explanation": "2nd_place는 숫자로 시작하고, my-score의 -는 빼기 기호로 읽히며, class는 파이썬이 이미 쓰는 키워드입니다."
+    },
+    {
+      "id": "print-quote",
+      "slide": 9,
+      "kind": "choice",
+      "prompt": "name = \"민지\" 다음에 print(\"name\")을 실행하면 무엇이 출력될까요?",
+      "options": [
+        "민지",
+        "name",
+        "\"name\"",
+        "오류가 난다"
+      ],
+      "answer": 1,
+      "explanation": "따옴표 안은 글자 그대로의 값입니다. 이름표 name이 묶인 값을 꺼내려면 따옴표 없이 print(name)이라고 씁니다."
+    },
+    {
+      "id": "error-indent",
+      "slide": 17,
+      "kind": "choice",
+      "prompt": "화면의 4번 코드가 실행되지 않는 까닭은 무엇일까요?\ndef greet(name):\nprint(f\"안녕, {name}!\")\ngreet(\"민지\")",
+      "options": [
+        "따옴표를 닫지 않았다",
+        "들여쓰기를 하지 않았다",
+        "없는 이름을 불렀다",
+        "괄호를 닫지 않았다"
+      ],
+      "answer": 1,
+      "explanation": "def 다음 줄은 앞을 띄어 써야 함수 안의 줄이 됩니다. 파이썬은 IndentationError로 알려 줍니다."
+    },
+    {
+      "id": "exit",
+      "slide": "last",
+      "kind": "exit",
+      "prompt": "변수와 함수를 각각 여러분의 말로 한 문장씩 설명해 주세요."
+    }
+  ]
+}

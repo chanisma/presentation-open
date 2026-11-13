@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>클래식 음악 감상법 - 중학교 음악</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* 1. Reset & CSS Variables */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Gradient Mesh 05 */
+      --mesh-pink:   #FF6EC7;
+      --mesh-violet: #7B61FF;
+      --mesh-cyan:   #00D4FF;
+      --mesh-orange: #FFB347;
+
+      --style-bg: #7B61FF;
+      --style-primary: #FFFFFF;
+      --style-accent: #FF6EC7;
+      --style-text: #FFFFFF;
+      --style-text-secondary: rgba(255,255,255,0.82);
+
+      /* Glass card */
+      --card-bg: rgba(255,255,255,0.13);
+      --card-border: rgba(255,255,255,0.28);
+      --card-shadow: 0 8px 32px rgba(0,0,0,0.22);
+
+      /* Utility */
+      --main:     #FF6EC7;
+      --dark:     #7B61FF;
+      --light:    rgba(255,255,255,0.15);
+      --white:    #FFFFFF;
+      --gray-200: rgba(255,255,255,0.25);
+      --gray-600: rgba(255,255,255,0.65);
+      --gray-700: rgba(255,255,255,0.85);
+      --text:     #FFFFFF;
+    }
+
+    /* 2. Base Typography */
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Pretendard Variable', 'Outfit', sans-serif;
+      color: var(--style-text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* 3. Background — multi-radial gradient mesh */
+    body {
+      background:
+        radial-gradient(ellipse at 10% 20%,  #FF6EC7 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 10%,  #00D4FF 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 85%,  #FFB347 0%, transparent 50%),
+        radial-gradient(ellipse at 15% 90%,  #7B61FF 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 50%,  #9B59FF 0%, transparent 60%),
+        #5540D0;
+      background-attachment: fixed;
+    }
+
+    /* 4. Layout */
+    .presentation {
+      height: calc(100vh - 42px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      animation: slideIn 0.35s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 5. Browser Card — frosted glass */
+    .browser-card {
+      width: 100%;
+      max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--card-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1.5px solid var(--card-border);
+      border-radius: 1.2rem;
+      box-shadow: var(--card-shadow);
+    }
+
+    /* Frameless variant for cover/end */
+    .browser-card--frameless {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--card-border);
+      flex-shrink: 0;
+      min-height: 2.2rem;
+    }
+    .dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; flex-shrink: 0; }
+    .dot.red    { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green  { background: #28C840; }
+    .topbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.03em;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+    .browser-content::-webkit-scrollbar { width: 4px; }
+    .browser-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+
+    /* 6. Typography */
+    h1 { font-family: 'Bebas Neue', 'Pretendard Variable', sans-serif; font-size: 2.4rem; font-weight: 400; line-height: 1.1; color: var(--style-text); text-shadow: 0 2px 12px rgba(0,0,0,0.35); }
+    h2 { font-size: 1.5rem; font-weight: 700; color: var(--style-text); }
+    h3 { font-size: 1.15rem; font-weight: 600; color: var(--style-text); }
+    p  { font-size: 1rem; line-height: 1.7; color: var(--style-text-secondary); }
+
+    /* 7. Progress Bar */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #FF6EC7, #00D4FF);
+      z-index: 1000;
+      will-change: width;
+      transition: width 0.3s ease;
+    }
+
+    /* 8. Cover Slide */
+    .cover-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.7rem;
+      padding: 2rem;
+      min-height: 60vh;
+    }
+    .cover-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.22);
+      border: 1.5px solid rgba(255,255,255,0.45);
+      border-radius: 2rem;
+      padding: 0.25rem 1rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.05em;
+      backdrop-filter: blur(8px);
+    }
+    .cover-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.6rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFD6EF 50%, #C8BBFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+      line-height: 1.05;
+    }
+    .cover-subtitle {
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.88);
+      font-weight: 400;
+      max-width: 32rem;
+    }
+    .cover-divider {
+      width: 4rem;
+      height: 3px;
+      background: linear-gradient(90deg, #FF6EC7, #00D4FF);
+      border-radius: 2px;
+      margin: 0.3rem auto;
+    }
+    .cover-meta {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.72);
+    }
+
+    /* 9. TOC */
+    .toc-slide { padding: 0.8rem 1.5rem; }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+      color: #fff;
+    }
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.5rem 0.9rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 0.6rem;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .toc-item:hover { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.4); }
+    .toc-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.15rem;
+      color: var(--mesh-cyan);
+      min-width: 1.8rem;
+      text-align: center;
+    }
+    .toc-text { flex: 1; font-size: 0.95rem; font-weight: 600; color: #fff; }
+    .toc-arrow { font-size: 0.88rem; color: rgba(255,255,255,0.5); }
+
+    /* 10. Section Header */
+    .section-header { margin-bottom: 0.7rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { font-size: 0.9rem; color: var(--style-text-secondary); margin-top: 0.2rem; }
+
+    /* 11. Highlight Box */
+    .highlight-box {
+      background: rgba(255,255,255,0.15);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-left: 4px solid #FF6EC7;
+      border-radius: 0.6rem;
+      padding: 0.7rem 1rem;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    /* 12. Card Grid */
+    .card-grid { display: grid; gap: 0.6rem; margin-top: 0.5rem; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      background: rgba(255,255,255,0.12);
+      border: 1.5px solid rgba(255,255,255,0.22);
+      border-radius: 0.8rem;
+      padding: 0.8rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      contain: layout style;
+      transition: background 0.2s;
+    }
+    .card:hover { background: rgba(255,255,255,0.2); }
+    .card-icon { font-size: 1.4rem; line-height: 1; }
+    .card-title { font-size: 1rem; font-weight: 700; color: #fff; }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* 13. Activity List */
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 0.7rem;
+      padding: 0.65rem 0.9rem;
+    }
+    .activity-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.05rem; }
+    .activity-body { flex: 1; }
+    .activity-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.15rem; }
+    .activity-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* 14. Task List */
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-left: 4px solid var(--mesh-cyan);
+      border-radius: 0.7rem;
+      padding: 0.65rem 0.9rem;
+    }
+    .task-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      color: var(--mesh-cyan);
+      min-width: 1.8rem;
+      flex-shrink: 0;
+    }
+    .task-body { flex: 1; }
+    .task-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.1rem; }
+    .task-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* 15. Two Column */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 2px 1fr;
+      gap: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    .col-divider { background: rgba(255,255,255,0.22); border-radius: 2px; }
+    .col-title { font-size: 1rem; font-weight: 700; color: var(--mesh-cyan); margin-bottom: 0.4rem; }
+    .col-list { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
+    .col-list li { font-size: 0.9rem; color: var(--style-text-secondary); padding-left: 0.8rem; position: relative; line-height: 1.5; }
+    .col-list li::before { content: '◆'; font-size: 0.55rem; position: absolute; left: 0; top: 0.35em; color: var(--mesh-pink); }
+
+    /* 16. End Slide */
+    .end-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.8rem;
+      padding: 1.5rem 2rem;
+    }
+    .end-header { text-align: center; }
+    .end-icon { font-size: 2.5rem; display: block; margin-bottom: 0.4rem; }
+    .end-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 400;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFD6EF 50%, #C8BBFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .end-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-top: 0.2rem; }
+    .end-summary {
+      width: 100%;
+      max-width: 36rem;
+      text-align: left;
+    }
+    .summary-title { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 0.4rem; }
+    .summary-list { list-style: none; display: flex; flex-direction: column; gap: 0.25rem; }
+    .summary-list li { font-size: 0.9rem; color: var(--style-text-secondary); }
+
+    /* 17. Badge */
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.65rem;
+      border-radius: 1rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+    .badge-cyan  { background: rgba(0,212,255,0.25); border-color: rgba(0,212,255,0.5); color: #d0f9ff; }
+    .badge-pink  { background: rgba(255,110,199,0.25); border-color: rgba(255,110,199,0.5); color: #ffe0f5; }
+
+    /* 18. Quote */
+    .quote-slide { display: flex; align-items: center; justify-content: center; }
+    .quote-figure { max-width: 40rem; text-align: center; }
+    .quote-mark { font-family: 'Bebas Neue', serif; font-size: 5rem; line-height: 0.7; color: rgba(255,110,199,0.6); display: block; margin-bottom: 0.5rem; }
+    .quote-text p { font-size: 1.2rem; font-style: italic; color: #fff; line-height: 1.7; }
+    .quote-source { font-size: 0.9rem; color: var(--style-text-secondary); margin-top: 0.8rem; }
+
+    /* 19. Nav Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1.5rem;
+      background: rgba(30,10,80,0.88);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255,255,255,0.15);
+      z-index: 999;
+      font-size: 14px;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      cursor: pointer;
+      font-size: 0;
+      color: #fff;
+      transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--mesh-pink); background: var(--mesh-pink); }
+    .nav-btn:focus-visible { outline: 3px solid var(--mesh-cyan); outline-offset: 2px; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+      min-width: 3rem;
+      text-align: center;
+      display: flex; align-items: center; gap: 0.15rem;
+      line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+      font-family: inherit; padding: 0; outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--mesh-pink); }
+    .slide-input:focus { border-bottom-color: var(--mesh-cyan); background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    /* 20. Skip / SR */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--mesh-pink); color: #fff; padding: 8px 16px; z-index: 9999; font-size: 14px; border-radius: 0 0 4px 0; transition: top 0.2s; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--mesh-cyan); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    /* 21. Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .browser-card { border-radius: 0.8rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .col-divider { display: none; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+    @media (prefers-contrast: high) {
+      :root { --card-bg: rgba(0,0,0,0.8); --card-border: #fff; }
+      .browser-card { border: 2px solid #fff; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <span class="cover-badge">중학교 음악 수업</span>
+          <h1 class="cover-title">클래식 음악<br>감상법</h1>
+          <p class="cover-subtitle">위대한 음악과 친해지는 즐거운 여정</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>음악 교과</span>
+            <span aria-hidden="true">·</span>
+            <span>중학교</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026">2026학년도</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: TOC -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">클래식 음악 감상법</span>
+        </div>
+        <div class="browser-content toc-slide">
+          <h2 class="section-title">오늘 배울 내용</h2>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0"
+                  aria-label="3번 슬라이드로 이동: 클래식 음악이란?"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                <span class="toc-num" aria-hidden="true">01</span>
+                <span class="toc-text">클래식 음악이란?</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                  aria-label="4번 슬라이드로 이동: 감상의 3단계"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num" aria-hidden="true">02</span>
+                <span class="toc-text">감상의 3단계</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                  aria-label="5번 슬라이드로 이동: 악기와 음색 탐구"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num" aria-hidden="true">03</span>
+                <span class="toc-text">악기와 음색 탐구</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                  aria-label="6번 슬라이드로 이동: 음악 형식 이해하기"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                <span class="toc-num" aria-hidden="true">04</span>
+                <span class="toc-text">음악 형식 이해하기</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                  aria-label="7번 슬라이드로 이동: 작곡가와 시대"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num" aria-hidden="true">05</span>
+                <span class="toc-text">작곡가와 시대</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0"
+                  aria-label="8번 슬라이드로 이동: 감상 일기 쓰기"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                <span class="toc-num" aria-hidden="true">06</span>
+                <span class="toc-text">감상 일기 쓰기</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 클래식 음악이란? -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 클래식 음악이란?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">클래식 음악이란?</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🎼</span> 클래식 음악이란?</h2>
+            <p class="section-subtitle">오래 사랑받아온 음악의 유산</p>
+          </div>
+          <div class="highlight-box" role="note">
+            클래식 음악은 보통 18~19세기 유럽에서 발전한 서양 예술 음악을 말해요. 오케스트라, 독주, 실내악 등 다양한 형태로 연주됩니다.
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🏛</span>
+              <h3 class="card-title">긴 역사</h3>
+              <p class="card-desc">약 400년 넘는 세월 동안 수많은 작곡가가 인류의 감동을 음표에 담아왔어요.</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🌍</span>
+              <h3 class="card-title">전 세계로 전파</h3>
+              <p class="card-desc">유럽에서 시작해 지금은 전 세계 사람들이 즐기는 보편적 예술 장르가 되었어요.</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🎹</span>
+              <h3 class="card-title">다양한 편성</h3>
+              <p class="card-desc">혼자 연주하는 독주부터 100명 이상의 오케스트라까지 스케일이 다양해요.</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">📝</span>
+              <h3 class="card-title">악보로 기록</h3>
+              <p class="card-desc">정확한 악보 표기 덕분에 수백 년 전 음악을 지금도 그대로 연주할 수 있어요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 감상의 3단계 -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 감상의 3단계">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">감상의 3단계</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">👂</span> 감상의 3단계</h2>
+            <p class="section-subtitle">귀를 열고, 마음으로 느끼고, 생각을 정리하자</p>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">01</span>
+              <div class="task-body">
+                <h3 class="task-title">듣기 — 소리에 집중</h3>
+                <p class="task-desc">눈을 감고 어떤 악기가 들리는지, 빠른지 느린지, 크고 작은 변화를 느껴보세요.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">02</span>
+              <div class="task-body">
+                <h3 class="task-title">상상하기 — 이미지 그리기</h3>
+                <p class="task-desc">음악을 들으며 떠오르는 장면이나 색깔, 분위기를 머릿속에 그려보세요.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">03</span>
+              <div class="task-body">
+                <h3 class="task-title">분석하기 — 구조 이해</h3>
+                <p class="task-desc">주요 멜로디가 어떻게 반복되고 변화하는지, 전체 흐름을 파악해 보세요.</p>
+              </div>
+            </li>
+          </ol>
+          <div class="highlight-box" role="note">
+            처음엔 느낌으로 충분해요! 여러 번 들을수록 더 많은 것이 들려요.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 악기와 음색 탐구 -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 악기와 음색 탐구">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">악기와 음색 탐구</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🎻</span> 오케스트라 악기 가족</h2>
+            <p class="section-subtitle">각 악기의 개성 있는 목소리를 구별해 보자</p>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🎻</span>
+              <h3 class="card-title">현악기</h3>
+              <p class="card-desc">바이올린·비올라·첼로·콘트라베이스. 활로 줄을 긁어 따뜻하고 풍성한 소리를 냅니다.</p>
+              <span class="badge badge-cyan">주선율</span>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🎺</span>
+              <h3 class="card-title">금관악기</h3>
+              <p class="card-desc">트럼펫·호른·트롬본·튜바. 입술 진동으로 소리를 내며 밝고 힘찬 울림을 줍니다.</p>
+              <span class="badge badge-pink">웅장함</span>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🪕</span>
+              <h3 class="card-title">목관악기</h3>
+              <p class="card-desc">플루트·오보에·클라리넷·바순. 바람을 불어 섬세하고 서정적인 소리를 냅니다.</p>
+              <span class="badge badge-cyan">서정미</span>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🥁</span>
+              <h3 class="card-title">타악기</h3>
+              <p class="card-desc">팀파니·큰북·실로폰 등. 리듬과 강약을 조절해 음악에 생동감을 불어넣습니다.</p>
+              <span class="badge badge-pink">리듬감</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 음악 형식 이해하기 -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 음악 형식 이해하기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">음악 형식 이해하기</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📐</span> 음악의 구조와 형식</h2>
+            <p class="section-subtitle">건축처럼, 음악에도 설계도가 있어요</p>
+          </div>
+          <div class="two-col" role="list">
+            <div class="col-left" role="listitem">
+              <h3 class="col-title">주요 형식</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem"><strong>소나타 형식</strong> — 제시·발전·재현부 3부 구성, 교향곡에 자주 쓰여요</li>
+                <li role="listitem"><strong>론도 형식</strong> — A-B-A-C-A처럼 주제가 반복하며 새 선율이 등장해요</li>
+                <li role="listitem"><strong>변주 형식</strong> — 같은 멜로디를 조금씩 다르게 바꿔가며 전개해요</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right" role="listitem">
+              <h3 class="col-title">감상 포인트</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">주제 멜로디를 처음 들을 때 기억해 두세요</li>
+                <li role="listitem">같은 선율이 반복될 때 어떻게 변하는지 주목하세요</li>
+                <li role="listitem">빠르기와 셈여림의 변화를 느껴보세요</li>
+              </ul>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            형식을 알면 "지금 어디쯤 왔지?" 하고 지도를 보듯 음악을 따라갈 수 있어요.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 작곡가와 시대 -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 작곡가와 시대">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">작곡가와 시대</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🎶</span> 시대별 대표 작곡가</h2>
+            <p class="section-subtitle">음악의 역사를 이끈 천재들을 만나보자</p>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">🕰</span>
+              <div class="activity-body">
+                <h3 class="activity-title">바로크 (1600–1750) — 바흐·헨델</h3>
+                <p class="activity-desc">대위법과 화성이 발달한 시기. 바흐의 <em>토카타와 푸가</em>처럼 복잡하고 정교한 구조가 특징이에요.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">✨</span>
+              <div class="activity-body">
+                <h3 class="activity-title">고전 (1750–1820) — 모차르트·하이든·베토벤</h3>
+                <p class="activity-desc">균형 잡힌 형식미가 돋보이는 시기. 소나타 형식이 완성되고 교향곡이 크게 발전했어요.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">🌹</span>
+              <div class="activity-body">
+                <h3 class="activity-title">낭만 (1820–1900) — 쇼팽·슈베르트·차이콥스키</h3>
+                <p class="activity-desc">감정 표현이 풍부해진 시기. 개인의 감정과 이야기를 음악으로 표현하는 것이 중요해졌어요.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 감상 일기 쓰기 / End -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <span class="end-icon" aria-hidden="true">🎵</span>
+            <h1 class="end-title">감상 일기로<br>마무리해요</h1>
+            <p class="end-subtitle">오늘 들은 음악을 나만의 언어로 기록해 보세요.</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="오늘의 핵심">
+            <h2 class="summary-title">오늘의 핵심 정리</h2>
+            <ul class="summary-list" role="list">
+              <li role="listitem">✅ 클래식 음악은 긴 역사와 다양한 편성을 가진 예술 음악이다</li>
+              <li role="listitem">✅ 감상은 듣기 → 상상하기 → 분석하기 3단계로 깊어진다</li>
+              <li role="listitem">✅ 악기 음색, 형식, 시대 배경을 알면 더 풍부하게 즐길 수 있다</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    // Stagger delays
+    document.querySelectorAll('.stagger-item').forEach((el, i) => {
+      el.style.setProperty('--delay', (i * 0.08) + 's');
+    });
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (current + 1) + ' / ' + total;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      const cur = slides[currentSlide];
+      const nxt = slides[index];
+      cur.classList.add('will-animate');
+      nxt.classList.add('will-animate');
+      cur.classList.remove('active');
+      currentSlide = index;
+      nxt.classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      setTimeout(() => {
+        cur.classList.remove('will-animate');
+        nxt.classList.remove('will-animate');
+      }, 400);
+      const content = nxt.querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)) {
+        e.preventDefault(); nextSlide();
+      } else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End')   { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    // Touch swipe
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dx = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(dx) > 50) { if (dx > 0) nextSlide(); else prevSlide(); }
+    }, { passive: true });
+
+    // Slide input
+    slideInput.addEventListener('focus', () => slideInput.select());
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const v = parseInt(slideInput.value, 10); if (!isNaN(v)) goToSlide(v - 1); slideInput.blur(); }
+      if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => { const v = parseInt(slideInput.value, 10); if (!isNaN(v)) goToSlide(v - 1); });
+
+    // Fullscreen
+    function toggleFullscreen() {
+      const expand   = document.getElementById('fsExpand');
+      const compress = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          expand.style.display = 'none';
+          compress.style.display = 'block';
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          expand.style.display = 'block';
+          compress.style.display = 'none';
+        }).catch(() => {});
+      }
+    }
+
+    updateNav();
+  </script>
+</body>
+</html>

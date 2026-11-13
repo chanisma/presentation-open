@@ -1,0 +1,54 @@
+{
+  "title": "컴포지트 데모 — JSON으로 엮는 혼합 덱",
+  "favicon": "🧩",
+  "theme": {
+    "--bg": "#0a1410",
+    "--bg-grad-1": "rgba(79, 229, 176, 0.13)",
+    "--bg-grad-2": "rgba(90, 169, 255, 0.07)",
+    "--primary": "#4fe5b0",
+    "--accent": "linear-gradient(115deg, #8ff2cd 0%, #4fe5b0 50%, #29c0f0 100%)",
+    "--accent-ink": "#03271a",
+    "--glow": "0 30px 80px -40px rgba(79, 229, 176, 0.5)"
+  },
+  "segments": [
+    {
+      "type": "title",
+      "kicker": "혼합 덱 연구 · 옵션 C",
+      "title": "컴포지트 덱 — JSON으로 엮는 수업",
+      "lead": "deck.json 매니페스트가 타이틀·NotebookLM 이미지·불릿 세그먼트를 하나의 bolt 덱으로 시퀀싱한다. 코드 배포 없이 데이터만으로.",
+      "nav": "타이틀",
+      "notes": "컴포지트 덱 소개 — 이 덱 자체가 deck.json 하나로 만들어졌음을 강조."
+    },
+    {
+      "type": "images",
+      "src": "../../../2026-1/정보/2027프로그래밍선택과목/images",
+      "pages": [1, 2, 4],
+      "captions": [
+        {
+          "kicker": "NotebookLM 자산 세그먼트",
+          "title": "수업 이미지가 그대로 슬라이드로",
+          "body": "다른 수업 폴더의 images/slide-NN.png를 상대 경로로 참조했다. KenBurns가 t의 순수 함수로 무대화한다."
+        },
+        {
+          "title": "캡션은 매니페스트의 JSON",
+          "body": "kicker·title·body 세 줄이면 된다 — 저작 도구 없이 텍스트 편집만으로."
+        },
+        null
+      ],
+      "nav": "일러스트",
+      "notes": "2027 선택과목 안내 덱의 이미지 3장 재사용. 마지막 장은 캡션 없는 순수 전면 이미지."
+    },
+    {
+      "type": "bullets",
+      "kicker": "정리",
+      "title": "이 덱이 증명하는 것",
+      "items": [
+        "세그먼트 시퀀싱 — 서로 다른 소스가 한 덱의 연속된 쪽이 된다",
+        "자산 재사용 — NotebookLM 이미지는 URL 참조, 복사도 추출도 없다",
+        "라이브 호환 — 매니페스트 옆 live.json이면 실시간 문항도 그대로"
+      ],
+      "nav": "정리",
+      "notes": "클릭으로 세 줄 전개. 라이브 문항은 레거시 덱과 같은 규약(수업폴더/live.json)임을 언급."
+    }
+  ]
+}

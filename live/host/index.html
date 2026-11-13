@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>교사 콘솔 — 이동 중</title>
+    <script>
+      // 교사 콘솔은 React 앱(?app=host)으로 통합됨 — 구 링크·북마크 보존용
+      // 리다이렉트. 클래식 콘솔은 classic.html에 그대로 남아 있다.
+      const p = new URLSearchParams(location.search);
+      p.set('app', 'host');
+      location.replace(new URL('../../?' + p.toString(), location.href));
+    </script>
+  </head>
+  <body>
+    <a href="../../?app=host">교사 콘솔로 이동</a>
+  </body>
+</html>

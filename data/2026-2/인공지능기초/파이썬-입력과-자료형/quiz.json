@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "activities": [
+    {
+      "id": "input-repeat",
+      "slide": 4,
+      "kind": "choice",
+      "prompt": "이 코드를 실행하고 2를 입력하면 무엇이 출력될까요?\ncount = input(\"몇 접시? \")\nprint(count * 3000)",
+      "options": ["6000", "222…2", "오류가 난다", "23000"],
+      "answer": 1,
+      "explanation": "input()이 돌려준 2는 문자열 \"2\"입니다. 문자열에 정수를 곱하면 계산하지 않고 그 문자열을 정수만큼 이어 붙입니다(문자열 반복). 그래서 2가 3000번 이어진 문자열 하나가 나옵니다."
+    },
+    {
+      "id": "div-float",
+      "slide": 11,
+      "kind": "choice",
+      "prompt": "print(6 / 2)를 실행하면 무엇이 출력될까요?",
+      "options": ["3", "3.0", "3.5", "오류가 난다"],
+      "answer": 1,
+      "explanation": "/로 나누면 결과는 실수형(float)입니다. 크기는 3과 같지만 3.0으로 출력됩니다. 정수 몫이 필요하면 //를 씁니다."
+    },
+    {
+      "id": "age-typeerror",
+      "slide": 14,
+      "kind": "choice",
+      "prompt": "이 코드를 실행하고 17을 입력하면 어떻게 될까요?\nage = input(\"나이: \")\nprint(age + 1)",
+      "options": ["18이 출력된다", "171이 출력된다", "TypeError가 난다", "ValueError가 난다"],
+      "answer": 2,
+      "explanation": "input()이 돌려준 \"17\"은 문자열이라 정수 1과 +로 이을 수 없습니다. 문자열과 정수를 +로 잇는 조합은 허용되지 않아 TypeError가 납니다. age = int(input(\"나이: \"))로 바꾸면 18이 나옵니다."
+    },
+    {
+      "id": "exit",
+      "slide": "last",
+      "kind": "exit",
+      "prompt": "키오스크에서 input()으로 받은 개수 \"3\"에 가격 1500을 곱하려 합니다. 곱하기 전에 무엇을 해야 하고, 그러지 않으면 어떤 결과가 나올까요?"
+    }
+  ]
+}

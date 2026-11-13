@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 비스듬히 위에서 본 도서관 대출 창구 책상. 상판 위에 책 두 권과 호출 벨.
+       웹 요청·응답을 "대출 신청 → 책 건네기"로 보여 주는 장면의 가운데 소품
+       (바이브코딩 「웹의 구조와 설계도」 3장). 어두운 청사진 배경 위에 얹히므로 면을 밝게, 잉크는 짙은 남색.
+       팔레트: ink #0b1a30 · top #e2c49a · front #b98a5a · panel #a47548 · book1 #ff9a8b · book2 #9cc3ff · page #f6efe0 · brass #f2c96b
+       앵커: 상판 앞 모서리 y≈118, x 30~490 · 책을 건네는 자리(상판 가운데) (260,96) -->
+
+  <!-- 바닥 그림자 -->
+  <path d="M40 286 L480 286" stroke="#0b1a30" stroke-width="10" opacity=".08" />
+
+  <!-- 상판 윗면 -->
+  <path d="M62 62 C64 56 68 54 76 54 L444 54 C452 54 456 56 458 62 L494 112 C496 116 494 120 488 120 L32 120 C26 120 24 116 26 112 Z"
+        fill="#e2c49a" stroke="#0b1a30" stroke-width="2.4" />
+  <!-- 상판 결 -->
+  <path d="M96 74 C160 70 220 72 280 70" stroke="#0b1a30" stroke-width="1.3" opacity=".22" />
+  <path d="M300 92 C360 90 420 92 460 90" stroke="#0b1a30" stroke-width="1.3" opacity=".22" />
+  <path d="M80 100 L150 100" stroke="#ffffff" stroke-width="3" opacity=".28" />
+  <!-- 상판 두께 -->
+  <path d="M26 112 L26 128 C26 132 30 134 34 134 L486 134 C490 134 494 132 494 128 L494 112"
+        fill="#c9a67a" stroke="#0b1a30" stroke-width="2.2" />
+
+  <!-- 앞판 -->
+  <path d="M44 134 L476 134 L476 276 C476 282 472 286 466 286 L54 286 C48 286 44 282 44 276 Z"
+        fill="#b98a5a" stroke="#0b1a30" stroke-width="2.4" />
+  <!-- 패널 세 칸 -->
+  <path d="M70 156 L178 156 L178 262 L70 262 Z" fill="#a47548" stroke="#0b1a30" stroke-width="1.8" />
+  <path d="M206 156 L314 156 L314 262 L206 262 Z" fill="#a47548" stroke="#0b1a30" stroke-width="1.8" />
+  <path d="M342 156 L450 156 L450 262 L342 262 Z" fill="#a47548" stroke="#0b1a30" stroke-width="1.8" />
+  <!-- 패널 결 -->
+  <path d="M90 176 L90 242 M262 176 L262 242 M398 176 L398 242" stroke="#0b1a30" stroke-width="1.2" opacity=".2" />
+  <path d="M78 164 L120 164 M214 164 L256 164 M350 164 L392 164" stroke="#ffffff" stroke-width="2.4" opacity=".2" />
+
+  <!-- 책 1 (아래, 코랄) — 옆으로 누운 책 -->
+  <path d="M168 78 L300 70 L322 88 L190 96 Z" fill="#f6efe0" stroke="#0b1a30" stroke-width="1.8" />
+  <path d="M168 78 L190 96 L190 108 L168 90 Z" fill="#e0533f" stroke="#0b1a30" stroke-width="2" />
+  <path d="M190 96 L322 88 L322 100 L190 108 Z" fill="#ff9a8b" stroke="#0b1a30" stroke-width="2.2" />
+  <path d="M206 99 L300 93" stroke="#0b1a30" stroke-width="1.2" opacity=".35" />
+  <!-- 종이 단면 결 -->
+  <path d="M178 80 L296 73 M184 84 L302 77" stroke="#0b1a30" stroke-width="1" opacity=".25" />
+
+  <!-- 책 2 (위, 하늘) -->
+  <path d="M184 62 L292 56 L310 70 L202 76 Z" fill="#f6efe0" stroke="#0b1a30" stroke-width="1.8" />
+  <path d="M184 62 L202 76 L202 86 L184 72 Z" fill="#5f8fd6" stroke="#0b1a30" stroke-width="2" />
+  <path d="M202 76 L310 70 L310 80 L202 86 Z" fill="#9cc3ff" stroke="#0b1a30" stroke-width="2.2" />
+  <!-- 가름끈 -->
+  <path d="M262 81 L264 98 L268 92 L272 97 L270 80" fill="#ffd36b" stroke="#0b1a30" stroke-width="1.4" />
+
+  <!-- 호출 벨 -->
+  <path d="M372 92 L432 92 C434 92 436 94 436 96 L436 100 L368 100 L368 96 C368 94 370 92 372 92 Z" fill="#8a6a3a" stroke="#0b1a30" stroke-width="1.8" />
+  <path d="M376 92 C376 72 388 62 402 62 C416 62 428 72 428 92 Z" fill="#f2c96b" stroke="#0b1a30" stroke-width="2.2" />
+  <path d="M386 78 C388 72 392 68 398 66" stroke="#ffffff" stroke-width="2.6" opacity=".45" />
+  <path d="M402 62 L402 56" stroke="#0b1a30" stroke-width="2.2" />
+  <path d="M396 55 L408 55" stroke="#0b1a30" stroke-width="3" />
+</svg>

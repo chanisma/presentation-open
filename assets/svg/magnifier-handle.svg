@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 손잡이 달린 돋보기. 렌즈 안쪽은 투명이라 아래 그림이 비친다
+       (image-classifier-project S5 「돋보기가 비추는 모델의 시선」 — 사진 위를 훑다가 눈밭에서 멈춘다).
+       렌즈 안에는 유리 반사 두 줄만 있다. 텍스트 없음. 그라데이션 없음.
+       팔레트: ink #22304a · rim #3d4f73 · rimTop #5a6d93 · ferrule #d98e04 · ferruleDark #b47406 · handle #9c3d6e · handleDark #7a2d55
+       앵커: 렌즈 중심 (110,110), 투명 영역 반지름 70 · 손잡이 끝 ≈ (272,272) -->
+  <g transform="rotate(45 110 110)">
+    <rect x="222" y="94" width="104" height="32" rx="16" fill="#9c3d6e" stroke="#22304a" stroke-width="2.4"/>
+    <path d="M236 117.5 L314 117.5" stroke="#7a2d55" stroke-width="6"/>
+    <path d="M238 101.5 L300 101.5" stroke="#ffffff" stroke-width="2" opacity=".3"/>
+    <rect x="192" y="98" width="34" height="24" rx="4" fill="#d98e04" stroke="#22304a" stroke-width="2.2"/>
+    <path d="M203 99 L203 121 M214 99 L214 121" stroke="#b47406" stroke-width="1.6"/>
+    <path d="M196 103 L222 103" stroke="#ffffff" stroke-width="1.6" opacity=".35"/>
+    <path fill-rule="evenodd" d="M110 22 A88 88 0 1 1 109.99 22 Z M110 40 A70 70 0 1 0 110.01 40 Z" fill="#3d4f73" stroke="#22304a" stroke-width="2.4"/>
+    <path d="M36 92 A79 79 0 0 1 128 32" stroke="#5a6d93" stroke-width="6"/>
+    <path d="M62 92 A52 52 0 0 1 96 58" stroke="#ffffff" stroke-width="5" opacity=".55"/>
+    <path d="M60 120 A50 50 0 0 1 59 106" stroke="#ffffff" stroke-width="4" opacity=".45"/>
+  </g>
+</svg>

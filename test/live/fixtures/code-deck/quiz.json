@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "activities": [
+    {
+      "id": "py-sum",
+      "kind": "code",
+      "prompt": "1부터 n까지의 합을 구하는 sum_to(n)을 완성하세요.",
+      "language": "python",
+      "starter": "def sum_to(n):\n    return 0",
+      "tests": [
+        { "call": "sum_to(5)", "expected": "15" },
+        { "call": "sum_to(10)", "expected": "55" }
+      ],
+      "solution": "def sum_to(n):\n    return n * (n + 1) // 2"
+    }
+  ]
+}

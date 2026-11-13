@@ -1,0 +1,7183 @@
+{
+  "version": 1,
+  "_readme": "재활용 에셋 레지스트리 — asset-library 스킬이 관리. 이미지(NotebookLM 등)는 원본 위치를 참조(복사 금지), 생성 SVG는 assets/svg/에 저장. style 필드가 재사용 판단의 1차 기준: NotebookLM 이미지는 같은 set(최우선) 또는 같은 style끼리만 한 덱에 섞는다(보수 원칙). tags가 빈 항목은 미태깅 — asset-library refresh 대상. SVG 재사용은 2세대(clean-hand-illustration, 2026-09-29 이후 생성)만 — reusable:true 항목만 후보로 올리고, 재사용할 때는 contexts(쓰인 덱·장·역할·메타포·배치·변형)를 참고해 덱 디자인에 맞게 변형·판단한다(svg-asset-builder). reusable:false는 쓰던 덱에서만 유지.",
+  "assets": [
+    {
+      "file": "assets/svg/claude-assistant.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "클로드 코드",
+        "비서",
+        "로봇",
+        "터미널",
+        "인사",
+        "나비넥타이",
+        "assistant",
+        "robot",
+        "mascot"
+      ],
+      "alt": "손그림 잉크 선의 나비넥타이 비서 로봇 — 클로드 코드 마스코트 (다크 배경용 앰버 선)",
+      "usedIn": [
+        "claude-code-guide"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/node-engine.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "Node.js",
+        "엔진",
+        "바퀴",
+        "깃발",
+        "클로드",
+        "탑승",
+        "설치",
+        "준비물",
+        "engine",
+        "ride"
+      ],
+      "alt": "바퀴 달린 엔진(육각 명판) 위에 앉아 깃발을 든 미니 클로드 — 'Node는 클로드가 올라탈 엔진' 비유",
+      "usedIn": [
+        "claude-code-guide"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/chef-computer.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "요리사",
+        "컴퓨터",
+        "주문",
+        "파스타",
+        "접시",
+        "바이브코딩",
+        "비유",
+        "chef",
+        "order",
+        "monitor"
+      ],
+      "alt": "요리사 모자를 쓴 웃는 모니터가 김 오르는 파스타 접시를 내미는 손그림 — '코딩이 아니라 주문' 비유",
+      "usedIn": [
+        "claude-code-guide",
+        "vibe-coding-orientation2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/idea-bulb.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "아이디어",
+        "전구",
+        "영감",
+        "발상",
+        "빛",
+        "idea",
+        "lightbulb",
+        "inspiration"
+      ],
+      "alt": "필라멘트와 방사 빛살이 있는 손그림 전구 — 머릿속 아이디어",
+      "usedIn": [
+        "claude-code-guide",
+        "vibe-coding-orientation2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-02.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [
+        "요리",
+        "주문",
+        "비유",
+        "바이브코딩",
+        "옛날 코딩",
+        "레시피",
+        "대비",
+        "X표",
+        "체크",
+        "파스타"
+      ],
+      "alt": "직접 다 만들기(옛날 코딩) vs 주문하기(바이브코딩) — 요리 주문 비유 화이트보드",
+      "usedIn": [
+        "클로드코드를-활용한-바이브코딩"
+      ]
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-04.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [
+        "아이디어",
+        "교사",
+        "수업 게임",
+        "학습지",
+        "퀴즈",
+        "학급 운영",
+        "홈페이지",
+        "전구",
+        "활용 사례"
+      ],
+      "alt": "머릿속 아이디어를 학생들이 쓰는 진짜 도구로 — 교사 아이디어의 4갈래 활용 화이트보드",
+      "usedIn": [
+        "클로드코드를-활용한-바이브코딩"
+      ]
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-01.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-03.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-05.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-06.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-07.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-08.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-09.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-10.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-11.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-12.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-13.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-14.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-15.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-16.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-17.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-18.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/AI전문적학습동아리/클로드코드를-활용한-바이브코딩/images/slide-19.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "클로드코드를-활용한-바이브코딩",
+      "style": "whiteboard",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/2026-1/정보/2027프로그래밍선택과목/images/slide-01.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "2027프로그래밍선택과목",
+      "style": "watercolor-ghibli",
+      "tags": [
+        "토토로",
+        "나무",
+        "수채화",
+        "표지",
+        "프로그래밍",
+        "선택과목",
+        "숲",
+        "동물"
+      ],
+      "alt": "프로그래밍 선택과목 표지 — 나무 아래 토토로풍 동물 수채화",
+      "usedIn": [
+        "mixed-demo",
+        "컴포지트-데모",
+        "2027프로그래밍선택과목"
+      ]
+    },
+    {
+      "file": "data/2026-1/정보/2027프로그래밍선택과목/images/slide-02.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "2027프로그래밍선택과목",
+      "style": "watercolor-ghibli",
+      "tags": [
+        "4단계",
+        "여정",
+        "기획",
+        "개념 학습",
+        "AI 활용",
+        "프로그램 제작",
+        "길",
+        "이정표",
+        "수채화"
+      ],
+      "alt": "기획부터 제작까지 4단계 여정 — 숲길 이정표 수채화",
+      "usedIn": [
+        "mixed-demo",
+        "컴포지트-데모",
+        "2027프로그래밍선택과목"
+      ]
+    },
+    {
+      "file": "data/2026-1/정보/2027프로그래밍선택과목/images/slide-03.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "2027프로그래밍선택과목",
+      "style": "watercolor-ghibli",
+      "tags": [],
+      "alt": ""
+    },
+    {
+      "file": "data/2026-1/정보/2027프로그래밍선택과목/images/slide-04.png",
+      "type": "image",
+      "origin": "notebooklm",
+      "set": "2027프로그래밍선택과목",
+      "style": "watercolor-ghibli",
+      "tags": [
+        "석양",
+        "버스정류장",
+        "토토로",
+        "학생",
+        "새싹",
+        "추천 대상",
+        "만들고 싶은 마음",
+        "수채화"
+      ],
+      "alt": "만들어 보고 싶은 마음이 있다면 — 석양 버스정류장의 토토로와 학생 수채화",
+      "usedIn": [
+        "컴포지트-데모",
+        "2027프로그래밍선택과목"
+      ]
+    },
+    {
+      "file": "assets/external/anthropic.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "ai",
+        "claude",
+        "anthropic",
+        "llm"
+      ],
+      "alt": "anthropic",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/blog.webp",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "icon",
+      "category": "icon",
+      "tags": [
+        "blog"
+      ],
+      "alt": "blog",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/claudecode.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "claudecode"
+      ],
+      "alt": "claudecode",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/cli.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "cli"
+      ],
+      "alt": "cli",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/fastapi.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "fastapi"
+      ],
+      "alt": "fastapi",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/figma.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "design",
+        "figma",
+        "ui"
+      ],
+      "alt": "figma",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/gemini.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "ai",
+        "google",
+        "gemini"
+      ],
+      "alt": "gemini",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/gmail.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "gmail",
+        "email",
+        "google"
+      ],
+      "alt": "gmail",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/google.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "ai",
+        "google",
+        "gemini"
+      ],
+      "alt": "google",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/instagram.avif",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "icon",
+      "category": "icon",
+      "tags": [
+        "instagram",
+        "social",
+        "meta"
+      ],
+      "alt": "instagram",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/javascript.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "javascript",
+        "js",
+        "language"
+      ],
+      "alt": "javascript",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/nextjs.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "nextjs",
+        "react",
+        "framework"
+      ],
+      "alt": "nextjs",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/notebooklm.webp",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "icon",
+      "category": "icon",
+      "tags": [
+        "notebooklm"
+      ],
+      "alt": "notebooklm",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/notion.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "notion",
+        "productivity",
+        "notes"
+      ],
+      "alt": "notion",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/openai.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "ai",
+        "openai",
+        "gpt",
+        "chatgpt"
+      ],
+      "alt": "openai",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/opencode.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "opencode"
+      ],
+      "alt": "opencode",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/pencil.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "pencil"
+      ],
+      "alt": "pencil",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/Python.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "python",
+        "py",
+        "language"
+      ],
+      "alt": "Python",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/supabase.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "supabase",
+        "database",
+        "backend"
+      ],
+      "alt": "supabase",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/Threads.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "threads",
+        "social",
+        "meta"
+      ],
+      "alt": "Threads",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/typescript.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "typescript",
+        "ts",
+        "language"
+      ],
+      "alt": "typescript",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/youtube.png",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "logo",
+      "category": "brand-logo",
+      "tags": [
+        "youtube",
+        "video",
+        "google"
+      ],
+      "alt": "youtube",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/BG/code-dark.jpg",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "photo-dark",
+      "tags": [
+        "배경",
+        "다크",
+        "code"
+      ],
+      "alt": "",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/BG/data-dark.jpg",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "photo-dark",
+      "tags": [
+        "배경",
+        "다크",
+        "data"
+      ],
+      "alt": "",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/BG/network-dark.jpg",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "photo-dark",
+      "tags": [
+        "배경",
+        "다크",
+        "network"
+      ],
+      "alt": "",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/BG/office-dark.jpg",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "photo-dark",
+      "tags": [
+        "배경",
+        "다크",
+        "office"
+      ],
+      "alt": "",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/external/BG/tech-dark.jpg",
+      "type": "image",
+      "origin": "newvideogen",
+      "style": "photo-dark",
+      "tags": [
+        "배경",
+        "다크",
+        "tech"
+      ],
+      "alt": "",
+      "usedIn": [],
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿1.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿10.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿11.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿12.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿13.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿14.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿15.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿16.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿17.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿18.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿19.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿2.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿20.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿21.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿22.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿23.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿24.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿25.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿3.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿4.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿5.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿6.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿7.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿8.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "assets/svg/템플릿9.svg",
+      "type": "svg",
+      "origin": "newvideogen",
+      "style": "template",
+      "tags": [],
+      "alt": "",
+      "usedIn": [],
+      "reusable": false,
+      "license": "공개판 가림판 — 원본은 권리 미확인(newVideoGen)이라 뺐다"
+    },
+    {
+      "file": "data/2026-2/인공지능기초/오리엔테이션/images/lee-sedol-2016.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC BY 2.0 · LG전자 · Wikimedia Commons (File:Lee Se-Dol - 2016 (cropped).jpg)",
+      "tags": [
+        "이세돌",
+        "바둑",
+        "알파고",
+        "인물",
+        "2016",
+        "Lee Sedol",
+        "portrait",
+        "go"
+      ],
+      "alt": "이세돌 9단 인물 사진 (2016, 미소)",
+      "usedIn": [
+        "ai-basics-orientation"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/오리엔테이션/images/alphago-game4.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "diagram",
+      "license": "CC BY-SA 4.0 · Wesalius · Wikimedia Commons (File:Lee Sedol (B) vs AlphaGo (W) - Game 4.jpg)",
+      "tags": [
+        "알파고",
+        "이세돌",
+        "제4국",
+        "기보",
+        "바둑",
+        "신의 한 수",
+        "AlphaGo",
+        "game record"
+      ],
+      "alt": "이세돌 대 알파고 제4국 기보 — 백 78수, 인간의 유일한 승리",
+      "usedIn": [
+        "ai-basics-orientation",
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/alphafold-protein.png",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC BY 4.0 · Wikimedia Commons (File:AlphaFold ZNF555 Protein Structure.png)",
+      "tags": [
+        "AlphaFold",
+        "단백질",
+        "구조 예측",
+        "리본 다이어그램",
+        "생명과학",
+        "protein",
+        "deepmind"
+      ],
+      "alt": "AlphaFold가 예측한 ZNF555 단백질 리본 구조 렌더 (다크 배경)",
+      "usedIn": [
+        "ai-changing-world",
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/ai-drug-lab.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "Public domain · Rhoda Baer / NIH · Wikimedia Commons (File:Researcher uses pipettes.jpg)",
+      "tags": [
+        "신약",
+        "실험실",
+        "연구원",
+        "피펫",
+        "제약",
+        "laboratory",
+        "drug discovery"
+      ],
+      "alt": "피펫으로 시료를 옮기는 신약 연구원",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/chest-xray.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC0 · Mikael Häggström · Wikimedia Commons (File:Normal posteroanterior (PA) chest radiograph (X-ray).jpg)",
+      "tags": [
+        "흉부 X-ray",
+        "의료영상",
+        "판독",
+        "병원",
+        "radiograph",
+        "chest"
+      ],
+      "alt": "정상 소견 흉부 X-ray (PA)",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/typhoon-satellite.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "Public domain · NASA · Wikimedia Commons (File:Photo of typhoon nanmadol from international space station.jpg)",
+      "tags": [
+        "태풍",
+        "난마돌",
+        "국제우주정거장",
+        "기상",
+        "위성",
+        "typhoon",
+        "ISS",
+        "NASA"
+      ],
+      "alt": "국제우주정거장에서 본 태풍 난마돌 — 뚜렷한 태풍의 눈과 ISS 태양전지판",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/waymo-street.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC BY 4.0 · 4300streetcar · Wikimedia Commons (File:Waymo Jaguar I-Pace in San Francisco January 2026.jpg)",
+      "tags": [
+        "웨이모",
+        "로보택시",
+        "자율주행",
+        "샌프란시스코",
+        "2026",
+        "waymo",
+        "self-driving"
+      ],
+      "alt": "샌프란시스코 도심을 주행 중인 웨이모 재규어 I-Pace (2026.1)",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/atlas-robot.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC BY-SA 4.0 · Damian B Oh · Wikimedia Commons (File:Boston Dynamics Atlas (1).jpg)",
+      "tags": [
+        "아틀라스",
+        "휴머노이드",
+        "보스턴 다이내믹스",
+        "현대차",
+        "로봇",
+        "전시",
+        "Atlas",
+        "humanoid"
+      ],
+      "alt": "현대차그룹 전시장의 전기식 Atlas 휴머노이드 (후면)",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/optimus-robot.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC BY 2.0 · Steve Jurvetson · Wikimedia Commons (File:Latest Tesla Optimus Humanoid Robot.jpg)",
+      "tags": [
+        "옵티머스",
+        "테슬라",
+        "휴머노이드",
+        "로봇",
+        "Optimus",
+        "Tesla"
+      ],
+      "alt": "테슬라 옵티머스 휴머노이드 로봇",
+      "usedIn": []
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/herculaneum-scroll.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC BY 4.0 · Stabile et al. · Wikimedia Commons (File:Herculaneum papyri.jpg)",
+      "tags": [
+        "헤르쿨라네움",
+        "파피루스",
+        "탄화 두루마리",
+        "CT",
+        "고고학",
+        "베수비오",
+        "papyrus",
+        "scroll"
+      ],
+      "alt": "탄화된 헤르쿨라네움 파피루스와 CT 스캔 준비 장비 (3패널 연구 사진)",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/sperm-whale.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC BY-SA 2.0 · Gabriel Barathieu · Wikimedia Commons (File:Mother and baby sperm whale.jpg)",
+      "tags": [
+        "향유고래",
+        "어미와 새끼",
+        "수중",
+        "바다",
+        "CETI",
+        "whale",
+        "underwater"
+      ],
+      "alt": "어미와 새끼 향유고래가 함께 헤엄치는 수중 사진",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/bci-braingate.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "Public domain · PaulWicks · Wikimedia Commons (File:BrainGate.jpg)",
+      "tags": [
+        "BCI",
+        "브레인게이트",
+        "뇌-컴퓨터 인터페이스",
+        "전극",
+        "신경",
+        "BrainGate",
+        "implant"
+      ],
+      "alt": "BrainGate 뇌-컴퓨터 인터페이스 구조를 보여주는 전시 모형",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능이-바꾸는-세상/images/thinking-game-thumb.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "YouTube 썸네일 (Google DeepMind 공식 영상 d95J8yzvjbQ) — 영상 링크 카드 전용",
+      "tags": [
+        "The Thinking Game",
+        "다큐멘터리",
+        "딥마인드",
+        "AlphaFold",
+        "영상 썸네일"
+      ],
+      "alt": "The Thinking Game 다큐멘터리 유튜브 썸네일",
+      "usedIn": [
+        "ai-changing-world"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/packet-idle.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 478,
+      "h": 357,
+      "tags": [
+        "패킷",
+        "편지",
+        "봉투",
+        "캐릭터",
+        "인사",
+        "데이터",
+        "네트워크",
+        "packet",
+        "envelope",
+        "mascot"
+      ],
+      "alt": "손 흔드는 크림색 편지 봉투 캐릭터(청록 밀랍 도장·청록 신발) — 패킷 의인화 기본 포즈",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/packet-walk-a.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 451,
+      "h": 351,
+      "tags": [
+        "패킷",
+        "편지",
+        "봉투",
+        "걷기",
+        "이동",
+        "전송",
+        "packet",
+        "walk",
+        "envelope"
+      ],
+      "alt": "오른쪽으로 걷는 편지 봉투 캐릭터 A(왼발 앞) — walk-b와 교차해 걷기 플립북",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/packet-walk-b.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 448,
+      "h": 362,
+      "tags": [
+        "패킷",
+        "편지",
+        "봉투",
+        "걷기",
+        "이동",
+        "전송",
+        "packet",
+        "walk",
+        "envelope"
+      ],
+      "alt": "오른쪽으로 걷는 편지 봉투 캐릭터 B(오른발 앞) — walk-a와 교차해 걷기 플립북",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/packet-worry.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 366,
+      "h": 373,
+      "tags": [
+        "패킷",
+        "편지",
+        "봉투",
+        "걱정",
+        "의문",
+        "혼란",
+        "순서",
+        "packet",
+        "worried",
+        "envelope"
+      ],
+      "alt": "볼에 손을 대고 걱정하는 편지 봉투 캐릭터 — 순서가 섞였을 때의 감정 비트용",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/디오라마-샘플/images/stage-01.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "세계지도",
+        "보드",
+        "전략판",
+        "항로",
+        "여정",
+        "척추보드",
+        "지도",
+        "world map",
+        "board"
+      ],
+      "alt": "나무 테이블 위 보드게임풍 세계 지도 — 하단에 배우가 설 나무 테두리(척추 보드 무대)",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/디오라마-샘플/images/stage-02.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "책상",
+        "방",
+        "컴퓨터",
+        "밤",
+        "출발",
+        "가정",
+        "desk",
+        "room",
+        "night"
+      ],
+      "alt": "밤의 책상 코너 — 발광하는 구형 모니터·스탠드 램프·창문, 하단은 빈 마루(출발 무대)",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/디오라마-샘플/images/stage-03.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "관문",
+        "검문소",
+        "갈림길",
+        "이정표",
+        "라우터",
+        "선택",
+        "gate",
+        "crossroad",
+        "signpost"
+      ],
+      "alt": "차단봉이 있는 관문 초소와 빈 나무 이정표 3개가 선 갈림길 — 라우터 은유 무대(팻말 글자는 오버레이로)",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/디오라마-샘플/images/stage-04.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "해저",
+        "케이블",
+        "바다",
+        "전송",
+        "광케이블",
+        "심해",
+        "undersea",
+        "cable",
+        "seabed"
+      ],
+      "alt": "바다 밑 모래 위를 가로지르는 청록빛 해저 광케이블 — 하단은 빈 해저 바닥(이동 무대)",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/keeper-idle.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 295,
+      "h": 407,
+      "tags": [
+        "문지기",
+        "라우터",
+        "등불",
+        "안내",
+        "관문",
+        "캐릭터",
+        "keeper",
+        "router",
+        "lantern"
+      ],
+      "alt": "등불 머리에 청록 모자를 쓴 나무 기둥 문지기 캐릭터(정면) — 라우터 의인화",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/keeper-point.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 370,
+      "h": 407,
+      "tags": [
+        "문지기",
+        "라우터",
+        "가리키기",
+        "안내",
+        "방향",
+        "keeper",
+        "point",
+        "router"
+      ],
+      "alt": "한 팔을 들어 옆을 가리키는 등불 문지기 캐릭터 — 다음 홉 지시 포즈",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/server-house.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 433,
+      "h": 374,
+      "tags": [
+        "서버",
+        "데이터센터",
+        "건물",
+        "우체통",
+        "보관",
+        "server",
+        "house",
+        "datacenter"
+      ],
+      "alt": "둥근 지붕에 투입구가 있는 크림·청록 상자형 작은 건물 — 서버/데이터센터 소품",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/letter-stack.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 508,
+      "h": 345,
+      "tags": [
+        "편지",
+        "조각",
+        "패킷 묶음",
+        "더미",
+        "분할",
+        "letters",
+        "stack",
+        "packets"
+      ],
+      "alt": "청록 밀랍 도장이 찍힌 크림색 편지 4장이 부채꼴로 겹친 더미 — 조각(패킷) 묶음 소품",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/packet-idle-l.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 722,
+      "h": 557,
+      "tags": [
+        "패킷",
+        "편지",
+        "봉투",
+        "인사",
+        "클로즈업",
+        "고해상도",
+        "packet",
+        "envelope",
+        "closeup"
+      ],
+      "alt": "손 흔드는 편지 봉투 캐릭터 — 클로즈업/펀치인용 큰 크롭(722px)",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/디오라마-샘플/packet-worry-l.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "디오라마-샘플",
+      "style": "cartoon-diorama",
+      "w": 564,
+      "h": 574,
+      "tags": [
+        "패킷",
+        "편지",
+        "봉투",
+        "걱정",
+        "의문",
+        "클로즈업",
+        "packet",
+        "worried",
+        "closeup"
+      ],
+      "alt": "볼에 손을 대고 걱정하는 편지 봉투 캐릭터 — 클로즈업용 큰 크롭(574px)",
+      "usedIn": [
+        "diorama-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-laptop.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 425,
+      "h": 345,
+      "tags": [
+        "노트북",
+        "컴퓨터",
+        "코드",
+        "화면",
+        "laptop",
+        "computer"
+      ],
+      "alt": "열린 노트북(빈 하늘색 화면) 두들 — 코드·실행 화면",
+      "usedIn": [
+        "whiteboard-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-person-cook.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 308,
+      "h": 484,
+      "tags": [
+        "사람",
+        "요리",
+        "국자",
+        "앞치마",
+        "레시피",
+        "실행",
+        "person",
+        "cook",
+        "doodle"
+      ],
+      "alt": "국자를 들고 앞치마를 두른 채 신난 두들 인물 — 순서대로 실행하는 사람",
+      "usedIn": [
+        "whiteboard-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-person-think.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 175,
+      "h": 484,
+      "tags": [
+        "사람",
+        "생각",
+        "고민",
+        "팔짱",
+        "두들",
+        "화이트보드",
+        "person",
+        "think",
+        "doodle"
+      ],
+      "alt": "턱에 손을 대고 생각하는 하늘색 옷의 두들 인물 — 문제를 마주한 순간",
+      "usedIn": [
+        "whiteboard-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-pot.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 351,
+      "h": 347,
+      "tags": [
+        "냄비",
+        "요리",
+        "김",
+        "레시피",
+        "알고리즘",
+        "pot",
+        "cooking",
+        "steam"
+      ],
+      "alt": "김이 오르는 살구색 냄비 두들 — 요리(실행) 비유의 소품",
+      "usedIn": [
+        "whiteboard-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-recipe-card.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 349,
+      "h": 292,
+      "tags": [
+        "레시피",
+        "카드",
+        "목록",
+        "절차",
+        "종이",
+        "recipe",
+        "card",
+        "steps"
+      ],
+      "alt": "줄이 그어진 빈 레시피 카드(모서리 접힘) 두들 — 절차·알고리즘 표기",
+      "usedIn": [
+        "whiteboard-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-robot.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 294,
+      "h": 390,
+      "tags": [
+        "로봇",
+        "컴퓨터",
+        "기계",
+        "실행",
+        "마스코트",
+        "robot",
+        "machine"
+      ],
+      "alt": "안테나와 민트색 가슴판을 가진 네모 로봇 두들 — 컴퓨터 의인화",
+      "usedIn": [
+        "whiteboard-demo",
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-stopwatch.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 418,
+      "h": 490,
+      "tags": [
+        "스톱워치",
+        "시간",
+        "측정",
+        "효율",
+        "stopwatch",
+        "time"
+      ],
+      "alt": "둥근 스톱워치 두들(숫자 없음) — 시간·효율 비유",
+      "usedIn": [
+        "whiteboard-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/화이트보드-키트/wb-write-hand.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "화이트보드-키트",
+      "style": "whiteboard-doodle",
+      "w": 518,
+      "h": 520,
+      "tags": [
+        "손",
+        "마커",
+        "쓰는 손",
+        "펜",
+        "드로잉",
+        "hand",
+        "marker",
+        "writing"
+      ],
+      "alt": "검은 마커를 쥔 손과 하늘색 소매 — 화이트보드 킷의 쓰는 손(펜촉 좌상단)",
+      "usedIn": [
+        "whiteboard-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-cart.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 442,
+      "h": 517,
+      "tags": [
+        "쇼핑카트",
+        "소비",
+        "광고",
+        "구매",
+        "cart",
+        "shopping",
+        "ads"
+      ],
+      "alt": "상자 두 개가 담긴 흰 쇼핑카트 종이 콜라주 조각 — 맞춤 광고·소비",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-coins.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 366,
+      "h": 378,
+      "tags": [
+        "동전",
+        "돈",
+        "수익",
+        "대가",
+        "coins",
+        "money",
+        "value"
+      ],
+      "alt": "다섯 개가 쌓인 동전 종이 콜라주 조각 — 데이터의 값·무료의 대가",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-eye.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 416,
+      "h": 302,
+      "tags": [
+        "눈",
+        "감시",
+        "추적",
+        "관찰",
+        "eye",
+        "surveillance",
+        "tracking"
+      ],
+      "alt": "눈꺼풀 아치가 있는 큰 눈 종이 콜라주 조각 — 감시·추적",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-person-fold.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 212,
+      "h": 549,
+      "tags": [
+        "사람",
+        "팔짱",
+        "고민",
+        "의심",
+        "콜라주",
+        "person",
+        "arms folded",
+        "doubt"
+      ],
+      "alt": "머스터드 스웨터의 한국 성인이 팔짱을 끼고 걱정스레 선 종이 콜라주 조각",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-person-phone.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 195,
+      "h": 540,
+      "tags": [
+        "사람",
+        "스마트폰",
+        "사용자",
+        "한국인",
+        "콜라주",
+        "person",
+        "phone",
+        "user"
+      ],
+      "alt": "네이비 재킷·초록 바지의 한국 성인이 고개를 숙이고 스마트폰을 보는 종이 콜라주 조각",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-pin.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 280,
+      "h": 426,
+      "tags": [
+        "위치",
+        "핀",
+        "지도",
+        "위치정보",
+        "location",
+        "pin",
+        "map"
+      ],
+      "alt": "물방울 모양 위치 핀 종이 콜라주 조각 — 위치 데이터",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-servers.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 351,
+      "h": 493,
+      "tags": [
+        "서버",
+        "데이터센터",
+        "저장",
+        "네이비",
+        "collage",
+        "server",
+        "datacenter"
+      ],
+      "alt": "표시등이 달린 네이비 서버 3단 종이 콜라주 조각 — 데이터가 모이는 곳",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/데이터-콜라주/vox-shield.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "데이터-콜라주",
+      "style": "paper-collage",
+      "w": 363,
+      "h": 453,
+      "tags": [
+        "방패",
+        "보호",
+        "권리",
+        "보안",
+        "자물쇠",
+        "shield",
+        "privacy",
+        "rights"
+      ],
+      "alt": "열쇠구멍이 뚫린 방패 종이 콜라주 조각 — 개인정보 보호·권리",
+      "usedIn": [
+        "vox-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/수채화-샘플/images/scene-01.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "수채화-샘플",
+      "style": "watercolor",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "아침",
+        "방",
+        "침대",
+        "기상",
+        "스마트폰",
+        "수채화",
+        "morning",
+        "bedroom",
+        "watercolor"
+      ],
+      "alt": "아침 햇살이 든 방에서 침대 끝에 앉아 눈을 비비는 뒷모습 — 수채화 wash",
+      "usedIn": [
+        "watercolor-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/수채화-샘플/images/scene-02.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "수채화-샘플",
+      "style": "watercolor",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "교실",
+        "수업",
+        "학생",
+        "오후",
+        "노트",
+        "수채화",
+        "classroom",
+        "students",
+        "watercolor"
+      ],
+      "alt": "창으로 빛이 드는 오후 교실 뒷자리 시점 — 노트와 노트북 앞의 학생들, 수채화 wash",
+      "usedIn": [
+        "watercolor-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/수채화-샘플/images/scene-03.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "수채화-샘플",
+      "style": "watercolor",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "저녁",
+        "책상",
+        "스탠드",
+        "창밖",
+        "도시",
+        "수채화",
+        "evening",
+        "desk",
+        "dusk"
+      ],
+      "alt": "저녁 창가 책상 — 스탠드·노트·빛나는 휴대폰과 푸른 도시의 어스름, 수채화 wash",
+      "usedIn": [
+        "watercolor-demo"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/hover-bird.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 539,
+      "h": 425,
+      "tags": [
+        "새",
+        "둥지",
+        "품다",
+        "날개",
+        "돌봄",
+        "루아흐",
+        "bird",
+        "nest",
+        "brooding"
+      ],
+      "alt": "둥지 위에서 두 날개를 펼친 갈색 새 — 신명기 32:11의 품는 새(메라헤페트)",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/scale-balance.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 497,
+      "h": 438,
+      "tags": [
+        "저울",
+        "판결",
+        "무게",
+        "비교",
+        "공의",
+        "scale",
+        "balance",
+        "judgment"
+      ],
+      "alt": "빈 접시 두 개가 달린 황동 양팔 저울 — 값을 견주는 판결 소품",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/scribe-idle.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 242,
+      "h": 575,
+      "tags": [
+        "필사자",
+        "서기관",
+        "히브리",
+        "두루마리",
+        "성경",
+        "해설자",
+        "scribe",
+        "hebrew",
+        "scroll"
+      ],
+      "alt": "크림 튜닉에 청·금 줄무늬 겉옷과 두건을 두른 고대 히브리 필사자 — 두루마리를 들고 선 기본 포즈",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/scribe-point.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 319,
+      "h": 574,
+      "tags": [
+        "필사자",
+        "가리키다",
+        "지시",
+        "설명",
+        "강조",
+        "scribe",
+        "pointing",
+        "teach"
+      ],
+      "alt": "오른팔을 들어 위쪽을 가리키는 필사자 — 본문의 한 지점을 지목하는 포즈",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/scribe-wonder.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 292,
+      "h": 563,
+      "tags": [
+        "필사자",
+        "놀람",
+        "경이",
+        "묵상",
+        "질문",
+        "scribe",
+        "wonder",
+        "awe"
+      ],
+      "alt": "두 손을 펴 들고 위를 올려다보는 필사자 — 경이·질문의 순간",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/scribe-write.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 231,
+      "h": 554,
+      "tags": [
+        "필사자",
+        "기록",
+        "갈대펜",
+        "필사",
+        "서기관",
+        "scribe",
+        "writing",
+        "pen"
+      ],
+      "alt": "갈대펜을 들고 몸을 숙여 기록하는 필사자 — 본문을 옮겨 적는 순간",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/seal-stamp.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 349,
+      "h": 448,
+      "tags": [
+        "봉인",
+        "도장",
+        "인장",
+        "밀랍",
+        "확정",
+        "seal",
+        "stamp",
+        "wax"
+      ],
+      "alt": "나무 손잡이의 황동 인장과 붉은 밀랍 봉인 — 각인·확정의 소품",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "assets/sprites/히브리어-사본/serpent.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 400,
+      "h": 402,
+      "tags": [
+        "뱀",
+        "창세기3장",
+        "유혹",
+        "원수",
+        "serpent",
+        "snake",
+        "genesis3"
+      ],
+      "alt": "몸을 한 번 감고 고개를 든 초록 뱀(금빛 배비늘) — 창세기 3장의 뱀",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/히브리어-창세기1장-디오라마/images/stage-01.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "두루마리",
+        "양피지",
+        "책상",
+        "촛불",
+        "척추보드",
+        "무대",
+        "scroll",
+        "parchment",
+        "table"
+      ],
+      "alt": "어두운 나무 책상 위에 펼쳐진 빈 양피지 두루마리 — 이 덱의 척추 보드(하단은 배우 자리)",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/히브리어-창세기1장-디오라마/images/stage-02.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "필사실",
+        "서재",
+        "등불",
+        "잉크",
+        "갈대펜",
+        "두루마리",
+        "무대",
+        "scriptorium",
+        "lamp"
+      ],
+      "alt": "밤의 필사실 — 경사진 책상 위 빈 양피지·기름등·잉크병, 뒤로 두루마리 선반과 아치창",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/히브리어-창세기1장-디오라마/images/stage-03.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "발굴",
+        "트렌치",
+        "지층",
+        "고고학",
+        "사다리",
+        "무대",
+        "excavation",
+        "strata",
+        "layers"
+      ],
+      "alt": "세 지층이 드러난 발굴 트렌치 단면과 사다리 — 어근을 파 내려가는 무대",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/히브리어-창세기1장-디오라마/images/stage-04.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "혼돈",
+        "깊은물",
+        "수면",
+        "안개",
+        "어둠",
+        "무대",
+        "chaos",
+        "deep",
+        "water"
+      ],
+      "alt": "형태 없는 검푸른 수면과 안개, 앞쪽에 바위 턱 — 토후·보후의 무대",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/히브리어-창세기1장-디오라마/images/stage-05.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "창조",
+        "하늘",
+        "바다",
+        "땅",
+        "해",
+        "달",
+        "물고기",
+        "무대",
+        "creation",
+        "bands"
+      ],
+      "alt": "하늘·바다·땅 세 띠로 정돈된 세계(해·달·새·물고기·나무) — 짓다/채우다 대칭 무대",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/히브리어-창세기1장-디오라마/images/stage-06.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "히브리어-사본",
+      "style": "illuminated-manuscript",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "균열",
+        "갈라진 땅",
+        "노을",
+        "마른나무",
+        "심판",
+        "무대",
+        "crack",
+        "dusk",
+        "judgment"
+      ],
+      "alt": "붉은 노을 아래 좌우로 갈라진 마른 땅과 앙상한 나무 — 창세기 3장의 무대",
+      "usedIn": [
+        "hebrew-genesis-diorama"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/영상-에셋-데모/media/scrub-notice.mp4",
+      "type": "video",
+      "origin": "openmontage",
+      "style": "cinematic-sageuk",
+      "tags": [
+        "훈민정음",
+        "방문",
+        "한자",
+        "백성",
+        "조선",
+        "마을",
+        "스크럽",
+        "all-intra",
+        "notice",
+        "commoner"
+      ],
+      "alt": "한자 방문(榜文) 앞에 선 백성 — 카메라가 마을로 도는 14.3초 클립. all-intra(-g 1) 재인코딩본이라 ScrubVideo(t 스크럽) 전용. 포스터 scrub-notice.jpg 동봉",
+      "usedIn": [
+        "video-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/영상-에셋-데모/media/step-decree.mp4",
+      "type": "video",
+      "origin": "openmontage",
+      "style": "cinematic-sageuk",
+      "tags": [
+        "훈민정음",
+        "관리",
+        "낭독",
+        "백성",
+        "문맹",
+        "조선",
+        "구간 재생",
+        "decree",
+        "reading"
+      ],
+      "alt": "관리가 문서를 소리 내어 읽고 백성은 듣기만 하는 9.4초 클립 — 1초 키프레임(-g 24), StepVideo(클릭 구간 재생)용. 포스터 step-decree.jpg 동봉",
+      "usedIn": [
+        "video-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/영상-에셋-데모/media/loop-script.mp4",
+      "type": "video",
+      "origin": "openmontage",
+      "style": "cinematic-sageuk",
+      "tags": [
+        "한자",
+        "붓글씨",
+        "문서",
+        "클로즈업",
+        "루프",
+        "무대 배경",
+        "calligraphy",
+        "ambient"
+      ],
+      "alt": "한자 붓글씨 문서 위를 훑는 12.3초 저용량(0.6MB) 클립 — AmbientVideo(muted 루프 무대 텍스처)용. 포스터 loop-script.jpg 동봉",
+      "usedIn": [
+        "video-demo"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/전주-영상-콜라주/media/city.mp4",
+      "type": "video",
+      "origin": "openmontage",
+      "style": "vox-collage-film",
+      "tags": [
+        "전주",
+        "타이틀",
+        "역사",
+        "후백제",
+        "조선왕조",
+        "인구",
+        "vox 콜라주",
+        "JeonjuCity"
+      ],
+      "alt": "vox 콜라주 형식 정보 영상 1편 '전주라는 도시' 13.5초 — 3장면(전주 全州 타이틀 / 천 년의 이력 / 인구 약 64만). remotion-composer JeonjuVox.tsx 저작, 장면 경계 4.5s/9s, StepVideo auto 구간 [4.4, 8.9, 13.4]. 포스터 city.jpg",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/전주-영상-콜라주/media/tenmillion.mp4",
+      "type": "video",
+      "origin": "openmontage",
+      "style": "vox-collage-film",
+      "tags": [
+        "전주",
+        "한옥마을",
+        "방문객",
+        "경기전",
+        "전동성당",
+        "오목대",
+        "vox 콜라주",
+        "JeonjuTenMillion"
+      ],
+      "alt": "vox 콜라주 형식 정보 영상 2편 '천만의 마을' 13.5초 — 3장면(연 1,000만 방문객 / 한옥 700여 채 종이 지붕 / 걸어서 닿는 세 곳). 장면 경계 4.5s/9s. 포스터 tenmillion.jpg",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "data/dev/테스트 수업 자료/전주-영상-콜라주/media/culture.mp4",
+      "type": "video",
+      "origin": "openmontage",
+      "style": "vox-collage-film",
+      "tags": [
+        "전주",
+        "비빔밥",
+        "유네스코",
+        "판소리",
+        "한지",
+        "vox 콜라주",
+        "JeonjuCulture"
+      ],
+      "alt": "vox 콜라주 형식 정보 영상 3편 '맛·소리·종이' 13.5초 — 3장면(비빔밥 그릇 / 판소리 소리결 / 전주한지 겹장 + 세 키워드 요약). 장면 경계 4.5s/9s. 포스터 culture.jpg",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/gyeonggijeon.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 589,
+      "h": 408,
+      "tags": [
+        "전주",
+        "경기전",
+        "전각",
+        "한옥",
+        "사당",
+        "조선",
+        "건축",
+        "shrine"
+      ],
+      "alt": "경기전 전각 종이 콜라주 조각 — 먹색 기와지붕에 흰 용마루 선, 코랄 기둥, 베이지 석축 기단",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/jeondong-cathedral.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 523,
+      "h": 553,
+      "tags": [
+        "전주",
+        "전동성당",
+        "성당",
+        "벽돌",
+        "로마네스크",
+        "건축",
+        "cathedral"
+      ],
+      "alt": "전동성당 종이 콜라주 조각 — 적벽돌 로마네스크 몸체에 초록 돔 세 개, 장미창",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/omokdae.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 554,
+      "h": 450,
+      "tags": [
+        "전주",
+        "오목대",
+        "정자",
+        "누각",
+        "한옥마을",
+        "pavilion"
+      ],
+      "alt": "오목대 정자 종이 콜라주 조각 — 초록 언덕 위 팔각 기와지붕 열린 정자",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/hanji-scrolls.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 553,
+      "h": 370,
+      "tags": [
+        "전주",
+        "한지",
+        "두루마리",
+        "종이",
+        "전통",
+        "공예",
+        "scroll"
+      ],
+      "alt": "전주한지 두루마리 세 축 종이 콜라주 조각 — 크림·베이지 종이 말이, 초록·머스터드 끈 리본",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/pansori-singer.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 374,
+      "h": 506,
+      "tags": [
+        "전주",
+        "판소리",
+        "소리꾼",
+        "한복",
+        "부채",
+        "국악",
+        "singer"
+      ],
+      "alt": "판소리 소리꾼 종이 콜라주 조각 — 코랄 저고리·미색 치마 한복의 여성이 부채를 펴 들고 입을 벌려 소리하는 모습",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/gosu-drummer.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 443,
+      "h": 476,
+      "tags": [
+        "전주",
+        "판소리",
+        "고수",
+        "북",
+        "갓",
+        "국악",
+        "drummer"
+      ],
+      "alt": "고수 종이 콜라주 조각 — 갓 쓴 베이지 한복 남성이 책상다리로 앉아 북채로 소리북을 치는 모습",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/tourists-selfie.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 384,
+      "h": 542,
+      "tags": [
+        "전주",
+        "관광객",
+        "한복체험",
+        "셀카",
+        "한옥마을",
+        "여행",
+        "tourist"
+      ],
+      "alt": "한복 입은 관광객 커플 종이 콜라주 조각 — 네이비 한복 남성이 폰 셀카, 머스터드 치마 여성이 브이",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/king-portrait.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 433,
+      "h": 545,
+      "tags": [
+        "전주",
+        "태조",
+        "어진",
+        "초상",
+        "조선",
+        "경기전",
+        "왕",
+        "portrait"
+      ],
+      "alt": "태조 어진풍 왕 초상 액자 종이 콜라주 조각 — 청룡포·익선관의 조선 왕, 짙은 나무 액자",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/bibimbap.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 593,
+      "h": 533,
+      "tags": [
+        "전주",
+        "비빔밥",
+        "음식",
+        "유네스코",
+        "미식",
+        "탑뷰",
+        "food"
+      ],
+      "alt": "비빔밥 탑뷰 종이 콜라주 조각 — 먹색 그릇에 흰 밥, 초록·머스터드·코랄·네이비 고명이 방사형, 중앙 노른자",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/전주-콜라주/hanok-house.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "전주-콜라주",
+      "style": "vox-collage",
+      "w": 608,
+      "h": 490,
+      "tags": [
+        "전주",
+        "한옥",
+        "기와집",
+        "한옥마을",
+        "건축",
+        "전통가옥",
+        "hanok"
+      ],
+      "alt": "한옥 한 채 종이 콜라주 조각 — 완만히 휜 먹색 기와지붕과 흰 용마루 선, 베이지 벽, 주황 기둥과 격자문",
+      "usedIn": [
+        "jeonju-vox"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/packet-idle.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 434,
+      "h": 377,
+      "tags": [
+        "패킷",
+        "봉투",
+        "캐릭터",
+        "idle",
+        "네트워크",
+        "메시지"
+      ],
+      "alt": "봉투 패킷 캐릭터 기본 포즈 — 크림색 봉투에 점 눈·미소, 붉은 봉랍, 팔다리, 서서 웃는 모습",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/packet-run.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 456,
+      "h": 395,
+      "tags": [
+        "패킷",
+        "봉투",
+        "캐릭터",
+        "달리기",
+        "run",
+        "전송"
+      ],
+      "alt": "봉투 패킷 캐릭터 달리기 포즈 — 앞으로 기울어 한 발 들고 질주",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/packet-worry.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 392,
+      "h": 378,
+      "tags": [
+        "패킷",
+        "봉투",
+        "캐릭터",
+        "걱정",
+        "worry",
+        "오류"
+      ],
+      "alt": "봉투 패킷 캐릭터 걱정 포즈 — 식은땀 한 방울, 양손으로 머리를 감싼 모습",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/packet-cheer.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 446,
+      "h": 382,
+      "tags": [
+        "패킷",
+        "봉투",
+        "캐릭터",
+        "만세",
+        "cheer",
+        "도착"
+      ],
+      "alt": "봉투 패킷 캐릭터 만세 포즈 — 양팔 들고 환호",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/person-phone.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 212,
+      "h": 483,
+      "tags": [
+        "사람",
+        "폰",
+        "전송",
+        "후디",
+        "옆모습",
+        "보내기"
+      ],
+      "alt": "후디 입은 사람이 옆으로 서서 두 손으로 폰을 보는 모습 — 메시지 보내는 사람",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/router-robot.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 387,
+      "h": 421,
+      "tags": [
+        "라우터",
+        "로봇",
+        "길안내",
+        "방향",
+        "바퀴",
+        "네트워크"
+      ],
+      "alt": "바퀴 달린 네이비 안내 로봇이 오른쪽을 가리키는 모습 — 라우터 의인화",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/server-rack.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 342,
+      "h": 479,
+      "tags": [
+        "서버",
+        "랙",
+        "캐릭터",
+        "데이터센터",
+        "목적지"
+      ],
+      "alt": "서버 랙 캐릭터 — 네이비 캐비닛에 청록 표시등 눈과 미소, 짧은 팔",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/sprites/패킷-필름/envelope-pieces.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "패킷-필름",
+      "style": "storybook-diorama",
+      "w": 373,
+      "h": 440,
+      "tags": [
+        "패킷",
+        "조각",
+        "분할",
+        "봉투",
+        "파편",
+        "TCP"
+      ],
+      "alt": "찢어진 봉투 조각 3개 — 크림·앰버·청록 삼각 조각 (얼굴 없음), 분할된 패킷 비유",
+      "usedIn": [
+        "packet-film"
+      ]
+    },
+    {
+      "file": "assets/svg/empty-chair.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "의자",
+        "빈 의자",
+        "자리",
+        "역할",
+        "결정",
+        "사람",
+        "chair",
+        "empty",
+        "seat",
+        "role"
+      ],
+      "alt": "에메랄드 잉크 단선으로 그린 빈 의자 — 데이터로 무엇을 할지 정하는 사람의 비어 있는 자리",
+      "usedIn": [
+        "info-research-data-value"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/stage-cover.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-night",
+      "style": "painterly-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "서울",
+        "야경",
+        "도시",
+        "빛줄기",
+        "데이터 흐름",
+        "학생",
+        "실루엣",
+        "표지",
+        "night city",
+        "data flow"
+      ],
+      "alt": "밤의 서울을 내려다보는 학생 실루엣, 도로와 강 위로 에메랄드 빛 점들이 하늘로 솟는 풍경 — 도시가 남기는 데이터의 발자국",
+      "usedIn": [
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/stage-reddit.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-night",
+      "style": "painterly-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "스마트폰",
+        "서버",
+        "눈",
+        "감시",
+        "금화",
+        "주가",
+        "추락",
+        "파노라마",
+        "phone",
+        "server",
+        "coins"
+      ],
+      "alt": "스마트폰을 보는 청소년에게서 나온 빛 조각이 서버 탑으로 모이고 금화와 추락하는 선으로 바뀌는 밤 풍경 파노라마 — 글에 가격표가 붙는 순간",
+      "usedIn": [
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/stage-chair.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-night",
+      "style": "painterly-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "빈 의자",
+        "관제실",
+        "화면",
+        "데이터",
+        "스포트라이트",
+        "자리",
+        "empty chair",
+        "control room"
+      ],
+      "alt": "거대한 데이터 화면들 앞에 홀로 놓인 빈 의자에 앰버 조명이 떨어지는 어두운 관제실 — 데이터로 무엇을 할지 정하는 사람의 빈자리",
+      "usedIn": [
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/stage-nightbus.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-night",
+      "style": "painterly-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "심야버스",
+        "정류장",
+        "택시",
+        "스마트폰",
+        "서울",
+        "밤",
+        "빛 점",
+        "night bus",
+        "bus stop",
+        "taxi"
+      ],
+      "alt": "비 젖은 새벽 정류장에서 스마트폰을 보는 사람들, 파란 띠 버스와 택시, 하늘로 오르는 주황·시안 빛 점 — 통화와 택시 데이터가 겹치는 서울의 밤",
+      "usedIn": [
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/stage-lab.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-night",
+      "style": "painterly-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "댐",
+        "수문",
+        "물줄기",
+        "연구실",
+        "단백질",
+        "나선",
+        "개방",
+        "dam",
+        "floodgate",
+        "lab"
+      ],
+      "alt": "수문이 열린 댐에서 에메랄드 물줄기가 쏟아져 평야의 연구실 창마다 불이 켜지고, 댐 위로 단백질 나선이 떠오르는 밤 — 데이터가 데이터를 낳다",
+      "usedIn": [
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/stage-school.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-night",
+      "style": "painterly-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "학교",
+        "급식실",
+        "도서관",
+        "복도",
+        "매점",
+        "교실",
+        "단면도",
+        "별자리",
+        "school",
+        "cafeteria",
+        "library"
+      ],
+      "alt": "급식실·도서관·복도·매점·교실이 이어진 학교 단면도 위로 에메랄드 빛 점이 별자리처럼 연결되는 저녁 풍경 — 학교가 이미 가진 데이터",
+      "usedIn": [
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/stage-gallery.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-night",
+      "style": "painterly-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "갤러리 워크",
+        "교실",
+        "포스트잇",
+        "벽",
+        "학생",
+        "동선",
+        "고리",
+        "gallery walk",
+        "sticky notes"
+      ],
+      "alt": "조명 아래 벽에 붙은 여섯 장의 종이와 노란 포스트잇, 그 앞을 돌아보는 학생 실루엣들과 바닥의 시안 빛 동선 고리 — 갤러리 워크",
+      "usedIn": []
+    },
+    {
+      "file": "data/2026-2/정보과제연구/데이터의-가치와-활용/images/seoul-night-skyline.jpg",
+      "type": "image",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC0 · Wikimedia Commons (File:Seoul Skyline Night 2018.jpg · mauveine.kim)",
+      "tags": [
+        "서울",
+        "야경",
+        "스카이라인",
+        "한강",
+        "도시",
+        "photo",
+        "seoul",
+        "night",
+        "skyline"
+      ],
+      "alt": "한강 쪽에서 본 서울 야경 사진 (세로 원본을 1920px로 축소)",
+      "usedIn": [
+        "info-research-data-value"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/바이브코딩/images/stage-vibe-cover.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-bright",
+      "style": "painterly-bright",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "바이브코딩",
+        "표지",
+        "노트북",
+        "말풍선",
+        "아침",
+        "책상",
+        "수채",
+        "cover laptop speech bubble"
+      ],
+      "alt": "햇살 드는 책상 위 노트북에서 에메랄드 말풍선들이 피어오르는 밝은 수채 무대 — 바이브코딩 표지",
+      "usedIn": [
+        "info-research-vibe-coding"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/바이브코딩/images/stage-stopwatch.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-bright",
+      "style": "painterly-bright",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "스톱워치",
+        "회중시계",
+        "모형 비행기",
+        "장난감 로봇",
+        "선반",
+        "정물",
+        "shelf stopwatch plane robot"
+      ],
+      "alt": "밝은 벽 선반 위 회중시계·목제 비행기·장난감 로봇 정물 — 실화 씬 배경 (좌측 여백 넓음)",
+      "usedIn": [
+        "info-research-vibe-coding"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/바이브코딩/images/stage-kitchen.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-bright",
+      "style": "painterly-bright",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "주방",
+        "분식집",
+        "주문서",
+        "집게줄",
+        "타일",
+        "카운터",
+        "kitchen order slip"
+      ],
+      "alt": "집게줄에 빈 주문서가 걸린 밝은 분식집 주방 카운터 — 주문서 씬 배경 (중앙 여백 넓음)",
+      "usedIn": [
+        "info-research-vibe-coding"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/바이브코딩/images/stage-sculpt.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-bright",
+      "style": "painterly-bright",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "조각",
+        "아틀리에",
+        "작업대",
+        "끌",
+        "망치",
+        "창빛",
+        "sculpt atelier chisel"
+      ],
+      "alt": "창으로 빛이 드는 조각 아틀리에 작업대와 끌·망치 — 깎는 루프 씬 배경",
+      "usedIn": [
+        "info-research-vibe-coding"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/바이브코딩/images/stage-desk-tools.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-bright",
+      "style": "painterly-bright",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "책상",
+        "노트",
+        "연필",
+        "스마트폰",
+        "붙임쪽지",
+        "다육이",
+        "정물",
+        "desk notebook pencil"
+      ],
+      "alt": "펼친 노트·연필·스마트폰·붙임쪽지가 놓인 밝은 책상 정물 — 도구·초안 카드 배경 (우측 여백 넓음)",
+      "usedIn": [
+        "info-research-vibe-coding"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/바이브코딩/images/stage-workshop.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-bright",
+      "style": "painterly-bright",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "공방",
+        "작업실",
+        "책상들",
+        "노트북",
+        "창가",
+        "빈 액자",
+        "workshop desks"
+      ],
+      "alt": "큰 창과 빈 액자가 있는 밝은 공방의 노트북 책상 네 개 — 실습 슬라이드 상단 배경",
+      "usedIn": [
+        "info-research-vibe-coding"
+      ]
+    },
+    {
+      "file": "data/2026-2/정보과제연구/바이브코딩/images/stage-gallery.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "painterly-bright",
+      "style": "painterly-bright",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "갤러리",
+        "선반",
+        "액자",
+        "종이비행기",
+        "화분",
+        "마무리",
+        "gallery frames shelf"
+      ],
+      "alt": "수채 색면 액자 셋과 종이비행기·화분이 놓인 밝은 갤러리 선반 — 마무리 풀블리드",
+      "usedIn": [
+        "info-research-vibe-coding"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/나의-첫-AI-서비스/images/stage-cover.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "야간-작업실",
+      "style": "painterly-workshop-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "야간 작업실",
+        "책상",
+        "작업등",
+        "노트북",
+        "설계 도면",
+        "부품",
+        "공구",
+        "머그",
+        "빈 의자",
+        "표지",
+        "workshop",
+        "desk"
+      ],
+      "alt": "작업등이 켜진 밤의 작업실 책상을 비스듬히 내려다본 회화 — 노트북 화면이 민트빛, 도면과 부품·드라이버·머그가 주황 불빛 안에 놓이고 좌측 절반은 제목이 앉도록 어둡게 비어 있다",
+      "usedIn": [
+        "my-first-ai-service"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/나의-첫-AI-서비스/images/stage-interview.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "야간-작업실",
+      "style": "painterly-workshop-night",
+      "w": 1600,
+      "h": 900,
+      "tags": [
+        "면접 대기",
+        "복도",
+        "벤치",
+        "서류철",
+        "넥타이",
+        "가방",
+        "진로",
+        "긴장",
+        "interview",
+        "waiting"
+      ],
+      "alt": "어두운 복도의 나무 벤치 위에 서류철과 발표 원고, 넥타이가 놓이고 바닥에 가방이 기대어 있는 회화 — 천장 조명이 벤치 위로만 주황빛 웅덩이를 만들고 복도 끝 문틈에서 민트빛이 샌다",
+      "usedIn": [
+        "my-first-ai-service"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/나의-첫-AI-서비스/images/stage-cram.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "야간-작업실",
+      "style": "painterly-workshop-night",
+      "w": 1600,
+      "h": 900,
+      "tags": [
+        "벼락치기",
+        "시험 전날",
+        "책상",
+        "펼친 책",
+        "문제집 더미",
+        "알람시계",
+        "형광펜",
+        "머그",
+        "학습",
+        "cram",
+        "study"
+      ],
+      "alt": "스탠드 불빛이 펼쳐진 책의 면만 밝히는 밤 책상 회화 — 옆에 쌓인 문제집 더미 위 알람시계, 흩어진 형광펜과 머그가 시간에 쫓기는 분위기를 만든다",
+      "usedIn": [
+        "my-first-ai-service"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/나의-첫-AI-서비스/images/stage-comfort.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "야간-작업실",
+      "style": "painterly-workshop-night",
+      "w": 1600,
+      "h": 900,
+      "tags": [
+        "위로",
+        "밤 창가",
+        "담요",
+        "머그",
+        "김",
+        "화분",
+        "도시 불빛",
+        "감성",
+        "고요",
+        "comfort",
+        "window"
+      ],
+      "alt": "늦은 밤 창턱에 접힌 담요와 김이 오르는 머그, 작은 화분이 놓인 회화 — 창밖 도시 불빛이 흐릿하게 번지고 창턱 주변만 따뜻한 주황빛으로 밝다",
+      "usedIn": [
+        "my-first-ai-service"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/나의-첫-AI-서비스/images/stage-finish.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "야간-작업실",
+      "style": "painterly-workshop-night",
+      "w": 1600,
+      "h": 900,
+      "tags": [
+        "작업 완료",
+        "새벽",
+        "정리된 공구",
+        "접힌 도면",
+        "노트북",
+        "창빛",
+        "마무리",
+        "뿌듯함",
+        "finish",
+        "dawn"
+      ],
+      "alt": "공구와 부품이 가지런히 정리되고 도면이 접힌 새벽 작업실 책상 회화 — 작업등은 꺼지고 노트북 화면만 민트빛으로 켜져 있으며 창밖 새벽빛이 책상 왼쪽 가장자리를 주황빛으로 물들인다",
+      "usedIn": [
+        "my-first-ai-service"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/나의-첫-AI-서비스/images/stage-start.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "야간-작업실",
+      "style": "painterly-workshop-night",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "작업 시작",
+        "빈 노트",
+        "펼친 공책",
+        "연필",
+        "자",
+        "부품 상자",
+        "작업등",
+        "노트북",
+        "준비",
+        "start",
+        "blank"
+      ],
+      "alt": "막 켜진 작업등이 펼쳐진 빈 노트를 밝히고 연필·자·부품 상자가 가지런히 준비된 책상 회화 — 왼쪽 노트북 화면은 아직 비어 민트빛만 은은하고 위쪽 절반은 텍스트가 앉도록 어둡게 비어 있다",
+      "usedIn": [
+        "my-first-ai-service"
+      ]
+    },
+    {
+      "file": "data/2026-2/AI쇼츠제작/오리엔테이션/images/scene-01.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-video-showcase-wash",
+      "style": "watercolor-nightsky",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "수채화",
+        "밤하늘",
+        "남색",
+        "보라",
+        "와시",
+        "별빛",
+        "watercolor",
+        "nightsky"
+      ],
+      "alt": "어두운 남색에서 보라로 대각선으로 번지는 수채화 밤하늘 wash — 별처럼 반짝이는 작은 빛 입자, 중앙~하단에 텍스트를 얹을 여백",
+      "usedIn": [
+        "ai-shorts-orientation"
+      ]
+    },
+    {
+      "file": "data/2026-2/AI쇼츠제작/오리엔테이션/images/stage-01.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-video-showcase",
+      "style": "cinematic-still",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "영상생성AI",
+        "포탈",
+        "도시야경",
+        "실루엣",
+        "밤하늘",
+        "남색",
+        "보라",
+        "cinematic",
+        "portal"
+      ],
+      "alt": "밤하늘 아래 인물 뒷모습 실루엣이 손끝으로 빛나는 직사각형 포탈을 여는 장면 — 포탈 안에 몽환적인 도시 야경과 물결이 비친다",
+      "usedIn": [
+        "ai-shorts-orientation"
+      ]
+    },
+    {
+      "file": "data/2026-2/AI쇼츠제작/오리엔테이션/images/stage-02.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-video-showcase",
+      "style": "cinematic-still",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "옥상",
+        "하이앵글",
+        "네온",
+        "도시야경",
+        "실루엣",
+        "오마주",
+        "밤",
+        "rooftop",
+        "neon"
+      ],
+      "alt": "빗물 젖은 옥상 난간에 걸터앉아 아래를 내려다보는 인물 뒷모습 실루엣 — 하이앵글로 내려다본 네온 불빛 가득한 도시 골목",
+      "usedIn": [
+        "ai-shorts-orientation"
+      ]
+    },
+    {
+      "file": "data/2026-2/AI쇼츠제작/오리엔테이션/images/stage-03.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-video-showcase",
+      "style": "cinematic-still",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "구름도서관",
+        "책",
+        "새",
+        "일출",
+        "판타지",
+        "보라",
+        "핑크",
+        "library",
+        "fantasy"
+      ],
+      "alt": "구름 위에 떠 있는 거대한 도서관 — 책장에서 날아오르는 책과 새 떼, 노을이 지는 몽환적인 하늘",
+      "usedIn": [
+        "ai-shorts-orientation"
+      ]
+    },
+    {
+      "file": "data/2026-2/AI쇼츠제작/오리엔테이션/images/stage-04.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-video-showcase",
+      "style": "cinematic-still",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "심해",
+        "소년",
+        "물결",
+        "도시야경",
+        "실루엣",
+        "시네마틱",
+        "청보라",
+        "ocean",
+        "walking"
+      ],
+      "alt": "심해 위를 걷는 소년 뒷모습 실루엣 — 발밑에 잔잔한 물결과 빛무늬, 저 멀리 빛나는 도시 스카이라인과 은하수",
+      "usedIn": [
+        "ai-shorts-orientation",
+        "ai-shorts-scene-design"
+      ]
+    },
+    {
+      "file": "data/2026-2/AI쇼츠제작/오리엔테이션/images/stage-05.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-video-showcase",
+      "style": "cinematic-still",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "필름스트립",
+        "3컷",
+        "태블릿",
+        "스케치북",
+        "작업",
+        "손",
+        "편집",
+        "filmstrip",
+        "sketch"
+      ],
+      "alt": "3컷 필름스트립 — 태블릿 펜으로 우주 풍경을 그리는 손, 스케치북에 산과 달을 그리는 손, 완성된 영상을 편집하며 바라보는 옆모습",
+      "usedIn": [
+        "ai-shorts-orientation"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/AI는-어떻게-그림을-그릴까/images/quiz-real-apple.jpg",
+      "type": "image",
+      "origin": "external",
+      "kind": "stage",
+      "set": "AI는-어떻게-그림을-그릴까",
+      "style": "photo",
+      "tags": [
+        "사과",
+        "빨간 사과",
+        "이끼",
+        "잎",
+        "실제 사진",
+        "판별 문항",
+        "정답",
+        "apple",
+        "real-photo",
+        "quiz"
+      ],
+      "alt": "이끼 낀 바닥 위 빨간 사과 한 알과 초록 잎, 배경은 초록 보케 — 실제로 촬영된 사진(S5 판별 문항의 정답)",
+      "usedIn": [
+        "ai-how-to-draw"
+      ],
+      "license": "CC0 · Pixel2013 · Wikimedia Commons (File:Apple-2924531 1920.jpg, 원본은 Pixabay 2924531) — 1280px 판을 1200×900으로 크롭"
+    },
+    {
+      "file": "data/2026-2/인공지능기초/AI는-어떻게-그림을-그릴까/images/quiz-ai-apple.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "AI는-어떻게-그림을-그릴까",
+      "style": "photo",
+      "w": 1200,
+      "h": 900,
+      "tags": [
+        "사과",
+        "나무 탁자",
+        "창가",
+        "AI 생성",
+        "사진풍",
+        "판별 문항",
+        "apple",
+        "ai-generated",
+        "quiz"
+      ],
+      "alt": "창가 나무 탁자 위 빨간 사과 한 알, 아침 햇빛 — AI가 생성한 사진풍 이미지(S5 판별 문항, 실제 사진과 같은 소재)",
+      "usedIn": [
+        "ai-how-to-draw"
+      ],
+      "license": "AI 생성 — Codex CLI 내장 image_gen(OpenAI 이미지 생성 모델)으로 2026-09-06 생성, gen_image.mjs · 프롬프트는 prompt 필드 (FLUX가 아니다)",
+      "prompt": "A single red apple resting on a weathered wooden table beside a window. Soft morning daylight from the left, gentle shadow to the right, tiny water droplets on the apple skin, a little dust and wood grain visible on the table. 50mm lens, shallow depth of field, background softly blurred. Aspect ratio 4:3."
+    },
+    {
+      "file": "data/2026-2/인공지능기초/AI는-어떻게-그림을-그릴까/images/quiz-ai-store.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "AI는-어떻게-그림을-그릴까",
+      "style": "photo",
+      "w": 1200,
+      "h": 900,
+      "tags": [
+        "편의점",
+        "밤",
+        "거리",
+        "젖은 아스팔트",
+        "AI 생성",
+        "사진풍",
+        "판별 문항",
+        "convenience-store",
+        "night",
+        "ai-generated",
+        "quiz"
+      ],
+      "alt": "밤의 작은 편의점 외관, 실내 불빛이 젖은 아스팔트에 비침, 사람 없음 — AI가 생성한 사진풍 이미지(S5 판별 문항)",
+      "usedIn": [
+        "ai-how-to-draw"
+      ],
+      "license": "AI 생성 — Codex CLI 내장 image_gen(OpenAI 이미지 생성 모델)으로 2026-09-06 생성, gen_image.mjs · 프롬프트는 prompt 필드 (FLUX가 아니다)",
+      "prompt": "Exterior of a small convenience store at night on a quiet Korean city side street. The bright white interior light spills onto wet asphalt and reflects in a puddle; a few parked bicycles, a vending machine, a dim apartment building behind. Signboard is a plain glowing rectangle with no letters. 35mm lens, street photography at night, slight motion-free stillness. Aspect ratio 4:3."
+    },
+    {
+      "file": "data/2026-2/인공지능기초/AI는-어떻게-그림을-그릴까/images/quiz-ai-glass.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "AI는-어떻게-그림을-그릴까",
+      "style": "photo",
+      "w": 1200,
+      "h": 900,
+      "tags": [
+        "유리컵",
+        "물",
+        "창턱",
+        "오후 햇빛",
+        "커스틱",
+        "AI 생성",
+        "사진풍",
+        "판별 문항",
+        "glass",
+        "ai-generated",
+        "quiz"
+      ],
+      "alt": "흰 창턱 위 물이 든 유리컵, 늦은 오후 햇빛이 만든 빛 무늬 — AI가 생성한 사진풍 이미지(S5 판별 문항)",
+      "usedIn": [
+        "ai-how-to-draw"
+      ],
+      "license": "AI 생성 — Codex CLI 내장 image_gen(OpenAI 이미지 생성 모델)으로 2026-09-06 생성, gen_image.mjs · 프롬프트는 prompt 필드 (FLUX가 아니다)",
+      "prompt": "A plain drinking glass of water standing on a white windowsill in late afternoon. Low sun throws a bright caustic light pattern through the glass onto the sill, a sheer curtain glows softly behind, a few condensation drops on the glass. Macro photograph, 85mm lens, shallow depth of field. Aspect ratio 4:3."
+    },
+    {
+      "file": "data/2026-2/인공지능기초/AI는-어떻게-그림을-그릴까/images/demo-cat.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "AI는-어떻게-그림을-그릴까",
+      "style": "photo",
+      "w": 1200,
+      "h": 900,
+      "tags": [
+        "고양이",
+        "편의점",
+        "밤",
+        "AI 생성",
+        "사진풍",
+        "S2 예시",
+        "cat",
+        "convenience-store",
+        "night",
+        "ai-generated"
+      ],
+      "alt": "밤의 편의점 앞에 앉은 얼룩 고양이, 가게 불빛이 뒤에서 비침 — S2 즉석 생성 시연이 막힐 때 보여 줄 예시(AI 생성)",
+      "usedIn": [
+        "ai-how-to-draw"
+      ],
+      "license": "AI 생성 — Codex CLI 내장 image_gen(OpenAI 이미지 생성 모델)으로 2026-09-06 생성, gen_image.mjs · 프롬프트는 prompt 필드 (FLUX가 아니다)",
+      "prompt": "A tabby cat sitting calmly in front of a convenience store at night, lit by the warm light from the store window behind it. Wet pavement with soft reflections, the store's signboard is a plain glowing rectangle with no letters. Photorealistic night photograph, 50mm lens, shallow depth of field, the cat in sharp focus. Aspect ratio 4:3."
+    },
+    {
+      "file": "assets/svg/problem-planet-orbits.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "궤도",
+        "행성",
+        "위성",
+        "중심",
+        "문제 해결",
+        "바이브코딩",
+        "비유",
+        "orbit",
+        "planet",
+        "core"
+      ],
+      "alt": "손그림 열린 타원 궤도 셋 가운데 놓인 행성 — \"코드는 위성, 문제가 중심\" 비유 무대 (viewBox는 덱 좌표 220,300 기준 · 위성 칩과 글자는 덱이 얹는다)",
+      "usedIn": [
+        "vibe-coding-orientation2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/problem-tree.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "나무",
+        "가지",
+        "분기",
+        "문제 분해",
+        "쪼개기",
+        "핵심 문제",
+        "트리",
+        "tree",
+        "branch",
+        "decompose"
+      ],
+      "alt": "왼쪽 뿌리에서 오른쪽으로 갈라지고 아래 하나로 모이는 손그림 가지들 — \"쪼개면 보인다\" 문제 분해 비유 (viewBox는 덱 좌표 80,100 기준 · 노드 카드는 덱이 얹는다)",
+      "usedIn": [
+        "vibe-coding-orientation2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/arrow-on-whetstone.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "숫돌",
+        "화살",
+        "화살대",
+        "깃",
+        "갈다",
+        "시도",
+        "질문",
+        "whetstone",
+        "arrow",
+        "sharpen"
+      ],
+      "alt": "빗금 결이 있는 긴 숫돌 슬래브 위에 놓인 깃 달린 화살대 — \"좋은 질문은 시도에서 나온다\" 비유 (화살촉은 덱이 시도 횟수에 따라 그린다 · viewBox는 덱 좌표 110,560 기준)",
+      "usedIn": [
+        "vibe-coding-orientation2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/idea-constellation.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "별자리",
+        "별",
+        "연결",
+        "아이디어",
+        "댓글",
+        "마무리",
+        "constellation",
+        "star",
+        "link"
+      ],
+      "alt": "십자 반짝 표식 열두 개가 손으로 그은 선으로 이어진 별자리 — \"오늘의 댓글이 별자리가 된다\" 마무리 비유 (viewBox는 덱 좌표 180,100 기준)",
+      "usedIn": [
+        "vibe-coding-orientation2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/journey-road.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "길",
+        "여정",
+        "정거장",
+        "깃발",
+        "다음 시간",
+        "로드맵",
+        "road",
+        "journey",
+        "milestone",
+        "flag"
+      ],
+      "alt": "왼쪽 아래에서 오른쪽 위로 두 번 꺾여 오르는 손그림 길과 정거장 표지 말뚝, 끝의 깃발 — \"다음 시간, 세 정거장\" 비유 (번호 링과 글자는 덱이 얹는다 · viewBox는 덱 좌표 200,240 기준)",
+      "usedIn": [
+        "vibe-coding-orientation2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능은-어떻게-배울까/dataset/치와와-머핀.zip",
+      "type": "dataset",
+      "origin": "external",
+      "style": "photo",
+      "license": "CC0 · PDM(퍼블릭 도메인 마크) 사진 171장 — 사진별 제목·작성자·원본 페이지는 zip 안 출처.csv (Openverse에서 license=cc0,pdm 필터로 수집, 2026-09-14, 640px 이하로 축소)",
+      "tags": [
+        "치와와",
+        "머핀",
+        "데이터셋",
+        "이미지 분류",
+        "Teachable Machine",
+        "지도학습",
+        "chihuahua",
+        "muffin",
+        "dataset"
+      ],
+      "alt": "치와와·머핀 이미지 분류 실습 데이터셋 — 학습용 치와와 83장·머핀 72장, 시험용 16장(정답 CSV), 출처 CSV, 안내문",
+      "usedIn": [
+        "ai-how-to-learn",
+        "image-classifier-project"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/aima-book.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 831,
+      "h": 1157,
+      "tags": [
+        "교재",
+        "책",
+        "AIMA",
+        "러셀 노빅",
+        "대학 교재",
+        "book",
+        "textbook"
+      ],
+      "alt": "글자 없는 짙은 초록 하드커버 대학 교재(앰버 책갈피) — 러셀·노빅 『Artificial Intelligence: A Modern Approach』 상징 오브젝트, 제목은 덱이 얹음, 배경 투명",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-car-1.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 267,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "자동차",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "car"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 빨간 해치백 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-car-2.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 267,
+      "h": 321,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "자동차",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "car"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 파란 빈티지 세단 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-car-3.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 267,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "자동차",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "car"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 노란 픽업트럭 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-car-4.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 267,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "자동차",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "car"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 초록 소형 밴 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cat-1.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "고양이",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cat"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 주황 태비 고양이 앉음 (지도·비지도 씬의 사진 더미 소품, 카드 직사각형 불투명)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cat-2.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 321,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "고양이",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cat"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 회색 고양이 웅크려 잠 (지도·비지도 씬의 사진 더미 소품, 카드 직사각형 불투명)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cat-3.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "고양이",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cat"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 검은·흰 고양이 서 있음 (지도·비지도 씬의 사진 더미 소품, 카드 직사각형 불투명)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cat-4.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "고양이",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cat"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 흰 솜털 새끼 고양이 (지도·비지도 씬의 사진 더미 소품, 카드 직사각형 불투명)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cup-1.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "컵",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cup"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 흰 도자기 머그 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cup-2.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 321,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "컵",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cup"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 투명 유리 텀블러 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cup-3.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "컵",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cup"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 초록 법랑 캠핑 머그 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/card-cup-4.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 266,
+      "h": 320,
+      "tags": [
+        "사진 카드",
+        "폴라로이드",
+        "컵",
+        "레이블",
+        "지도학습",
+        "소품",
+        "card",
+        "cup"
+      ],
+      "alt": "폴라로이드풍 사진 카드 — 종이 테이크아웃 커피컵 (지도·비지도 씬의 사진 더미 소품)",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/fruit-fly.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1307,
+      "h": 1048,
+      "tags": [
+        "초파리",
+        "노랑초파리",
+        "커넥톰",
+        "곤충",
+        "Drosophila",
+        "fruit fly",
+        "connectome"
+      ],
+      "alt": "노랑초파리 측면 전신 — 붉은 겹눈, 앰버 가슴, 줄무늬 배, 투명한 날개, 다리 6개, 잉크 선+수채, 배경 투명",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/mccarthy.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1145,
+      "h": 1352,
+      "tags": [
+        "존 매카시",
+        "매카시",
+        "학자",
+        "초상",
+        "인물",
+        "다트머스",
+        "인공지능 명명",
+        "McCarthy",
+        "portrait",
+        "ink-watercolor"
+      ],
+      "alt": "존 매카시 초상화풍 재현(생성 이미지) — 노년, 백발·흰 턱수염, 안경, 초록 카디건·앰버 넥타이, 3/4 측면, 배경 투명",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/minsky.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1022,
+      "h": 1364,
+      "tags": [
+        "마빈 민스키",
+        "민스키",
+        "학자",
+        "초상",
+        "인물",
+        "퍼셉트론즈",
+        "Minsky",
+        "portrait",
+        "ink-watercolor"
+      ],
+      "alt": "마빈 민스키 초상화풍 재현(생성 이미지) — 노년, 대머리·큰 안경·미소, 초록 스웨터, 3/4 측면, 배경 투명",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/neuron.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1878,
+      "h": 960,
+      "tags": [
+        "뉴런",
+        "신경세포",
+        "가지돌기",
+        "세포체",
+        "축삭",
+        "퍼셉트론",
+        "neuron",
+        "dendrite",
+        "axon"
+      ],
+      "alt": "생물학적 뉴런 단면 — 왼쪽 가지돌기 다발, 가운데 세포체(앰버 핵), 오른쪽 수초가 있는 긴 축삭과 축삭 말단(좌→우 배치), 초록·잉크 수채, 배경 투명",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/sprites/ai-how-to-learn/turing.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "sprite",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1145,
+      "h": 1366,
+      "tags": [
+        "앨런 튜링",
+        "튜링",
+        "학자",
+        "초상",
+        "인물",
+        "1950",
+        "모방 게임",
+        "Turing",
+        "portrait",
+        "ink-watercolor"
+      ],
+      "alt": "앨런 튜링 초상화풍 재현(생성 이미지) — 30대, 짙은 머리 옆가르마, 트위드 재킷·앰버 넥타이, 3/4 측면, 잉크 선+수채, 배경 투명",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/인공지능은-어떻게-배울까/images/stage-notebook.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1920,
+      "h": 1080,
+      "tags": [
+        "실험 노트",
+        "노트",
+        "빈 페이지",
+        "전환",
+        "무대",
+        "종이",
+        "연필",
+        "잉크 자국",
+        "notebook",
+        "stage"
+      ],
+      "alt": "위에서 내려다본 펼친 빈 실험 노트가 화면을 가득 채움 — 가운데 두 면은 비어 있음(텍스트 밴드 자리), 왼쪽 여백 초록 잉크 얼룩, 오른쪽 아래 앰버 연필, 글자 없음",
+      "usedIn": [
+        "ai-how-to-learn"
+      ]
+    },
+    {
+      "file": "assets/svg/clipboard-check.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "클립보드",
+        "체크리스트",
+        "체크박스",
+        "확인 목록",
+        "지시 확인",
+        "종이",
+        "clipboard",
+        "checklist",
+        "checkbox",
+        "todo"
+      ],
+      "alt": "둥근 클립보드(-2° 기울임)에 금속 클립으로 꽂힌 살짝 비뚠 종이 — 왼쪽에 열린 손그림 체크박스 5개(x 850~895, y 380+100i~425+100i), 오른쪽으로 흐린 안내선 5줄(x 930~1540, y 415+100i). 체크 표시와 글자는 덱이 얹는다 (viewBox는 덱 좌표 700,120 기준 · 1020×860)",
+      "usedIn": [
+        "vibe-coding-first-command"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/tollgate-arch.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "요금소",
+        "하이패스",
+        "차단봉",
+        "아치",
+        "통과",
+        "확인 절차",
+        "tollgate",
+        "toll booth",
+        "barrier",
+        "hipass"
+      ],
+      "alt": "위는 요금소 — 기둥 둘(x 900·1180, y 290~470)과 아치(정점 y≈250), 왼쪽 기둥에 붙은 부스와 창, 부스에서 오른쪽 위로 올라간 차단봉(960,450→1120,320). 아래는 하이패스 — 가로 빔(y 620, x 900~1180)과 기둥 둘(y 620~800), 빔에 매달린 표지판(x 960~1120, y 640~720) 안의 전파 호 셋. 요금소는 굵게, 하이패스는 가늘게. 차선과 글자는 덱이 얹는다 (viewBox는 덱 좌표 860,200 기준 · 360×640)",
+      "usedIn": [
+        "vibe-coding-first-command"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/hourglass-pair.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "모래시계",
+        "시간",
+        "기다림",
+        "짧은 시간",
+        "긴 시간",
+        "대비",
+        "hourglass",
+        "time",
+        "wait",
+        "sand"
+      ],
+      "alt": "크기가 다른 손그림 모래시계 둘 — 앞의 작은 것(중심 x=350, 받침 y 340·860, 기둥 x 236·464, 목 y=600 반폭 12, 최대 반폭 110, 유리 y 352~848, 굵은 선)과 뒤의 큰 것(중심 x=790, 받침 y 170·920, 기둥 x 618·962, 목 y=550 반폭 16, 최대 반폭 165, 유리 y 184~906, 가는 선). 유리 윤곽·틀·받침·하이라이트만 있고 모래는 덱이 채운다 (viewBox는 덱 좌표 160,140 기준 · 920×800)",
+      "usedIn": [
+        "vibe-coding-first-command"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/ink-slider-knob.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "슬라이더",
+        "손잡이",
+        "다이얼",
+        "가중치",
+        "조절",
+        "학습",
+        "눈금",
+        "slider",
+        "knob",
+        "dial",
+        "weight"
+      ],
+      "alt": "가로 트랙(휜 선 두 겹·양끝 멈춤·작은 눈금) 중앙에 얹힌 둥근 다이얼 손잡이 — 앰버 눈금 한 줄과 꼭지, 위쪽 흐린 호가 돌림 방향을 암시. '학습 = 가중치 손잡이를 돌린다' 비유 (viewBox 0 0 400 160 · 손잡이 중심 200,92 r40 · 크림 배경용 잉크 #1d2a26 + 앰버)",
+      "usedIn": [
+        "ai-how-to-learn-v2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/ink-clipboard.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "클립보드",
+        "규칙표",
+        "체크리스트",
+        "체크 칸",
+        "끝없는 목록",
+        "규칙 기반",
+        "종이",
+        "clipboard",
+        "checklist",
+        "rules",
+        "endless"
+      ],
+      "alt": "앰버 집게가 달린 클립보드 판 위에 체크 칸 12개가 세로로 줄지어 있고(위 3칸 체크, 글자 없음), 종이는 판 바닥(y 642)을 지나 y≈738 찢긴 가장자리까지 길게 이어져 잘려 나간다 — '규칙표가 끝없이 늘어난다' 비유 (viewBox 0 0 520 760 · 체크 칸 x 130~164, y 190+46i · 크림 배경용 잉크 #1d2a26 + 앰버)",
+      "usedIn": [
+        "ai-how-to-learn-v2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/ink-gamepad.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "게임 컨트롤러",
+        "게임패드",
+        "에이전트",
+        "강화학습",
+        "십자키",
+        "버튼",
+        "gamepad",
+        "controller",
+        "agent",
+        "reinforcement"
+      ],
+      "alt": "정면 게임 컨트롤러 손그림 — 왼쪽 십자키, 오른쪽 둥근 버튼 둘(위 앰버 강조), 가운데 알약 버튼 둘, 열린 선 몸통과 그립 빗금. 강화학습의 「에이전트」 (viewBox 0 0 520 320 · 십자키 중심 138,158 · 앰버 버튼 392,128 · 크림 배경용 잉크 #1d2a26 + 앰버)",
+      "usedIn": [
+        "ai-how-to-learn-v2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/ink-glasses.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "안경",
+        "둥근 안경",
+        "렌즈",
+        "전이학습",
+        "도수",
+        "사전학습",
+        "glasses",
+        "spectacles",
+        "lens",
+        "transfer learning"
+      ],
+      "alt": "둥근 안경 손그림 — 렌즈 둘(안은 비워 둠, 덱이 도식을 얹는다)·위로 휜 코걸이·코받침·바깥으로 뻗어 굽는 다리 둘·경첩. '이미 도수가 맞는 안경' 전이학습 비유 (viewBox 0 0 700 300 · 렌즈 중심 210,160·490,160 r96 · 크림 배경용 잉크 #1d2a26 단색)",
+      "usedIn": [
+        "ai-how-to-learn-v2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/ink-add-lens.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "ink-sketch",
+      "tags": [
+        "덧렌즈",
+        "렌즈",
+        "부품",
+        "교체",
+        "마지막 층",
+        "전이학습",
+        "미세조정",
+        "lens",
+        "add-on",
+        "fine-tuning"
+      ],
+      "alt": "안경 렌즈 위에 끼우는 작은 둥근 덧렌즈 하나 — 앰버 테두리(열린 원+보조 원, 옅은 앰버 면)·오른쪽 위 손잡이 고리·왼쪽 위 유리 반짝임. '마지막 층만 새로' 비유, ink-glasses.svg의 렌즈 위에 겹쳐 쓴다 (viewBox 0 0 220 220 · 렌즈 중심 104,118 r78 · 앰버 #e0a52a + 잉크 반짝임)",
+      "usedIn": [
+        "ai-how-to-learn-v2"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "data/2026-2/AI쇼츠제작/Seedance로-첫-영상-만들기/images/cake-wide.png",
+      "type": "image",
+      "origin": "generated · OpenAI imagegen · 2026-09-16",
+      "license": "AI 생성 이미지 · 본 저장소 수업 자료 CC BY-NC-SA 4.0 · 원본 exec-7722bb84-fb92-4132-93f0-6836f4607507.png",
+      "style": "cinematic-still",
+      "set": "seedance-first-video",
+      "tags": [
+        "Seedance",
+        "카메라",
+        "와이드 숏",
+        "클로즈업",
+        "케이크"
+      ],
+      "alt": "창가 나무 테이블 위 딸기 케이크, 화면 범위와 빛 설명용 생성 이미지",
+      "usedIn": [
+        "seedance-first-video"
+      ]
+    },
+    {
+      "file": "https://storage.googleapis.com/gdm-deepmind-com-prod-public/media/media/veo__veo-3__sailor.webm",
+      "type": "video",
+      "origin": "Google DeepMind · https://deepmind.google/models/veo/prompt-guide/",
+      "license": "© Google DeepMind · 별도 재배포 라이선스 미확인 · 공식 서버 외부 참조만 사용 · 원본 veo__veo-3__sailor.webm",
+      "style": "official-veo-demo",
+      "tags": [
+        "Seedance 수업 참고",
+        "영상 언어",
+        "공개 프롬프트"
+      ],
+      "alt": "바다를 가리키는 선원",
+      "usedIn": [
+        "seedance-first-video"
+      ]
+    },
+    {
+      "file": "https://lh3.googleusercontent.com/ZiwH_wa1LfkkOwklJ874qQBiNdhxukLDOasXDAOIvj_myLyX8RgewbtrCiB-GYYeGHwV54tZ8M8CY3bBmqZ3qikQliW7hpIfotfdgiQXSUOgR79s8VE",
+      "type": "image",
+      "origin": "Google DeepMind · https://deepmind.google/models/veo/prompt-guide/",
+      "license": "© Google DeepMind · 별도 재배포 라이선스 미확인 · 공식 서버 외부 참조만 사용 · 원본 ZiwH_wa1LfkkOwklJ874qQBiNdhxukLDOasXDAOIvj_myLyX8RgewbtrCiB-GYYeGHwV54tZ8M8CY3bBmqZ3qikQliW7hpIfotfdgiQXSUOgR79s8VE",
+      "style": "official-veo-demo",
+      "tags": [
+        "Seedance 수업 참고",
+        "영상 언어",
+        "공개 프롬프트"
+      ],
+      "alt": "바다를 가리키는 선원",
+      "usedIn": [
+        "seedance-first-video"
+      ]
+    },
+    {
+      "file": "https://storage.googleapis.com/gdm-deepmind-com-prod-public/media/media/veo__veo-3__keyboard.webm",
+      "type": "video",
+      "origin": "Google DeepMind · https://deepmind.google/models/veo/prompt-guide/",
+      "license": "© Google DeepMind · 별도 재배포 라이선스 미확인 · 공식 서버 외부 참조만 사용 · 원본 veo__veo-3__keyboard.webm",
+      "style": "official-veo-demo",
+      "tags": [
+        "Seedance 수업 참고",
+        "영상 언어",
+        "공개 프롬프트"
+      ],
+      "alt": "사탕 키보드",
+      "usedIn": [
+        "seedance-first-video"
+      ]
+    },
+    {
+      "file": "https://lh3.googleusercontent.com/pXiJ9oz3cXbRZMtOJ_viYUIqi0N_PKpgOABXH1-Lf3K7XQGJC-4JGp24kaomk2GDQhZcOdrZqlvBCMwED5cSWsDyZbAkMy7jqJK668G-zPOZhA4BbQ",
+      "type": "image",
+      "origin": "Google DeepMind · https://deepmind.google/models/veo/prompt-guide/",
+      "license": "© Google DeepMind · 별도 재배포 라이선스 미확인 · 공식 서버 외부 참조만 사용 · 원본 pXiJ9oz3cXbRZMtOJ_viYUIqi0N_PKpgOABXH1-Lf3K7XQGJC-4JGp24kaomk2GDQhZcOdrZqlvBCMwED5cSWsDyZbAkMy7jqJK668G-zPOZhA4BbQ",
+      "style": "official-veo-demo",
+      "tags": [
+        "Seedance 수업 참고",
+        "영상 언어",
+        "공개 프롬프트"
+      ],
+      "alt": "사탕 키보드",
+      "usedIn": [
+        "seedance-first-video"
+      ]
+    },
+    {
+      "file": "https://storage.googleapis.com/gdm-deepmind-com-prod-public/media/media/veo__veo-3__moon-dust.webm",
+      "type": "video",
+      "origin": "Google DeepMind · https://deepmind.google/models/veo/prompt-guide/",
+      "license": "© Google DeepMind · 별도 재배포 라이선스 미확인 · 공식 서버 외부 참조만 사용 · 원본 veo__veo-3__moon-dust.webm",
+      "style": "official-veo-demo",
+      "tags": [
+        "Seedance 수업 참고",
+        "영상 언어",
+        "공개 프롬프트"
+      ],
+      "alt": "결정 꽃과 인물",
+      "usedIn": [
+        "seedance-first-video"
+      ]
+    },
+    {
+      "file": "https://lh3.googleusercontent.com/FIlO9beZG0PJb7FuOXoN4f99N_bXxJXiAC2xJw-CwfM2H9OZJynIesOUwY2pI7GZSOmzZR9aUOcgx5Zx-g8zRN4cqzUwuKaW8pq3kKPxc_ffQBLZ",
+      "type": "image",
+      "origin": "Google DeepMind · https://deepmind.google/models/veo/prompt-guide/",
+      "license": "© Google DeepMind · 별도 재배포 라이선스 미확인 · 공식 서버 외부 참조만 사용 · 원본 FIlO9beZG0PJb7FuOXoN4f99N_bXxJXiAC2xJw-CwfM2H9OZJynIesOUwY2pI7GZSOmzZR9aUOcgx5Zx-g8zRN4cqzUwuKaW8pq3kKPxc_ffQBLZ",
+      "style": "official-veo-demo",
+      "tags": [
+        "Seedance 수업 참고",
+        "영상 언어",
+        "공개 프롬프트"
+      ],
+      "alt": "결정 꽃과 인물",
+      "usedIn": [
+        "seedance-first-video"
+      ]
+    },
+    {
+      "file": "assets/svg/plated-dish.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "license": "자체 제작 (Claude 직필)",
+      "tags": [
+        "완성품",
+        "요리",
+        "접시",
+        "밥",
+        "달걀",
+        "포크",
+        "공유",
+        "완성품 공유",
+        "dish",
+        "plate",
+        "finished"
+      ],
+      "alt": "위에서 내려다본 완성 요리 한 접시(밥·달걀·잎채소·당근·방울토마토)와 포크 — '받아 먹을 수는 있지만 고칠 수 없는 완성품' 비유",
+      "usedIn": [
+        "teacher-centered-ai"
+      ],
+      "reusable": true,
+      "created": "2026-09-29",
+      "palette": {
+        "ink": "#16201b",
+        "plate": "#ffffff",
+        "well": "#f6f8f5",
+        "rice": "#fbfaf3",
+        "yolk": "#f2b544",
+        "greens": "#7fae8d / #6a9f7e / #94bf9f",
+        "carrot": "#e8955a",
+        "tomato": "#d9574a"
+      },
+      "anchors": "없음 (접시 중심 viewBox x≈232, y≈178)",
+      "contexts": [
+        {
+          "deck": "teacher-centered-ai",
+          "slide": 12,
+          "role": "대비 소품 — 레시피 원본 카드들 왼쪽의 '완성품'",
+          "metaphor": "받아서 먹을 수는 있지만 고칠 수 없는 완성품 공유 (원본=레시피와 대비)",
+          "placement": "왼쪽 25% 구역, 폭 290px, 아래에 '완성품 공유' 라벨",
+          "adaptation": "CSS filter grayscale(0.35)·opacity .85로 한 톤 눌러 주인공(레시피 카드)보다 뒤로 물렸다",
+          "background": "밝은 종이 #f3f5f2"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/receipt-printer.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "license": "자체 제작 (Claude 직필)",
+      "tags": [
+        "영수증",
+        "프린터",
+        "출력",
+        "결제",
+        "과제 목록",
+        "행정",
+        "receipt",
+        "printer"
+      ],
+      "alt": "비스듬히 위에서 본 짙은 회색 영수증 프린터 — 앞면 아래 배출구(viewBox y≈172, x 50~490)로 종이가 나온다",
+      "usedIn": [
+        "teacher-centered-ai"
+      ],
+      "reusable": true,
+      "created": "2026-09-29",
+      "palette": {
+        "ink": "#16201b",
+        "front": "#27322d",
+        "top": "#3b4842",
+        "window": "#dfe6e1",
+        "base": "#46524b",
+        "slot": "#0b110e"
+      },
+      "anchors": "배출구 viewBox y≈172, x 50~490 · 상태 LED 자리 (60,112)",
+      "contexts": [
+        {
+          "deck": "teacher-centered-ai",
+          "slide": 2,
+          "role": "소품 — 영수증이 이 프린터에서 한 줄씩 출력된다",
+          "metaphor": "사업 하나에 부수 과제가 줄줄이 딸려 나오는 영수증 (도입 장면)",
+          "placement": "왼쪽 40% 구역, 폭 540px, 배출구 아래로 HTML 영수증 종이가 t에 따라 자란다",
+          "adaptation": "원본 그대로. 인쇄 중 초록 LED와 미세 진동은 덱이 덮어 그렸다",
+          "background": "밝은 종이 #f3f5f2"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/rubber-stamp.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "license": "자체 제작 (Claude 직필)",
+      "tags": [
+        "도장",
+        "고무 도장",
+        "스탬프",
+        "결재",
+        "반복",
+        "서류",
+        "stamp",
+        "rubber stamp"
+      ],
+      "alt": "옆에서 본 나무 손잡이 고무 도장 — 인면이 아래(viewBox y≈206), 가로 중앙 x=80이 찍히는 지점",
+      "usedIn": [
+        "teacher-centered-ai",
+        "vibe-github-supabase",
+        "ai-shorts-scene-design",
+        "ai-shorts-script"
+      ],
+      "reusable": true,
+      "created": "2026-09-29",
+      "palette": {
+        "ink": "#16201b",
+        "knob": "#c98f5a",
+        "neck": "#b67c48",
+        "block": "#d9a46f",
+        "rubber": "#94570f"
+      },
+      "anchors": "인면 viewBox y≈206, 찍히는 중심 x=80 (폭 110px 표시 때 이미지 위에서 약 141px 아래)",
+      "contexts": [
+        {
+          "deck": "teacher-centered-ai",
+          "slide": 17,
+          "role": "움직이는 연출 도구 — 같은 요청서 세 장 위를 오가며 '제출'을 차례로 찍는다",
+          "metaphor": "이미 나이스·교육통계에 있는 자료를 여러 번 요구받는 반복",
+          "placement": "폭 110px, 요청서 줄 위를 수평 이동 후 눌렀다 떼기(t 순수 함수), 세 번째 뒤 사라짐",
+          "adaptation": "원본 그대로. 찍힌 '제출' 표시는 덱이 HTML로 그리고, 인면 색(호박)과 같은 색으로 맞췄다",
+          "background": "밝은 종이 #f3f5f2"
+        },
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 1,
+          "role": "여권 도장 칸 셋을 차례로 누르는 도장(표지는 누르는 시늉, 29장은 실제로 찍힘)",
+          "metaphor": "오늘 받을 도장 세 개",
+          "placement": "폭 110px, 인면 중심을 칸 중심에 맞춘다",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        },
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 15,
+          "role": "교정지에 '승인' 도장을 찍는 도구",
+          "metaphor": "AI 초안을 사람이 대조한 뒤 승인",
+          "placement": "교정지 오른쪽 아래, 폭 110px",
+          "adaptation": "원본 그대로. 찍힌 자국(빨간 '승인' 틀)은 덱이 HTML로 그림",
+          "background": "크림 교정지 #fbf8f1"
+        },
+        {
+          "deck": "ai-shorts-script",
+          "slide": 19,
+          "role": "'결정은 나' 옆의 승인 도장",
+          "metaphor": "AI 조수의 제안은 사람이 승인한다",
+          "placement": "오른쪽 아래, 폭 90px",
+          "adaptation": "원본 그대로 — 어두운 배경에서 나무색 면이 충분히 밝다",
+          "background": "어두운 편집실 #141826"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/conductor-baton.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-08",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1b2133",
+        "grip": "#b9814c",
+        "gripDark": "#9a6534",
+        "gripTop": "#d6a571",
+        "ring": "#c9a04a",
+        "shaft": "#fbf8ef"
+      },
+      "anchors": "지휘 끝 viewBox (506, 60) · 손잡이 중심 (70, 60)",
+      "tags": [
+        "지휘봉",
+        "지휘",
+        "오케스트라",
+        "총보",
+        "baton",
+        "conductor",
+        "위임",
+        "분담"
+      ],
+      "alt": "옆에서 본 오케스트라 지휘봉 — 물방울형 나무 손잡이, 금속 고리, 끝으로 갈수록 가늘어지는 흰 봉",
+      "usedIn": [
+        "ai-era-teacher"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-era-teacher",
+          "slide": 12,
+          "role": "소품 — 총보(업무 분담표) 위에서 흔들리는 지휘봉",
+          "metaphor": "복잡한 업무를 파트별로 나누어 맡기고 마지막 검토는 사람이 하는 「지휘」",
+          "placement": "오른쪽 위 (1400, 92), 폭 450px, rotate(-12°)에서 t로 ±2.6° 흔들림",
+          "adaptation": "원본 그대로",
+          "background": "크림 줄무늬 노트 #f6f3e6"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/brass-compass.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-08",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1b2133",
+        "brass": "#c9a04a",
+        "brassDark": "#a87f2e",
+        "brassLight": "#e6c983",
+        "dial": "#f8f2df",
+        "needleN": "#d9673f",
+        "needleS": "#3b4cc0"
+      },
+      "anchors": "문자판 중심 viewBox (200, 230) · 반지름 132 · 바늘 끝(북동) (283, 147) · 고리 꼭대기 (200, 16)",
+      "tags": [
+        "나침반",
+        "방향",
+        "가치",
+        "compass",
+        "direction",
+        "마무리",
+        "황동"
+      ],
+      "alt": "위에서 내려다본 황동 나침반 — 크림 문자판에 눈금, 바늘은 오른쪽 위(북동)를 가리킨 채 고정(코랄·인디고)",
+      "usedIn": [
+        "ai-era-teacher"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-era-teacher",
+          "slide": 17,
+          "role": "dominant 소품 — 바깥 궤도로 도구 이름(분필·프로젝터·태블릿·AI)이 도는 동안 바늘은 한 방향",
+          "metaphor": "도구는 바뀌어도 방향(가치 판단)은 교사가 정한다",
+          "placement": "왼쪽 (380, 260), 폭 560px, 바늘 끝 연장선이 오른쪽 카피를 가리킨다",
+          "adaptation": "원본 그대로. 바늘 색은 덱의 코랄·인디고에 맞춰 처음부터 그렸다",
+          "background": "크림 줄무늬 노트 #f6f3e6"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/images/stage-darkroom.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1920,
+      "h": 1080,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen, 앵커 stage-notebook.png)",
+      "tags": [
+        "책상",
+        "사진 더미",
+        "분류 전",
+        "빈 상자",
+        "표지",
+        "데이터",
+        "stage",
+        "photos",
+        "boxes"
+      ],
+      "alt": "따뜻한 나무 책상 — 왼쪽에 흰 테두리 수채 사진(새·고양이·토끼·나비·나무·풍경) 수십 장이 흐트러져 쌓임, 오른쪽에 이름표 없는 빈 크라프트 상자 두 개, 오른쪽 아래 앰버 연필. 위쪽 약 38%는 빈 크림 벽(텍스트 밴드), 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 1,
+          "role": "image form 표지 무대 — 아직 고르지 않은 데이터와 비어 있는 클래스",
+          "placement": "풀블리드, 제목은 위쪽 벽 밴드"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/images/stage-workbench.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1920,
+      "h": 1080,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen, 앵커 stage-notebook.png)",
+      "tags": [
+        "작업대",
+        "노트북",
+        "스마트폰",
+        "사진 폴더",
+        "연필",
+        "활동",
+        "stage",
+        "laptop",
+        "workbench"
+      ],
+      "alt": "위에서 비스듬히 내려다본 나무 작업대 — 오른쪽에 화면이 빈 노트북·빈 화면 스마트폰·크라프트/짙은 초록/앰버 사진 폴더(풍경 사진 삐져나옴)·연필, 왼쪽 약 50%는 물건 없는 나무 면(텍스트·버튼 자리), 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 18,
+          "role": "활동 시작 배경 — 왼쪽 스크림 위 버튼 넷",
+          "placement": "풀블리드, 왼쪽 45%에 스크림+버튼"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/images/stage-finish.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1920,
+      "h": 1080,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen, 앵커 stage-notebook.png)",
+      "tags": [
+        "책상",
+        "정리",
+        "이름표",
+        "상자",
+        "노트북",
+        "결과 카드",
+        "마무리",
+        "수미상관",
+        "stage"
+      ],
+      "alt": "stage-darkroom과 같은 책상·벽 — 사진 더미는 사라지고 오른쪽 두 크라프트 상자에 사진이 가지런히 꽂힘(짙은 초록·앰버 빈 태그), 가운데 왼쪽에 켜진 노트북 화면 속 결과 카드(동그란 풍경 아이콘 + 초록 긴 막대·앰버 짧은 막대), 오른쪽 아래 연필. 위쪽 약 40% 빈 벽, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 19,
+          "role": "image form 마무리 무대 — S1 표지의 수미상관(데이터 정리 + 프로그램 실행)",
+          "placement": "풀블리드, 제목은 위쪽 벽 밴드, 아래 메모 둘은 책상 위 오버레이"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/images/card-husky-grass.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1600,
+      "h": 1200,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen, 앵커 stage-notebook.png)",
+      "tags": [
+        "허스키",
+        "시베리안 허스키",
+        "개",
+        "잔디",
+        "동물",
+        "지름길 학습",
+        "husky",
+        "dog",
+        "grass"
+      ],
+      "alt": "초록 잔디밭 위에 3/4 측면으로 서 있는 회색·흰색 시베리안 허스키(말린 꼬리, 쫑긋한 귀, 흰 얼굴 마스크), 뒤로 나무와 푸른 언덕, 잉크 선+수채, 4:3, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 5,
+          "role": "대조 카드 — 잔디 배경 허스키(동물 기준 판정의 비교 짝)",
+          "placement": "카드"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/images/card-husky-snow.png",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 1600,
+      "h": 1200,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen, 앵커 stage-notebook.png)",
+      "tags": [
+        "허스키",
+        "시베리안 허스키",
+        "개",
+        "눈밭",
+        "겨울",
+        "동물",
+        "지름길 학습",
+        "husky",
+        "dog",
+        "snow"
+      ],
+      "alt": "하얀 눈밭 위에 3/4 측면으로 서 있는 회색·흰색 시베리안 허스키(말린 꼬리, 쫑긋한 귀), 바닥 눈이 화면 아래 약 45%를 넓게 차지, 뒤로 눈 덮인 침엽수·흐린 겨울 하늘, 잉크 선+수채, 4:3, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 5,
+          "role": "dominant 카드 — 모델이 동물 대신 눈밭을 근거로 '늑대'라 판정하는 지름길 학습 사례",
+          "placement": "왼쪽 65% 큰 카드, 아래쪽 눈 영역에 열지도 마스크"
+        }
+      ]
+    },
+    {
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "file": "assets/svg/open-textbook-brown.svg",
+      "palette": {
+        "ink": "#22304a",
+        "cover": "#9a6638",
+        "coverDark": "#714722",
+        "page": "#fbf7ee",
+        "pageEdge": "#e8dcc4",
+        "ribbon": "#d98e04"
+      },
+      "anchors": "viewBox 0 0 480 330 · 왼쪽 빈 면 x 62~222, y 80~248 · 오른쪽 빈 면 x 258~418, y 80~248 · 책등 x=240",
+      "tags": [
+        "교과서",
+        "책",
+        "펼친 책",
+        "학습 데이터",
+        "공부",
+        "textbook",
+        "open book",
+        "book",
+        "갈색"
+      ],
+      "alt": "정면에서 약간 내려다본 펼친 교과서 — 갈색 표지, 양쪽 페이지는 빈 면(썸네일 얹는 자리), 앰버 가름끈",
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 4,
+          "role": "교과서 A — 페이지 위의 치와와 썸네일 네 장이 위쪽 모델 상자로 빨려 들어간다",
+          "metaphor": "같은 학생, 다른 교과서 — 같은 학습 방법이라도 데이터가 다르면 다른 모델",
+          "placement": "왼쪽 아래, 빈 페이지에 갈색 털 치와와 썸네일 4장",
+          "adaptation": "원본(갈색 표지)",
+          "background": "크림 종이 #f3eee3"
+        }
+      ]
+    },
+    {
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "file": "assets/svg/open-textbook-teal.svg",
+      "palette": {
+        "ink": "#22304a",
+        "cover": "#3f7f78",
+        "coverDark": "#2b5c57",
+        "page": "#fbf7ee",
+        "pageEdge": "#e8dcc4",
+        "ribbon": "#d98e04"
+      },
+      "anchors": "viewBox 0 0 480 330 · 왼쪽 빈 면 x 62~222, y 80~248 · 오른쪽 빈 면 x 258~418, y 80~248 · 책등 x=240",
+      "tags": [
+        "교과서",
+        "책",
+        "펼친 책",
+        "학습 데이터",
+        "공부",
+        "textbook",
+        "open book",
+        "book",
+        "청록"
+      ],
+      "alt": "정면에서 약간 내려다본 펼친 교과서 — 청록 표지, 양쪽 페이지는 빈 면(썸네일 얹는 자리), 앰버 가름끈",
+      "variantOf": "open-textbook-brown",
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 4,
+          "role": "교과서 B — 페이지 위의 치와와 썸네일 네 장이 위쪽 모델 상자로 빨려 들어간다",
+          "metaphor": "같은 학생, 다른 교과서 — 같은 학습 방법이라도 데이터가 다르면 다른 모델",
+          "placement": "오른쪽 아래, 빈 페이지에 여러 털색 치와와 썸네일 4장",
+          "adaptation": "갈색 원본과 같은 모양, 표지 색만 청록으로 바꾼 짝",
+          "background": "크림 종이 #f3eee3"
+        }
+      ]
+    },
+    {
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "file": "assets/svg/magnifier-handle.svg",
+      "palette": {
+        "ink": "#22304a",
+        "rim": "#3d4f73",
+        "rimTop": "#5a6d93",
+        "ferrule": "#d98e04",
+        "ferruleDark": "#b47406",
+        "handle": "#9c3d6e",
+        "handleDark": "#7a2d55"
+      },
+      "anchors": "viewBox 0 0 300 300 · 렌즈 중심 (110,110), 투명 영역 반지름 70 · 손잡이 끝 ≈ (272,272)",
+      "tags": [
+        "돋보기",
+        "확대경",
+        "관찰",
+        "찾기",
+        "근거",
+        "설명 가능성",
+        "magnifier",
+        "magnifying glass",
+        "search"
+      ],
+      "alt": "남색 테와 산딸기색 손잡이의 돋보기 — 렌즈 안쪽은 투명(유리 반사 두 줄만), 손잡이는 오른쪽 아래 45°",
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 5,
+          "role": "움직이는 연출 도구 — 사진 카드 위를 훑다가 동물이 아닌 눈밭에 멈춘다",
+          "metaphor": "돋보기가 비추는 모델의 시선 — 지름길 학습(허스키·늑대 사례)",
+          "placement": "왼쪽 65% 사진 카드 위를 이동, 렌즈 안으로 아래 그림이 비친다",
+          "adaptation": "원본",
+          "background": "크림 종이 #f3eee3"
+        }
+      ]
+    },
+    {
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "usedIn": [
+        "image-classifier-project",
+        "vibe-github-supabase"
+      ],
+      "file": "assets/svg/power-plug.svg",
+      "palette": {
+        "ink": "#22304a",
+        "body": "#fbf7ee",
+        "bodyShade": "#e3d9c6",
+        "face": "#cfc4ae",
+        "pin": "#c9cdd6",
+        "pinShade": "#9aa1b0",
+        "cord": "#2b3a55"
+      },
+      "anchors": "viewBox 0 0 360 160 · 코드 시작 (6,118) · 플러그 앞면 x=288 · 핀 중심선 y=66, y=94(간격 28) · 핀 끝 x=338 · power-outlet.svg와 같은 배율로 띄울 것",
+      "tags": [
+        "플러그",
+        "전원",
+        "코드",
+        "연결",
+        "꽂기",
+        "공유 링크",
+        "plug",
+        "power plug",
+        "connect"
+      ],
+      "alt": "옆에서 본 크림색 전원 플러그 — 둥근 핀 두 개가 오른쪽을 향하고 왼쪽으로 남색 코드 꼬리가 늘어진다",
+      "set": "power-plug + power-outlet (한 세트)",
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 12,
+          "role": "모델 꾸러미 꼬리에 달린 플러그 — 공유 링크 라벨과 함께 이동해 콘센트에 꽂힌다",
+          "metaphor": "공유 링크 = 학습(Teachable Machine)과 사용(내 프로그램)을 잇는 플러그",
+          "placement": "가운데로 이동하는 꾸러미의 꼬리, 프로그램 창 왼쪽 벽 콘센트로 수평 이동",
+          "adaptation": "원본",
+          "background": "크림 종이 #f3eee3"
+        },
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 24,
+          "role": "Codex에서 나온 플러그가 Supabase 콘센트에 꽂힌다(25장 상자 안 부품으로 다시)",
+          "metaphor": "MCP = 에이전트용 콘센트 규격",
+          "placement": "폭 331px, 잉크색 코드 선은 덱이 그림",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        }
+      ]
+    },
+    {
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "usedIn": [
+        "image-classifier-project",
+        "vibe-github-supabase"
+      ],
+      "file": "assets/svg/power-outlet.svg",
+      "palette": {
+        "ink": "#22304a",
+        "plate": "#fbf7ee",
+        "plateShade": "#e3d9c6",
+        "recess": "#d8cdb6",
+        "recessDeep": "#bfb299",
+        "metal": "#c9cdd6"
+      },
+      "anchors": "viewBox 0 0 160 200 · 구멍 중심 (80,86) · (80,114), 지름 12 · 홈 중심 (80,100) r 46 · 판 x 20~140, y 18~182",
+      "tags": [
+        "콘센트",
+        "전원",
+        "벽",
+        "소켓",
+        "연결",
+        "outlet",
+        "socket",
+        "power outlet"
+      ],
+      "alt": "벽에 붙은 크림색 콘센트 판 — 둥근 홈 안에 세로로 놓인 구멍 두 개, 위아래 나사",
+      "set": "power-plug + power-outlet (한 세트)",
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 12,
+          "role": "내 웹 프로그램 창 왼쪽 벽의 콘센트 — 플러그가 꽂히면 창에 불이 들어온다",
+          "metaphor": "공유 링크를 꽂으면 내 프로그램이 모델을 불러온다",
+          "placement": "오른쪽 프로그램 창 왼쪽 가장자리",
+          "adaptation": "원본",
+          "background": "크림 종이 #f3eee3"
+        },
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 24,
+          "role": "잉크색 벽 패널 위 같은 모양 콘센트 셋(Supabase·GitHub·Google Drive)",
+          "metaphor": "서비스마다 같은 규격의 MCP 서버",
+          "placement": "폭 150px ×3, 짙은 패널 #2b3446 위",
+          "adaptation": "원본",
+          "background": "짙은 벽 패널 #2b3446"
+        }
+      ]
+    },
+    {
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "file": "assets/svg/water-gauge-ruler.svg",
+      "palette": {
+        "ink": "#22304a",
+        "face": "#f6ecd4",
+        "side": "#dccba5",
+        "cap": "#3d4f73",
+        "capTop": "#5a6d93"
+      },
+      "anchors": "viewBox 0 0 140 600 · 0% y=550 · 100% y=50 · 1% = 5 units(균등) · 50% 굵은 눈금 · 눈금 왼쪽 끝 x=34, 앞면 x 34~96",
+      "tags": [
+        "눈금자",
+        "수위",
+        "수위표",
+        "게이지",
+        "신뢰도",
+        "기준값",
+        "측정",
+        "ruler",
+        "gauge",
+        "water level",
+        "scale"
+      ],
+      "alt": "받침에 선 세로 수위 눈금자 — 크림색 앞면에 0~100 균등 눈금(10마다 긴 눈금, 50 굵게), 남색 덮개·받침, 숫자 없음",
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 14,
+          "role": "dominant — 신뢰도 막대가 이 눈금자 앞에서 물처럼 차오르고 70% 기준선을 넘어야 답이 된다",
+          "metaphor": "수위 눈금자 — 기준값(합격선)을 넘은 막대만 답이 된다",
+          "placement": "가운데 크게, 막대 두세 개를 앞에 겹치고 앰버 기준선을 가로로 긋는다",
+          "adaptation": "원본",
+          "background": "크림 종이 #f3eee3"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/images/photo-cat-awake.jpg",
+      "type": "image",
+      "origin": "openverse",
+      "kind": "photo",
+      "created": "2026-10-20",
+      "license": "CC0 1.0 · doublefire1 (Flickr) · https://www.flickr.com/photos/97668319@N03/35951425865",
+      "tags": [
+        "고양이",
+        "사진",
+        "cat",
+        "photo",
+        "분류 실패",
+        "닫힌 세계"
+      ],
+      "alt": "바닥에서 카메라를 올려다보는 갈색 줄무늬 고양이, 배경에 의자 다리가 흐리게 보인다",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slides": [
+            2,
+            14
+          ],
+          "use": "치와와·머핀 모델에 넣으면 치와와 99.8%로 판정되는 실측 사례"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/images/photo-cat-asleep.jpg",
+      "type": "image",
+      "origin": "openverse",
+      "kind": "photo",
+      "created": "2026-10-20",
+      "license": "CC0 1.0 · Jonas Nilsson Lee (StockSnap) · https://stocksnap.io/photo/cat-pet-A2E33C32B9",
+      "tags": [
+        "고양이",
+        "사진",
+        "잠",
+        "흐림",
+        "cat",
+        "photo"
+      ],
+      "alt": "회색 소파 위에서 앞발을 뻗고 잠든 흰색·회색 고양이, 초점이 앞발에만 맞아 몸은 흐리다",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slides": [
+            14
+          ],
+          "use": "치와와 75.8% — 기준값 70%는 넘고 85%는 못 넘는 실측 사례"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/demo/samples/banana-green.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 512,
+      "h": 512,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen 3×2 시트를 잘라 씀, 앵커 stage-workbench.png)",
+      "tags": [
+        "바나나",
+        "덜 익은 바나나",
+        "초록",
+        "과일",
+        "숙성도"
+      ],
+      "alt": "크림 종이 위 덜 익은 초록 바나나 네 개 송이(노란 기 없음), 잉크 선+수채, 정사각, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 11,
+          "role": "예시 프로그램 「바나나 언제 먹지?」의 예시 사진 — 덜 익음 96%",
+          "placement": "demo/바나나-언제-먹지.html 사진 고르기 칸"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/demo/samples/banana-yellow.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 512,
+      "h": 512,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen 3×2 시트를 잘라 씀, 앵커 stage-workbench.png)",
+      "tags": [
+        "바나나",
+        "잘 익은 바나나",
+        "노랑",
+        "과일",
+        "숙성도"
+      ],
+      "alt": "크림 종이 위 고르게 노랗게 익은 바나나 네 개 송이, 잉크 선+수채, 정사각, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 11,
+          "role": "예시 프로그램 「바나나 언제 먹지?」의 예시 사진 — 딱 좋음 95% (11장 캡처 상태)",
+          "placement": "demo/바나나-언제-먹지.html 사진 고르기 칸"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/demo/samples/banana-spotted.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 512,
+      "h": 512,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen 3×2 시트를 잘라 씀, 앵커 stage-workbench.png)",
+      "tags": [
+        "바나나",
+        "너무 익은 바나나",
+        "갈색 반점",
+        "과일",
+        "숙성도"
+      ],
+      "alt": "크림 종이 위 갈색 반점이 빽빽한 많이 익은 바나나 네 개 송이, 잉크 선+수채, 정사각, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 11,
+          "role": "예시 프로그램 「바나나 언제 먹지?」의 예시 사진 — 너무 익음 93%",
+          "placement": "demo/바나나-언제-먹지.html 사진 고르기 칸"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/demo/samples/banana-turning.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 512,
+      "h": 512,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen 3×2 시트를 잘라 씀, 앵커 stage-workbench.png)",
+      "tags": [
+        "바나나",
+        "반쯤 익은 바나나",
+        "초록과 노랑",
+        "과일",
+        "경계 사례"
+      ],
+      "alt": "크림 종이 위 초록과 노랑이 반씩 섞인 막 익기 시작한 바나나 네 개 송이, 잉크 선+수채, 정사각, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 11,
+          "role": "예시 프로그램 「바나나 언제 먹지?」의 예시 사진 — 덜 익음 76% (기준값 80% 이상이면 모르겠어요)",
+          "placement": "demo/바나나-언제-먹지.html 사진 고르기 칸"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/demo/samples/banana-dim.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 512,
+      "h": 512,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen 3×2 시트를 잘라 씀, 앵커 stage-workbench.png)",
+      "tags": [
+        "바나나",
+        "어두운 조명",
+        "저품질 사진",
+        "과일",
+        "모르겠어요"
+      ],
+      "alt": "어둡고 탁한 갈색 배경 속 색을 알아보기 힘든 바나나 송이, 칸 전체가 어두움, 잉크 선+수채, 정사각, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 11,
+          "role": "예시 프로그램 「바나나 언제 먹지?」의 예시 사진 — 신뢰도 44%로 기준값 미달 → 모르겠어요",
+          "placement": "demo/바나나-언제-먹지.html 사진 고르기 칸"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/인공지능기초/이미지-분류-AI-프로젝트/demo/samples/banana-chamoe.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "illustration",
+      "set": "ai-how-to-learn",
+      "style": "ink-watercolor",
+      "w": 512,
+      "h": 512,
+      "created": "2026-10-20",
+      "license": "자체 생성 (Codex CLI image_gen 3×2 시트를 잘라 씀, 앵커 stage-workbench.png)",
+      "tags": [
+        "참외",
+        "노란 과일",
+        "학습하지 않은 것",
+        "클래스 밖 입력",
+        "과일"
+      ],
+      "alt": "크림 종이 위 흰 세로 줄무늬가 뚜렷한 노란 참외 한 개, 잉크 선+수채, 정사각, 글자 없음",
+      "usedIn": [
+        "image-classifier-project"
+      ],
+      "contexts": [
+        {
+          "deck": "image-classifier-project",
+          "slide": 11,
+          "role": "예시 프로그램 「바나나 언제 먹지?」의 예시 사진 — 바나나가 아닌데 딱 좋음 90%로 자신 있게 틀림",
+          "placement": "demo/바나나-언제-먹지.html 사진 고르기 칸"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/library-desk.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#0b1a30",
+        "top": "#e2c49a",
+        "front": "#b98a5a",
+        "panel": "#a47548",
+        "book1": "#ff9a8b",
+        "book2": "#9cc3ff",
+        "brass": "#f2c96b"
+      },
+      "anchors": "상판 앞 모서리 viewBox y≈118, x 30~490 · 책을 건네는 자리 (260,96)",
+      "tags": [
+        "도서관",
+        "대출 창구",
+        "책상",
+        "카운터",
+        "책",
+        "호출 벨",
+        "요청",
+        "응답",
+        "library desk",
+        "counter"
+      ],
+      "alt": "비스듬히 위에서 본 나무 대출 창구 책상 — 상판 위에 코랄·하늘색 책 두 권과 황동 호출 벨, 앞판 패널 세 칸",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ],
+      "contexts": [
+        {
+          "deck": "vibe-web-blueprint",
+          "slide": 3,
+          "role": "소품 — 브라우저와 서버 사이의 창구",
+          "metaphor": "주소(청구 기호)를 내밀면 서버(사서)가 파일(책)을 건네는 요청·응답",
+          "placement": "화면 가운데 x 700~1220, y 420, 폭 520px. 요청 쪽지와 응답 책 카드가 이 위를 건너간다",
+          "adaptation": "원본 그대로",
+          "background": "다크 청사진 #0f2747"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/moving-box.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#0b1a30",
+        "top": "#e8bf86",
+        "front": "#d29c5c",
+        "side": "#a8733a",
+        "tape": "#f3e6c4"
+      },
+      "anchors": "앞면 라벨 자리 x 30~170, y 120~150 (중심 100,136) · 바닥 y≈216",
+      "tags": [
+        "이사",
+        "상자",
+        "골판지",
+        "택배",
+        "배포",
+        "옮기기",
+        "moving box",
+        "cardboard box"
+      ],
+      "alt": "비스듬히 위에서 본 테이프 붙인 골판지 이사 상자 — 앞면에 빈 라벨 종이와 \"이쪽이 위\" 화살표 두 개",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ],
+      "contexts": [
+        {
+          "deck": "vibe-web-blueprint",
+          "slide": 8,
+          "role": "소품 — 파일 하나가 상자 하나",
+          "metaphor": "내 노트북의 파일을 빌린 서버로 옮기는 이사(배포)",
+          "placement": "170×150px 세 개가 노트북에서 건물 문으로 포물선 이동, 라벨 자리에 파일 이름(index.html 등)을 덱이 얹음",
+          "adaptation": "원본 그대로",
+          "background": "다크 청사진 #0f2747"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/clipboard-questionnaire.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-20",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#0b1a30",
+        "board": "#b98a5a",
+        "paper": "#f6efe0",
+        "line": "#9aa6b8",
+        "clip": "#c7d0dc"
+      },
+      "anchors": "체크 칸 왼쪽 위 (64, 196/284/372/460), 칸 크기 40 · 밑줄 x 124~360",
+      "tags": [
+        "문진표",
+        "클립보드",
+        "체크리스트",
+        "설문",
+        "인터뷰",
+        "병원",
+        "clipboard",
+        "questionnaire",
+        "checklist"
+      ],
+      "alt": "정면에서 본 나무 클립보드와 금속 집게 — 크림색 종이에 빈 체크 칸 네 줄과 밑줄",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ],
+      "contexts": [
+        {
+          "deck": "vibe-web-blueprint",
+          "slide": 16,
+          "role": "소품 — 설계도 네 칸이 적힌 문진표",
+          "metaphor": "에이전트가 한 질문씩 묻고 내가 고르면 칸이 채워지는 병원 문진",
+          "placement": "오른쪽 x 1300, y 230, 420×560 원래 크기. 체크 표시와 칸 이름·답은 덱이 HTML로 덮어 씀",
+          "adaptation": "원본 그대로",
+          "background": "다크 청사진 #0f2747"
+        }
+      ]
+    },
+    {
+      "file": "data/2026-2/바이브코딩/웹의-구조와-설계도/images/pet/egg-whole.png",
+      "type": "image",
+      "origin": "spacekijun 저장소 public/images/tamagotchi/codex/ (교사 본인 프로젝트, Codex image_gen 생성)",
+      "license": "교사 저작물 (spacekijun 다마고찌 · 원본 파일명 egg-whole.png)",
+      "set": "spacekijun-tamagotchi",
+      "style": "pixel-art",
+      "tags": [
+        "다마고찌",
+        "펫",
+        "도트",
+        "픽셀 아트",
+        "spacekijun",
+        "egg"
+      ],
+      "alt": "다마고찌 도트 그림 — 별 무늬가 있는 크림색 알 (투명 배경, 원본 크기 그대로 정수배 확대해 쓴다)",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ]
+    },
+    {
+      "file": "data/2026-2/바이브코딩/웹의-구조와-설계도/images/pet/egg-crack.png",
+      "type": "image",
+      "origin": "spacekijun 저장소 public/images/tamagotchi/codex/ (교사 본인 프로젝트, Codex image_gen 생성)",
+      "license": "교사 저작물 (spacekijun 다마고찌 · 원본 파일명 egg-crack.png)",
+      "set": "spacekijun-tamagotchi",
+      "style": "pixel-art",
+      "tags": [
+        "다마고찌",
+        "펫",
+        "도트",
+        "픽셀 아트",
+        "spacekijun",
+        "egg"
+      ],
+      "alt": "다마고찌 도트 그림 — 금이 간 크림색 알 (투명 배경, 원본 크기 그대로 정수배 확대해 쓴다)",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ]
+    },
+    {
+      "file": "data/2026-2/바이브코딩/웹의-구조와-설계도/images/pet/baby-idle.png",
+      "type": "image",
+      "origin": "spacekijun 저장소 public/images/tamagotchi/codex/ (교사 본인 프로젝트, Codex image_gen 생성)",
+      "license": "교사 저작물 (spacekijun 다마고찌 · 원본 파일명 baby-idle.png)",
+      "set": "spacekijun-tamagotchi",
+      "style": "pixel-art",
+      "tags": [
+        "다마고찌",
+        "펫",
+        "도트",
+        "픽셀 아트",
+        "spacekijun",
+        "baby"
+      ],
+      "alt": "다마고찌 도트 그림 — 보라색 아기 펫 — 웃는 얼굴 (투명 배경, 원본 크기 그대로 정수배 확대해 쓴다)",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ]
+    },
+    {
+      "file": "data/2026-2/바이브코딩/웹의-구조와-설계도/images/pet/baby-eat.png",
+      "type": "image",
+      "origin": "spacekijun 저장소 public/images/tamagotchi/codex/ (교사 본인 프로젝트, Codex image_gen 생성)",
+      "license": "교사 저작물 (spacekijun 다마고찌 · 원본 파일명 baby-eat.png)",
+      "set": "spacekijun-tamagotchi",
+      "style": "pixel-art",
+      "tags": [
+        "다마고찌",
+        "펫",
+        "도트",
+        "픽셀 아트",
+        "spacekijun",
+        "baby"
+      ],
+      "alt": "다마고찌 도트 그림 — 보라색 아기 펫 — 입을 벌리고 먹는 모습 (투명 배경, 원본 크기 그대로 정수배 확대해 쓴다)",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ]
+    },
+    {
+      "file": "data/2026-2/바이브코딩/웹의-구조와-설계도/images/pet/baby-no.png",
+      "type": "image",
+      "origin": "spacekijun 저장소 public/images/tamagotchi/codex/ (교사 본인 프로젝트, Codex image_gen 생성)",
+      "license": "교사 저작물 (spacekijun 다마고찌 · 원본 파일명 baby-no.png)",
+      "set": "spacekijun-tamagotchi",
+      "style": "pixel-art",
+      "tags": [
+        "다마고찌",
+        "펫",
+        "도트",
+        "픽셀 아트",
+        "spacekijun",
+        "baby"
+      ],
+      "alt": "다마고찌 도트 그림 — 보라색 아기 펫 — 눈을 질끈 감고 싫다는 표정 (투명 배경, 원본 크기 그대로 정수배 확대해 쓴다)",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ]
+    },
+    {
+      "file": "data/2026-2/바이브코딩/웹의-구조와-설계도/images/pet/child-happy.png",
+      "type": "image",
+      "origin": "spacekijun 저장소 public/images/tamagotchi/codex/ (교사 본인 프로젝트, Codex image_gen 생성)",
+      "license": "교사 저작물 (spacekijun 다마고찌 · 원본 파일명 child-happy.png)",
+      "set": "spacekijun-tamagotchi",
+      "style": "pixel-art",
+      "tags": [
+        "다마고찌",
+        "펫",
+        "도트",
+        "픽셀 아트",
+        "spacekijun",
+        "child"
+      ],
+      "alt": "다마고찌 도트 그림 — 머리에 별 새싹이 난 하늘색 어린이 펫 — 윙크 (투명 배경, 원본 크기 그대로 정수배 확대해 쓴다)",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ]
+    },
+    {
+      "file": "data/2026-2/바이브코딩/웹의-구조와-설계도/images/pet/adult-idle.png",
+      "type": "image",
+      "origin": "spacekijun 저장소 public/images/tamagotchi/codex/ (교사 본인 프로젝트, Codex image_gen 생성)",
+      "license": "교사 저작물 (spacekijun 다마고찌 · 원본 파일명 adult-idle.png)",
+      "set": "spacekijun-tamagotchi",
+      "style": "pixel-art",
+      "tags": [
+        "다마고찌",
+        "펫",
+        "도트",
+        "픽셀 아트",
+        "spacekijun",
+        "adult"
+      ],
+      "alt": "다마고찌 도트 그림 — 왕관과 망토를 두른 어른 펫 (투명 배경, 원본 크기 그대로 정수배 확대해 쓴다)",
+      "usedIn": [
+        "vibe-web-blueprint"
+      ]
+    },
+    {
+      "file": "assets/svg/passport-open.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-28",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1f2430",
+        "cover": "#3b2f7a",
+        "coverEdge": "#2a2160",
+        "paper": "#fbf7ee",
+        "paperShade": "#ece3d1",
+        "rule": "#c9bfa8"
+      },
+      "anchors": "viewBox 0 0 640 440 · 오른쪽 사증 면 x 344~592, y 58~392 (도장 칸을 얹는 자리) · 책등 x=320",
+      "tags": [
+        "여권",
+        "펼친 여권",
+        "도장",
+        "여정",
+        "출발",
+        "passport",
+        "open passport",
+        "journey",
+        "stamp page"
+      ],
+      "alt": "정면에서 약간 내려다본 펼친 여권 — 남보라 표지, 왼쪽은 사진 칸과 글줄이 있는 신원 면, 오른쪽은 빈 사증 면",
+      "usedIn": [
+        "vibe-github-supabase"
+      ],
+      "contexts": [
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 1,
+          "role": "표지 — 빈 도장 칸 셋 위를 도장이 지나간다(아직 찍지 않음)",
+          "metaphor": "오늘 내 폴더가 기록·주소·기억 세 도장을 받으러 떠나는 여정",
+          "placement": "오른쪽 화면 폭 1000px, -3° 기울임, 사증 면에 HTML 도장 칸 3개",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        },
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 29,
+          "role": "마무리 — 같은 여권에 도장이 실제로 찍힌다(기억은 점선)",
+          "metaphor": "표지의 거울상 — 여정의 완성",
+          "placement": "표지와 같은 위치·크기",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/school-lockers.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-28",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1f2430",
+        "steel": "#a9bbcd",
+        "steelShade": "#8499ae",
+        "cap": "#c4d2e0",
+        "inside": "#2b3446",
+        "insideShade": "#1f2633",
+        "base": "#5b6c80"
+      },
+      "anchors": "viewBox 0 0 540 560 · 칸 세 개 x 44~182 · 201~339 · 358~496 (폭 138), y 62~496 — locker-door.svg를 같은 배율로 얹는다",
+      "tags": [
+        "사물함",
+        "학교 사물함",
+        "칸",
+        "잠금",
+        "보안",
+        "권한",
+        "locker",
+        "school locker",
+        "access control"
+      ],
+      "alt": "정면에서 본 세 칸짜리 학교 사물함 몸체 — 문 없이 칸 안쪽(선반·옷걸이 고리)이 보인다",
+      "set": "school-lockers + locker-door (한 세트)",
+      "usedIn": [
+        "vibe-github-supabase"
+      ],
+      "contexts": [
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 20,
+          "role": "RLS — 칸 = 표의 행, 자기 방문증으로 자기 칸만 열린다",
+          "metaphor": "행 수준 보안 = 내 열쇠로 내 칸만",
+          "placement": "왼쪽 540px, 문은 CSS rotateY로 경첩 축 회전",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/locker-door.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-28",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1f2430",
+        "door": "#bccbdb",
+        "doorShade": "#9fb1c4",
+        "plate": "#fbf7ee",
+        "lock": "#c9a24a",
+        "slot": "#2b3446"
+      },
+      "anchors": "viewBox 0 0 138 434 · 이름표 x 18~116, y 128~164 · 자물쇠 중심 (104,246) · 경첩 x=2",
+      "tags": [
+        "사물함 문",
+        "문",
+        "자물쇠",
+        "이름표",
+        "locker door",
+        "door",
+        "lock"
+      ],
+      "alt": "학교 사물함 문 한 짝 — 위아래 통풍구, 빈 이름표, 금색 자물쇠",
+      "set": "school-lockers + locker-door (한 세트)",
+      "usedIn": [
+        "vibe-github-supabase"
+      ],
+      "contexts": [
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 20,
+          "role": "사물함 칸마다 얹는 문 — 이름표에 '서연의 펫' 등을 덱이 얹는다",
+          "metaphor": "내 칸만 열린다",
+          "placement": "school-lockers.svg 칸 좌표에 같은 배율",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/kit-box.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-28",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1f2430",
+        "lid": "#6c4cf0",
+        "lidInside": "#9d86f6",
+        "box": "#e6d6b8",
+        "boxSide": "#cdb990",
+        "inside": "#b59f74",
+        "insideDeep": "#9c875e",
+        "tray": "#f1e7d2",
+        "label": "#fbf7ee"
+      },
+      "anchors": "viewBox 0 0 620 440 · 왼쪽 칸 중심 (200,200) · 오른쪽 칸 중심 (424,200) · 앞면 라벨 x 222~402, y 296~360",
+      "tags": [
+        "키트",
+        "조립 키트",
+        "상자",
+        "부품",
+        "설명서",
+        "플러그인",
+        "패키지",
+        "kit",
+        "box",
+        "package",
+        "plugin"
+      ],
+      "alt": "비스듬히 앞에서 본 뚜껑 열린 조립 키트 상자 — 보라 뚜껑, 왼쪽은 부품 홈 받침, 오른쪽은 설명서 칸, 앞면에 빈 라벨",
+      "usedIn": [
+        "vibe-github-supabase"
+      ],
+      "contexts": [
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 25,
+          "role": "플러그인 = 부품(MCP 서버) + 설명서(스킬) 상자",
+          "metaphor": "레고 키트 — 부품만 받은 것과 설명서까지 받은 것",
+          "placement": "오른쪽 폭 900px, 왼쪽 칸 위에 플러그·.mcp.json, 오른쪽 칸 위에 스킬 카드 두 장",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        },
+        {
+          "deck": "vibe-github-supabase",
+          "slide": 26,
+          "role": "설치 순간 터미널로 미끄러져 들어가는 상자",
+          "metaphor": "플러그인을 들이는 일 = 상자를 들인다",
+          "placement": "왼쪽 420px → 축소·투명",
+          "adaptation": "원본",
+          "background": "크림 종이 #f4efe6"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/clapper-slate.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-29",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1d1b22",
+        "slate": "#2b2933",
+        "slateEdge": "#3b3846",
+        "chalk": "#f3ede1",
+        "stripe": "#f6f2ea",
+        "hinge": "#b8b2c4"
+      },
+      "anchors": "위 막대가 얹히는 선 y=8 (x 14~306) · 경첩 (20,8) · 칠판 칸 위 x30~290 y46~108(세로선 x=114·204), 아래 y116~228(가로선 168) — clapper-stick.svg와 한 쌍",
+      "tags": [
+        "클래퍼보드",
+        "슬레이트",
+        "촬영",
+        "영화",
+        "장면",
+        "숏",
+        "clapperboard",
+        "slate",
+        "film"
+      ],
+      "alt": "정면에서 본 영화 클래퍼보드 몸판 — 줄무늬 고정 막대와 칸이 나뉜 빈 칠판(글씨는 덱이 얹는다)",
+      "usedIn": [
+        "ai-shorts-scene-design",
+        "ai-shorts-script"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 1,
+          "role": "표지의 주인공 — 위 막대가 '딱' 닫히고 칠판에 장면 3·숏 1이 분필로 써진다",
+          "metaphor": "촬영장에서 한 장면이 시작되는 순간",
+          "placement": "오른쪽 절반, 폭 900px",
+          "adaptation": "원본 그대로. 위 막대는 clapper-stick.svg를 경첩 축으로 회전",
+          "background": "밝은 콘티 종이 #f3ede1"
+        },
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 6,
+          "role": "비트 맵에서 '오늘의 장면' 스티커",
+          "metaphor": "반전 비트 = 오늘 찍을 장면",
+          "placement": "반전 카드 안 왼쪽 아래, 폭 190px",
+          "adaptation": "원본 그대로",
+          "background": "밝은 콘티 종이 #f3ede1"
+        },
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 21,
+          "role": "마무리 — '다음: 장면 3 · 숏 2'",
+          "metaphor": "다음 숏을 예고",
+          "placement": "오른쪽 아래, 폭 300px",
+          "adaptation": "원본 그대로",
+          "background": "밝은 콘티 종이 #f3ede1"
+        },
+        {
+          "deck": "ai-shorts-script",
+          "slide": 22,
+          "role": "대본 첫 줄이 칠판에 옮겨 적힌다 — 대본 한 줄이 장면 하나가 된다",
+          "metaphor": "대본 역 → 장면 계획 역",
+          "placement": "왼쪽 아래 밝은 판(#f3ede1) 위, 폭 620px",
+          "adaptation": "원본 그대로. 어두운 배경 대비를 위해 밝은 판 위에 올렸다",
+          "background": "어두운 편집실 #141826"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/clapper-stick.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-29",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1d1b22",
+        "slate": "#2b2933",
+        "stripe": "#f6f2ea"
+      },
+      "anchors": "회전축(경첩) (20,28) → transform-origin 6.25% 87.5% · 이 파일 y=28을 몸판 y=8에 맞춘다(같은 width)",
+      "tags": [
+        "클래퍼보드",
+        "막대",
+        "슬레이트",
+        "clapper stick",
+        "clapperboard"
+      ],
+      "alt": "클래퍼보드 위쪽 움직이는 줄무늬 막대 — clapper-slate.svg와 한 쌍",
+      "usedIn": [
+        "ai-shorts-scene-design",
+        "ai-shorts-script"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 1,
+          "role": "표지에서 경첩을 축으로 -28°→0° 닫힌다",
+          "metaphor": "'딱' — 장면의 시작",
+          "placement": "몸판과 같은 폭으로 겹침",
+          "adaptation": "원본 그대로",
+          "background": "밝은 콘티 종이 #f3ede1"
+        },
+        {
+          "deck": "ai-shorts-script",
+          "slide": 22,
+          "role": "막대가 닫히며 장면 시작",
+          "metaphor": "장면의 시작",
+          "placement": "몸판과 같은 폭",
+          "adaptation": "원본 그대로",
+          "background": "어두운 편집실 #141826"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/sketchbook-pencil.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-29",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1d1b22",
+        "cover": "#2f6f68",
+        "coverDark": "#24564f",
+        "paper": "#fbf8f1",
+        "paperShade": "#ece5d6",
+        "ring": "#9a97a3",
+        "pencil": "#e8b33a",
+        "eraser": "#e58b84"
+      },
+      "anchors": "그림 그릴 종이 면 x 40~380, y 56~256 (viewBox 440×320) · 연필은 오른쪽 아래 모서리 밖",
+      "tags": [
+        "스케치북",
+        "연필",
+        "그리기",
+        "스케치",
+        "드로잉",
+        "sketchbook",
+        "pencil",
+        "drawing"
+      ],
+      "alt": "정면에서 약간 내려다본 청록 표지 스프링 스케치북(빈 종이)과 비스듬히 놓인 노란 연필",
+      "usedIn": [
+        "ai-shorts-scene-design"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 8,
+          "role": "전화로 설명만 듣고 그리는 사람의 스케치북 — 물음표가 선 그림으로 바뀐다",
+          "metaphor": "본 적 없는 사람도 그릴 수 있는가(자기완결 프롬프트)",
+          "placement": "오른쪽, 폭 1000px, 종이 면 위에 SVG 선을 겹쳐 그림",
+          "adaptation": "원본 그대로",
+          "background": "밝은 콘티 종이 #f3ede1"
+        },
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 19,
+          "role": "실습 ⑥ '짝이 그려 보기' 표시",
+          "metaphor": "S8의 거울",
+          "placement": "오른쪽 아래, 폭 300px",
+          "adaptation": "원본 그대로",
+          "background": "밝은 콘티 종이 #f3ede1"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/cinema-camera-tripod.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-29",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1d1b22",
+        "body": "#3b3846",
+        "bodyTop": "#55516a",
+        "reel": "#6d6880",
+        "glass": "#8fb7d6",
+        "leg": "#a07a52"
+      },
+      "anchors": "렌즈 끝 (266,108) · 삼각대 머리 (140,170) · 다리 끝 y≈304 (viewBox 300×320)",
+      "tags": [
+        "영화 카메라",
+        "카메라",
+        "삼각대",
+        "촬영",
+        "필름",
+        "cinema camera",
+        "tripod",
+        "movie camera"
+      ],
+      "alt": "옆에서 본 필름 릴 두 개 달린 고전 영화 카메라가 나무 삼각대 위에 올라간 모습(렌즈 오른쪽)",
+      "usedIn": [
+        "ai-shorts-scene-design"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-shorts-scene-design",
+          "slide": 11,
+          "role": "촬영장 평면도 장의 안내 소품",
+          "metaphor": "카메라 지시(돌리·줌·고정)",
+          "placement": "오른쪽 아래 구석, 폭 150px",
+          "adaptation": "원본 그대로",
+          "background": "밝은 콘티 종이 #f3ede1"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/pour-over-dripper.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-29",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#10131d",
+        "ceramic": "#f1ece2",
+        "ceramicShade": "#d6cdbd",
+        "paper": "#fbf7ec",
+        "glass": "#cfe3ee",
+        "glassShade": "#a9c6d6"
+      },
+      "anchors": "깔때기 입구 y≈46 (x 34~266) · 추출 구멍 (150,176) · 서버 안쪽 빈 칸 x 62~238, y 214~326 (viewBox 300×360)",
+      "tags": [
+        "드리퍼",
+        "드립 커피",
+        "깔때기",
+        "거르기",
+        "핵심",
+        "요약",
+        "pour over",
+        "dripper",
+        "coffee",
+        "filter"
+      ],
+      "alt": "옆에서 본 흰 도자기 드립 깔때기가 손잡이 달린 유리 서버 위에 얹힌 모습 — 서버 안은 비어 있다",
+      "usedIn": [
+        "ai-shorts-script"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-shorts-script",
+          "slide": 5,
+          "role": "아이디어 조각이 깔때기에 쌓이고 서버에 핵심 메시지가 떨어져 모인다",
+          "metaphor": "많은 아이디어를 걸러 한 문장(핵심 메시지)만 남긴다",
+          "placement": "가운데, 폭 380px · 서버 안을 덱이 앰버 색면으로 채움",
+          "adaptation": "원본 그대로",
+          "background": "어두운 편집실 #141826"
+        }
+      ]
+    },
+    {
+      "file": "assets/svg/wooden-hourglass.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-10-29",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#10131d",
+        "wood": "#c98f55",
+        "woodDark": "#9a6534",
+        "woodTop": "#e0ad73",
+        "glass": "#cfe3ee",
+        "post": "#b07a45"
+      },
+      "anchors": "위 칸 안쪽 x 64~176, y 46~150 · 목 (120,180) · 아래 칸 안쪽 x 64~176, y 210~314 (viewBox 240×360)",
+      "tags": [
+        "모래시계",
+        "시간",
+        "예산",
+        "분량",
+        "제한 시간",
+        "hourglass",
+        "time",
+        "budget"
+      ],
+      "alt": "정면에서 본 나무 테 모래시계 — 유리 안은 비어 있다(덱이 모래 대신 글자 블록을 채운다)",
+      "usedIn": [
+        "ai-shorts-script"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-shorts-script",
+          "slide": 11,
+          "role": "글자 블록이 위 칸에 쌓였다가 읽는 속도대로 아래로 떨어지고, 넘치면 밖으로 흘러내린다",
+          "metaphor": "글자 예산 = 읽는 속도 × 목표 시간",
+          "placement": "가운데 왼쪽, 폭 300px · 같은 viewBox의 SVG clipPath로 블록을 유리 안에 그림",
+          "adaptation": "원본 그대로",
+          "background": "어두운 편집실 #141826"
+        }
+      ]
+    },
+    {
+      "file": "assets/vrm/isekai3d/female-teen-gijeon.vrm",
+      "type": "model",
+      "origin": "chanisma/isekai3d prototypes/generated/gijeon-01.vrm (revision 3, models/compare/shrink.py 512 jpeg로 텍스처만 축소)",
+      "license": "저장소 라이선스 미적용 · 저작자 chanisma(VRoid Studio 모델을 isekai3d에서 재단) · 원본 파일 gijeon-01.vrm · VRM 메타: allowModification, personalNonProfit, allowRedistribution false",
+      "style": "vroid-anime",
+      "tags": [
+        "VRM",
+        "캐릭터",
+        "십대",
+        "여성",
+        "샘플고",
+        "교복",
+        "three-vrm"
+      ],
+      "alt": "isekai3d 프로젝트의 샘플고 교복을 입은 십대 다인 캐릭터(카디건·셔츠·넥타이·회색 주름 치마). 교표는 사진을 참고한 간략한 배지다.",
+      "usedIn": [
+        "data/2026-1/정보/점등봇-프로그래밍-퍼즐/index.html"
+      ],
+      "contexts": [
+        "data/2026-1/정보/점등봇-프로그래밍-퍼즐/index.html: 플레이어 캐릭터"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/stage-night-stall.jpg",
+      "type": "image",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "밤 강변 포장마차 내부. 등불, 빈 선반, 빈 간판, 칠판, 화구 4개, 나무 판매대",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/burner-off-4.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "stage-night-stall.jpg의 불꽃 영역에서 이 저장소가 파생",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "화구",
+        "꺼짐",
+        "포장마차"
+      ],
+      "alt": "무대 그림의 화구 4번 불꽃을 덮어 꺼진 모습으로 만드는 조각",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/burner-off-3.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "stage-night-stall.jpg의 불꽃 영역에서 이 저장소가 파생",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "화구",
+        "꺼짐",
+        "포장마차"
+      ],
+      "alt": "무대 그림의 화구 3번 불꽃을 덮어 꺼진 모습으로 만드는 조각",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/burner-off-2.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "stage-night-stall.jpg의 불꽃 영역에서 이 저장소가 파생",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "화구",
+        "꺼짐",
+        "포장마차"
+      ],
+      "alt": "무대 그림의 화구 2번 불꽃을 덮어 꺼진 모습으로 만드는 조각",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/burner-off-1.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "stage-night-stall.jpg의 불꽃 영역에서 이 저장소가 파생",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "화구",
+        "꺼짐",
+        "포장마차"
+      ],
+      "alt": "무대 그림의 화구 1번 불꽃을 덮어 꺼진 모습으로 만드는 조각",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/pot.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "위에서 살짝 내려다본 빈 스테인리스 양수 냄비",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/pot-burnt.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "검게 탄 빈 양수 냄비",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/kettle.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "찌그러진 금색 주전자, 주둥이 왼쪽",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/noodle.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "네모난 마른 라면 사리",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/soup.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "글자 없는 빨간 스프 봉지",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/scallion.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "대파 한 줄기",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/egg.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "흰 날계란",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/tray.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "빈 나무 쟁반",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/bowl.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "계란과 파를 올린 라면 한 그릇",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/in-noodle.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "위에서 본 익은 면 덩어리",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/in-egg.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "위에서 본 수란",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/in-scallion.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "흩어진 송송 썬 파",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/in-soup.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "흩어진 고춧가루와 양념",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/dodam-idle.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "도담: 짧은 갈색 머리, 청록 머리띠, 크림색 셔츠, 빨간 앞치마의 십대 요리사. 국자를 들고 미소",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대",
+        "data/2026-2/인공지능기초/문제를-푸는-과정을-설계하다/: 알고리즘 수업의 예시와 활동 안내"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/dodam-cheer.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "도담: 두 주먹을 들고 눈 감고 환호",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/dodam-sad.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "도담: 고개 숙이고 땀방울, 미안한 표정",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/sprites/도담이네/dodam-proud.png",
+      "type": "sprite",
+      "set": "도담이네",
+      "origin": "OpenAI 이미지 API(gpt-image-2.5-sunburst)로 이 저장소에서 생성",
+      "license": "생성 이미지 · 저작자 chanisma(생성 지시) · 시트 sheet-a/b/c, stage",
+      "style": "cel-ink-night-stall",
+      "tags": [
+        "라면",
+        "포장마차",
+        "도담"
+      ],
+      "alt": "도담: 김 나는 라면 그릇을 두 손으로 내밂",
+      "usedIn": [
+        "data/2026-1/정보/도담이네-심야-라면/"
+      ],
+      "contexts": [
+        "프로그램으로 라면을 끓이는 알고리즘 게임의 무대"
+      ],
+      "reusable": false
+    },
+    {
+      "file": "assets/svg/name-tag-string.svg",
+      "type": "svg",
+      "origin": "generated",
+      "style": "clean-hand-illustration",
+      "reusable": true,
+      "created": "2026-11-08",
+      "license": "자체 제작 (Claude 직필)",
+      "palette": {
+        "ink": "#1f1a14",
+        "face": "#d6336c",
+        "edge": "#a8204f",
+        "panel": "#fbf3e3",
+        "ring": "#c99a2e",
+        "twine": "#efe2c4"
+      },
+      "anchors": "글자 칸 viewBox x 126~368, y 62~128 · 고리 구멍 중심 (88,95) · 끈 끝 (8,30) · viewBox 400×190",
+      "tags": [
+        "이름표",
+        "꼬리표",
+        "태그",
+        "변수",
+        "라벨",
+        "노끈",
+        "name tag",
+        "tag",
+        "label",
+        "variable"
+      ],
+      "alt": "놋쇠 고리에 노끈이 묶인 자홍색 종이 이름표 — 가운데 크림색 글자 칸은 비어 있다(덱이 이름을 얹는다)",
+      "usedIn": [
+        "ai-basics-python-var-func"
+      ],
+      "contexts": [
+        {
+          "deck": "ai-basics-python-var-func",
+          "slide": "1·5·13·19",
+          "role": "소품 — 변수 이름을 얹는 이름표",
+          "metaphor": "변수는 값에 붙이는 이름표, 대입은 이름표 끈을 값에 묶는 일",
+          "placement": "상태창 줄 왼쪽·값 카드에 날아가 묶이는 이름표, 폭 180~320px",
+          "adaptation": "원본",
+          "background": "마닐라 종이 #f2ead9"
+        }
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-00-intro.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "밤",
+        "거리",
+        "버스킹",
+        "가로등",
+        "night street",
+        "busking"
+      ],
+      "alt": "초저녁 작은 도시의 보행자 거리 — 양옆 꽃가게 창과 가로등, 젖은 돌바닥, 멀리 키보드·마이크 버스킹 자리와 모여드는 작은 실루엣들",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-01-room.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "밤",
+        "방",
+        "창문",
+        "빛",
+        "room",
+        "window light"
+      ],
+      "alt": "어두운 남색 방바닥에 등을 보이고 앉은 사람, 오른쪽 창으로 금빛 빛이 쏟아져 방을 채운다 — 마음에 차오르는 사랑",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-02-prayer.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "기도",
+        "옥상",
+        "등불",
+        "풍등",
+        "prayer",
+        "lantern"
+      ],
+      "alt": "밤 옥상에서 촛불 등 옆에 무릎 꿇고 손 모은 사람(옆뒤 모습), 아래 마을 불빛, 하늘로 떠오르는 풍등들",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-03-shore.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "바다",
+        "하늘",
+        "노을",
+        "광활",
+        "sea",
+        "sky"
+      ],
+      "alt": "푸른 시간의 넓은 바닷가, 화면 아래 가운데 아주 작은 사람 하나와 수평선 가득 번지는 따뜻한 빛 — 거대한 하늘의 품",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-04-stars.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "별",
+        "은하수",
+        "언덕",
+        "stars",
+        "milky way"
+      ],
+      "alt": "언덕 위에 누워 별을 보는 작은 사람 실루엣, 화면 위를 가로지르는 은하수와 금빛 별들",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-05-dawn.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "새벽",
+        "세상",
+        "십자가",
+        "일출",
+        "dawn",
+        "cross"
+      ],
+      "alt": "높은 곳에서 본 새벽의 세상 — 겹친 언덕·강·먼 바다와 안개, 오른쪽 언덕 위 작은 나무 십자가 뒤로 해가 뜬다",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-06-tree.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "나무",
+        "벤치",
+        "등불",
+        "오래된",
+        "ancient tree",
+        "bench"
+      ],
+      "alt": "저녁 들판에 홀로 선 거대한 고목, 가지에 매달린 등불과 그 아래 비어 있는 나무 벤치 — 오래전부터 준비된 자리",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-07-path.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "길",
+        "들판",
+        "일출",
+        "걷는 사람",
+        "path",
+        "sunrise"
+      ],
+      "alt": "해가 뜨는 지평선으로 굽어 가는 들판 길, 빛 입자가 떠오르고 작은 사람이 뒷모습으로 걸어간다",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/images/stage-08-street.jpg",
+      "type": "image",
+      "origin": "generated",
+      "kind": "stage",
+      "set": "이-시간-너의-맘속에",
+      "style": "painterly-dusk-worship",
+      "tags": [
+        "새벽",
+        "거리",
+        "버스킹",
+        "군중",
+        "dawn street"
+      ],
+      "alt": "첫 장면의 거리가 새벽빛으로 물든 모습 — 남색에서 장밋빛·금빛으로 바뀌는 하늘, 버스킹 자리 앞 더 많은 사람들과 떠오르는 빛",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    },
+    {
+      "file": "data/버스킹/이-시간-너의-맘속에/media/이-시간-너의-맘속에-mr.mp3",
+      "type": "audio",
+      "origin": "external",
+      "kind": "music",
+      "set": "이-시간-너의-맘속에",
+      "license": "러빔피아노 MR 사용 허용 조건(출처 링크 표기, 원 영상 그대로 재업로드 금지) · 연주 러빔피아노(Luvim) · 원본 「[러빔피아노] 이 시간 너의 맘속에 MR 연주법 악보」 https://www.youtube.com/watch?v=CxXTkF5Dpws · 곡 작사·작곡 김수지",
+      "tags": [
+        "반주",
+        "MR",
+        "찬양",
+        "버스킹"
+      ],
+      "alt": "「이 시간 너의 맘속에」 피아노 MR을 부르는 순서로 다시 이은 2분 15초 편집본 — 원곡 0:00~1:37.15 → 1:10.50~1:48.4(페이드아웃)",
+      "usedIn": [
+        "busking-maumsoge"
+      ]
+    }
+  ]
+}

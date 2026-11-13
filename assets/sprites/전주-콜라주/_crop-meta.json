@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "entries": {
+    "gyeonggijeon": {
+      "sheet": "sheet-A.png",
+      "bbox": [
+        38,
+        186,
+        589,
+        408
+      ],
+      "w": 589,
+      "h": 408,
+      "cropped_at": "2026-08-20"
+    },
+    "jeondong-cathedral": {
+      "sheet": "sheet-A.png",
+      "bbox": [
+        627,
+        59,
+        523,
+        553
+      ],
+      "w": 523,
+      "h": 553,
+      "cropped_at": "2026-08-20"
+    },
+    "omokdae": {
+      "sheet": "sheet-A.png",
+      "bbox": [
+        68,
+        695,
+        554,
+        450
+      ],
+      "w": 554,
+      "h": 450,
+      "cropped_at": "2026-08-20"
+    },
+    "hanji-scrolls": {
+      "sheet": "sheet-A.png",
+      "bbox": [
+        652,
+        785,
+        553,
+        370
+      ],
+      "w": 553,
+      "h": 370,
+      "cropped_at": "2026-08-20"
+    },
+    "pansori-singer": {
+      "sheet": "sheet-B.png",
+      "bbox": [
+        174,
+        75,
+        374,
+        506
+      ],
+      "w": 374,
+      "h": 506,
+      "cropped_at": "2026-08-20"
+    },
+    "gosu-drummer": {
+      "sheet": "sheet-B.png",
+      "bbox": [
+        655,
+        90,
+        443,
+        476
+      ],
+      "w": 443,
+      "h": 476,
+      "cropped_at": "2026-08-20"
+    },
+    "tourists-selfie": {
+      "sheet": "sheet-B.png",
+      "bbox": [
+        172,
+        629,
+        384,
+        542
+      ],
+      "w": 384,
+      "h": 542,
+      "cropped_at": "2026-08-20"
+    },
+    "king-portrait": {
+      "sheet": "sheet-B.png",
+      "bbox": [
+        665,
+        627,
+        433,
+        545
+      ],
+      "w": 433,
+      "h": 545,
+      "cropped_at": "2026-08-20"
+    },
+    "bibimbap": {
+      "sheet": "sheet-L.png",
+      "bbox": [
+        34,
+        349,
+        593,
+        533
+      ],
+      "w": 593,
+      "h": 533,
+      "cropped_at": "2026-08-20"
+    },
+    "hanok-house": {
+      "sheet": "sheet-L.png",
+      "bbox": [
+        627,
+        390,
+        608,
+        490
+      ],
+      "w": 608,
+      "h": 490,
+      "cropped_at": "2026-08-20"
+    }
+  }
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>프로그래밍(웹 개발) 자기평가서 — 제출 마감</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #F4F1FF;
+      --primary: #6B5DD3;
+      --accent: #2EC5E0;
+      --text: #1F2540;
+      --text-sub: #4E5677;
+      --text-muted: #828AAA;
+      --glass: rgba(255,255,255,0.62);
+      --glass-border: rgba(255,255,255,0.85);
+      --shadow-lg: 0 10px 38px rgba(31,37,64,0.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: clamp(15px, 1.2vw, 17px); }
+    body {
+      background: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 70% 55% at 12% 15%, rgba(168,155,255,0.45), transparent 60%),
+        radial-gradient(ellipse 55% 50% at 88% 18%, rgba(159,230,242,0.45), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 18% 90%, rgba(236,77,142,0.20), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 80%, rgba(31,184,144,0.22), transparent 60%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .card {
+      max-width: 560px; width: 100%;
+      background: var(--glass);
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.3rem;
+      box-shadow: var(--shadow-lg);
+      padding: 2.6rem 2rem 2.2rem;
+      text-align: center;
+    }
+    .lock {
+      width: 3.6rem; height: 3.6rem; margin: 0 auto 1.2rem;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: 0 8px 20px rgba(107,93,211,0.30);
+    }
+    .lock svg { width: 1.75rem; height: 1.75rem; fill: #fff; }
+    .badge {
+      display: inline-block;
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+      font-size: 0.76rem; font-weight: 600; letter-spacing: 0.02em;
+      padding: 0.2rem 0.75rem; border-radius: 2rem;
+      color: var(--primary);
+      background: linear-gradient(135deg, rgba(107,93,211,0.16), rgba(46,197,224,0.16));
+      border: 1px solid rgba(107,93,211,0.30);
+      margin-bottom: 0.9rem;
+    }
+    h1 {
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+      font-size: clamp(1.4rem, 3.4vw, 1.8rem); font-weight: 700;
+      word-break: keep-all; margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .subject { font-size: 0.95rem; font-weight: 600; color: var(--text-sub); margin-bottom: 1.4rem; word-break: keep-all; }
+    .desc { font-size: 0.93rem; color: var(--text-sub); word-break: keep-all; }
+    .desc + .desc { margin-top: 0.7rem; }
+    .note {
+      margin-top: 1.6rem; padding-top: 1.1rem;
+      border-top: 1px solid rgba(107,93,211,0.15);
+      font-size: 0.84rem; color: var(--text-muted); word-break: keep-all;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="lock" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6a5 5 0 00-10 0v2H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V10a2 2 0 00-2-2zM9 6a3 3 0 016 0v2H9V6zm3 12a2 2 0 110-4 2 2 0 010 4z"/></svg>
+    </div>
+    <span class="badge">제출 마감</span>
+    <h1>제출이 마감되었습니다</h1>
+    <div class="subject">프로그래밍(웹 개발) 자기평가서</div>
+    <p class="desc">자기평가서 제출 기간이 종료되어 <b>더 이상 작성·제출할 수 없습니다.</b></p>
+    <p class="desc">이미 제출한 내용은 정상적으로 저장되어 있으니 걱정하지 않아도 됩니다.</p>
+    <p class="note">제출 여부 확인이나 그 밖의 문의는 담당 선생님께 말씀해 주세요.</p>
+  </main>
+</body>
+</html>

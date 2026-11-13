@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>조선시대 과거제도 — 한국사 수업자료</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* ─────────────────────────────────────────────
+       1. Reset & CSS Variables
+    ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --style-bg: #1A1208;
+      --style-bg-2: #0E0A05;
+      --style-primary: #C9A84C;
+      --style-accent: #8A7340;
+      --style-text: #D4BF9A;
+      --style-text-secondary: #A8956E;
+      --style-border: #3D2E10;
+      --style-card-bg: rgba(61, 46, 16, 0.35);
+      --style-card-border: #4A3A18;
+      --style-topbar-bg: #120D04;
+      --nav-bg: rgba(18, 13, 4, 0.97);
+    }
+
+    /* ─────────────────────────────────────────────
+       2. Base Typography
+    ───────────────────────────────────────────── */
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'EB Garamond', 'Pretendard Variable', serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Playfair Display', 'EB Garamond', serif;
+      color: var(--style-primary);
+    }
+
+    h1 { font-size: 2.4rem; font-weight: 700; font-style: italic; letter-spacing: 0.04em; }
+    h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.06em; }
+    h3 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.02em; }
+    p  { font-size: 1rem; line-height: 1.75; color: var(--style-text); }
+
+    /* ─────────────────────────────────────────────
+       3. Accessibility
+    ───────────────────────────────────────────── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--style-primary); color: var(--style-bg);
+      padding: 8px 16px; z-index: 9999; font-size: 14px;
+      border-radius: 0 0 4px 0; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ─────────────────────────────────────────────
+       4. Progress Bar
+    ───────────────────────────────────────────── */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      z-index: 1000; width: 10%;
+      will-change: width; transform: translateZ(0); transition: width 0.3s ease;
+    }
+
+    /* ─────────────────────────────────────────────
+       5. Slide Container
+    ───────────────────────────────────────────── */
+    .presentation {
+      height: calc(100vh - 42px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    .slide.will-animate { will-change: opacity, transform; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─────────────────────────────────────────────
+       6. Browser Card — Dark Academia: minimal style
+    ───────────────────────────────────────────── */
+    .browser-card {
+      width: 100%;
+      max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--style-card-bg);
+      border: 1px solid var(--style-card-border);
+      border-radius: 0.4rem;
+      /* Inset double border effect */
+      box-shadow:
+        inset 0 0 0 1px rgba(201, 168, 76, 0.12),
+        0 4px 32px rgba(0,0,0,0.7);
+    }
+
+    /* Frameless card for cover / end */
+    .browser-card--frameless {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      padding: 0.45rem 1rem;
+      background: var(--style-topbar-bg);
+      border-bottom: 1px solid var(--style-border);
+      flex-shrink: 0;
+      min-height: 2.2rem;
+    }
+
+    .topbar-title {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.18em;
+      color: var(--style-accent);
+      text-transform: uppercase;
+      margin: 0 auto;
+    }
+
+    /* minimal style: thin title bar, no dots */
+    .topbar-rule {
+      width: 2rem;
+      height: 1px;
+      background: var(--style-border);
+      flex-shrink: 0;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    .browser-content::-webkit-scrollbar { width: 4px; }
+    .browser-content::-webkit-scrollbar-track { background: transparent; }
+    .browser-content::-webkit-scrollbar-thumb { background: var(--style-border); border-radius: 2px; }
+
+    /* ─────────────────────────────────────────────
+       7. Dark Academia Decorative Elements
+    ───────────────────────────────────────────── */
+    .gold-rule {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--style-primary), transparent);
+      margin: 0.6rem 0;
+      opacity: 0.5;
+    }
+
+    .ornament {
+      color: var(--style-primary);
+      font-family: 'EB Garamond', serif;
+      font-size: 1.1rem;
+      opacity: 0.7;
+      letter-spacing: 0.3em;
+    }
+
+    .section-label {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+      color: var(--style-accent);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ─────────────────────────────────────────────
+       8. Section Header
+    ───────────────────────────────────────────── */
+    .section-header {
+      margin-bottom: 0.65rem;
+    }
+
+    .section-header h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.4em;
+      font-size: 1.5rem;
+    }
+
+    .section-icon {
+      display: inline;
+      font-size: 1.2em;
+      margin-right: 0.4em;
+      vertical-align: -0.1em;
+      color: var(--style-primary);
+    }
+
+    .section-subtitle {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      margin-top: 0.25rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* ─────────────────────────────────────────────
+       9. Highlight Box
+    ───────────────────────────────────────────── */
+    .highlight-box {
+      background: rgba(201, 168, 76, 0.08);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      border-left: 3px solid var(--style-primary);
+      border-radius: 0.25rem;
+      padding: 0.65rem 1rem;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      color: var(--style-text);
+      line-height: 1.65;
+    }
+
+    /* ─────────────────────────────────────────────
+       10. Card Grid
+    ───────────────────────────────────────────── */
+    .card-grid {
+      display: grid;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: rgba(61, 46, 16, 0.4);
+      border: 1px solid var(--style-card-border);
+      border-radius: 0.3rem;
+      padding: 0.8rem 1rem;
+      contain: layout style;
+    }
+
+    .card-icon {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 0.3rem;
+      color: var(--style-primary);
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--style-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ─────────────────────────────────────────────
+       11. TOC
+    ───────────────────────────────────────────── */
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      margin-top: 0.5rem;
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--style-border);
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      background: rgba(61, 46, 16, 0.2);
+    }
+
+    .toc-item:hover {
+      background: rgba(201, 168, 76, 0.1);
+      border-color: var(--style-primary);
+    }
+
+    .toc-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--style-primary);
+      min-width: 2rem;
+    }
+
+    .toc-text {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--style-text);
+      letter-spacing: 0.02em;
+    }
+
+    .toc-arrow {
+      color: var(--style-accent);
+      font-size: 0.88rem;
+    }
+
+    /* ─────────────────────────────────────────────
+       12. Activity List
+    ───────────────────────────────────────────── */
+    .activity-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 0.7rem 1rem;
+      background: rgba(61, 46, 16, 0.35);
+      border: 1px solid var(--style-card-border);
+      border-radius: 0.25rem;
+    }
+
+    .activity-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      color: var(--style-primary);
+      margin-top: 0.05rem;
+    }
+
+    .activity-body { flex: 1; }
+
+    .activity-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--style-primary);
+      margin-bottom: 0.15rem;
+    }
+
+    .activity-desc {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ─────────────────────────────────────────────
+       13. Two Column
+    ───────────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .col-divider {
+      background: linear-gradient(180deg, transparent, var(--style-primary), transparent);
+      opacity: 0.4;
+    }
+
+    .col-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--style-primary);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.03em;
+    }
+
+    .col-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .col-list li {
+      font-size: 0.9rem;
+      color: var(--style-text);
+      line-height: 1.6;
+      padding-left: 1rem;
+      position: relative;
+    }
+
+    .col-list li::before {
+      content: '❧';
+      position: absolute;
+      left: 0;
+      color: var(--style-accent);
+      font-size: 0.8rem;
+      top: 0.15em;
+    }
+
+    /* ─────────────────────────────────────────────
+       14. Timeline
+    ───────────────────────────────────────────── */
+    .timeline {
+      display: flex;
+      gap: 0;
+      align-items: flex-start;
+      margin-top: 0.5rem;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 1rem;
+      left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--style-accent), transparent);
+      opacity: 0.5;
+    }
+
+    .timeline-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 0.3rem;
+    }
+
+    .timeline-marker {
+      width: 0.7rem; height: 0.7rem;
+      border-radius: 50%;
+      background: var(--style-accent);
+      border: 2px solid var(--style-bg);
+      margin-bottom: 0.5rem;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .timeline-marker.highlight-marker {
+      background: var(--style-primary);
+      width: 0.9rem; height: 0.9rem;
+    }
+
+    .timeline-date {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.82rem;
+      color: var(--style-primary);
+      letter-spacing: 0.05em;
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .timeline-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--style-text);
+      margin-bottom: 0.15rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ─────────────────────────────────────────────
+       15. Comparison Table
+    ───────────────────────────────────────────── */
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      border-radius: 0.3rem;
+      border: 1px solid var(--style-border);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .comparison-table thead tr {
+      background: rgba(201, 168, 76, 0.15);
+    }
+
+    .comparison-table th {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      color: var(--style-primary);
+      padding: 0.55rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--style-border);
+      letter-spacing: 0.04em;
+    }
+
+    .comparison-table td {
+      padding: 0.5rem 1rem;
+      color: var(--style-text);
+      border-bottom: 1px solid rgba(61,46,16,0.6);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    .comparison-table tbody tr:last-child td { border-bottom: none; }
+    .comparison-table tbody tr:nth-child(even) td { background: rgba(61,46,16,0.25); }
+    .comparison-table th[scope="row"] { color: var(--style-text-secondary); font-style: italic; }
+
+    /* ─────────────────────────────────────────────
+       16. Quote
+    ───────────────────────────────────────────── */
+    .quote-slide {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quote-figure {
+      text-align: center;
+      max-width: 780px;
+    }
+
+    .quote-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      color: var(--style-primary);
+      line-height: 0.6;
+      display: block;
+      margin-bottom: 0.8rem;
+      opacity: 0.6;
+    }
+
+    .quote-text {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 1.3rem;
+      color: var(--style-text);
+      line-height: 1.8;
+    }
+
+    .quote-source {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─────────────────────────────────────────────
+       17. Stat Highlight
+    ───────────────────────────────────────────── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0.8rem 0.6rem;
+      background: rgba(61, 46, 16, 0.4);
+      border: 1px solid var(--style-card-border);
+      border-radius: 0.3rem;
+      contain: layout style;
+    }
+
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--style-primary);
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      margin-top: 0.3rem;
+      letter-spacing: 0.04em;
+    }
+
+    /* ─────────────────────────────────────────────
+       18. Cover Slide
+    ───────────────────────────────────────────── */
+    .cover-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 80%;
+      padding: 2rem;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.22em;
+      color: var(--style-accent);
+      text-transform: uppercase;
+      border: 1px solid var(--style-accent);
+      border-radius: 0.2rem;
+      padding: 0.2rem 0.8rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .cover-title {
+      font-size: 2.8rem;
+      font-style: italic;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .cover-subtitle {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.06em;
+      margin-bottom: 1.2rem;
+    }
+
+    .cover-divider {
+      width: 8rem;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--style-primary), transparent);
+      margin: 0.8rem auto;
+    }
+
+    .cover-meta {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.12em;
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+    }
+
+    /* ─────────────────────────────────────────────
+       19. End Slide
+    ───────────────────────────────────────────── */
+    .end-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .end-header {
+      margin-bottom: 1rem;
+    }
+
+    .end-ornament {
+      font-size: 1.8rem;
+      color: var(--style-primary);
+      margin-bottom: 0.5rem;
+      display: block;
+      opacity: 0.75;
+    }
+
+    .end-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-style: italic;
+      color: var(--style-primary);
+      letter-spacing: 0.04em;
+    }
+
+    .end-subtitle {
+      font-size: 0.95rem;
+      color: var(--style-text-secondary);
+      margin-top: 0.4rem;
+      letter-spacing: 0.04em;
+    }
+
+    .summary-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      text-align: left;
+    }
+
+    .summary-list li {
+      font-size: 0.92rem;
+      color: var(--style-text);
+      line-height: 1.6;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .summary-list li::before {
+      content: '✦';
+      color: var(--style-primary);
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      margin-top: 0.2em;
+    }
+
+    /* ─────────────────────────────────────────────
+       20. Badge
+    ───────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      padding: 0.15rem 0.6rem;
+      border-radius: 0.2rem;
+      vertical-align: middle;
+    }
+
+    .badge-gold {
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--style-primary);
+      border: 1px solid rgba(201, 168, 76, 0.4);
+    }
+
+    .badge-muted {
+      background: rgba(138, 115, 64, 0.15);
+      color: var(--style-text-secondary);
+      border: 1px solid rgba(138, 115, 64, 0.35);
+    }
+
+    /* ─────────────────────────────────────────────
+       21. Navigation Bar
+    ───────────────────────────────────────────── */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1.5rem;
+      background: var(--nav-bg);
+      border-top: 1px solid var(--style-border);
+      z-index: 999;
+      font-size: 14px;
+    }
+
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--style-border);
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0;
+      color: var(--style-accent);
+      transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: rgba(201,168,76,0.12); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--style-primary); }
+    .nav-btn:focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .nav-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--style-accent);
+      min-width: 3rem;
+      text-align: center;
+      display: flex; align-items: center; gap: 0.15rem;
+      line-height: 1;
+      font-family: 'Pretendard Variable', sans-serif;
+      letter-spacing: 0.05em;
+    }
+
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700;
+      color: inherit; font-family: inherit; padding: 0;
+      outline: none; cursor: pointer; transition: border-color 0.2s; line-height: 1;
+    }
+
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-primary); background: rgba(201,168,76,0.08); border-radius: 4px; }
+
+    /* ─────────────────────────────────────────────
+       22. Responsive
+    ───────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .slide { padding: 1.5rem; }
+    }
+
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .col-divider { display: none; }
+      .timeline { flex-direction: column; align-items: flex-start; }
+      .timeline::before { display: none; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      h1 { font-size: 1.7rem; }
+      h2 { font-size: 1.2rem; }
+      .browser-content { padding: 0.8rem; }
+    }
+
+    /* ─────────────────────────────────────────────
+       23. High Contrast
+    ───────────────────────────────────────────── */
+    @media (prefers-contrast: high) {
+      :root {
+        --style-primary: #FFD700;
+        --style-text: #FFFFFF;
+        --style-bg: #000000;
+      }
+      .browser-card { border: 2px solid #FFD700; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="10"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 1: 표지 (Cover)
+    ══════════════════════════════════════════ -->
+    <div class="slide active" data-slide="0"
+         role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">조선시대 과거제도</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content cover-slide">
+          <div class="cover-badge">고등학교 한국사 · 수업자료</div>
+          <h1 class="cover-title">朝鮮時代<br>科擧制度</h1>
+          <p class="cover-subtitle">조선을 이끈 인재 선발의 문, 과거제도</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <p class="ornament" aria-hidden="true">❧ ✦ ❧</p>
+          <div class="cover-meta">
+            <span>고등학교 한국사</span>
+            <span aria-hidden="true">·</span>
+            <span>조선의 정치·사회 제도</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 2: 학습 목표 (stat-highlight)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="1"
+         role="region" aria-label="슬라이드 2: 학습 목표">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">학습 목표</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-label">Learning Objectives</div>
+          <h2>이번 수업에서 배울 것</h2>
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">Ⅰ</span>
+              <span class="stat-label">과거제도의 역사적<br>배경과 목적</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">Ⅱ</span>
+              <span class="stat-label">과거의 종류와<br>절차 및 과목</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">Ⅲ</span>
+              <span class="stat-label">과거제도의 의의와<br>한계 및 폐지</span>
+            </div>
+          </div>
+
+          <div class="highlight-box" role="note">
+            과거제도는 고려에서 도입되어 조선에서 꽃피운 관리 선발 제도로, 조선 사회의 신분 질서와 유교 문화를 이해하는 핵심 열쇠입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 3: 목차 (TOC)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="2"
+         role="region" aria-label="슬라이드 3: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">목차</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-label">Table of Contents</div>
+          <h2>수업 구성</h2>
+          <div class="gold-rule" aria-hidden="true"></div>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                  aria-label="슬라이드 4로 이동: 과거제도의 배경과 목적"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num" aria-hidden="true">I</span>
+                <span class="toc-text">과거제도의 배경과 목적</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                  aria-label="슬라이드 5로 이동: 과거의 종류"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num" aria-hidden="true">II</span>
+                <span class="toc-text">과거의 종류 — 문과·무과·잡과</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                  aria-label="슬라이드 6로 이동: 과거 시험의 절차"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                <span class="toc-num" aria-hidden="true">III</span>
+                <span class="toc-text">과거 시험의 절차와 단계</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                  aria-label="슬라이드 7로 이동: 과거와 신분제"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num" aria-hidden="true">IV</span>
+                <span class="toc-text">과거제도와 신분 질서</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0"
+                  aria-label="슬라이드 8로 이동: 과거제도의 의의와 한계"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                <span class="toc-num" aria-hidden="true">V</span>
+                <span class="toc-text">과거제도의 의의와 한계</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(8)" role="button" tabindex="0"
+                  aria-label="슬라이드 9로 이동: 과거제도의 폐지"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(8)">
+                <span class="toc-num" aria-hidden="true">VI</span>
+                <span class="toc-text">과거제도의 폐지와 역사적 유산</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 4: 배경과 목적 (section-overview + card-grid)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="3"
+         role="region" aria-label="슬라이드 4: 과거제도의 배경과 목적">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">I. 배경과 목적</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span>과거제도의 역사적 배경</h2>
+            <p class="section-subtitle">고려에서 도입, 조선에서 확립된 관리 선발 제도</p>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <div class="highlight-box" role="note">
+            조선은 건국(1392) 이후 유교적 이념에 입각한 관료제를 정비하며, 능력 중심의 인재 선발을 위해 과거제도를 핵심 제도로 운영하였습니다.
+          </div>
+
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">◆</span>
+              <h3 class="card-title">도입 배경</h3>
+              <p class="card-desc">고려 광종(958) 때 쌍기의 건의로 도입. 조선 태조 때 정비되어 성종 대에 체계화. 문벌 중심에서 능력 중심 관리 선발로 전환.</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">✦</span>
+              <h3 class="card-title">제도의 목적</h3>
+              <p class="card-desc">유교적 소양을 갖춘 관리 확보, 왕권 강화, 양반 중심의 지배 체제 유지, 신분제 내에서의 능력주의적 요소 도입.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 5: 과거의 종류 (card-grid 3열)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="4"
+         role="region" aria-label="슬라이드 5: 과거의 종류">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">II. 과거의 종류</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span>과거의 세 가지 종류</h2>
+            <p class="section-subtitle">조선의 과거는 크게 문과·무과·잡과로 나뉩니다</p>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <div class="grid-3 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">◆</span>
+              <h3 class="card-title">文科 (문과)</h3>
+              <p class="card-desc">유교 경전·문학 시험. 가장 중시된 시험. 소과(생원·진사시) → 대과(성균관 입학 후 응시). 합격자 33인 선발.</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">✦</span>
+              <h3 class="card-title">武科 (무과)</h3>
+              <p class="card-desc">무예·병서 시험. 임진왜란 이후 중요성 증대. 초시→복시→전시의 3단계. 합격자 28인 선발. 문과보다 사회적 위신 낮음.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">雜科 (잡과)</h3>
+              <p class="card-desc">역과(통역)·의과·율과(법률)·음양과(천문). 기술직 관리 선발. 주로 중인 계층이 응시. 문과·무과에 비해 낮은 지위.</p>
+            </div>
+          </div>
+
+          <div class="highlight-box" role="note">
+            별시(別試): 나라의 경사가 있을 때 부정기적으로 시행. 증광시·알성시·정시 등이 포함됩니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 6: 시험 절차 (timeline)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="5"
+         role="region" aria-label="슬라이드 6: 과거 시험의 절차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">III. 시험 절차</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span>문과 급제의 길</h2>
+            <p class="section-subtitle">소과에서 대과까지, 합격의 단계</p>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <div class="timeline" role="list" aria-label="과거 시험 단계">
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">1단계</span>
+              <h3 class="timeline-title">소과 초시</h3>
+              <p class="timeline-desc">각 도(道)별로 시행. 성적 우수자를 선발하여 서울로 올라갈 자격 부여.</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">2단계</span>
+              <h3 class="timeline-title">소과 복시</h3>
+              <p class="timeline-desc">생원시·진사시. 각 100명 선발. 성균관 입학 자격 획득. 합격자를 생원·진사라 칭함.</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker highlight-marker" aria-hidden="true"></div>
+              <span class="timeline-date">3단계</span>
+              <h3 class="timeline-title">대과 초시·복시</h3>
+              <p class="timeline-desc">성균관 유생 및 소과 합격자 응시. 유교 경전, 논술, 시문 등 출제. 33인 선발.</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker highlight-marker" aria-hidden="true"></div>
+              <span class="timeline-date">최종</span>
+              <h3 class="timeline-title">전시(殿試)</h3>
+              <p class="timeline-desc">왕이 직접 주관. 갑·을·병 3등급 순위 결정. 급제 후 홍패 수여, 관직 제수.</p>
+            </div>
+          </div>
+
+          <div class="highlight-box" role="note">
+            정기시험(式年試)은 3년마다 시행. 과거 급제는 양반 가문의 영예이자 입신양명의 최고 수단이었습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 7: 과거제도와 신분 (two-column)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="6"
+         role="region" aria-label="슬라이드 7: 과거제도와 신분 질서">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">IV. 신분 질서</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span>과거제도와 신분 질서</h2>
+            <p class="section-subtitle">명목상 개방성 vs. 현실적 제한</p>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">응시 자격 — 원칙</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">양인(良人) 이상이면 이론상 응시 가능</li>
+                <li role="listitem">천민(노비)·승려·범죄자 제외</li>
+                <li role="listitem">중인도 잡과 응시 가능</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">현실적 제약</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">장기간 학업에는 경제적 여유 필수</li>
+                <li role="listitem">성균관 입학·향교 교육은 양반 중심</li>
+                <li role="listitem">서얼(庶孼)은 문과 응시 제한</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="highlight-box" role="note">
+            과거는 능력주의를 표방하였으나, 실질적으로 양반 계층이 독점하는 구조였습니다. 이는 조선 신분제의 모순을 보여주는 대표적 사례입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 8: 의의와 한계 (activity-list)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="7"
+         role="region" aria-label="슬라이드 8: 과거제도의 의의와 한계">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">V. 의의와 한계</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span>과거제도의 의의와 한계</h2>
+            <p class="section-subtitle">빛과 그림자 — 조선 사회에 미친 영향</p>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">◆</span>
+              <div class="activity-body">
+                <h3 class="activity-title">의의 — 능력주의적 관료제 확립</h3>
+                <p class="activity-desc">혈통이 아닌 시험 성적으로 관리를 선발하는 합리적 제도. 유교적 소양을 갖춘 관료 집단을 육성하여 조선의 문치주의를 뒷받침하였습니다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">✦</span>
+              <div class="activity-body">
+                <h3 class="activity-title">한계 — 양반 독점과 폐단</h3>
+                <p class="activity-desc">사실상 양반층이 독점. 부정행위(청탁·代試), 과거 중독(벼슬 집착), 실용 학문 경시 등의 폐단이 만성화되었습니다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">❧</span>
+              <div class="activity-body">
+                <h3 class="activity-title">사회·문화적 영향</h3>
+                <p class="activity-desc">학문(유학) 숭상 문화 형성. 교육열 고취. 그러나 문(文) 우위 풍조로 실용 기술·과학 발전이 상대적으로 위축되었습니다.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 9: 폐지와 유산 (comparison table)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="8"
+         role="region" aria-label="슬라이드 9: 과거제도의 폐지와 유산">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">VI. 폐지와 유산</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span>과거제도의 폐지와 역사적 유산</h2>
+            <p class="section-subtitle">1894년 갑오개혁과 근대적 전환</p>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <div class="table-wrapper" role="region" aria-label="과거제도 폐지 전후 비교" tabindex="0">
+            <table class="comparison-table">
+              <caption class="sr-only">과거제도 폐지 전후 관리 선발 방식 비교</caption>
+              <thead>
+                <tr>
+                  <th scope="col">구분</th>
+                  <th scope="col">과거제도 (폐지 전)</th>
+                  <th scope="col">근대적 관리 선발 (폐지 후)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">시기</th>
+                  <td>고려~1894년(갑오개혁)</td>
+                  <td>1894년 이후</td>
+                </tr>
+                <tr>
+                  <th scope="row">선발 기준</th>
+                  <td>유교 경전·문장 실력</td>
+                  <td>근대적 학력·실무 능력</td>
+                </tr>
+                <tr>
+                  <th scope="row">응시 대상</th>
+                  <td>양인 이상 (실질은 양반 중심)</td>
+                  <td>신분 제한 폐지, 개방 확대</td>
+                </tr>
+                <tr>
+                  <th scope="row">폐지 이유</th>
+                  <td colspan="2">갑오개혁(1894)으로 신분제 철폐 및 근대 관료제 도입</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="highlight-box" role="note">
+            과거제도는 500여 년간 조선의 인재 선발을 담당하며 한국의 교육열과 학문 전통 형성에 깊은 영향을 남겼습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         슬라이드 10: 마무리 (end + quote)
+    ══════════════════════════════════════════ -->
+    <div class="slide" data-slide="9"
+         role="region" aria-label="슬라이드 10: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="topbar-rule"></div>
+          <span class="topbar-title">마무리</span>
+          <div class="topbar-rule"></div>
+        </div>
+        <div class="browser-content end-slide" tabindex="-1">
+          <div class="end-header">
+            <span class="end-ornament" aria-hidden="true">❧ ✦ ❧</span>
+            <h2 class="end-title">오늘의 핵심 정리</h2>
+            <p class="end-subtitle">조선시대 과거제도 — 핵심 요약</p>
+          </div>
+
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <div class="highlight-box end-summary" role="complementary" aria-label="핵심 요약">
+            <ul class="summary-list" role="list">
+              <li role="listitem">과거제도는 고려에서 도입, 조선에서 문과·무과·잡과의 체계로 정비된 관리 선발 제도</li>
+              <li role="listitem">소과 → 대과 → 전시의 단계를 거쳐 합격 시 홍패를 수여, 관직에 등용</li>
+              <li role="listitem">능력주의를 표방하였으나 실질적으로 양반이 독점한 한계를 지녔으며, 1894년 갑오개혁으로 폐지</li>
+            </ul>
+          </div>
+
+          <div class="gold-rule" aria-hidden="true"></div>
+
+          <figure class="quote-figure" style="margin-top:0.6rem;">
+            <span class="quote-mark" aria-hidden="true">"</span>
+            <blockquote class="quote-text">
+              <p>배움에 힘쓰면 반드시 쓰임이 있다<br><span style="font-size:0.85em;opacity:0.7">學而優則仕</span></p>
+            </blockquote>
+            <figcaption class="quote-source">— <cite>논어(論語), 자장편</cite></figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">10</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    // ── State ──────────────────────────────────────────
+    const slides      = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn     = document.getElementById('prevBtn');
+    const nextBtn     = document.getElementById('nextBtn');
+    const slideInput  = document.getElementById('slideInput');
+    const totalEl     = document.getElementById('totalSlides');
+    let currentSlide  = 0;
+
+    totalEl.textContent = totalSlides;
+    progressBar.setAttribute('aria-valuemax', totalSlides);
+
+    // ── Stagger delay init ────────────────────────────
+    document.querySelectorAll('.stagger-item').forEach((el, i) => {
+      el.style.setProperty('--delay', (i * 0.08) + 's');
+    });
+
+    // ── Core navigation ───────────────────────────────
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+
+      const current = slides[currentSlide];
+      const next    = slides[index];
+
+      current.classList.add('will-animate');
+      next.classList.add('will-animate');
+
+      current.classList.remove('active');
+      currentSlide = index;
+      next.classList.add('active');
+
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+
+      setTimeout(() => {
+        current.classList.remove('will-animate');
+        next.classList.remove('will-animate');
+      }, 400);
+
+      const content = next.querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    // ── UI update ─────────────────────────────────────
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = `슬라이드 ${current + 1} / ${total}`;
+    }
+
+    // ── Keyboard ──────────────────────────────────────
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault(); nextSlide();
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+        else if (e.key === 'End')  { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    // ── Slide input ───────────────────────────────────
+    slideInput.addEventListener('focus', () => slideInput.select());
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        const v = parseInt(slideInput.value, 10);
+        if (!isNaN(v) && v >= 1 && v <= totalSlides) goToSlide(v - 1);
+        else slideInput.value = currentSlide + 1;
+        slideInput.blur();
+      } else if (e.key === 'Escape') {
+        slideInput.value = currentSlide + 1;
+        slideInput.blur();
+      }
+    });
+    slideInput.addEventListener('blur', () => {
+      const v = parseInt(slideInput.value, 10);
+      if (!isNaN(v) && v >= 1 && v <= totalSlides) goToSlide(v - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    // ── Mouse wheel (600ms debounce) ──────────────────
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    // ── Touch swipe (50px threshold) ──────────────────
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+    }, { passive: true });
+
+    // ── Fullscreen ────────────────────────────────────
+    function toggleFullscreen() {
+      const fsExpand   = document.getElementById('fsExpand');
+      const fsCompress = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          fsExpand.style.display   = 'none';
+          fsCompress.style.display = 'block';
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          fsExpand.style.display   = 'block';
+          fsCompress.style.display = 'none';
+        }).catch(() => {});
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const fsExpand   = document.getElementById('fsExpand');
+      const fsCompress = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        fsExpand.style.display   = 'block';
+        fsCompress.style.display = 'none';
+      }
+    });
+
+    // ── Init ──────────────────────────────────────────
+    updateNav();
+  </script>
+</body>
+</html>

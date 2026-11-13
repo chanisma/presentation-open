@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>알고리즘과 프로그래밍</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Reset & Variables ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --main:    #1a237e;
+      --dark:    #0d1642;
+      --light:   #e8eaf6;
+      --accent:  #3f51b5;
+      --accent2: #5c6bc0;
+      --white:   #ffffff;
+      --gray-100:#f5f5f5;
+      --gray-200:#eeeeee;
+      --gray-300:#e0e0e0;
+      --gray-500:#9e9e9e;
+      --gray-600:#757575;
+      --gray-700:#616161;
+      --gray-900:#212121;
+      --blue-bg: #e3f2fd;
+      --blue:    #1565c0;
+      --orange:  #e65100;
+      --orange-bg:#fff3e0;
+      --green:   #2e7d32;
+      --green-bg:#e8f5e9;
+      --red:     #c62828;
+      --red-bg:  #ffebee;
+      --purple:  #6a1b9a;
+      --purple-bg:#f3e5f5;
+      --teal:    #00695c;
+      --teal-bg: #e0f2f1;
+    }
+
+    html {
+      font-size: clamp(16px, 1.45vw, 26px);
+      font-family: 'Noto Sans KR', sans-serif;
+      height: 100%;
+    }
+
+    body {
+      background: #f0f2f5;
+      color: var(--gray-900);
+      height: 100%;
+      overflow: hidden;
+      line-height: 1.6;
+    }
+
+    /* ─── Progress Bar ─────────────────────────────────── */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #7986cb);
+      width: 0%;
+      z-index: 1000;
+      transition: width 0.3s ease;
+    }
+
+    /* ─── Slide Container ────────────────────────────────── */
+    .presentation {
+      width: 100%;
+      height: calc(100vh - 40px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 1.2rem 0.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ─── Browser Card ────────────────────────────────────── */
+    .browser-card {
+      width: 100%;
+      max-width: 1560px;
+      height: 100%;
+      background: var(--white);
+      border-radius: 0.8rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .browser-topbar {
+      background: var(--gray-200);
+      padding: 0.38rem 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--gray-300);
+    }
+    .browser-dots { display: flex; gap: 0.28rem; }
+    .browser-dot {
+      width: 0.58rem; height: 0.58rem;
+      border-radius: 50%;
+    }
+    .dot-red   { background: #ff5f57; }
+    .dot-yellow{ background: #ffbd2e; }
+    .dot-green { background: #28c840; }
+
+    .browser-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      letter-spacing: 0.02em;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.1rem 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Typography ──────────────────────────────────────── */
+    h1 { font-size: 2.3rem; font-weight: 900; line-height: 1.2; }
+    h2 { font-size: 1.45rem; font-weight: 700; line-height: 1.3; }
+    h3 { font-size: 1.1rem; font-weight: 700; }
+    p  { font-size: 0.95rem; line-height: 1.7; }
+
+    /* ─── Section Divider ───────────────────────────────── */
+    .section-divider {
+      text-align: center;
+      margin-bottom: 0.9rem;
+      flex-shrink: 0;
+    }
+    .section-divider .icon {
+      font-size: 2rem;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+    .section-divider h2 {
+      color: var(--main);
+      font-size: 1.55rem;
+      font-weight: 800;
+    }
+    .section-divider .sub {
+      color: var(--gray-600);
+      font-size: 0.88rem;
+      margin-top: 0.15rem;
+    }
+
+    /* ─── Cover Slide ─────────────────────────────────── */
+    .cover-inner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.7rem;
+    }
+    .year-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--light);
+      color: var(--main);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.3rem 0.8rem;
+      border-radius: 2rem;
+      border: 1.5px solid var(--accent2);
+    }
+    .cover-inner h1 {
+      color: var(--main);
+      font-size: 2.8rem;
+      font-weight: 900;
+    }
+    .cover-inner .sub {
+      color: var(--gray-600);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .cover-deco {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+    .cover-deco-item {
+      background: var(--light);
+      border: 1.5px solid var(--accent2);
+      border-radius: 0.7rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--main);
+      text-align: center;
+    }
+    .cover-deco-item span { display: block; font-size: 1.3rem; margin-bottom: 0.15rem; }
+
+    /* ─── Badge ──────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.18rem 0.55rem;
+      border-radius: 2rem;
+    }
+    .badge-blue   { background: var(--blue-bg);   color: var(--blue); }
+    .badge-orange { background: var(--orange-bg); color: var(--orange); }
+    .badge-green  { background: var(--green-bg);  color: var(--green); }
+    .badge-red    { background: var(--red-bg);    color: var(--red); }
+    .badge-purple { background: var(--purple-bg); color: var(--purple); }
+    .badge-navy   { background: var(--light);     color: var(--main); }
+    .badge-teal   { background: var(--teal-bg);   color: var(--teal); }
+
+    /* ─── TOC ─────────────────────────────────────────── */
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 0.55rem; flex: 1; }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.6rem 0.9rem;
+      border-radius: 0.6rem;
+      background: var(--gray-100);
+      border: 1.5px solid var(--gray-200);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+    .toc-item:hover { background: var(--light); border-color: var(--accent2); transform: translateX(4px); }
+    .toc-num {
+      width: 1.8rem; height: 1.8rem;
+      border-radius: 50%;
+      background: var(--main);
+      color: white;
+      font-size: 0.82rem;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .toc-text h3 { font-size: 0.95rem; font-weight: 700; color: var(--gray-900); }
+    .toc-text p  { font-size: 0.82rem; color: var(--gray-600); margin-top: 0.05rem; }
+
+    /* ─── Grids ────────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.65rem; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.6rem; }
+
+    /* ─── Cards ───────────────────────────────────────── */
+    .card {
+      background: var(--gray-100);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 0.7rem;
+      padding: 0.75rem 0.85rem;
+    }
+    .card-accent {
+      border-top: 3px solid var(--main);
+    }
+    .card-blue   { background: var(--blue-bg);   border-color: #90caf9; }
+    .card-orange { background: var(--orange-bg); border-color: #ffcc80; }
+    .card-green  { background: var(--green-bg);  border-color: #a5d6a7; }
+    .card-purple { background: var(--purple-bg); border-color: #ce93d8; }
+    .card-teal   { background: var(--teal-bg);   border-color: #80cbc4; }
+    .card-navy   { background: var(--light);     border-color: #9fa8da; }
+
+    .card-icon { font-size: 1.5rem; margin-bottom: 0.3rem; display: block; }
+    .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--gray-900); }
+    .card p  { font-size: 0.85rem; color: var(--gray-700); line-height: 1.55; }
+
+    /* ─── Highlight Box ──────────────────────────────── */
+    .highlight-box {
+      background: linear-gradient(135deg, var(--light) 0%, #c5cae9 100%);
+      border: 2px solid var(--accent2);
+      border-radius: 0.8rem;
+      padding: 0.8rem 1.1rem;
+      text-align: center;
+    }
+    .highlight-box .hl-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+    .highlight-box .hl-text {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--main);
+      line-height: 1.4;
+    }
+    .highlight-box .hl-sub {
+      font-size: 0.82rem;
+      color: var(--gray-600);
+      margin-top: 0.2rem;
+    }
+
+    /* ─── Info Box ──────────────────────────────────── */
+    .info-box {
+      border-left: 4px solid var(--main);
+      background: var(--light);
+      padding: 0.6rem 0.9rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      font-size: 0.88rem;
+      color: var(--gray-800);
+      line-height: 1.6;
+    }
+    .info-box.orange { border-color: var(--orange); background: var(--orange-bg); }
+    .info-box.green  { border-color: var(--green);  background: var(--green-bg);  }
+    .info-box.red    { border-color: var(--red);    background: var(--red-bg);    }
+    .info-box.teal   { border-color: var(--teal);   background: var(--teal-bg);   }
+
+    /* ─── Two Column ─────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem;
+      flex: 1;
+    }
+    .two-col-60 {
+      display: grid;
+      grid-template-columns: 3fr 2fr;
+      gap: 1.1rem;
+      flex: 1;
+    }
+    .two-col-img {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 1.1rem;
+      flex: 1;
+      align-items: start;
+    }
+
+    .col { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    /* ─── Image ──────────────────────────────────────── */
+    .img-box {
+      border-radius: 0.7rem;
+      overflow: hidden;
+      border: 1.5px solid var(--gray-200);
+      background: var(--gray-100);
+    }
+    .img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .img-caption {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      text-align: center;
+      margin-top: 0.25rem;
+    }
+
+    /* ─── Step List ────────────────────────────────────── */
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.5rem 0.7rem;
+      background: var(--gray-100);
+      border-radius: 0.55rem;
+      border: 1.5px solid var(--gray-200);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .step-num {
+      width: 1.6rem; height: 1.6rem;
+      border-radius: 50%;
+      background: var(--main);
+      color: white;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-item .arrow {
+      margin-left: auto;
+      font-size: 0.85rem;
+      color: var(--gray-500);
+    }
+
+    /* ─── Flow Diagram ──────────────────────────────── */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .flow-box {
+      background: var(--light);
+      border: 2px solid var(--accent2);
+      border-radius: 0.55rem;
+      padding: 0.5rem 0.7rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--main);
+      text-align: center;
+      flex: 1;
+      min-width: 80px;
+    }
+    .flow-box.condition {
+      background: var(--orange-bg);
+      border-color: #ffb74d;
+      color: var(--orange);
+      clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+    }
+    .flow-box.process {
+      background: var(--blue-bg);
+      border-color: #90caf9;
+      color: var(--blue);
+    }
+    .flow-arrow { font-size: 1rem; color: var(--gray-500); flex-shrink: 0; }
+
+    /* ─── Condition Card (4 conditions) ────────────────── */
+    .cond-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      flex: 1;
+    }
+    .cond-card {
+      border-radius: 0.8rem;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cond-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3.5px;
+    }
+    .cond-card-1 { background: var(--blue-bg);   border: 1.5px solid #90caf9; }
+    .cond-card-1::before { background: var(--blue); }
+    .cond-card-2 { background: var(--green-bg);  border: 1.5px solid #a5d6a7; }
+    .cond-card-2::before { background: var(--green); }
+    .cond-card-3 { background: var(--orange-bg); border: 1.5px solid #ffcc80; }
+    .cond-card-3::before { background: var(--orange); }
+    .cond-card-4 { background: var(--purple-bg); border: 1.5px solid #ce93d8; }
+    .cond-card-4::before { background: var(--purple); }
+
+    .cond-card .cond-icon { font-size: 1.5rem; }
+    .cond-card .cond-title { font-size: 1rem; font-weight: 800; color: var(--gray-900); }
+    .cond-card .cond-def   { font-size: 0.83rem; color: var(--gray-700); line-height: 1.5; }
+
+    /* ─── Example Good/Bad ────────────────────────────── */
+    .ex-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .ex-good {
+      background: var(--green-bg);
+      border: 1.5px solid #a5d6a7;
+      border-radius: 0.55rem;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
+      display: flex; align-items: flex-start; gap: 0.45rem;
+    }
+    .ex-bad {
+      background: var(--red-bg);
+      border: 1.5px solid #ef9a9a;
+      border-radius: 0.55rem;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
+      display: flex; align-items: flex-start; gap: 0.45rem;
+    }
+    .ex-good strong { color: var(--green); font-weight: 800; flex-shrink: 0; }
+    .ex-bad  strong { color: var(--red);   font-weight: 800; flex-shrink: 0; }
+    .ex-reason {
+      background: var(--orange-bg);
+      border-left: 3px solid var(--orange);
+      padding: 0.3rem 0.65rem;
+      border-radius: 0 0.4rem 0.4rem 0;
+      font-size: 0.8rem;
+      color: var(--orange);
+      margin-left: 1.3rem;
+    }
+
+    /* ─── Hanoi Check Table ─────────────────────────── */
+    .hanoi-check {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .hanoi-check th {
+      background: var(--main);
+      color: white;
+      padding: 0.5rem 0.7rem;
+      font-weight: 700;
+      text-align: left;
+    }
+    .hanoi-check td {
+      padding: 0.45rem 0.7rem;
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    .hanoi-check tr:nth-child(even) td { background: var(--gray-100); }
+    .hanoi-check .check { color: var(--green); font-weight: 800; font-size: 1rem; }
+
+    /* ─── Lightbot Slide ────────────────────────────── */
+    .lightbot-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .game-img-box {
+      flex: 1;
+      border-radius: 0.7rem;
+      overflow: hidden;
+      border: 2px solid var(--gray-300);
+      background: #1a1a2e;
+      max-height: 55%;
+    }
+    .game-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* ─── Algorithm Structure Diagram ──────────────── */
+    .struct-row {
+      display: flex;
+      gap: 0.65rem;
+      flex: 1;
+    }
+    .struct-card {
+      flex: 1;
+      border-radius: 0.8rem;
+      padding: 0.8rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      border: 1.5px solid var(--gray-200);
+    }
+    .struct-card .struct-icon { font-size: 1.7rem; }
+    .struct-card .struct-title { font-size: 1rem; font-weight: 800; }
+    .struct-card .struct-def { font-size: 0.82rem; color: var(--gray-600); line-height: 1.5; }
+    .struct-card .struct-ex { font-size: 0.82rem; line-height: 1.5; margin-top: 0.2rem; }
+    .struct-q {
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(255,255,255,0.6);
+      border-radius: 0.4rem;
+      padding: 0.2rem 0.45rem;
+      margin-top: auto;
+    }
+    .struct-1 { background: var(--blue-bg);   }
+    .struct-1 .struct-title { color: var(--blue); }
+    .struct-2 { background: var(--orange-bg); }
+    .struct-2 .struct-title { color: var(--orange); }
+    .struct-3 { background: var(--green-bg);  }
+    .struct-3 .struct-title { color: var(--green); }
+
+    /* ─── Link Button ───────────────────────────────── */
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--main);
+      color: white;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 700;
+      padding: 0.55rem 1.1rem;
+      border-radius: 2rem;
+      transition: background 0.2s;
+    }
+    .link-btn:hover { background: var(--accent); }
+    .link-btn.orange {
+      background: var(--orange);
+    }
+    .link-btn.orange:hover { background: #bf360c; }
+
+    /* ─── Navigation ─────────────────────────────────── */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--gray-200);
+      z-index: 999;
+      font-size: 14px;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 50%;
+      background: var(--white);
+      cursor: pointer;
+      font-size: 0;
+      color: var(--gray-700);
+      transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 14px; height: 14px; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main); }
+    .nav-btn:hover:not(:disabled) svg { fill: white; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-600);
+      display: flex; align-items: center; gap: 3px;
+      min-width: 50px; text-align: center; line-height: 1;
+    }
+    .slide-input {
+      width: 22px; text-align: center;
+      border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px;
+      font-weight: 700; color: inherit;
+      font-family: inherit; padding: 0; outline: none;
+      cursor: pointer; transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--main); }
+    .slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 3px; }
+
+    /* ─── Responsive ─────────────────────────────────── */
+    @media (max-width: 1024px) {
+      html { font-size: clamp(14px, 2vw, 20px); }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      html { font-size: clamp(13px, 3vw, 18px); }
+      .grid-2, .grid-3, .grid-4, .two-col, .two-col-60, .two-col-img, .cond-grid, .struct-row { grid-template-columns: 1fr; flex-direction: column; }
+      .cover-deco { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 1: 표지
+  ══════════════════════════════════════════════════ -->
+  <div class="slide active" data-slide="0">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">정보 수업</div>
+      </div>
+      <div class="browser-content" style="justify-content:center;">
+        <div class="cover-inner">
+          <div class="year-badge">🖥️ 정보 · 2024</div>
+          <h1>알고리즘과 프로그래밍</h1>
+          <p class="sub">문제를 해결하는 절차적 사고력을 기르고,<br>프로그래밍으로 직접 구현해 봅시다.</p>
+          <div class="cover-deco">
+            <div class="cover-deco-item">
+              <span>🗼</span>하노이의 탑
+            </div>
+            <div class="cover-deco-item">
+              <span>🤖</span>라이트봇
+            </div>
+            <div class="cover-deco-item">
+              <span>⚔️</span>코드컴뱃
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ══════════════════════════════════════════════════
+       Slide 2: 오늘의 목표
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="1">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">오늘의 목표</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <span class="icon">🎯</span>
+          <h2>오늘의 학습 목표</h2>
+          <p class="sub">이번 수업을 마치면 다음을 할 수 있어요</p>
+        </div>
+        <ul class="toc-list">
+          <li class="toc-item" onclick="goToSlide(3)">
+            <div class="toc-num">1</div>
+            <div class="toc-text">
+              <h3>🗼 하노이의 탑 탐구 활동</h3>
+              <p>규칙에 따라 원반을 옮기며 '알고리즘적 사고'를 직접 체험합니다.</p>
+            </div>
+          </li>
+          <li class="toc-item" onclick="goToSlide(5)">
+            <div class="toc-num">2</div>
+            <div class="toc-text">
+              <h3>🧠 알고리즘의 개념과 3가지 구조 이해</h3>
+              <p>알고리즘의 의미와 순차·선택·반복 구조를 이해합니다.</p>
+            </div>
+          </li>
+          <li class="toc-item" onclick="goToSlide(8)">
+            <div class="toc-num">3</div>
+            <div class="toc-text">
+              <h3>✅ 알고리즘으로 해결 가능한 문제의 조건 파악</h3>
+              <p>명확성·입출력·유한성·실현 가능의 4가지 조건을 알 수 있습니다.</p>
+            </div>
+          </li>
+          <li class="toc-item" onclick="goToSlide(13)">
+            <div class="toc-num">4</div>
+            <div class="toc-text">
+              <h3>🎮 라이트봇 · 코드컴뱃으로 프로그래밍 체험</h3>
+              <p>게임으로 알고리즘을 직접 구현하는 경험을 합니다.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 3: 도입 — VR 폭탄해체반 회상
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="2">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">💣 기억 소환 — VR 폭탄해체반</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>저번 시간 기억나시나요? 💣</h2>
+          <p class="sub">VR 폭탄해체반에서 폭탄을 해제하기 위해 여러분은 무엇을 했나요? — 질문을 클릭해서 확인해보세요!</p>
+        </div>
+        <div class="two-col" style="flex:1;">
+          <div class="col">
+            <img src="https://i.namu.wiki/i/RVQ22Tgh81yJ2kWpw5RzQ7yS0s87ldA8H4Mhjg3DsBFHVDUgCOrNgYAuv5_328RJeH7LRGmAvNDk5qOYmY1qUNIw7x5qPB-wyLoChI9hGZ7l1MZ3srqQW2MaaF9JSkKe81pnrXRZFnLuPNOrJ0FD-Q.webp"
+              alt="Keep Talking and Nobody Explodes"
+              style="width:100%; border-radius:0.6rem; object-fit:cover; max-height:13rem; box-shadow:0 2px 8px rgba(0,0,0,0.15); margin-bottom:0.6rem;">
+            <div class="info-box orange">
+              ⏰ <strong>제한 시간</strong> 안에 정해진 <strong>규칙과 순서</strong>를 지키면서 해결해야 했던 그 경험 — 사실 그것이 바로 <strong>알고리즘적 사고</strong>입니다!
+            </div>
+          </div>
+          <div class="col" style="display:flex; flex-direction:column; gap:0.55rem; justify-content:center;">
+            <!-- 아코디언 1: 순서 -->
+            <div class="vr-accordion" onclick="toggleVrAccordion(this)" style="border-left:4px solid var(--main); background:var(--light); border-radius:0.55rem; overflow:hidden; cursor:pointer;">
+              <div style="display:flex; align-items:center; gap:0.6rem; padding:0.65rem 0.85rem;">
+                <strong style="font-size:0.95rem;">📋 순서가 있었나요?</strong>
+                <span style="color:var(--gray-600); font-size:0.85rem;">모듈을 해제하는 데 정해진 단계가 있었나요?</span>
+                <span class="vr-arrow" style="margin-left:auto; font-size:0.8rem; transition:transform 0.3s;">▼</span>
+              </div>
+              <div class="vr-answer" style="max-height:0; overflow:hidden; transition:max-height 0.35s ease, padding 0.35s ease; padding:0 0.85rem; background:#dce8ff; font-size:0.9rem;">
+                <div style="padding:0.55rem 0;">
+                  각 모듈마다 <strong>정해진 순서</strong>로 해제해야 했습니다 → <strong style="color:var(--main);">순차 구조</strong>
+                </div>
+              </div>
+            </div>
+            <!-- 아코디언 2: 선택 -->
+            <div class="vr-accordion" onclick="toggleVrAccordion(this)" style="border-left:4px solid var(--orange); background:var(--orange-bg); border-radius:0.55rem; overflow:hidden; cursor:pointer;">
+              <div style="display:flex; align-items:center; gap:0.6rem; padding:0.65rem 0.85rem;">
+                <strong style="font-size:0.95rem;">🔀 선택이 있었나요?</strong>
+                <span style="color:var(--gray-600); font-size:0.85rem;">"이 경우엔 이렇게, 저 경우엔 저렇게" 한 순간이 있었나요?</span>
+                <span class="vr-arrow" style="margin-left:auto; font-size:0.8rem; transition:transform 0.3s;">▼</span>
+              </div>
+              <div class="vr-answer" style="max-height:0; overflow:hidden; transition:max-height 0.35s ease, padding 0.35s ease; padding:0 0.85rem; background:#ffe5c0; font-size:0.9rem;">
+                <div style="padding:0.55rem 0;">
+                  설명서를 보며 <strong>조건</strong>에 따라 다른 행동을 해야 했습니다 → <strong style="color:var(--orange);">선택 구조</strong>
+                </div>
+              </div>
+            </div>
+            <!-- 아코디언 3: 반복 -->
+            <div class="vr-accordion" onclick="toggleVrAccordion(this)" style="border-left:4px solid var(--green); background:var(--green-bg); border-radius:0.55rem; overflow:hidden; cursor:pointer;">
+              <div style="display:flex; align-items:center; gap:0.6rem; padding:0.65rem 0.85rem;">
+                <strong style="font-size:0.95rem;">🔁 반복이 있었나요?</strong>
+                <span style="color:var(--gray-600); font-size:0.85rem;">같은 동작을 여러 번 반복해야 했던 순간이 있었나요?</span>
+                <span class="vr-arrow" style="margin-left:auto; font-size:0.8rem; transition:transform 0.3s;">▼</span>
+              </div>
+              <div class="vr-answer" style="max-height:0; overflow:hidden; transition:max-height 0.35s ease, padding 0.35s ease; padding:0 0.85rem; background:#c8e6c9; font-size:0.9rem;">
+                <div style="padding:0.55rem 0;">
+                  특정 단계를 <strong>반복</strong>해야 할 때도 있었습니다 → <strong style="color:var(--green);">반복 구조</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 4: 도입 활동 - 하노이의 탑 (활동지)
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="3">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🗼 도입 활동 — 하노이의 탑</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>먼저 해봅시다! 🗼 하노이의 탑</h2>
+          <p class="sub">개념을 배우기 전, 직접 문제를 풀어보세요</p>
+        </div>
+        <div class="two-col-60" style="flex:1; align-items:start;">
+          <div class="col">
+            <div class="card card-navy">
+              <h3 style="color:var(--main); margin-bottom:0.4rem;">📋 활동 안내</h3>
+              <p style="font-size:0.88rem;">A, B, C 세 개의 기둥이 있습니다.<br>
+              기둥 A에 꽂혀 있는 <strong>세 개의 원반</strong>을 기둥 C로 옮기되,<br>
+              <strong>최소한의 움직임</strong>으로 옮기는 알고리즘을 설계하세요.</p>
+            </div>
+            <div class="card card-orange">
+              <h3 style="color:var(--orange); margin-bottom:0.4rem;">📌 규칙</h3>
+              <ul style="padding-left:1rem; font-size:0.88rem; line-height:1.8;">
+                <li>큰 원반은 작은 원반 위에 올라갈 <strong>수 없다</strong></li>
+                <li>한 번에 <strong>하나</strong>의 원반만 옮길 수 있다</li>
+                <li><strong>최소한</strong>의 움직임으로 원반을 옮겨야 한다</li>
+              </ul>
+            </div>
+            <div class="info-box">
+              💡 <strong>생각해보기:</strong> 이 문제를 해결하는 방법을 <em>단계별로</em> 정리할 수 있을까요? 알고리즘이 될 수 있는 조건은 무엇일까요?
+            </div>
+          </div>
+          <div class="col">
+            <div class="img-box" style="max-height: 58%; min-height: 180px;">
+              <img src="images/hanoi_activity.png" alt="하노이의 탑 활동지">
+            </div>
+            <div class="card card-teal">
+              <h3 style="color:var(--teal); margin-bottom:0.35rem;">📝 활동지 기록</h3>
+              <p style="font-size:0.85rem;">입력 / 출력 / 명확성 / 유한성 / 수행 가능성 칸을<br>직접 채워봅시다. (수업 후반에 다시 확인합니다!)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 4: 하노이의 탑 플래시 게임
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="4">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🗼 하노이의 탑 — 플래시 게임으로 체험</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>하노이의 탑 게임으로 직접 풀어봐요!</h2>
+          <p class="sub">규칙을 지키면서 가장 적은 횟수로 원반을 옮겨보세요</p>
+        </div>
+        <div class="two-col" style="flex:1; align-items:center;">
+          <div class="col">
+            <div class="highlight-box">
+              <div class="hl-label">최소 이동 횟수</div>
+              <div class="hl-text">원반 3개 → 최소 <span style="color:var(--orange);">7번</span></div>
+              <div class="hl-sub">공식: 2ⁿ − 1 번 &nbsp;(n = 원반 개수)</div>
+            </div>
+            <div class="card card-navy">
+              <span class="card-icon">🎯</span>
+              <h3>게임 목표</h3>
+              <p>A 기둥의 원반 3개를 C 기둥으로 모두 옮기기. 큰 원반이 작은 원반 위에 올라가면 안 됩니다!</p>
+            </div>
+            <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+              <a class="link-btn" href="https://www.google.com/search?q=Tower+of+Hanoi+game+online" target="_blank">🎮 게임 시작하기</a>
+              <span style="font-size:0.82rem; color:var(--gray-500);">검색 후 플래시 게임을 선택하세요</span>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card card-blue">
+              <span class="card-icon">🤔</span>
+              <h3>풀면서 생각해보기</h3>
+              <ul style="padding-left:1rem; font-size:0.88rem; line-height:1.9;">
+                <li>어떤 <strong>규칙</strong>이 있어야 게임이 가능한가요?</li>
+                <li>게임에 <strong>끝</strong>이 있나요? 언제 끝나나요?</li>
+                <li>각 단계에서 할 수 있는 행동이 <strong>명확</strong>한가요?</li>
+                <li>이 문제의 <strong>입력</strong>과 <strong>출력</strong>은 무엇인가요?</li>
+              </ul>
+            </div>
+            <div class="info-box orange">
+              🔗 <strong>수업 TIP:</strong> 게임을 끝낸 후, 내가 원반을 옮긴 순서를 적어보면 그게 바로 알고리즘의 한 형태입니다!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 5: 알고리즘이란? — 유래 (알 콰리즈미)
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="5">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🧠 알고리즘이란?</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>알고리즘 — 이름의 유래</h2>
+          <p class="sub">"algorithm"은 어디서 왔을까요?</p>
+        </div>
+        <div class="two-col-img" style="flex:1; align-items:center;">
+          <div class="col" style="align-items:center;">
+            <div class="img-box" style="max-height:300px; width:100%;">
+              <img src="images/al_khwarizmi.png" alt="알 콰리즈미 동상">
+            </div>
+            <p class="img-caption">무함마드 이븐 무사 알 콰리즈미 (780~850년경)</p>
+          </div>
+          <div class="col">
+            <div class="card card-navy">
+              <span class="card-icon">📖</span>
+              <h3>알 콰리즈미 (Al-Khwārizmī)</h3>
+              <p>9세기 페르시아의 수학자이자 천문학자. 그의 이름 <strong>"알 콰리즈미"</strong>가 라틴어로 전해지면서 <strong>"알고리즘"</strong>이라는 단어가 만들어졌습니다.</p>
+            </div>
+            <div class="grid-2">
+              <div class="card card-blue">
+                <span class="card-icon">📐</span>
+                <h3>수학적 업적</h3>
+                <p>대수학(Algebra)의 기초 확립, 0과 10진법 도입, 문제를 해결하는 <strong>절차적 접근법</strong> 제시</p>
+              </div>
+              <div class="card card-green">
+                <span class="card-icon">🌐</span>
+                <h3>과학적 업적</h3>
+                <p>천문학 및 삼각법을 활용한 계산법 발전, 지리학 연구와 경도·위도 개념 보완</p>
+              </div>
+            </div>
+            <div class="highlight-box">
+              <div class="hl-label">핵심 정의</div>
+              <div class="hl-text">알고리즘 = 문제를 해결하는 <span style="color:var(--orange);">절차적 접근법</span></div>
+              <div class="hl-sub">1,200년 전 수학자의 아이디어가 현대 컴퓨터 과학의 기반이 되었습니다</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 6: 알고리즘 정의 — GPS 비유
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="6">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🧠 알고리즘의 정의</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>알고리즘이란 무엇인가?</h2>
+          <p class="sub">우리 일상 속에 이미 알고리즘이 있습니다</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.75rem; flex:1;">
+          <div class="highlight-box">
+            <div class="hl-label">정의</div>
+            <div class="hl-text">주어진 <span style="color:var(--blue);">입력</span>을 바탕으로 원하는 <span style="color:var(--green);">출력</span>을 만들어내는<br><span style="color:var(--orange);">명확하고 유한한 단계</span>의 문제 해결 절차</div>
+          </div>
+          <div class="card card-navy" style="padding:0.8rem 1rem;">
+            <h3 style="color:var(--main); margin-bottom:0.5rem;">🗺️ 예시 — 내비게이션(GPS) 앱</h3>
+            <div class="flow-row" style="margin-bottom:0.4rem;">
+              <div class="flow-box process" style="flex:1.2;">
+                <div style="font-size:1.1rem;">📍</div>
+                <div><strong>입력</strong></div>
+                <div style="font-size:0.78rem; margin-top:0.15rem;">현재 위치<br>목적지<br>도로 정보</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box" style="flex:2; background:var(--light); border-color:var(--accent2);">
+                <div style="font-size:1.1rem;">⚙️</div>
+                <div><strong>처리 (알고리즘)</strong></div>
+                <div style="font-size:0.75rem; margin-top:0.15rem;">수백만 개의 경로 중<br>최적 경로 계산</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-box process" style="flex:1.2; background:var(--green-bg); border-color:#a5d6a7;">
+                <div style="font-size:1.1rem;">🏁</div>
+                <div><strong>출력</strong></div>
+                <div style="font-size:0.78rem; margin-top:0.15rem;">최단 경로<br>예상 소요 시간</div>
+              </div>
+            </div>
+          </div>
+          <div class="grid-3" style="flex:1;">
+            <div class="card card-blue">
+              <span class="card-icon">📋</span>
+              <h3>명확한 순서</h3>
+              <p>각 단계는 누가 봐도 이해할 수 있을 만큼 명확합니다. 모호한 지시는 알고리즘이 아닙니다.</p>
+            </div>
+            <div class="card card-orange">
+              <span class="card-icon">⏱️</span>
+              <h3>반드시 끝남</h3>
+              <p>무한히 실행되지 않습니다. 언젠가는 결과를 내고 종료합니다.</p>
+            </div>
+            <div class="card card-green">
+              <span class="card-icon">🎯</span>
+              <h3>결과가 정확함</h3>
+              <p>같은 입력에는 항상 같은 출력이 나옵니다. 우연이나 감에 의존하지 않습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 7: 알고리즘의 3가지 구조 — 개요
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="7">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🔧 알고리즘의 3가지 구조</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>모든 알고리즘은 3가지 구조로 이루어집니다</h2>
+          <p class="sub">아무리 복잡한 프로그램도 이 세 가지의 조합입니다</p>
+        </div>
+        <div class="struct-row">
+          <div class="struct-card struct-1">
+            <div class="struct-icon">📋</div>
+            <div class="struct-title">① 순차 구조</div>
+            <div class="struct-def">시작부터 종료까지 <strong>순서대로</strong> 명령을 실행하는 구조</div>
+            <div class="struct-ex">
+              <strong>예:</strong> 라면 끓이기<br>
+              물 끓이기 → 면 넣기 → 수프 넣기 → 3분 기다리기 → 완성
+            </div>
+            <div class="struct-q">🤔 어떤 문제에 순서가 필요할까요?</div>
+          </div>
+          <div class="struct-card struct-2">
+            <div class="struct-icon">🔀</div>
+            <div class="struct-title">② 선택 구조</div>
+            <div class="struct-def"><strong>조건</strong>에 따라 실행하는 명령이 달라지는 구조</div>
+            <div class="struct-ex">
+              <strong>예:</strong> 음악 추천<br>
+              기분이 좋으면 → 신나는 노래<br>
+              기분이 우울하면 → 잔잔한 노래
+            </div>
+            <div class="struct-q">🤔 어떤 조건이 필요한지 어떻게 정할까요?</div>
+          </div>
+          <div class="struct-card struct-3">
+            <div class="struct-icon">🔁</div>
+            <div class="struct-title">③ 반복 구조</div>
+            <div class="struct-def"><strong>조건</strong>이 만족될 때까지 특정 명령을 반복 실행하는 구조</div>
+            <div class="struct-ex">
+              <strong>예:</strong> 인터넷 검색<br>
+              원하는 정보가 나올 때까지<br>스크롤하며 결과 확인 반복
+            </div>
+            <div class="struct-q">🤔 반복이 멈추는 조건은 무엇인가요?</div>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top:0.7rem;">
+          💡 <strong>핵심:</strong> 이 세 구조를 조합하면 세상의 어떤 문제도 알고리즘으로 표현할 수 있습니다. 하노이의 탑 게임에서도 이 세 구조를 모두 찾을 수 있어요!
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 11: 알고리즘으로 해결할 수 있는 문제 — 도입
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="8">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">✅ 알고리즘으로 해결할 수 있는 문제</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>알고리즘으로 모든 문제를 풀 수 있을까요?</h2>
+          <p class="sub">모든 문제가 알고리즘으로 해결되는 것은 아닙니다 — 4가지 조건이 필요합니다</p>
+        </div>
+        <div class="info-box orange" style="margin-bottom:0.7rem;">
+          🗼 <strong>하노이의 탑 활동을 다시 떠올려 보세요.</strong> 그 게임이 알고리즘으로 해결될 수 있었던 이유가 무엇일까요?
+        </div>
+        <div class="cond-grid">
+          <div class="cond-card cond-card-1">
+            <div class="cond-icon">🎯</div>
+            <div class="cond-title">① 명확성 (Definiteness)</div>
+            <div class="cond-def">문제와 각 단계가 모호하지 않고 <strong>명확하게 정의</strong>되어야 합니다.</div>
+          </div>
+          <div class="cond-card cond-card-2">
+            <div class="cond-icon">↔️</div>
+            <div class="cond-title">② 입력과 출력 (I/O)</div>
+            <div class="cond-def">입력 내용과 출력 내용이 <strong>구체적으로 정의</strong>되어야 합니다.</div>
+          </div>
+          <div class="cond-card cond-card-3">
+            <div class="cond-icon">⏳</div>
+            <div class="cond-title">③ 유한성 (Finiteness)</div>
+            <div class="cond-def">유한한 단계를 거쳐 <strong>반드시 끝</strong>나야 합니다. 무한 루프가 없어야 합니다.</div>
+          </div>
+          <div class="cond-card cond-card-4">
+            <div class="cond-icon">⚙️</div>
+            <div class="cond-title">④ 실현 가능 (Feasibility)</div>
+            <div class="cond-def">각 단계는 실제로 <strong>실행 가능한 방법</strong>이어야 합니다. 불가능한 단계가 없어야 합니다.</div>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top:0.65rem;">
+          <div class="hl-text" style="font-size:0.95rem;">이 4가지가 모두 충족되어야 <span style="color:var(--orange);">알고리즘으로 해결 가능한 문제</span>가 됩니다</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 12: 명확성 — 예시
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="9">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🎯 조건 ① — 명확성</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2><span class="badge badge-blue">① 명확성</span> &nbsp;문제가 분명하게 정의되어야 합니다</h2>
+          <p class="sub">"누가 봐도 같은 방법으로 풀 수 있을 만큼" 명확해야 합니다</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.7rem; flex:1;">
+          <div class="grid-2">
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+              <div class="badge badge-green" style="width:fit-content;">✅ 명확한 문제</div>
+              <div class="ex-good">
+                <strong>✓</strong>
+                <div>"학교에서 집까지 <strong>최단 경로</strong>(최소 이동 거리)를 찾아라"</div>
+              </div>
+              <div class="info-box green" style="font-size:0.82rem;">
+                👍 "최단 경로"는 수치로 측정 가능 — 기준이 명확합니다.
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+              <div class="badge badge-red" style="width:fit-content;">❌ 모호한 문제</div>
+              <div class="ex-bad">
+                <strong>✗</strong>
+                <div>"학교 가는 길을 <strong>편하게</strong> 가는 방법을 찾아라"</div>
+              </div>
+              <div class="info-box red" style="font-size:0.82rem;">
+                🤔 "편하다"의 기준이 사람마다 다릅니다. 컴퓨터는 모호한 기준을 처리할 수 없어요.
+              </div>
+            </div>
+          </div>
+          <div class="card card-teal">
+            <span class="card-icon">🗼</span>
+            <h3>하노이의 탑 — 명확성 체크 ✅</h3>
+            <div class="grid-2" style="margin-top:0.3rem;">
+              <div style="font-size:0.85rem; line-height:1.65;">
+                <strong>규칙이 명확합니다:</strong><br>
+                • 큰 원반은 작은 원반 위에 올라갈 수 없다<br>
+                • 한 번에 하나의 원반만 옮길 수 있다
+              </div>
+              <div style="font-size:0.85rem; line-height:1.65;">
+                <strong>목표가 명확합니다:</strong><br>
+                • A 기둥의 원반을 C 기둥으로 옮긴다<br>
+                • 최소 이동 횟수로 달성한다
+              </div>
+            </div>
+          </div>
+          <div class="info-box">
+            💡 <strong>핵심:</strong> 알고리즘은 컴퓨터가 실행합니다. 컴퓨터는 "대충", "적당히", "편하게" 같은 모호한 표현을 이해하지 못합니다. 수치와 규칙으로 정확히 정의해야 합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 13: 입력과 출력 — 예시
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="10">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">↔️ 조건 ② — 입력과 출력</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2><span class="badge badge-green">② 입력과 출력</span> &nbsp;무엇을 넣고 무엇이 나오는지 정확히</h2>
+          <p class="sub">알고리즘은 "블랙박스"처럼 — 입력을 받아 처리하고 출력을 냅니다</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:0.7rem; flex:1;">
+          <div class="grid-2">
+            <div class="card card-green">
+              <span class="card-icon">🗺️</span>
+              <h3>예시 1 — 길 찾기</h3>
+              <div style="display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem; font-size:0.85rem;">
+                <div style="background:var(--blue-bg); border-radius:0.4rem; padding:0.35rem 0.6rem;">
+                  📥 <strong>입력:</strong> 출발지, 목적지, 도로 정보
+                </div>
+                <div style="background:var(--green-bg); border-radius:0.4rem; padding:0.35rem 0.6rem;">
+                  📤 <strong>출력:</strong> 최단 경로, 예상 소요 시간
+                </div>
+              </div>
+            </div>
+            <div class="card card-orange">
+              <span class="card-icon">🎵</span>
+              <h3>예시 2 — 음악 추천</h3>
+              <div style="display:flex; flex-direction:column; gap:0.3rem; margin-top:0.3rem; font-size:0.85rem;">
+                <div style="background:var(--blue-bg); border-radius:0.4rem; padding:0.35rem 0.6rem;">
+                  📥 <strong>입력:</strong> 학생의 청취 기록, 좋아요/싫어요 이력
+                </div>
+                <div style="background:var(--green-bg); border-radius:0.4rem; padding:0.35rem 0.6rem;">
+                  📤 <strong>출력:</strong> 다음 추천 곡 목록 (상위 10개)
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+              <div class="badge badge-red" style="width:fit-content;">❌ 입출력 불분명</div>
+              <div class="ex-bad"><strong>✗</strong><div>"완벽한 친구 추천 시스템을 만들어라"</div></div>
+              <div class="ex-reason">"완벽한 친구"의 기준이 없음 — 출력이 정의되지 않음</div>
+            </div>
+            <div class="card card-teal">
+              <span class="card-icon">🗼</span>
+              <h3>하노이의 탑 — 입출력 ✅</h3>
+              <div style="font-size:0.85rem; line-height:1.7; margin-top:0.25rem;">
+                📥 <strong>입력:</strong> 기둥 A의 원반 개수(n개)<br>
+                📤 <strong>출력:</strong> 원반이 모두 C 기둥에 쌓인 상태<br>
+                <span style="color:var(--gray-600);">→ 원반 3개이면 최소 7번의 이동 기록</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 14: 유한성 & 실현 가능 — 예시
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="11">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">⏳⚙️ 조건 ③④ — 유한성 & 실현 가능</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>③ 유한성 &amp; ④ 실현 가능</h2>
+          <p class="sub">언젠가는 끝나야 하고, 각 단계는 실제로 할 수 있어야 합니다</p>
+        </div>
+        <div class="two-col" style="flex:1;">
+          <div class="col">
+            <div class="badge badge-orange" style="width:fit-content; margin-bottom:0.3rem;">③ 유한성 — 반드시 끝나야 합니다</div>
+            <div class="ex-good">
+              <strong>✓</strong>
+              <div><strong>학생들을 키 순서대로 정렬</strong><br>
+              <small>→ 학생 수(n)가 정해져 있으므로 최대 n²번 비교 후 반드시 종료</small></div>
+            </div>
+            <div class="ex-bad" style="margin-top:0.35rem;">
+              <strong>✗</strong>
+              <div><strong>"완벽한" 답이 나올 때까지 계속 계산</strong><br>
+              <small>→ 완벽의 기준이 없으면 영원히 끝나지 않을 수 있음</small></div>
+            </div>
+            <div class="card card-teal" style="margin-top:0.45rem;">
+              <span class="card-icon">🗼</span>
+              <h3>하노이의 탑 — 유한성 ✅</h3>
+              <p style="font-size:0.85rem;">원반 n개일 때, 정확히 <strong>2ⁿ−1번</strong> 이동 후 완료.<br>원반 3개 → 7번, 10개 → 1023번. 항상 끝납니다.</p>
+            </div>
+          </div>
+          <div class="col">
+            <div class="badge badge-purple" style="width:fit-content; margin-bottom:0.3rem;">④ 실현 가능 — 실제로 할 수 있는 단계</div>
+            <div class="ex-good">
+              <strong>✓</strong>
+              <div><strong>버블 정렬로 학생들을 키 순으로 정렬</strong><br>
+              <small>→ 각 단계(두 학생 키 비교 후 교환)는 누구나 할 수 있음</small></div>
+            </div>
+            <div class="ex-bad" style="margin-top:0.35rem;">
+              <strong>✗</strong>
+              <div><strong>"학생들끼리 대화해서 가장 인기 있는 사람을 찾음"</strong><br>
+              <small>→ 어떻게 대화를 수치화하고 처리할지 정의되지 않음</small></div>
+            </div>
+            <div class="card card-teal" style="margin-top:0.45rem;">
+              <span class="card-icon">🗼</span>
+              <h3>하노이의 탑 — 실현 가능 ✅</h3>
+              <p style="font-size:0.85rem;">각 단계: <strong>"원반 하나를 한 기둥에서 다른 기둥으로 옮기기"</strong><br>누구든 실제로 할 수 있는 명확한 행동입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 15: 하노이의 탑으로 조건 확인 (종합)
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="12">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🗼 하노이의 탑으로 조건 총정리</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>하노이의 탑은 알고리즘 문제일까요?</h2>
+          <p class="sub">활동지를 펼치고 함께 확인해 봅시다</p>
+        </div>
+        <div class="two-col-img" style="flex:1; align-items:start;">
+          <div class="col">
+            <div class="img-box" style="max-height:200px;">
+              <img src="images/hanoi_activity.png" alt="하노이의 탑 활동지">
+            </div>
+          </div>
+          <div class="col">
+            <table class="hanoi-check">
+              <thead>
+                <tr>
+                  <th>조건</th>
+                  <th>하노이의 탑에서는?</th>
+                  <th>판정</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>① 명확성</strong></td>
+                  <td>규칙(큰 원반 금지, 한 번에 하나)이 명확하게 정의됨</td>
+                  <td class="check">✅ 충족</td>
+                </tr>
+                <tr>
+                  <td><strong>② 입력</strong></td>
+                  <td>기둥 A에 크기가 다른 n개의 원반이 있는 상태</td>
+                  <td class="check">✅ 충족</td>
+                </tr>
+                <tr>
+                  <td><strong>② 출력</strong></td>
+                  <td>모든 원반이 기둥 C에 크기 순서대로 쌓인 상태</td>
+                  <td class="check">✅ 충족</td>
+                </tr>
+                <tr>
+                  <td><strong>③ 유한성</strong></td>
+                  <td>정확히 2ⁿ−1번 이동 후 반드시 완료됨</td>
+                  <td class="check">✅ 충족</td>
+                </tr>
+                <tr>
+                  <td><strong>④ 실현 가능</strong></td>
+                  <td>각 단계(원반 하나 이동)는 실제로 가능한 행동</td>
+                  <td class="check">✅ 충족</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="highlight-box" style="margin-top:0.5rem;">
+              <div class="hl-text">✅ 하노이의 탑은 <span style="color:var(--green);">4가지 조건을 모두 충족</span>하므로<br>알고리즘으로 해결할 수 있는 문제입니다!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 16: 라이트봇 소개
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="13">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🤖 활동 2 — 라이트봇</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <span class="icon">🤖</span>
+          <h2>라이트봇으로 알고리즘 체험하기</h2>
+          <p class="sub">코딩 없이 명령 블록으로 알고리즘의 3가지 구조를 직접 느껴보세요</p>
+        </div>
+        <div class="two-col-img" style="flex:1; align-items:start;">
+          <div class="col">
+            <div class="img-box" style="max-height:220px;">
+              <img src="images/lightbot_empty.png" alt="라이트봇 게임 화면">
+            </div>
+          </div>
+          <div class="col">
+            <div class="grid-2">
+              <div class="card card-blue">
+                <span class="card-icon">📋</span>
+                <h3>순차 구조</h3>
+                <p style="font-size:0.83rem;">명령을 순서대로 입력하여 로봇을 이동시킵니다.</p>
+              </div>
+              <div class="card card-orange">
+                <span class="card-icon">🔧</span>
+                <h3>함수 (재사용)</h3>
+                <p style="font-size:0.83rem;">반복되는 명령을 FUNCT 1/2에 묶어 재사용합니다. → <strong>반복·추상화</strong></p>
+              </div>
+            </div>
+            <div class="card card-navy" style="margin-top:0.3rem;">
+              <h3 style="margin-bottom:0.4rem;">🕹️ 조작 방법</h3>
+              <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.3rem; font-size:0.82rem; text-align:center;">
+                <div style="background:var(--light); border-radius:0.4rem; padding:0.3rem;">↑<br><small>앞으로</small></div>
+                <div style="background:var(--light); border-radius:0.4rem; padding:0.3rem;">↺<br><small>왼쪽 회전</small></div>
+                <div style="background:var(--light); border-radius:0.4rem; padding:0.3rem;">↻<br><small>오른쪽 회전</small></div>
+                <div style="background:#fff3cd; border-radius:0.4rem; padding:0.3rem;">💡<br><small>불 켜기</small></div>
+              </div>
+            </div>
+            <div style="display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; margin-top:0.3rem;">
+              <a class="link-btn" href="https://lightbot.com/hour-of-code.html" target="_blank">🎮 라이트봇 시작</a>
+              <a class="link-btn orange" href="https://lightbot.com/flash.html" target="_blank">⚡ Flash 버전</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 17: 라이트봇 — 순차 구조 단계
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="14">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🤖 라이트봇 — 순차 구조</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>게임에서 등장한 알고리즘 — 순차 구조</h2>
+          <p class="sub">명령을 순서대로 실행하여 파란 타일을 모두 밝혀보세요</p>
+        </div>
+        <div class="lightbot-wrap">
+          <div class="game-img-box">
+            <img src="images/lightbot_seq.png" alt="라이트봇 순차 구조 단계">
+          </div>
+          <div class="grid-3" style="flex-shrink:0;">
+            <div class="card card-blue" style="padding:0.55rem 0.7rem;">
+              <h3 style="font-size:0.88rem;">📋 이 단계에서 사용된 구조</h3>
+              <p style="font-size:0.82rem;">앞으로 이동 → 불 켜기 → 앞으로 → ... 순서대로 실행</p>
+            </div>
+            <div class="card card-orange" style="padding:0.55rem 0.7rem;">
+              <h3 style="font-size:0.88rem;">🤔 생각해보기</h3>
+              <p style="font-size:0.82rem;">가장 적은 명령으로 모든 파란 타일을 켤 수 있을까요?</p>
+            </div>
+            <div class="card card-green" style="padding:0.55rem 0.7rem;">
+              <h3 style="font-size:0.88rem;">🔗 알고리즘 연결</h3>
+              <p style="font-size:0.82rem;">명령 블록 하나 = 알고리즘의 단계(step) 하나입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 18: 라이트봇 — 함수(반복) 구조
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="15">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">🤖 라이트봇 — 함수와 반복 구조</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>게임에서 등장한 알고리즘 — 함수 & 반복</h2>
+          <p class="sub">반복되는 패턴을 FUNCT에 묶으면 알고리즘이 훨씬 짧아집니다</p>
+        </div>
+        <div class="lightbot-wrap">
+          <div class="game-img-box">
+            <img src="images/lightbot_func.png" alt="라이트봇 함수 구조 단계">
+          </div>
+          <div class="two-col" style="flex-shrink:0;">
+            <div class="info-box">
+              🔧 <strong>FUNCT 1/2 = 함수(Function)</strong><br>
+              반복되는 명령 묶음에 이름을 붙여 재사용합니다.<br>
+              → <strong>앞 2칸 + 불 켜기</strong>를 FUNCT 1에 저장하면, 이후엔 FUNCT 1 한 번만 호출하면 됩니다.
+            </div>
+            <div class="info-box green">
+              💡 <strong>문제를 효율적으로 해결하기 위해 가능한 최적의 방법</strong>을 찾는 것 — 이것이 바로 알고리즘의 핵심입니다!<br>
+              같은 결과라도 더 적은 단계로 표현할수록 좋은 알고리즘입니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 19: CodeCombat 소개
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="16">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">⚔️ 활동 3 — 텍스트 프로그래밍 체험 (CodeCombat)</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <span class="icon">⚔️</span>
+          <h2>텍스트 프로그래밍 체험 — CodeCombat</h2>
+          <p class="sub">게임 속 영웅을 코드로 조종해보세요</p>
+        </div>
+        <div class="two-col-60" style="flex:1; align-items:start;">
+          <div class="col">
+            <div class="img-box" style="max-height:80px; padding:0.5rem; background:white;">
+              <img src="images/codecombat_logo.png" alt="CodeCombat 로고" style="object-fit:contain; height:60px; margin:auto;">
+            </div>
+            <div class="card card-navy">
+              <span class="card-icon">🎮</span>
+              <h3>CodeCombat이란?</h3>
+              <p>RPG 게임 형식으로 <strong>실제 프로그래밍 언어(Python/JavaScript)</strong>를 배우는 플랫폼입니다. 코드를 작성하면 게임 캐릭터가 그대로 움직입니다!</p>
+            </div>
+            <div class="game-img-box" style="max-height:200px;">
+              <img src="images/codecombat_game.png" alt="CodeCombat 게임 화면">
+            </div>
+          </div>
+          <div class="col">
+            <div class="card card-blue">
+              <span class="card-icon">📝</span>
+              <h3>오늘 배울 코드</h3>
+              <div style="background:#1e1e2e; color:#cdd6f4; border-radius:0.5rem; padding:0.6rem 0.8rem; font-family:monospace; font-size:0.85rem; margin-top:0.35rem; line-height:1.8;">
+                <span style="color:#89b4fa;">hero</span>.<span style="color:#a6e3a1;">moveRight</span>()<br>
+                <span style="color:#89b4fa;">hero</span>.<span style="color:#a6e3a1;">moveDown</span>()<br>
+                <span style="color:#89b4fa;">hero</span>.<span style="color:#a6e3a1;">moveLeft</span>()<br>
+                <span style="color:#89b4fa;">hero</span>.<span style="color:#a6e3a1;">moveUp</span>()
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.4rem; margin-top:0.1rem;">
+              <a class="link-btn" href="https://codecombat.com/students?_cc=StepJumpTooth" target="_blank" style="justify-content:center;">
+                🔗 수업 코드로 접속하기
+              </a>
+              <div class="info-box" style="font-size:0.82rem;">
+                📋 접속 코드: <strong>StepJumpTooth</strong><br>
+                위 링크를 클릭하거나 codecombat.com에서 학생으로 가입하세요
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       Slide 20: CodeCombat 계정 생성
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" data-slide="17">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots">
+          <div class="browser-dot dot-red"></div>
+          <div class="browser-dot dot-yellow"></div>
+          <div class="browser-dot dot-green"></div>
+        </div>
+        <div class="browser-title">⚔️ CodeCombat — 계정 생성 방법</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <h2>CodeCombat 학생 계정 만들기</h2>
+          <p class="sub">수업 코드를 입력하면 선생님의 수업에 자동으로 연결됩니다</p>
+        </div>
+        <div class="two-col-img" style="flex:1; align-items:start;">
+          <div class="col">
+            <div class="img-box" style="max-height:360px;">
+              <img src="images/codecombat_signup.png" alt="CodeCombat 계정 생성">
+            </div>
+          </div>
+          <div class="col">
+            <div class="card card-navy">
+              <span class="card-icon">📋</span>
+              <h3>가입 순서</h3>
+              <ul class="step-list" style="margin-top:0.4rem;">
+                <li class="step-item"><div class="step-num">1</div> 링크 접속 또는 수업 코드 입력</li>
+                <li class="step-item"><div class="step-num">2</div> 이름과 사용자 이름 입력</li>
+                <li class="step-item"><div class="step-num">3</div> 비밀번호 설정 (8~64자)</li>
+                <li class="step-item"><div class="step-num">4</div> <strong>계정 생성</strong> 버튼 클릭</li>
+                <li class="step-item" style="background:var(--green-bg); border-color:#a5d6a7;">
+                  <div class="step-num" style="background:var(--green);">✓</div>
+                  <strong>바로 첫 번째 미션 시작!</strong>
+                </li>
+              </ul>
+            </div>
+            <div class="highlight-box">
+              <div class="hl-label">수업 접속 코드</div>
+              <div class="hl-text" style="font-size:1.4rem; letter-spacing:0.05em;">StepJumpTooth</div>
+              <div class="hl-sub">이 코드를 입력하면 선생님 수업에 자동 연결됩니다</div>
+            </div>
+            <div class="info-box orange">
+              💡 <strong>구글 계정으로도 가입 가능합니다!</strong><br>
+              "1(으)로 로그인" 버튼을 누르면 학교 구글 계정으로 빠르게 가입할 수 있어요.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .presentation -->
+
+<!-- ─── Navigation ────────────────────────────── -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </button>
+  <span class="nav-counter">
+    <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호">
+    / <span id="totalSlides">18</span>
+  </span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음">
+    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+  </button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let current = 0;
+
+  document.getElementById('totalSlides').textContent = totalSlides;
+
+  function showSlide(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, totalSlides - 1));
+    slides[current].classList.add('active');
+
+    document.getElementById('slideInput').value = current + 1;
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === totalSlides - 1;
+
+    const pct = totalSlides > 1 ? (current / (totalSlides - 1)) * 100 : 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  }
+
+  function nextSlide() { showSlide(current + 1); }
+  function prevSlide() { showSlide(current - 1); }
+  function goToSlide(n) { showSlide(n); }
+
+  function toggleVrAccordion(el) {
+    const answer = el.querySelector('.vr-answer');
+    const arrow = el.querySelector('.vr-arrow');
+    const isOpen = answer.style.maxHeight !== '0px' && answer.style.maxHeight !== '';
+    if (isOpen) {
+      answer.style.maxHeight = '0px';
+      answer.style.padding = '0 0.85rem';
+      arrow.style.transform = 'rotate(0deg)';
+    } else {
+      answer.style.maxHeight = '4rem';
+      answer.style.padding = '0 0.85rem';
+      arrow.style.transform = 'rotate(180deg)';
+    }
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.target === document.getElementById('slideInput')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+    if (e.key === 'ArrowLeft')  { e.preventDefault(); prevSlide(); }
+    if (e.key === 'Home')       { e.preventDefault(); showSlide(0); }
+    if (e.key === 'End')        { e.preventDefault(); showSlide(totalSlides - 1); }
+  });
+
+  // Slide number input
+  const slideInput = document.getElementById('slideInput');
+  slideInput.addEventListener('focus', () => slideInput.select());
+  slideInput.addEventListener('keydown', e => {
+    e.stopPropagation();
+    if (e.key === 'Enter') { const v = parseInt(slideInput.value); if (!isNaN(v)) showSlide(v - 1); slideInput.blur(); }
+    if (e.key === 'Escape') { slideInput.value = current + 1; slideInput.blur(); }
+  });
+  slideInput.addEventListener('blur', () => {
+    const v = parseInt(slideInput.value);
+    if (!isNaN(v)) showSlide(v - 1);
+    else slideInput.value = current + 1;
+  });
+
+  // Touch swipe
+  let touchX = null;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) { dx < 0 ? nextSlide() : prevSlide(); }
+    touchX = null;
+  }, { passive: true });
+
+  // Init
+  showSlide(0);
+</script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

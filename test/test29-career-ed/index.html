@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 꿈 찾기 — 진로 탐색 워크숍</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bayon&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── 1. Reset & CSS Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #F4CED3;
+      --card-frame:  #F3F3E9;
+      --card-white:  #FFFFFF;
+      --card-pink:   #F4CED3;
+      --card-cream:  #EDE2E2;
+      --card-red:    #E33529;
+      --pink-mid:    #F0B5BE;
+      --pink-deep:   #E8A0AD;
+      --red:         #E33529;
+      --brown:       #924E26;
+      --brown-dark:  #693413;
+      --yellow-hl:   #FFF500;
+      --teal:        #2B6786;
+      --near-black:  #1A1A1A;
+      --text:        #333333;
+      --text-sec:    #666666;
+    }
+
+    /* ── 2. Base Typography ── */
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    h1 { font-family: 'Bayon', sans-serif; font-size: 2.8rem; font-weight: 800; color: var(--red); letter-spacing: 0.02em; line-height: 0.95; }
+    h2 { font-size: 1.5rem; font-weight: 700; color: var(--brown-dark); }
+    h3 { font-size: 1.15rem; font-weight: 700; color: var(--brown-dark); }
+    p  { font-size: 1rem; line-height: 1.65; color: var(--brown); }
+
+    /* ── 3. Accessibility ── */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--red); color: #fff; padding: 8px 16px; z-index: 9999; font-size: 14px; border-radius: 0 0 4px 0; transition: top 0.2s; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--red); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-contrast: high) {
+      :root { --red: #0000cc; --brown: #000000; --text: #000000; }
+      .browser-card { border: 2px solid #000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ── 4. Progress Bar ── */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--red), var(--pink-mid));
+      z-index: 1000; transition: width 0.3s ease;
+    }
+
+    /* ── 5. Presentation & Slide Container ── */
+    .presentation { position: fixed; inset: 0; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* Decorative background blobs */
+    .slide::before, .slide::after {
+      content: ''; position: absolute; border-radius: 50%;
+      pointer-events: none; z-index: 0;
+    }
+    .slide::before {
+      width: 22rem; height: 22rem;
+      background: radial-gradient(circle, var(--pink-mid) 0%, transparent 70%);
+      top: -6rem; right: -4rem; opacity: 0.55;
+    }
+    .slide::after {
+      width: 16rem; height: 16rem;
+      background: radial-gradient(circle, #fff8 0%, transparent 70%);
+      bottom: -4rem; left: -3rem; opacity: 0.45;
+    }
+
+    /* ── 6. Browser Card (macOS-style frame) ── */
+    .browser-card {
+      position: relative; z-index: 1;
+      background: var(--card-frame);
+      border-radius: 1.8rem;
+      box-shadow: 0 8px 40px rgba(227,53,41,0.10), 0 2px 8px rgba(0,0,0,0.06);
+      width: 100%; max-width: 1500px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .browser-topbar {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      background: var(--card-frame);
+      border-bottom: 1px solid var(--pink-deep);
+      flex-shrink: 0;
+    }
+    .dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
+    .dot.red    { background: #FF5F57; }
+    .dot.yellow { background: #FEBC2E; }
+    .dot.green  { background: #28C840; }
+    .topbar-title {
+      margin-left: auto; margin-right: auto;
+      font-family: 'Bayon', sans-serif; font-size: 0.88rem;
+      letter-spacing: 0.1em; color: var(--brown); text-transform: uppercase;
+    }
+
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1.6rem 2.2rem;
+    }
+
+    /* ── 7. Section Header ── */
+    .sec-label {
+      display: inline-block;
+      font-family: 'Bayon', sans-serif; font-size: 0.82rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: #fff; background: var(--red);
+      padding: 0.18rem 0.7rem; border-radius: 2rem;
+      margin-bottom: 0.4rem;
+    }
+    .sec-title { font-size: 1.5rem; font-weight: 700; color: var(--brown-dark); margin-bottom: 0.25rem; }
+    .sec-rule { height: 2px; background: linear-gradient(90deg, var(--red), transparent); border: none; margin-bottom: 0.9rem; }
+
+    /* ── 8. Cards ── */
+    .card-grid { display: grid; gap: 0.6rem; }
+    .card-grid.g2 { grid-template-columns: repeat(2, 1fr); }
+    .card-grid.g3 { grid-template-columns: repeat(3, 1fr); }
+    .card-grid.g4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: var(--card-white);
+      border-radius: 1rem;
+      padding: 0.9rem 1rem;
+      box-shadow: 0 2px 10px rgba(227,53,41,0.08);
+      position: relative;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(227,53,41,0.14); }
+    .card.pink  { background: var(--card-pink); }
+    .card.cream { background: var(--card-cream); }
+    .card.red   { background: var(--card-red); }
+    .card.red h3, .card.red p, .card.red .card-desc { color: #fff; }
+    .card.red .card-hl { color: var(--yellow-hl); }
+
+    .card-tilt   { transform: rotate(-2deg); }
+    .card-tilt:hover { transform: rotate(0); }
+    .card-tilt-r { transform: rotate(1.5deg); }
+    .card-tilt-r:hover { transform: rotate(0); }
+
+    .card-icon { font-size: 1.6rem; margin-bottom: 0.4rem; display: block; }
+    .card-num {
+      position: absolute; top: 0.5rem; right: 0.7rem;
+      font-family: 'Bayon', sans-serif; font-size: 2.2rem;
+      color: var(--red); opacity: 0.12; line-height: 1;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; color: var(--brown-dark); margin-bottom: 0.2rem; }
+    .card-desc  { font-size: 0.88rem; color: var(--brown); line-height: 1.5; }
+
+    /* ── 9. Badges ── */
+    .badge {
+      display: inline-block; border-radius: 2rem;
+      font-size: 0.82rem; font-weight: 700;
+      padding: 0.2rem 0.7rem; line-height: 1.4;
+    }
+    .badge-red   { background: var(--red); color: #fff; }
+    .badge-pink  { background: var(--pink-mid); color: var(--brown-dark); }
+    .badge-cream { background: var(--card-cream); color: var(--brown-dark); }
+    .badge-teal  { background: rgba(43,103,134,0.12); color: var(--teal); }
+
+    /* ── 10. Highlight Box ── */
+    .hl-box {
+      background: var(--card-white);
+      border-left: 4px solid var(--red);
+      border-radius: 0 0.8rem 0.8rem 0;
+      padding: 0.7rem 1rem;
+      margin-bottom: 0.6rem;
+    }
+    .hl-box p { font-size: 0.95rem; color: var(--brown); }
+
+    /* ── 11. Bullet List ── */
+    .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+    .bullet-list li { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.95rem; color: var(--brown); line-height: 1.55; }
+    .bullet-list li::before { content: ''; display: block; flex-shrink: 0; width: 7px; height: 7px; border-radius: 50%; background: var(--red); margin-top: 0.45rem; }
+
+    /* ── 12. Section Number (big decorative) ── */
+    .sec-num {
+      font-family: 'Bayon', sans-serif; font-size: 2.2rem;
+      color: var(--red); opacity: 0.2; line-height: 1;
+      display: inline-block; margin-right: 0.4rem; vertical-align: middle;
+    }
+
+    /* ── 13. Timeline ── */
+    .timeline { display: flex; gap: 0; position: relative; }
+    .timeline::before {
+      content: ''; position: absolute; top: 0.65rem; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--red), var(--pink-mid), var(--red)); opacity: 0.2;
+    }
+    .tl-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding-top: 0.2rem; }
+    .tl-dot { width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--red); background: #fff; flex-shrink: 0; }
+    .tl-label { font-family: 'Bayon', sans-serif; font-size: 0.9rem; color: var(--red); text-align: center; }
+    .tl-desc  { font-size: 0.8rem; color: var(--brown); text-align: center; line-height: 1.4; }
+
+    /* ── 14. Cover ── */
+    .cover-slide {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; gap: 0.7rem; min-height: 100%;
+    }
+    .cover-outline {
+      font-family: 'Bayon', sans-serif; font-size: 2.8rem; font-weight: 800;
+      color: var(--card-cream); -webkit-text-stroke: 2px var(--red);
+      letter-spacing: 0.04em; line-height: 1;
+    }
+    .cover-sub { font-size: 1rem; color: var(--brown); line-height: 1.6; max-width: 32rem; }
+    .cover-divider { width: 4rem; height: 3px; background: var(--red); border-radius: 2px; }
+    .cover-meta { font-size: 0.88rem; color: var(--text-sec); }
+    .cover-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.3rem; }
+    .cover-pill {
+      background: #fff; border-radius: 3rem;
+      padding: 0.3rem 0.9rem; font-size: 0.88rem;
+      box-shadow: 0 2px 8px rgba(227,53,41,0.12); color: var(--brown);
+    }
+
+    /* ── 15. Two-Column ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .col-box {
+      background: var(--card-white); border-radius: 1rem;
+      padding: 0.9rem 1rem;
+      box-shadow: 0 2px 10px rgba(227,53,41,0.07);
+    }
+    .col-box h3 { font-size: 1rem; color: var(--brown-dark); margin-bottom: 0.5rem; }
+
+    /* ── 16. Step Cards ── */
+    .step-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+    .step-card {
+      background: var(--card-white); border-radius: 1rem;
+      padding: 0.8rem; text-align: center;
+      box-shadow: 0 2px 10px rgba(227,53,41,0.07);
+      transition: transform 0.2s;
+    }
+    .step-card:hover { transform: translateY(-2px); }
+    .step-num { font-family: 'Bayon', sans-serif; font-size: 1.8rem; color: var(--red); opacity: 0.9; line-height: 1; }
+    .step-title { font-size: 0.95rem; font-weight: 700; color: var(--brown-dark); margin: 0.25rem 0 0.2rem; }
+    .step-desc  { font-size: 0.82rem; color: var(--brown); line-height: 1.45; }
+
+    /* ── 17. Activity Item ── */
+    .act-item {
+      display: flex; align-items: flex-start; gap: 0.8rem;
+      background: var(--card-white); border-radius: 0.9rem;
+      padding: 0.7rem 1rem;
+      box-shadow: 0 2px 8px rgba(227,53,41,0.07);
+    }
+    .act-icon { font-size: 1.5rem; flex-shrink: 0; }
+    .act-body h3 { font-size: 1rem; font-weight: 700; color: var(--brown-dark); margin-bottom: 0.15rem; }
+    .act-body p  { font-size: 0.88rem; color: var(--brown); line-height: 1.5; }
+
+    /* ── 18. Ending ── */
+    .ending-slide {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; gap: 0.7rem; min-height: 100%;
+    }
+
+    /* ── 19. Animations ── */
+    @keyframes popUp {
+      from { transform: translateY(25px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.92); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .anim-up    { animation: popUp  0.55s ease-out both; }
+    .anim-scale { animation: scaleUp 0.5s ease-out both; }
+    .d1 { animation-delay: 0.08s; }
+    .d2 { animation-delay: 0.16s; }
+    .d3 { animation-delay: 0.24s; }
+    .d4 { animation-delay: 0.32s; }
+    .d5 { animation-delay: 0.40s; }
+
+    /* ── 20. Navigation ── */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+      padding: 0.4rem 1rem;
+      background: rgba(243,243,233,0.85);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--pink-mid);
+    }
+    .nav-btn {
+      width: 2rem; height: 2rem; border-radius: 50%;
+      border: 2px solid var(--red); background: transparent; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, color 0.2s; color: var(--red);
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--red); color: #fff; }
+    .nav-btn:disabled { opacity: 0.35; cursor: default; }
+    .nav-btn svg { width: 1.1rem; height: 1.1rem; fill: currentColor; }
+    .nav-counter { font-size: 0.88rem; color: var(--brown); display: flex; align-items: center; gap: 0.3rem; }
+    .slide-input {
+      width: 2rem; text-align: center; border: 1px solid var(--pink-deep);
+      border-radius: 0.3rem; font-size: 0.88rem; padding: 0.1rem 0.2rem;
+      background: #fff; color: var(--brown); outline: none;
+    }
+    .slide-input:focus { border-color: var(--red); }
+
+    /* ── 21. Responsive ── */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .slide { padding: 1rem; }
+      .browser-card { border-radius: 1rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .card-grid.g3, .card-grid.g4, .step-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+      h1 { font-size: 2rem; }
+      .browser-topbar { padding: 0.4rem 0.8rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .card-grid.g2 { grid-template-columns: 1fr; }
+      .step-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .browser-content { padding: 0.8rem; }
+      h1 { font-size: 1.7rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ── Slide 1: Cover ── -->
+    <div class="slide active" data-slide="1"
+         role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Career Workshop</span>
+        </div>
+        <div class="browser-content cover-slide">
+          <span class="badge badge-red anim-up">2025학년도 진로교육</span>
+          <h1 class="anim-up d1">나의 꿈 찾기</h1>
+          <p class="cover-outline anim-up d2">진로 탐색 워크숍</p>
+          <div class="cover-divider anim-up d3" aria-hidden="true"></div>
+          <p class="cover-sub anim-up d3">자신의 흥미와 강점을 발견하고<br>미래의 나를 설계하는 시간</p>
+          <div class="cover-pills anim-up d4">
+            <span class="cover-pill">흥미 탐색</span>
+            <span class="cover-pill">강점 발견</span>
+            <span class="cover-pill">직업 세계</span>
+            <span class="cover-pill">꿈 설계</span>
+          </div>
+          <p class="cover-meta anim-up d5">중학교 진로탐색 프로그램</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Slide 2: 목차 ── -->
+    <div class="slide" data-slide="2"
+         role="region" aria-label="슬라이드 2: 오늘의 여정">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Today's Journey</span>
+        </div>
+        <div class="browser-content">
+          <span class="sec-label">목차</span>
+          <h2 class="sec-title anim-up">오늘 우리가 함께할 여정</h2>
+          <hr class="sec-rule" aria-hidden="true">
+          <div class="card-grid g2 anim-up d1">
+            <div class="card">
+              <span class="card-num">1</span>
+              <span class="card-icon" aria-hidden="true">🔍</span>
+              <div class="card-title">나를 알아가기</div>
+              <p class="card-desc">흥미, 성격, 가치관 탐색</p>
+            </div>
+            <div class="card pink">
+              <span class="card-num">2</span>
+              <div class="card-title">강점 발견하기</div>
+              <p class="card-desc">나만의 재능과 잠재력 찾기</p>
+            </div>
+            <div class="card cream">
+              <span class="card-num">3</span>
+              <div class="card-title">직업 세계 탐험</div>
+              <p class="card-desc">다양한 직업과 미래 트렌드</p>
+            </div>
+            <div class="card">
+              <span class="card-num">4</span>
+              <div class="card-title">꿈 로드맵 그리기</div>
+              <p class="card-desc">목표 설정과 실천 계획</p>
+            </div>
+          </div>
+          <div class="hl-box anim-up d2">
+            <p>워크숍 내내 <strong>나만의 진로 노트</strong>를 작성하며 스스로의 이야기를 만들어 가세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Slide 3: 나를 알아가기 — 흥미 탐색 ── -->
+    <div class="slide" data-slide="3"
+         role="region" aria-label="슬라이드 3: 나의 흥미 탐색">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Module 1 — Know Yourself</span>
+        </div>
+        <div class="browser-content">
+          <span class="sec-label">1단계</span>
+          <h2 class="sec-title anim-up">나의 흥미를 탐색해요</h2>
+          <hr class="sec-rule" aria-hidden="true">
+          <div class="card-grid g3 anim-up d1">
+            <div class="card card-tilt">
+              <div class="card-title">현실형 R</div>
+              <p class="card-desc">도구·기계를 다루거나 몸을 쓰는 활동을 좋아한다</p>
+              <div style="margin-top:0.4rem"><span class="badge badge-cream">요리사, 엔지니어, 운동선수</span></div>
+            </div>
+            <div class="card">
+              <div class="card-title">탐구형 I</div>
+              <p class="card-desc">분석하고 연구하며 새로운 것을 발견하고 싶다</p>
+              <div style="margin-top:0.4rem"><span class="badge badge-pink">과학자, 의사, 연구원</span></div>
+            </div>
+            <div class="card card-tilt-r">
+              <div class="card-title">예술형 A</div>
+              <p class="card-desc">창의적 표현과 상상력을 발휘하는 활동이 즐겁다</p>
+              <div style="margin-top:0.4rem"><span class="badge badge-cream">디자이너, 작가, 음악가</span></div>
+            </div>
+            <div class="card">
+              <div class="card-title">사회형 S</div>
+              <p class="card-desc">사람을 돕고 가르치며 함께하는 일이 보람 있다</p>
+              <div style="margin-top:0.4rem"><span class="badge badge-pink">교사, 사회복지사, 간호사</span></div>
+            </div>
+            <div class="card pink">
+              <div class="card-title">진취형 E</div>
+              <p class="card-desc">설득하고 이끌며 목표를 향해 도전하길 좋아한다</p>
+              <div style="margin-top:0.4rem"><span class="badge badge-red">기업가, 정치인, 마케터</span></div>
+            </div>
+            <div class="card cream">
+              <div class="card-title">관습형 C</div>
+              <p class="card-desc">체계적으로 정리하고 규칙 있게 일하는 것이 편하다</p>
+              <div style="margin-top:0.4rem"><span class="badge badge-cream">회계사, 사서, 행정가</span></div>
+            </div>
+          </div>
+          <div class="hl-box anim-up d2">
+            <p><strong>활동:</strong> 위 6가지 유형 중 나와 가장 비슷한 유형 2가지를 골라 노트에 적어 보세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Slide 4: 강점 발견하기 ── -->
+    <div class="slide" data-slide="4"
+         role="region" aria-label="슬라이드 4: 나의 강점 발견">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Module 2 — My Strengths</span>
+        </div>
+        <div class="browser-content">
+          <span class="sec-label">2단계</span>
+          <h2 class="sec-title anim-up">나만의 강점을 찾아요 ✨</h2>
+          <hr class="sec-rule" aria-hidden="true">
+          <div class="two-col anim-up d1">
+            <div class="col-box">
+              <h3>강점이란?</h3>
+              <ul class="bullet-list">
+                <li>특별히 잘 할 수 있는 능력</li>
+                <li>쉽게 집중하고 몰입되는 활동</li>
+                <li>다른 사람에게 칭찬받는 부분</li>
+                <li>하고 나면 뿌듯함이 느껴지는 일</li>
+              </ul>
+            </div>
+            <div class="col-box">
+              <h3>강점 발견 질문</h3>
+              <ul class="bullet-list">
+                <li>어떤 활동을 할 때 시간이 빨리 가나요?</li>
+                <li>친구들이 나에게 자주 부탁하는 것은?</li>
+                <li>어려워도 포기하지 않았던 경험은?</li>
+                <li>배우지 않아도 잘 되는 것이 있나요?</li>
+              </ul>
+            </div>
+          </div>
+          <div class="card-grid g4 anim-up d2" style="margin-top:0.6rem">
+            <div class="card red">
+              <div class="card-title card-hl">언어·소통</div>
+              <p class="card-desc" style="color:#fff">글쓰기, 발표, 설득</p>
+            </div>
+            <div class="card">
+              <div class="card-title">수리·논리</div>
+              <p class="card-desc">계산, 분석, 추론</p>
+            </div>
+            <div class="card pink">
+              <div class="card-title">예술·창의</div>
+              <p class="card-desc">그림, 음악, 디자인</p>
+            </div>
+            <div class="card cream">
+              <div class="card-title">공감·돌봄</div>
+              <p class="card-desc">경청, 배려, 협력</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Slide 5: 직업 세계 탐험 ── -->
+    <div class="slide" data-slide="5"
+         role="region" aria-label="슬라이드 5: 직업 세계 탐험">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Module 3 — Career World</span>
+        </div>
+        <div class="browser-content">
+          <span class="sec-label">3단계</span>
+          <h2 class="sec-title anim-up">변화하는 직업 세계</h2>
+          <hr class="sec-rule" aria-hidden="true">
+          <div class="card-grid g3 anim-up d1">
+            <div class="act-item" style="grid-column:span 3;">
+              <span class="act-icon" aria-hidden="true">🌐</span>
+              <div class="act-body">
+                <h3>미래 직업 트렌드</h3>
+                <p>AI·디지털 기술이 발전하면서 기존 직업이 변화하고 새로운 직업이 생겨납니다. 현재 초등학생의 65%는 아직 존재하지 않는 직업을 갖게 된다는 연구도 있습니다.</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-grid g3 anim-up d2" style="margin-top:0.6rem">
+            <div class="card">
+              <div class="card-title">4차 산업 직업군</div>
+              <ul class="bullet-list" style="margin-top:0.3rem">
+                <li>AI 트레이너</li>
+                <li>빅데이터 분석가</li>
+                <li>드론 조종사</li>
+              </ul>
+            </div>
+            <div class="card pink">
+              <div class="card-title">창의·문화 직업군</div>
+              <ul class="bullet-list" style="margin-top:0.3rem">
+                <li>콘텐츠 크리에이터</li>
+                <li>UX 디자이너</li>
+                <li>게임 개발자</li>
+              </ul>
+            </div>
+            <div class="card cream">
+              <div class="card-title">사회·환경 직업군</div>
+              <ul class="bullet-list" style="margin-top:0.3rem">
+                <li>기후변화 전문가</li>
+                <li>사회적 기업가</li>
+                <li>스마트팜 농업인</li>
+              </ul>
+            </div>
+          </div>
+          <div class="hl-box anim-up d3">
+            <p>흥미로운 직업을 3가지 찾아 노트에 적고, <strong>왜 관심이 생겼는지</strong> 이유를 써 보세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Slide 6: 꿈 로드맵 — 목표 설정 ── -->
+    <div class="slide" data-slide="6"
+         role="region" aria-label="슬라이드 6: 꿈 로드맵">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Module 4 — Dream Roadmap</span>
+        </div>
+        <div class="browser-content">
+          <span class="sec-label">4단계</span>
+          <h2 class="sec-title anim-up">나의 꿈 로드맵 그리기</h2>
+          <hr class="sec-rule" aria-hidden="true">
+          <div class="timeline anim-up d1" role="list">
+            <div class="tl-item" role="listitem">
+              <div class="tl-dot" aria-hidden="true"></div>
+              <div class="tl-label">지금</div>
+              <div class="tl-desc">흥미·강점 파악<br>좋아하는 것 탐색</div>
+            </div>
+            <div class="tl-item" role="listitem">
+              <div class="tl-dot" aria-hidden="true"></div>
+              <div class="tl-label">중학교</div>
+              <div class="tl-desc">다양한 경험<br>동아리·봉사활동</div>
+            </div>
+            <div class="tl-item" role="listitem">
+              <div class="tl-dot" aria-hidden="true"></div>
+              <div class="tl-label">고등학교</div>
+              <div class="tl-desc">진로 방향 결정<br>관련 역량 키우기</div>
+            </div>
+            <div class="tl-item" role="listitem">
+              <div class="tl-dot" aria-hidden="true"></div>
+              <div class="tl-label">대학·전문교육</div>
+              <div class="tl-desc">전공 심화<br>현장 경험 쌓기</div>
+            </div>
+            <div class="tl-item" role="listitem">
+              <div class="tl-dot" aria-hidden="true"></div>
+              <div class="tl-label">나의 꿈</div>
+              <div class="tl-desc">원하는 직업<br>나다운 삶</div>
+            </div>
+          </div>
+          <div class="step-grid anim-up d2" style="margin-top:0.7rem">
+            <div class="step-card">
+              <div class="step-num">1</div>
+              <div class="step-title">목표 쓰기</div>
+              <p class="step-desc">구체적이고 측정 가능한 목표 세우기</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">2</div>
+              <div class="step-title">경로 탐색</div>
+              <p class="step-desc">목표에 필요한 지식·경험 알아보기</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">3</div>
+              <div class="step-title">실천 계획</div>
+              <p class="step-desc">이번 달부터 할 수 있는 작은 행동</p>
+            </div>
+            <div class="step-card">
+              <div class="step-num">4</div>
+              <div class="step-title">점검·수정</div>
+              <p class="step-desc">주기적으로 돌아보고 유연하게 조정</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Slide 7: 워크숍 활동 안내 ── -->
+    <div class="slide" data-slide="7"
+         role="region" aria-label="슬라이드 7: 워크숍 활동 안내">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Workshop Activities</span>
+        </div>
+        <div class="browser-content">
+          <span class="sec-label">워크숍</span>
+          <h2 class="sec-title anim-up">오늘의 활동을 정리해요</h2>
+          <hr class="sec-rule" aria-hidden="true">
+          <div class="card-grid g2 anim-up d1">
+            <div class="act-item">
+              <div class="act-body">
+                <h3>활동 1 — 흥미 유형 카드 분류</h3>
+                <p>Holland 유형 카드 36장을 흥미도에 따라 분류하고 나의 Top 3 유형을 확인합니다.</p>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-body">
+                <h3>활동 2 — 강점 인터뷰</h3>
+                <p>짝과 서로 인터뷰하며 상대방의 강점을 발견하고 피드백 카드를 작성합니다.</p>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-body">
+                <h3>활동 3 — 직업 카드 매칭</h3>
+                <p>나의 흥미·강점과 직업 카드를 매칭하여 관심 직업 Top 5를 선정합니다.</p>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-body">
+                <h3>활동 4 — 꿈 포스터 만들기</h3>
+                <p>나의 꿈과 로드맵을 한 장의 포스터로 표현하고 모둠원과 발표합니다.</p>
+              </div>
+            </div>
+          </div>
+          <div class="hl-box anim-up d2">
+            <p>활동 후 <strong>"오늘 새롭게 발견한 나의 모습"</strong> 한 문장을 노트에 써 보세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Slide 8: 마무리 ── -->
+    <div class="slide" data-slide="8"
+         role="region" aria-label="슬라이드 8: 마무리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Closing</span>
+        </div>
+        <div class="browser-content ending-slide">
+          <span class="badge badge-red anim-up">오늘을 기억해요</span>
+          <h1 class="anim-up d1">꿈은 지금부터</h1>
+          <p class="cover-outline anim-up d2">시작됩니다</p>
+          <div class="cover-divider anim-up d3" aria-hidden="true"></div>
+          <p class="cover-sub anim-up d3">
+            정답은 없습니다. 지금 이 탐색 자체가<br>
+            여러분의 꿈을 향한 첫 걸음입니다.
+          </p>
+          <div class="card-grid g3 anim-up d4" style="width:100%;max-width:42rem">
+            <div class="card card-tilt" style="text-align:center">
+              <div class="card-title">나를 알아가는<br>용기</div>
+            </div>
+            <div class="card red" style="text-align:center">
+              <div class="card-title card-hl">도전하는<br>힘</div>
+            </div>
+            <div class="card card-tilt-r" style="text-align:center">
+              <div class="card-title">함께 성장하는<br>기쁨</div>
+            </div>
+          </div>
+          <p class="cover-meta anim-up d5">수고했어요! 진로 노트를 소중히 간직하세요.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled
+            aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()"
+            aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" style="margin-left:0.3rem">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const TOTAL = 8;
+    let current = 1;
+
+    function getSlide(n) { return document.querySelector(`.slide[data-slide="${n}"]`); }
+
+    function goTo(n) {
+      if (n < 1 || n > TOTAL) return;
+      getSlide(current).classList.remove('active');
+      current = n;
+      const next = getSlide(current);
+      next.classList.add('active');
+      // Re-trigger animations
+      next.querySelectorAll('.anim-up, .anim-scale').forEach(el => {
+        el.style.animation = 'none';
+        el.offsetHeight; // reflow
+        el.style.animation = '';
+      });
+      document.getElementById('prevBtn').disabled = current === 1;
+      document.getElementById('nextBtn').disabled = current === TOTAL;
+      document.getElementById('slideInput').value = current;
+      const pct = ((current - 1) / (TOTAL - 1)) * 100;
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressBar').setAttribute('aria-valuenow', current);
+      document.getElementById('slideAnnounce').textContent =
+        `슬라이드 ${current} / ${TOTAL}: ${next.getAttribute('aria-label')}`;
+    }
+
+    function nextSlide() { goTo(current + 1); }
+    function prevSlide() { goTo(current - 1); }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', e => {
+      if (e.target.classList.contains('slide-input')) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); prevSlide(); }
+    });
+
+    // Slide input
+    document.getElementById('slideInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const v = parseInt(e.target.value, 10);
+        if (!isNaN(v)) goTo(v);
+        e.target.blur();
+      }
+    });
+
+    // Touch / swipe
+    let touchX = null;
+    document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchend', e => {
+      if (touchX === null) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      if (Math.abs(dx) > 50) { dx < 0 ? nextSlide() : prevSlide(); }
+      touchX = null;
+    });
+
+    // Fullscreen
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+    document.addEventListener('fullscreenchange', () => {
+      const isFs = !!document.fullscreenElement;
+      document.getElementById('fsExpand').style.display  = isFs ? 'none' : '';
+      document.getElementById('fsCompress').style.display = isFs ? '' : 'none';
+    });
+
+    // Init
+    goTo(1);
+  </script>
+</body>
+</html>

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>치와와·머핀 분류기 만들기 — 인공지능 기초</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧁</text></svg>">
+<style>
+  :root {
+    --bg: #f4efe4;
+    --surface: #fffdf8;
+    --fg: #1d2a26;
+    --fg-muted: #4f5c57;
+    --fg-faint: #85918b;
+    --hair: rgba(30, 60, 45, 0.16);
+    --primary: #1e7a55;
+    --accent: linear-gradient(115deg, #1e7a55 0%, #3aa870 55%, #e0a52a 100%);
+    --c-green: #1e7a55; --c-amber: #d99a1c; --c-ink: #1d2a26;
+    --c-rose: #d1434b; --c-blue: #2b6cb0; --c-violet: #6b5bb5; --c-ok: #059669;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 12% -5%, rgba(30, 122, 85, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(224, 165, 42, 0.14), transparent 55%),
+      var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    padding-bottom: 110px;
+    word-break: keep-all;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 0; }
+
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 30px 28px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(30, 60, 45, 0.35);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(30, 60, 45, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(30, 60, 45, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--primary); text-transform: uppercase; }
+  .hero h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad { background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { color: var(--fg-muted); font-size: 14.5px; margin-top: 8px; max-width: 660px; }
+  .hero .gear { position: absolute; top: 14px; right: 14px; border: none; background: transparent; font-size: 17px; cursor: pointer; opacity: 0.35; }
+
+  .idrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; position: relative; }
+  .idrow .field { flex: 1 1 150px; }
+
+  #settingsPanel {
+    display: none; background: #fffbe9; border: 1px dashed #d9b53c; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 18px; font-size: 13px;
+  }
+  #settingsPanel input { width: 100%; margin-top: 6px; }
+  #settingsPanel button { margin-top: 8px; }
+
+  section.card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 24px 24px 26px; margin-bottom: 18px;
+    box-shadow: 0 16px 44px -32px rgba(30, 60, 45, 0.3);
+    border-top: 4px solid var(--sec, var(--primary));
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .sec-badge { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 16px; color: #fff; background: var(--sec, var(--primary)); }
+  .sec-head h2 { font-size: 18.5px; font-weight: 800; }
+  .sec-desc { color: var(--fg-muted); font-size: 13.5px; margin-bottom: 16px; }
+
+  label.q { display: block; font-weight: 700; font-size: 14.5px; margin: 16px 0 6px; }
+  label.q .req { color: var(--c-rose); }
+  .hint { font-weight: 500; color: var(--fg-faint); font-size: 12.5px; margin-left: 6px; }
+  input[type="text"], input[type="url"], input[type="number"], input[type="date"], input[type="password"], textarea, select {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px;
+    padding: 10px 13px; font: inherit; font-size: 14.5px; color: var(--fg);
+    background: #fffef9; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30, 122, 85, 0.14); }
+  textarea { resize: vertical; min-height: 74px; }
+
+  /* 준비물 링크 셋 */
+  .links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 8px; }
+  .link-card {
+    display: block; text-decoration: none; color: var(--fg);
+    border: 1.5px solid var(--hair); border-radius: 14px; padding: 14px 16px; background: #fffef9;
+    transition: transform 0.12s, border-color 0.15s;
+  }
+  .link-card:hover { transform: translateY(-2px); border-color: var(--tone); }
+  .link-card .lk-label { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: var(--tone); }
+  .link-card .lk-title { font-size: 15.5px; font-weight: 800; margin-top: 3px; text-decoration: underline; text-decoration-color: var(--tone); text-underline-offset: 3px; }
+  .link-card .lk-note { font-size: 12.5px; color: var(--fg-muted); margin-top: 4px; }
+  .steps { counter-reset: step; list-style: none; margin-top: 10px; display: grid; gap: 6px; }
+  .steps li { position: relative; padding-left: 34px; font-size: 13.5px; color: var(--fg); }
+  .steps li::before {
+    counter-increment: step; content: counter(step);
+    position: absolute; left: 0; top: 2px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--c-green); color: #fff; font-weight: 800; font-size: 12.5px; display: grid; place-items: center;
+  }
+  .steps li strong { color: var(--c-green); }
+  .steps li .warn { color: var(--c-rose); font-weight: 700; }
+
+  /* 클래스 두 칸 */
+  .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 6px; }
+  .cls {
+    border: 1.5px solid var(--hair); border-radius: 14px; padding: 12px 16px 16px; background: #fffef9;
+  }
+  .cls h3 { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+  .cls h3 .role { font-size: 12px; font-weight: 700; color: var(--fg-faint); }
+  .cls label.q { margin-top: 10px; font-size: 13.5px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; }
+  @media (max-width: 560px) { .row2, .row3 { grid-template-columns: 1fr; } }
+
+  /* 선택형 */
+  .choices { display: grid; gap: 8px; margin-top: 6px; }
+  .choice {
+    display: flex; align-items: flex-start; gap: 10px; border: 1.5px solid var(--hair); border-radius: 12px;
+    padding: 11px 14px; background: #fffef9; cursor: pointer; font-size: 14px;
+  }
+  .choice:has(input:checked) { border-color: var(--c-green); background: rgba(30, 122, 85, 0.07); }
+  .choice input { accent-color: var(--c-green); margin-top: 4px; }
+  .choice .why { display: block; font-size: 12.5px; color: var(--fg-muted); font-weight: 500; }
+
+  .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(255, 253, 248, 0.92); backdrop-filter: blur(10px); border-top: 1px solid var(--hair); padding: 12px 18px; }
+  .actionbar .inner { max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #draftStatus { font-size: 12px; color: var(--fg-faint); }
+  #draftStatus.pending { color: var(--c-amber); }
+  #draftStatus.saved { color: var(--c-ok); }
+  #draftStatus.failed { color: var(--c-rose); font-weight: 700; }
+  .draft-note { font-size: 11px; color: var(--fg-faint); opacity: 0.8; }
+  .btn { border: none; border-radius: 999px; padding: 12px 26px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; transition: transform 0.12s, opacity 0.15s; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: linear-gradient(115deg, #1e7a55 0%, #3aa870 55%, #e0a52a 100%); color: #fff; box-shadow: 0 10px 26px -12px rgba(30, 122, 85, 0.6); }
+  .btn-primary:disabled { opacity: 0.55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+
+  .sid-hint { margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px; font-family: 'JetBrains Mono', 'Malgun Gothic', monospace; }
+  .sid-hint.ok { color: var(--c-ok); }
+  .sid-hint.bad { color: var(--c-rose); }
+
+  .backdrop { position: fixed; inset: 0; background: rgba(29, 42, 38, 0.45); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 18px; z-index: 70; }
+  .backdrop[hidden] { display: none; }
+  .modal { width: min(460px, 100%); max-height: 88vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--hair); border-radius: 20px; padding: 24px 24px 20px; box-shadow: 0 30px 80px -30px rgba(29, 42, 38, 0.5); }
+  .modal h3 { font-size: 19px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .modal .btn { padding: 10px 18px; font-size: 14px; }
+  #lkResult { margin-top: 16px; }
+  #lkResult[hidden] { display: none; }
+  .lk-ok { border: 1.5px solid var(--c-ok); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 14px 16px; }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-ok); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--fg); margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { color: var(--fg); overflow-wrap: anywhere; }
+  .lk-bad { border: 1.5px solid var(--c-rose); background: rgba(209, 67, 75, 0.06); border-radius: 14px; padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--c-rose); }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; }
+
+  #submitBanner { display: none; align-items: center; gap: 10px; margin-bottom: 18px; border: 1.5px solid var(--c-ok); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 11px 16px; font-size: 13.5px; font-weight: 700; color: var(--fg); }
+  #submitBanner.show { display: flex; }
+  #submitBanner .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-ok); }
+
+  #toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(16px); background: #1d2a26; color: #fff; padding: 12px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 60; max-width: 90vw; text-align: center; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #059669; }
+  #toast.error { background: #d1434b; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    section.card { padding: 18px 16px 20px; }
+    .actionbar .inner { flex-wrap: wrap; gap: 8px; }
+    .draft-wrap { flex: 1 0 100%; order: -1; }
+    .draft-note { display: none; }
+    .actionbar .btn { flex: 1 1 auto; padding: 11px 10px; font-size: 13.5px; }
+    .wide-only { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="gear" id="btnGear" type="button" aria-label="설정">⚙</button>
+    <div class="kicker">인공지능 기초 · 2026-2 · 인공지능은 어떻게 배울까</div>
+    <h1>치와와·머핀 <span class="grad">분류기 만들기</span></h1>
+    <p class="sub">Teachable Machine에 사진과 <strong>레이블(정답)</strong>을 함께 넣어 지도학습으로 이미지 분류 모델을 만든다.
+      제출하는 것은 세 가지 — <strong>모델 공유 링크</strong>, <strong>클래스와 샘플 수</strong>, 그리고 <strong>관찰할 시험 사진과 그때의 출력값</strong>.
+      모델이 어디서 헷갈리는지가 오늘 기록할 가장 중요한 관찰이다.</p>
+    <div class="idrow">
+      <div class="field">
+        <label class="q" for="studentId">학번 <span class="req">*</span></label>
+        <input type="text" id="studentId" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+        <div id="sidPreview" class="sid-hint"></div>
+      </div>
+      <div class="field">
+        <label class="q" for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="이름">
+      </div>
+      <div class="field">
+        <label class="q" for="today">날짜 <span class="req">*</span></label>
+        <input type="date" id="today">
+      </div>
+      <div class="field">
+        <label class="q" for="password">제출 암호 <span class="req">*</span><span class="hint">4자 이상 · 이번 활동용으로 직접 정한다</span></label>
+        <input type="password" id="password" placeholder="4자 이상" autocomplete="off">
+      </div>
+    </div>
+    <p class="sub" style="margin-top:10px; font-size:12.5px;">
+      🎫 <strong>학번</strong>은 <strong>학년(1) + 반(2) + 번호(2)</strong> 다섯 자리 — 2학년 3반 17번이면 <strong>20317</strong>.<br>
+      🔑 <strong>제출 암호</strong>는 이번 활동용으로 <strong>직접 4자 이상 정한다</strong>. 나중에 <strong>제출 확인·불러오기</strong>에 쓰는 열쇠다.
+      <span style="color:var(--c-rose); font-weight:700;">평소 쓰는 비밀번호는 쓰지 말 것</span> — 잊으면 선생님께 문의.
+    </p>
+  </header>
+
+  <div id="submitBanner"><span class="dot"></span><span id="submitBannerText"></span></div>
+
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정 — Apps Script 배포 URL</strong>
+    <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus" style="margin-left:8px;"></span>
+  </div>
+
+  <!-- 0. 준비물과 순서 -->
+  <section class="card" style="--sec: var(--c-amber);">
+    <div class="sec-head"><span class="sec-badge">0</span><h2>준비물과 순서</h2></div>
+    <p class="sec-desc">아래 두 링크를 새 탭으로 열어 둔다. 내려받은 파일은 <strong>반드시 압축을 풀어야</strong> 쓸 수 있다. 다운로드 폴더에서 <strong>치와와-머핀.zip</strong>을 찾아 마우스 오른쪽 단추를 누르고 <strong>압축 풀기(모두 압축 풀기)</strong>를 고른 다음, 새로 생긴 일반 폴더 안에 <strong>치와와 · 머핀 · 시험</strong> 세 폴더가 보이면 준비가 끝난 것이다. <span class="warn">압축 파일을 두 번 눌러 안을 들여다본 상태는 압축을 푼 것이 아니다.</span> 폴더 안의 <strong>출처.csv</strong>에는 사진마다 제목·작성자·라이선스·원본 페이지가 적혀 있으며, 모든 사진은 CC0 또는 퍼블릭 도메인이다.</p>
+    <div class="links">
+      <a class="link-card" style="--tone: var(--c-amber);" href="dataset/치와와-머핀.zip" download>
+        <div class="lk-label">① 데이터셋 내려받기</div>
+        <div class="lk-title">치와와-머핀.zip (9.1MB)</div>
+        <div class="lk-note">학습용 치와와 83장 · 머핀 72장 · 시험용 16장</div>
+      </a>
+      <a class="link-card" style="--tone: var(--c-green);" href="https://teachablemachine.withgoogle.com/train" target="_blank" rel="noopener">
+        <div class="lk-label">② 도구 열기 (새 탭)</div>
+        <div class="lk-title">teachablemachine.withgoogle.com/train</div>
+        <div class="lk-note">크롬 권장 · 로그인 없이 시작할 수 있다</div>
+      </a>
+    </div>
+    <ol class="steps">
+      <li><strong>새 프로젝트</strong> 화면에서 <strong>이미지 프로젝트</strong>를 누르고, <strong>표준 이미지 모델</strong>을 고른다.</li>
+      <li>Class 1 옆 연필을 눌러 이름을 <strong>치와와</strong>로, Class 2를 <strong>머핀</strong>으로 바꾼다.</li>
+      <li><strong>치와와</strong> 카드의 <strong>업로드</strong>를 누른 뒤, 압축을 푼 폴더 안의 <strong>치와와</strong> 폴더로 들어가 이미지 파일을 모두 선택해 추가한다. <strong>머핀</strong>도 같은 방법으로 한다. 제공된 사진을 모두 사용한다(치와와 83장 · 머핀 72장). 업로드가 끝나면 카드에 표시된 샘플 개수를 확인한다. <span class="warn">시험 폴더는 학습 자료로 넣지 않는다</span> — 학습이 끝난 뒤 모델을 시험할 사진이다.</li>
+      <li><strong>모델 학습시키기</strong>를 누른다. <span class="warn">학습이 끝날 때까지 탭을 옮기거나 닫지 않는다.</span></li>
+      <li><strong>미리보기</strong>의 입력은 처음에 <strong>웹캠</strong>이다. 드롭다운을 열어 <strong>파일</strong>로 바꾸고 <strong>시험</strong> 폴더의 사진 16장을 하나씩 넣어, 클래스별 <strong>출력값(%)</strong> 막대를 본다. 이 값을 신뢰도라고도 부르지만, 90%가 정답률 90%를 뜻하지는 않는다.</li>
+      <li><strong>모델 내보내기</strong> → Tensorflow.js 탭에서 <strong>업로드(공유 가능한 링크)</strong>를 고른 채 <strong>모델 업로드</strong>를 누른다. 업로드가 끝난 뒤 생긴 <strong>/models/…/</strong> 주소를 복사해 새 탭에서 모델이 열리는지 확인한 다음, 아래 A에 붙여 넣는다.</li>
+    </ol>
+  </section>
+
+  <!-- A. 내 모델 -->
+  <section class="card" style="--sec: var(--c-green);">
+    <div class="sec-head"><span class="sec-badge">A</span><h2>내 모델 — 공유 링크와 데이터</h2></div>
+    <p class="sec-desc">모델 업로드가 끝나면 <strong>공유 가능한 링크</strong> 칸에 주소가 채워진다. 붙여 넣기 전에 그 주소를 <strong>새 탭에서 열어 모델이 실제로 뜨는지 확인한다</strong> — 편집 화면 주소(<code>/train/image</code>)를 복사하면 다른 사람이 열 수 없다. 확인이 끝난 주소를 그대로 붙여 넣는다. 클래스 이름과 샘플 수는 Teachable Machine 화면의 카드에 적힌 그대로 옮긴다.</p>
+    <label class="q" for="aLink">모델 공유 링크 <span class="req">*</span><span class="hint">https://teachablemachine.withgoogle.com/models/… 형식</span></label>
+    <input type="url" id="aLink" placeholder="https://teachablemachine.withgoogle.com/models/xxxxxxxx/" inputmode="url" autocomplete="off">
+    <div class="pair">
+      <div class="cls">
+        <h3>클래스 1 <span class="role">첫 번째 카드</span></h3>
+        <div class="row2">
+          <div>
+            <label class="q" for="aClass1">클래스 이름 <span class="req">*</span></label>
+            <input type="text" id="aClass1" placeholder="치와와">
+          </div>
+          <div>
+            <label class="q" for="aCount1">샘플 수 <span class="req">*</span></label>
+            <input type="number" id="aCount1" placeholder="예: 83" min="1" max="999" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+      <div class="cls">
+        <h3>클래스 2 <span class="role">두 번째 카드</span></h3>
+        <div class="row2">
+          <div>
+            <label class="q" for="aClass2">클래스 이름 <span class="req">*</span></label>
+            <input type="text" id="aClass2" placeholder="머핀">
+          </div>
+          <div>
+            <label class="q" for="aCount2">샘플 수 <span class="req">*</span></label>
+            <input type="number" id="aCount2" placeholder="예: 72" min="1" max="999" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B. 가장 헷갈린 사진 -->
+  <section class="card" style="--sec: var(--c-blue);">
+    <div class="sec-head"><span class="sec-badge">B</span><h2>관찰할 시험 사진</h2></div>
+    <p class="sec-desc">시험 사진 16장을 모두 넣어 본 뒤 한 장을 골라 기록한다. 고르는 기준은 셋 중 하나다 — <strong>두 클래스의 출력값이 비슷하게 나온 사진</strong>, <strong>모델이 틀리게 판정한 사진</strong>, 또는 헷갈릴 만해 보였는데도 <strong>모델이 잘 분류한 사진</strong>이다. 16장을 모두 맞혔고 출력값도 한쪽으로 크게 기울었다면 세 번째 기준으로 고르면 된다. 실제 정답은 데이터셋의 <strong>시험-정답.csv</strong>에 있다. 출력값은 미리보기 막대에 표시된 퍼센트이며, 신뢰도라고도 부르지만 90%가 정답률 90%를 뜻하지는 않는다.</p>
+    <div class="row3">
+      <div>
+        <label class="q" for="bFile">관찰할 시험 사진 <span class="req">*</span></label>
+        <select id="bFile">
+          <option value="">— 파일 이름 고르기 —</option>
+          <option>시험_01.jpg</option><option>시험_02.jpg</option><option>시험_03.jpg</option><option>시험_04.jpg</option>
+          <option>시험_05.jpg</option><option>시험_06.jpg</option><option>시험_07.jpg</option><option>시험_08.jpg</option>
+          <option>시험_09.jpg</option><option>시험_10.jpg</option><option>시험_11.jpg</option><option>시험_12.jpg</option>
+          <option>시험_13.jpg</option><option>시험_14.jpg</option><option>시험_15.jpg</option><option>시험_16.jpg</option>
+        </select>
+      </div>
+      <div>
+        <label class="q" for="bPred">모델의 판정 <span class="req">*</span></label>
+        <select id="bPred">
+          <option value="">— 고르기 —</option>
+          <option>치와와</option>
+          <option>머핀</option>
+        </select>
+      </div>
+      <div>
+        <label class="q" for="bConf">예측한 클래스의 출력값(%) <span class="req">*</span></label>
+        <input type="number" id="bConf" placeholder="예: 54" min="0" max="100" inputmode="numeric">
+      </div>
+    </div>
+    <label class="q" for="bReason">이 사진을 고른 이유 <span class="req">*</span></label>
+    <select id="bReason">
+      <option value="">— 고르기 —</option>
+      <option>두 클래스 출력값이 비슷함</option>
+      <option>오분류 — 정답과 다르게 판정함</option>
+      <option>잘 분류함 — 헷갈릴 만한데 정답을 맞힘</option>
+    </select>
+    <label class="q" for="bWhy">왜 그랬을까 <span class="req">*</span><span class="hint">추측을 한 줄로 — 두 클래스가 공유하는 색·모양·점의 배치, 배경, 학습 사진에 없던 조건 등. 잘 분류한 사진이라면 모델이 무엇을 보고 구별했을지 적는다</span></label>
+    <input type="text" id="bWhy" placeholder="예: 갈색 바탕에 어두운 점 두 개가 눈처럼 보여서 위에서 찍은 머핀이 치와와 얼굴과 닮았다">
+  </section>
+
+  <!-- C. 학습 방법 -->
+  <section class="card" style="--sec: var(--c-violet);">
+    <div class="sec-head"><span class="sec-badge">C</span><h2>이 모델은 어떤 학습 방법으로 배웠나</h2></div>
+    <p class="sec-desc">데이터에 무엇이 붙어 있었는지를 기준으로 고른다. 오늘 수업에서 본 세 가지 학습 방법 중 하나다.</p>
+    <div class="choices">
+      <label class="choice"><input type="radio" name="cMethod" value="지도학습"><span><strong>지도학습</strong><span class="why">사진마다 정답 레이블(치와와/머핀)을 붙여 주고, 새 사진의 레이블을 맞히도록 배웠다.</span></span></label>
+      <label class="choice"><input type="radio" name="cMethod" value="비지도학습"><span><strong>비지도학습</strong><span class="why">레이블 없이 사진을 넣고, 비슷한 데이터끼리 군집을 만들었다.</span></span></label>
+      <label class="choice"><input type="radio" name="cMethod" value="강화학습"><span><strong>강화학습</strong><span class="why">환경에서 행동하고, 그 결과로 받는 보상을 바탕으로 행동 선택 방법을 배웠다.</span></span></label>
+    </div>
+  </section>
+
+</div>
+
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <a class="btn btn-ghost" href="/data/2026-2/인공지능기초/제출현황.html" style="text-decoration:none; display:inline-block;">제출 현황</a>
+    <button class="btn btn-ghost" id="btnLookup" type="button">제출 확인</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-primary" id="btnSave" type="button">제출하기<span class="wide-only"> (TXT + 시트 저장)</span></button>
+  </div>
+</div>
+
+<div class="backdrop" id="lookupBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
+    <h3 id="lookupTitle">제출 확인 · 지난 제출 불러오기</h3>
+    <p class="m-desc">제출할 때 쓴 <strong>학번 · 이름 · 암호</strong>를 넣으면 가장 마지막으로 제출한 내용을 확인할 수 있어요.</p>
+    <label class="q" for="lkSid">학번</label>
+    <input type="text" id="lkSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label class="q" for="lkName">이름</label>
+    <input type="text" id="lkName" placeholder="이름">
+    <label class="q" for="lkPw">제출 암호</label>
+    <input type="password" id="lkPw" placeholder="제출할 때 정한 암호" autocomplete="off">
+    <div id="lkResult" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="lkClose" type="button">닫기</button>
+      <button class="btn btn-ghost" id="lkFill" type="button" hidden>양식에 불러오기</button>
+      <button class="btn btn-primary" id="lkGo" type="button">확인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SOURCE = 'chihuahua_muffin';
+  var DRAFT_KEY = 'draft_chihuahua_muffin';
+  var URL_KEY = 'gas_url_ai_basics_2026_2';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec'; // 인공지능 기초(2026-2) 과목 공용 배포 URL
+  var TEXT_IDS = ['studentName', 'studentId', 'today', 'aLink', 'aClass1', 'aCount1', 'aClass2', 'aCount2',
+    'bFile', 'bPred', 'bConf', 'bReason', 'bWhy'];
+
+  var SID_RE = /^\d{5}$/;
+  var TM_RE = /^https:\/\/teachablemachine\.withgoogle\.com\/models\/[A-Za-z0-9_-]+\/?$/;
+  function parseSid(sid) {
+    if (!SID_RE.test(sid)) return null;
+    return { grade: parseInt(sid.slice(0, 1), 10), cls: parseInt(sid.slice(1, 3), 10), no: parseInt(sid.slice(3, 5), 10) };
+  }
+  function sidLabel(sid) { var s = parseSid(sid); return s ? s.grade + '학년 ' + s.cls + '반 ' + s.no + '번' : sid; }
+  function renderSidPreview() {
+    var el = document.getElementById('sidPreview');
+    var sid = v('studentId');
+    if (!sid) { el.textContent = ''; el.className = 'sid-hint'; return; }
+    var s = parseSid(sid);
+    if (!s) { el.textContent = '↳ 숫자 5자리로 입력하세요 (예: 20317)'; el.className = 'sid-hint bad'; return; }
+    var sane = s.grade >= 1 && s.grade <= 3 && s.cls >= 1 && s.no >= 1;
+    el.textContent = '↳ ' + sidLabel(sid) + (sane ? '' : ' — 맞나요?');
+    el.className = 'sid-hint ' + (sane ? 'ok' : 'bad');
+  }
+
+  var todayEl = document.getElementById('today');
+  if (!todayEl.value) {
+    var d = new Date();
+    todayEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function v(id) { return document.getElementById(id).value.trim(); }
+  function method() {
+    var el = document.querySelector('input[name="cMethod"]:checked');
+    return el ? el.value : '';
+  }
+  function getFormData() {
+    var data = { source: SOURCE, password: v('password') };
+    TEXT_IDS.forEach(function (id) { data[id] = v(id); });
+    data.cMethod = method();
+    return data;
+  }
+
+  /* ── 임시저장 ── */
+  var draftTimer = null;
+  var statusEl = document.getElementById('draftStatus');
+  function saveDraft() {
+    try {
+      var dd = getFormData();
+      delete dd.password;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(dd));
+      statusEl.textContent = '임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      statusEl.className = 'saved';
+    } catch (e) {
+      statusEl.textContent = '임시저장 실패 — 이 기기에 저장 공간이 부족해요';
+      statusEl.className = 'failed';
+    }
+  }
+  function scheduleDraft() {
+    statusEl.textContent = '입력 중… 잠시 멈추면 임시저장됩니다';
+    statusEl.className = 'pending';
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function applyData(dd) {
+    TEXT_IDS.forEach(function (id) { var el = document.getElementById(id); if (el && typeof dd[id] === 'string') el.value = dd[id]; });
+    document.querySelectorAll('input[name="cMethod"]').forEach(function (el) { el.checked = (el.value === dd.cMethod); });
+    renderSidPreview();
+  }
+  function restoreDraft() {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    try { applyData(JSON.parse(raw)); statusEl.textContent = '임시저장 불러옴'; statusEl.className = 'saved'; } catch (e) { /* 손상된 draft */ }
+  }
+  document.querySelectorAll('input, textarea, select').forEach(function (el) {
+    el.addEventListener('input', scheduleDraft);
+    el.addEventListener('change', scheduleDraft);
+  });
+  restoreDraft();
+
+  ['studentId', 'lkSid'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () {
+      var cleaned = el.value.replace(/\D/g, '').slice(0, 5);
+      if (cleaned !== el.value) el.value = cleaned;
+      if (id === 'studentId') renderSidPreview();
+    });
+  });
+  renderSidPreview();
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg, type, ms) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, ms || 2600);
+  }
+
+  /* ── 유효성 검사 ── */
+  var REQUIRED = [
+    { id: 'studentId', label: '학번' }, { id: 'studentName', label: '이름' }, { id: 'today', label: '날짜' }, { id: 'password', label: '제출 암호' },
+    { id: 'aLink', label: 'A. 모델 공유 링크' },
+    { id: 'aClass1', label: 'A. 클래스 1 이름' }, { id: 'aCount1', label: 'A. 클래스 1 샘플 수' },
+    { id: 'aClass2', label: 'A. 클래스 2 이름' }, { id: 'aCount2', label: 'A. 클래스 2 샘플 수' },
+    { id: 'bFile', label: 'B. 관찰할 시험 사진' }, { id: 'bPred', label: 'B. 모델의 판정' }, { id: 'bConf', label: 'B. 출력값' },
+    { id: 'bReason', label: 'B. 고른 이유' }, { id: 'bWhy', label: 'B. 왜 그랬을까' },
+    { fn: method, label: 'C. 학습 방법', focus: 'cMethod' }
+  ];
+  function focusField(id) {
+    var el = document.getElementById(id) || document.querySelector('input[name="' + id + '"]');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { el.focus({ preventScroll: true }); }, 120);
+  }
+  function validate() {
+    var missing = [], first = null;
+    REQUIRED.forEach(function (f) {
+      var filled = f.id ? !!v(f.id) : !!f.fn();
+      if (filled) return;
+      missing.push(f.label);
+      if (!first) first = f;
+    });
+    if (missing.length) {
+      var head = missing.slice(0, 3).join(', ');
+      showToast('아직 안 쓴 곳이 ' + missing.length + '군데 있어요: ' + head + (missing.length > 3 ? ' 외 ' + (missing.length - 3) + '개' : ''), 'error', 5000);
+      focusField(first.id || first.focus);
+      return false;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      showToast('학번은 학년(1) + 반(2) + 번호(2) 다섯 자리 숫자예요. 예: 20317', 'error', 4600);
+      focusField('studentId');
+      return false;
+    }
+    if (!TM_RE.test(v('aLink'))) {
+      showToast('모델 공유 링크는 https://teachablemachine.withgoogle.com/models/… 형식이에요. 내보내기 창의 "공유 가능한 링크"를 그대로 붙여 넣어 주세요.', 'error', 5200);
+      focusField('aLink');
+      return false;
+    }
+    var conf = Number(v('bConf'));
+    if (!(conf >= 0 && conf <= 100)) {
+      showToast('출력값은 0에서 100 사이의 퍼센트 숫자예요.', 'error', 4000);
+      focusField('bConf');
+      return false;
+    }
+    if (Number(v('aCount1')) < 1 || Number(v('aCount2')) < 1) {
+      showToast('샘플 수는 1 이상의 숫자예요. Teachable Machine 카드에 적힌 "이미지 샘플 N개"를 옮겨 적어 주세요.', 'error', 4600);
+      focusField(Number(v('aCount1')) < 1 ? 'aCount1' : 'aCount2');
+      return false;
+    }
+    if (v('password').length < 4) {
+      showToast('제출 암호는 4자 이상으로 정해 주세요.', 'error', 3800);
+      focusField('password');
+      return false;
+    }
+    return true;
+  }
+
+  /* ── TXT ── */
+  function buildTxt(data) {
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  치와와·머핀 분류기 만들기 — 인공지능은 어떻게 배울까');
+    L.push('  ' + data.studentId + ' (' + sidLabel(data.studentId) + ') ' + data.studentName + ' · ' + data.today);
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    L.push('');
+    L.push('【 A. 내 모델 】');
+    L.push('모델 공유 링크: ' + data.aLink);
+    L.push('클래스 1: ' + data.aClass1 + ' (샘플 ' + data.aCount1 + '장)');
+    L.push('클래스 2: ' + data.aClass2 + ' (샘플 ' + data.aCount2 + '장)');
+    L.push('');
+    L.push('【 B. 관찰할 시험 사진 】');
+    L.push('사진: ' + data.bFile);
+    L.push('모델의 판정: ' + data.bPred + ' (출력값 ' + data.bConf + '%)');
+    L.push('고른 이유: ' + data.bReason);
+    L.push('왜 그랬을까: ' + data.bWhy);
+    L.push('');
+    L.push('【 C. 학습 방법 】');
+    L.push(data.cMethod);
+    return L.join('\n');
+  }
+  function downloadTxt(data) {
+    var blob = new Blob([buildTxt(data)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '치와와머핀분류기_' + (data.studentId || '') + '_' + (data.studentName || '무명') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── 제출 ── */
+  document.getElementById('btnSave').addEventListener('click', function () {
+    if (!validate()) return;
+    var data = getFormData();
+    var btn = this;
+    btn.disabled = true;
+    downloadTxt(data);
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) { showToast('TXT 파일로 저장됐어요. (시트 전송은 선생님 설정 후 가능)', 'success', 4200); btn.disabled = false; return; }
+    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      .then(function () { showToast('제출 완료! TXT 파일도 함께 저장됐어요.', 'success', 4200); localStorage.removeItem(DRAFT_KEY); recordSubmitted(data); })
+      .catch(function (err) { showToast('TXT는 저장됐어요. 시트 전송 오류: ' + err.message, 'error', 5000); })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요?')) return;
+    document.querySelectorAll('input[type="text"], input[type="url"], input[type="number"], input[type="password"], textarea').forEach(function (el) { el.value = ''; });
+    document.querySelectorAll('select').forEach(function (el) { el.value = ''; });
+    document.querySelectorAll('input[name="cMethod"]').forEach(function (el) { el.checked = false; });
+    localStorage.removeItem(DRAFT_KEY);
+    statusEl.textContent = '초기화됨';
+    statusEl.className = '';
+    renderSidPreview();
+    showToast('모든 입력을 지웠어요.');
+  });
+
+  /* ── 제출 상태 배너 ── */
+  var SUBMIT_KEY = 'submitted_chihuahua_muffin';
+  var bannerEl = document.getElementById('submitBanner');
+  var bannerTextEl = document.getElementById('submitBannerText');
+  function showBanner(text) { bannerTextEl.textContent = text; bannerEl.classList.add('show'); }
+  function recordSubmitted(data) {
+    var stamp = new Date().toLocaleString('ko-KR');
+    try { localStorage.setItem(SUBMIT_KEY, JSON.stringify({ at: stamp, name: data.studentName, sid: data.studentId })); } catch (e) { /* 무시 */ }
+    showBanner('제출을 보냈습니다 · ' + stamp + ' — [제출 확인]으로 서버에 저장됐는지 확인할 수 있어요.');
+  }
+  (function restoreBanner() {
+    try {
+      var raw = localStorage.getItem(SUBMIT_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      showBanner('이 기기에서 ' + s.at + '에 제출을 보냈습니다 — [제출 확인]으로 내용을 다시 볼 수 있어요.');
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* ── 제출 확인 · 불러오기 ── */
+  var lookupBackdrop = document.getElementById('lookupBackdrop');
+  var lkResult = document.getElementById('lkResult');
+  var lkFillBtn = document.getElementById('lkFill');
+  var lkGoBtn = document.getElementById('lkGo');
+  var lastLookup = null, lastLookupPw = '';
+  function openLookup() {
+    document.getElementById('lkSid').value = v('studentId');
+    document.getElementById('lkName').value = v('studentName');
+    document.getElementById('lkPw').value = '';
+    lkResult.hidden = true; lkResult.textContent = ''; lkFillBtn.hidden = true; lastLookup = null;
+    lookupBackdrop.hidden = false;
+    document.getElementById('lkPw').focus();
+  }
+  function closeLookup() { lookupBackdrop.hidden = true; }
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'lkcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버 응답이 없습니다.')); }, 20000);
+      function cleanup() { clearTimeout(timer); try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (script.parentNode) script.parentNode.removeChild(script); }
+      window[cb] = function (data) { cleanup(); resolve(data); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결할 수 없습니다.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function requestLookup(p) {
+    var base = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!base) return Promise.reject(new Error('서버 주소가 설정되지 않았습니다. 선생님께 문의하세요.'));
+    var qs = 'action=lookup&source=' + SOURCE + '&studentId=' + encodeURIComponent(p.studentId) + '&studentName=' + encodeURIComponent(p.studentName) + '&password=' + encodeURIComponent(p.password);
+    var url = base + '?' + qs;
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).catch(function () { return jsonp(url); });
+  }
+  function renderLookup(res) {
+    lkResult.textContent = '';
+    lkResult.hidden = false;
+    if (res && res.status === 'ok') {
+      lastLookup = res.data;
+      lkFillBtn.hidden = false;
+      var box = document.createElement('div'); box.className = 'lk-ok';
+      var stamp = document.createElement('div'); stamp.className = 'stamp'; stamp.textContent = '제출이 확인되었습니다';
+      var when = document.createElement('div'); when.className = 'when'; when.textContent = res.submittedAt;
+      box.appendChild(stamp); box.appendChild(when);
+      var dl = document.createElement('dl');
+      [['A 링크', res.data.aLink], ['A 클래스', (res.data.aClass1 || '') + ' ' + (res.data.aCount1 || '') + '장 / ' + (res.data.aClass2 || '') + ' ' + (res.data.aCount2 || '') + '장'],
+       ['B 사진', res.data.bFile], ['B 판정', (res.data.bPred || '') + ' ' + (res.data.bConf || '') + '%'], ['C 방법', res.data.cMethod]].forEach(function (pair) {
+        if (!pair[1] || !pair[1].trim()) return;
+        var dt = document.createElement('dt'); dt.textContent = pair[0];
+        var dd = document.createElement('dd'); dd.textContent = pair[1];
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      box.appendChild(dl);
+      lkResult.appendChild(box);
+      return;
+    }
+    lkFillBtn.hidden = true; lastLookup = null;
+    var bad = document.createElement('div'); bad.className = 'lk-bad';
+    if (res && res.status === 'denied') bad.textContent = '암호가 일치하지 않습니다. 제출할 때 정한 암호를 다시 확인해 주세요.';
+    else if (res && res.status === 'notfound') bad.textContent = '이 학번·이름으로 제출된 기록이 없습니다. 아직 제출하지 않았거나, 학번·이름이 제출할 때와 다를 수 있어요.';
+    else bad.textContent = '오류: ' + ((res && res.message) || '알 수 없는 오류');
+    lkResult.appendChild(bad);
+  }
+  document.getElementById('btnLookup').addEventListener('click', openLookup);
+  document.getElementById('lkClose').addEventListener('click', closeLookup);
+  lookupBackdrop.addEventListener('click', function (e) { if (e.target === lookupBackdrop) closeLookup(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lookupBackdrop.hidden) closeLookup(); });
+  ['lkSid', 'lkName', 'lkPw'].forEach(function (id) {
+    document.getElementById(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); lkGoBtn.click(); } });
+  });
+  lkGoBtn.addEventListener('click', function () {
+    var p = { studentId: document.getElementById('lkSid').value.trim(), studentName: document.getElementById('lkName').value.trim(), password: document.getElementById('lkPw').value.trim() };
+    if (!p.studentId || !p.studentName || !p.password) { renderLookup({ status: 'error', message: '학번 · 이름 · 암호를 모두 입력해 주세요.' }); return; }
+    if (!SID_RE.test(p.studentId)) { renderLookup({ status: 'error', message: '학번은 숫자 5자리예요 (학년1 + 반2 + 번호2, 예: 20317).' }); return; }
+    lkGoBtn.disabled = true;
+    lkResult.hidden = false; lkResult.textContent = ''; lkFillBtn.hidden = true;
+    var wait = document.createElement('div'); wait.className = 'lk-wait'; wait.textContent = '확인하는 중…'; lkResult.appendChild(wait);
+    requestLookup(p)
+      .then(function (res) { if (res && res.status === 'ok') lastLookupPw = p.password; renderLookup(res); })
+      .catch(function (err) { renderLookup({ status: 'error', message: err.message }); })
+      .finally(function () { lkGoBtn.disabled = false; });
+  });
+  lkFillBtn.addEventListener('click', function () {
+    if (!lastLookup) return;
+    if (!window.confirm('지금 화면의 내용을 지우고, 제출했던 내용을 불러올까요?')) return;
+    applyData(lastLookup);
+    saveDraft();
+    if (lastLookupPw) document.getElementById('password').value = lastLookupPw;
+    closeLookup();
+    showToast('제출했던 내용을 양식에 불러왔어요. 고친 뒤 다시 제출하면 최신 내용으로 갱신돼요.', 'success', 4200);
+  });
+
+  /* ── 설정 패널 (⚙ 5번 클릭 — 교사 전용) ── */
+  var gearCount = 0, gearTimer = null;
+  document.getElementById('btnGear').addEventListener('click', function () {
+    gearCount += 1;
+    clearTimeout(gearTimer);
+    gearTimer = setTimeout(function () { gearCount = 0; }, 1600);
+    if (gearCount >= 5) {
+      gearCount = 0;
+      var p = document.getElementById('settingsPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('scriptUrl').value = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    }
+  });
+  document.getElementById('btnSaveUrl').addEventListener('click', function () {
+    var u = document.getElementById('scriptUrl').value.trim();
+    if (u) { localStorage.setItem(URL_KEY, u); document.getElementById('urlStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(URL_KEY); document.getElementById('urlStatus').textContent = '기본값 사용'; }
+  });
+
+  /* ── 제출 현황 페이지에서 넘어온 경우 (?sid=…&restore=1) ── */
+  (function handoff() {
+    var params = new URLSearchParams(location.search);
+    var sid = params.get('sid');
+    if (sid && /^\d{5}$/.test(sid)) { document.getElementById('studentId').value = sid; renderSidPreview(); scheduleDraft(); }
+    if (params.get('restore') !== '1') return;
+    var key = 'handoff_' + SOURCE;
+    var raw = null;
+    try { raw = sessionStorage.getItem(key); sessionStorage.removeItem(key); } catch (e) { /* 무시 */ }
+    if (!raw) return;
+    try {
+      var payload = JSON.parse(raw);
+      if (!payload || !payload.data) return;
+      applyData(payload.data);
+      saveDraft();
+      if (payload.password) document.getElementById('password').value = payload.password;
+      if (payload.at) showBanner(payload.at + '에 낸 내용을 불러왔어요 — 고쳐서 다시 제출하면 최신 내용으로 갱신됩니다.');
+      showToast('제출했던 내용을 불러왔어요.', 'success', 3800);
+    } catch (e) { /* 무시 */ }
+  })();
+})();
+</script>
+<!-- 제출 마감 — apps-script.js SOURCES의 deadline과 같은 값 (생성일 + 45일).
+     서버도 마감 뒤 제출을 받지 않는다. 제출 확인(조회)은 마감 뒤에도 쓸 수 있다. -->
+<script>
+(function () {
+  var DEADLINE = '2026-10-30';
+  var end = new Date(DEADLINE + 'T23:59:59+09:00');
+  var closed = Date.now() > end.getTime();
+  var p = DEADLINE.split('-');
+  var label = Number(p[1]) + '월 ' + Number(p[2]) + '일';
+  var lookupBtn = document.getElementById('btnLookup');
+  var lookupName = lookupBtn ? lookupBtn.textContent.trim() : '제출 확인';
+  var box = document.createElement('div');
+  box.id = 'deadlineNotice';
+  box.setAttribute('role', 'status');
+  box.style.cssText = 'margin:14px 0 4px; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; line-height:1.5;' +
+    (closed ? 'background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5;'
+            : 'background:#eef4ff; color:#1e3a8a; border:1px solid #c7d7fe;');
+  box.textContent = closed
+    ? '⏰ 제출이 마감되었습니다 (' + label + ' 23:59까지). 이미 낸 내용은 [' + lookupName + ']에서 볼 수 있습니다.'
+    : '⏰ 제출 마감: ' + label + ' 23:59까지';
+  var hero = document.querySelector('header');
+  if (hero) hero.appendChild(box);
+  if (!closed) return;
+  var btn = document.getElementById('btnSubmit') || document.getElementById('btnSave');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '제출 마감';
+  btn.style.opacity = '0.5';
+  btn.style.cursor = 'not-allowed';
+  btn.title = label + '에 마감되었습니다.';
+  btn.addEventListener('click', function (e) { e.stopImmediatePropagation(); e.preventDefault(); }, true);
+})();
+</script>
+</body>
+</html>

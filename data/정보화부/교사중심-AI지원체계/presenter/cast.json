@@ -1,0 +1,18 @@
+{
+ "_readme": "기본 캐스트 — 실사풍 40대 여성 교사. 영상 폴더 <overlay.media>.",
+ "id": "",
+ "tag": "tcai",
+ "image": "presenter-ref.png",
+ "voice": {
+  "engine": "OmniVoice (k2-fsa, Apache-2.0)",
+  "instruct": "female, middle-aged, moderate pitch",
+  "language": "ko",
+  "ref": "voice-ref.wav",
+  "ref_text": "안녕하십니까. 오늘은 교사 중심의 인공지능 지원 체계에 대해 말씀드리겠습니다."
+ },
+ "h3": {
+  "prompt": "The woman from the reference image, a Korean high school teacher in a navy blazer, stands in a bright minimal studio with a soft grey-green backdrop and presents to the camera in Korean. Medium close-up, chest-up, static camera, soft even light. She speaks calmly and clearly with small natural hand gestures near her chest and gentle head movement, keeping eye contact with the lens. She says, in Korean: \"{text}\" Audio: one clear mature female voice speaking Korean at a natural pace, precise lip sync, no music, no other voices. {tail}",
+  "tail_end": "After the last word she closes her mouth and holds a soft smile.",
+  "tail_mid": "She keeps talking naturally; this is the middle of a longer explanation, so she does not stop or smile to close."
+ }
+}

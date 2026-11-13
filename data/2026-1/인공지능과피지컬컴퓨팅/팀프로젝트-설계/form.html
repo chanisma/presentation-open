@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI × 피지컬컴퓨팅 팀 프로젝트 설계</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #F4F1FF;
+      --primary: #6B5DD3;
+      --primary-soft: #A89BFF;
+      --accent: #2EC5E0;
+      --accent-soft: #9FE6F2;
+      --success: #1FB890;
+      --warn: #E8A422;
+      --pink: #EC4D8E;
+      --coral: #FF8A6B;
+      --text: #1F2540;
+      --text-sub: #4E5677;
+      --text-muted: #828AAA;
+      --glass: rgba(255,255,255,0.55);
+      --glass-strong: rgba(255,255,255,0.78);
+      --glass-soft: rgba(255,255,255,0.35);
+      --glass-border: rgba(255,255,255,0.85);
+      --glass-divide: rgba(107,93,211,0.12);
+      --shadow-sm: 0 2px 10px rgba(31,37,64,0.05);
+      --shadow-md: 0 6px 24px rgba(31,37,64,0.08);
+      --shadow-lg: 0 10px 38px rgba(31,37,64,0.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: clamp(15px, 1.2vw, 17px); scroll-behavior: smooth; }
+    body {
+      background: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 70% 55% at 12% 15%, rgba(168,155,255,0.45), transparent 60%),
+        radial-gradient(ellipse 55% 50% at 88% 18%, rgba(159,230,242,0.45), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 18% 90%, rgba(236,77,142,0.20), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 80%, rgba(31,184,144,0.22), transparent 60%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      line-height: 1.65;
+      min-height: 100vh;
+      padding-bottom: 7rem;
+    }
+    h1, h2, h3 { font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif; font-weight: 700; word-break: keep-all; color: var(--text); }
+    p, label { font-size: 0.93rem; word-break: keep-all; }
+
+    /* ───── Header ───── */
+    .page-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.65); backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 0.7rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .page-header-left { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .page-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .page-badge {
+      font-size: 0.74rem; padding: 0.18rem 0.65rem; border-radius: 2rem;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+      background: linear-gradient(135deg, rgba(107,93,211,0.18), rgba(46,197,224,0.18));
+      color: var(--primary);
+      border: 1px solid rgba(107,93,211,0.30);
+    }
+    .role-pill {
+      font-size: 0.74rem; padding: 0.18rem 0.7rem; border-radius: 2rem;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+      display: none; align-items: center; gap: 0.3rem;
+    }
+    .role-pill.show { display: inline-flex; }
+    .role-pill.designer { background: rgba(236,77,142,0.12); color: var(--pink); border: 1px solid rgba(236,77,142,0.35); }
+    .role-pill.coder    { background: rgba(46,197,224,0.12); color: var(--accent); border: 1px solid rgba(46,197,224,0.35); }
+    .role-pill.circuit  { background: rgba(31,184,144,0.12); color: var(--success); border: 1px solid rgba(31,184,144,0.35); }
+    .role-pill.tm       { background: rgba(232,164,34,0.14); color: var(--warn); border: 1px solid rgba(232,164,34,0.40); }
+    .header-actions { display: flex; gap: 0.4rem; }
+
+    /* ───── Main ───── */
+    .main { max-width: 920px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+    /* ───── Form Card ───── */
+    .form-card {
+      background: var(--glass); backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.1rem; overflow: hidden;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.25s;
+    }
+    .form-card:hover { box-shadow: var(--shadow-md); }
+    .form-card-header {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.85rem 1.3rem; border-bottom: 1px solid var(--glass-divide);
+      background: var(--glass-strong);
+    }
+    .form-card-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 700;
+      color: #fff; background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 50%;
+      width: 1.7rem; height: 1.7rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(107,93,211,0.30);
+    }
+    .form-card-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .form-card-desc { font-size: 0.82rem; color: var(--text-sub); margin-left: auto; }
+    .form-card-body { padding: 1.1rem 1.3rem; display: flex; flex-direction: column; gap: 0.85rem; }
+
+    /* ───── Controls ───── */
+    .field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .field-label, label {
+      font-size: 0.82rem; font-weight: 600; color: var(--text-sub);
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+    }
+    .required { color: var(--pink); margin-left: 2px; }
+    input[type="text"], input[type="number"], textarea, select {
+      background: rgba(255,255,255,0.78);
+      border: 1.5px solid rgba(107,93,211,0.15); border-radius: 0.55rem;
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.93rem;
+      padding: 0.55rem 0.8rem; outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      width: 100%; resize: vertical;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+      border-color: var(--primary); background: #fff;
+      box-shadow: 0 0 0 3px rgba(107,93,211,0.15);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    textarea { min-height: 88px; line-height: 1.65; }
+    .invalid { border-color: rgba(236,77,142,0.65) !important; background: rgba(236,77,142,0.05) !important; }
+
+    .hint {
+      background: rgba(46,197,224,0.07); border: 1px solid rgba(46,197,224,0.25);
+      border-left: 3px solid var(--accent);
+      border-radius: 0.45rem; padding: 0.55rem 0.85rem;
+      font-size: 0.83rem; color: var(--text-sub); line-height: 1.6;
+    }
+    .hint strong { color: var(--accent); }
+    .hint code {
+      background: rgba(46,197,224,0.13); color: var(--accent);
+      padding: 0.1rem 0.35rem; border-radius: 0.25rem; font-size: 0.85em;
+      font-family: 'Consolas', monospace;
+    }
+    .share-hint {
+      background: rgba(232,164,34,0.08); border: 1px solid rgba(232,164,34,0.30);
+      border-left: 3px solid var(--warn);
+      border-radius: 0.45rem; padding: 0.55rem 0.85rem;
+      font-size: 0.83rem; color: var(--text-sub);
+    }
+    .share-hint strong { color: var(--warn); }
+
+    /* ───── Landing screen ───── */
+    .landing-wrap {
+      max-width: 760px; margin: 1.5rem auto 0;
+      padding: 1rem;
+    }
+    .landing-title {
+      font-size: clamp(1.4rem, 3vw, 1.85rem);
+      font-weight: 700; text-align: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin-bottom: 0.4rem;
+    }
+    .landing-sub {
+      text-align: center; color: var(--text-sub); font-size: 0.95rem;
+      margin-bottom: 1.8rem;
+    }
+    .landing-card {
+      background: var(--glass-strong); backdrop-filter: blur(20px) saturate(170%);
+      -webkit-backdrop-filter: blur(20px) saturate(170%);
+      border: 1px solid var(--glass-border); border-radius: 1.3rem;
+      padding: 1.6rem 1.4rem; margin-bottom: 1.2rem;
+      box-shadow: var(--shadow-md);
+    }
+    .landing-card-title {
+      font-size: 0.95rem; font-weight: 600; color: var(--text);
+      margin-bottom: 0.9rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .landing-card-title::before {
+      content: ''; width: 0.4rem; height: 1.2rem;
+      background: linear-gradient(180deg, var(--primary), var(--accent));
+      border-radius: 0.2rem; display: inline-block;
+    }
+    .landing-fields {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem;
+    }
+    .role-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.85rem;
+    }
+    .role-card {
+      background: rgba(255,255,255,0.65); border: 2px solid transparent;
+      border-radius: 1rem; padding: 1.15rem 1rem; cursor: pointer;
+      transition: all 0.25s; text-align: left;
+      display: flex; flex-direction: column; gap: 0.45rem;
+      position: relative; overflow: hidden;
+    }
+    .role-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+      opacity: 0; transition: opacity 0.25s; z-index: 0;
+    }
+    .role-card.designer { --c1: rgba(236,77,142,0.10); --c2: rgba(255,138,107,0.10); }
+    .role-card.coder    { --c1: rgba(46,197,224,0.10); --c2: rgba(107,93,211,0.10); }
+    .role-card.circuit  { --c1: rgba(31,184,144,0.10); --c2: rgba(46,197,224,0.10); }
+    .role-card.tm       { --c1: rgba(232,164,34,0.14); --c2: rgba(255,138,107,0.10); }
+    .role-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .role-card:hover::before { opacity: 1; }
+    .role-card.active { border-color: var(--accent-color); box-shadow: 0 0 0 4px var(--accent-bg); }
+    .role-card.active::before { opacity: 1; }
+    .role-card.designer.active { --accent-color: var(--pink); --accent-bg: rgba(236,77,142,0.18); }
+    .role-card.coder.active    { --accent-color: var(--accent); --accent-bg: rgba(46,197,224,0.18); }
+    .role-card.circuit.active  { --accent-color: var(--success); --accent-bg: rgba(31,184,144,0.18); }
+    .role-card.tm.active       { --accent-color: var(--warn); --accent-bg: rgba(232,164,34,0.22); }
+    .role-card > * { position: relative; z-index: 1; }
+    .role-icon {
+      width: 2.4rem; height: 2.4rem; border-radius: 0.65rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem; color: #fff;
+    }
+    .role-card.designer .role-icon { background: linear-gradient(135deg, var(--pink), var(--coral)); }
+    .role-card.coder    .role-icon { background: linear-gradient(135deg, var(--accent), var(--primary)); }
+    .role-card.circuit  .role-icon { background: linear-gradient(135deg, var(--success), var(--accent)); }
+    .role-card.tm       .role-icon { background: linear-gradient(135deg, var(--warn), var(--coral)); }
+    .role-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .role-desc { font-size: 0.82rem; color: var(--text-sub); line-height: 1.5; }
+    .landing-actions { display: flex; justify-content: flex-end; margin-top: 1.2rem; }
+
+    /* ───── Activity sections (hidden until role chosen) ───── */
+    .activity-section { display: none; }
+    .activity-section.show { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .team-banner {
+      background: linear-gradient(135deg, rgba(107,93,211,0.10), rgba(46,197,224,0.10));
+      border: 1px solid var(--glass-border); border-radius: 0.9rem;
+      padding: 0.7rem 1.1rem; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap;
+      font-size: 0.85rem;
+    }
+    .team-banner b { color: var(--primary); }
+    .team-banner .change-btn {
+      margin-left: auto; background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(107,93,211,0.25); border-radius: 0.45rem;
+      padding: 0.25rem 0.65rem; font-size: 0.78rem; color: var(--primary);
+      cursor: pointer; font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+      transition: background 0.2s;
+    }
+    .team-banner .change-btn:hover { background: rgba(255,255,255,0.85); }
+
+    /* ───── Parts grid ───── */
+    .parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 0.4rem; }
+    .part-check {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.55); border: 1px solid rgba(107,93,211,0.18);
+      border-radius: 0.5rem; padding: 0.5rem 0.75rem; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+    }
+    .part-check:hover { background: rgba(255,255,255,0.8); }
+    .part-check:has(input:checked) { background: rgba(107,93,211,0.12); border-color: rgba(107,93,211,0.45); }
+    .part-check input[type="checkbox"] { accent-color: var(--primary); width: 14px; height: 14px; cursor: pointer; }
+    .part-check span { font-size: 0.87rem; color: var(--text); }
+
+    /* ───── Image upload ───── */
+    .image-upload-zone {
+      border: 2px dashed rgba(107,93,211,0.35);
+      background: rgba(255,255,255,0.45);
+      border-radius: 0.7rem; padding: 1.1rem;
+      text-align: center; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .image-upload-zone:hover {
+      background: rgba(107,93,211,0.06); border-color: rgba(107,93,211,0.55);
+    }
+    .image-upload-zone.has-files { padding: 0.6rem; border-style: solid; border-color: rgba(107,93,211,0.45); background: rgba(255,255,255,0.7); }
+    .image-upload-zone .upload-cta { font-size: 0.9rem; color: var(--primary); font-weight: 600; }
+    .image-upload-zone .upload-sub { font-size: 0.78rem; color: var(--text-sub); margin-top: 0.2rem; }
+    .image-preview-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 0.5rem; margin-top: 0.6rem;
+    }
+    .image-preview-item {
+      position: relative; border-radius: 0.5rem; overflow: hidden;
+      background: #fff; border: 1px solid var(--glass-border);
+      aspect-ratio: 4 / 3;
+    }
+    .image-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .image-preview-item .remove-btn {
+      position: absolute; top: 0.25rem; right: 0.25rem;
+      background: rgba(31,37,64,0.75); color: #fff;
+      border: none; border-radius: 50%; width: 1.4rem; height: 1.4rem;
+      cursor: pointer; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center; line-height: 1;
+    }
+    .image-preview-item .remove-btn:hover { background: var(--pink); }
+
+    /* ───── Table style for parts·classes·pins ───── */
+    .grid-table-wrap { overflow-x: auto; }
+    .grid-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      font-size: 0.88rem; min-width: 480px;
+    }
+    .grid-table thead th {
+      background: rgba(107,93,211,0.10); color: var(--text);
+      padding: 0.55rem 0.7rem; text-align: left;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.83rem;
+      border-bottom: 2px solid rgba(107,93,211,0.30);
+    }
+    .grid-table thead th:first-child { border-top-left-radius: 0.5rem; }
+    .grid-table thead th:last-child  { border-top-right-radius: 0.5rem; }
+    .grid-table tbody td { padding: 0.3rem 0.45rem; border-bottom: 1px solid rgba(107,93,211,0.10); vertical-align: middle; }
+    .grid-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.4); }
+    .grid-table input[type="text"], .grid-table select, .grid-table textarea {
+      padding: 0.35rem 0.55rem; font-size: 0.86rem; border-radius: 0.35rem;
+      background: rgba(255,255,255,0.7);
+    }
+    .grid-table textarea { min-height: 48px; }
+    .grid-table .pin-label {
+      font-family: 'Consolas', monospace; font-weight: 700; color: var(--primary);
+      background: rgba(107,93,211,0.10); padding: 0.25rem 0.55rem;
+      border-radius: 0.3rem; display: inline-block; min-width: 3.2rem; text-align: center;
+    }
+    .pin-label.power  { color: var(--coral); background: rgba(255,138,107,0.12); }
+    .pin-label.ground { color: var(--text-sub); background: rgba(31,37,64,0.08); }
+    .pin-label.analog { color: var(--success); background: rgba(31,184,144,0.12); }
+    .del-btn {
+      background: none; border: none; color: rgba(236,77,142,0.55);
+      cursor: pointer; font-size: 1rem; padding: 0.2rem 0.4rem;
+      border-radius: 0.3rem; transition: all 0.2s;
+    }
+    .del-btn:hover { color: var(--pink); background: rgba(236,77,142,0.10); }
+    .add-row-btn {
+      background: rgba(107,93,211,0.08); border: 1.5px dashed rgba(107,93,211,0.35);
+      color: var(--primary); border-radius: 0.55rem; padding: 0.5rem 1rem;
+      font-size: 0.88rem; cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600; transition: background 0.2s; width: 100%; margin-top: 0.5rem;
+    }
+    .add-row-btn:hover { background: rgba(107,93,211,0.16); }
+
+    /* ───── Prompt output box ───── */
+    .prompt-box {
+      background: linear-gradient(135deg, rgba(31,37,64,0.96), rgba(40,46,82,0.96));
+      color: #E8ECFF; border-radius: 0.7rem; padding: 1rem 1.1rem;
+      font-family: 'Consolas', 'Monaco', monospace; font-size: 0.82rem;
+      line-height: 1.65; white-space: pre-wrap; word-break: break-word;
+      max-height: 24rem; overflow-y: auto;
+      border: 1px solid rgba(107,93,211,0.35);
+    }
+    .prompt-box::-webkit-scrollbar { width: 8px; }
+    .prompt-box::-webkit-scrollbar-thumb { background: rgba(168,155,255,0.45); border-radius: 4px; }
+    .prompt-actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+
+    /* ───── Buttons ───── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1.1rem; border-radius: 0.55rem;
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; border: 1.5px solid transparent;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn svg { width: 1em; height: 1em; flex-shrink: 0; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; border-color: transparent;
+      box-shadow: 0 4px 14px rgba(107,93,211,0.30);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(107,93,211,0.35); }
+    .btn-success {
+      background: rgba(31,184,144,0.12); border-color: rgba(31,184,144,0.45); color: var(--success);
+    }
+    .btn-success:hover { background: rgba(31,184,144,0.22); }
+    .btn-warn {
+      background: rgba(232,164,34,0.10); border-color: rgba(232,164,34,0.40); color: var(--warn);
+    }
+    .btn-warn:hover { background: rgba(232,164,34,0.18); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.55); border-color: rgba(107,93,211,0.20); color: var(--text-sub);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.85); color: var(--text); }
+    .btn-danger {
+      background: rgba(236,77,142,0.08); border-color: rgba(236,77,142,0.30); color: var(--pink);
+    }
+    .btn-danger:hover { background: rgba(236,77,142,0.18); }
+    .btn-purple {
+      background: rgba(107,93,211,0.10); border-color: rgba(107,93,211,0.35); color: var(--primary);
+    }
+    .btn-purple:hover { background: rgba(107,93,211,0.20); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-big { padding: 0.7rem 1.5rem; font-size: 0.95rem; }
+    .btn-icon { width: 2.2rem; height: 2.2rem; padding: 0; justify-content: center; }
+
+    /* ───── Settings Panel ───── */
+    .settings-panel {
+      background: var(--glass-strong); border: 1px solid var(--glass-border);
+      border-radius: 0.9rem; padding: 1rem 1.2rem; margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .settings-title {
+      font-size: 0.88rem; font-weight: 600; color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem;
+    }
+    .settings-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+    .settings-row .field { flex: 1; }
+    .url-status { font-size: 0.78rem; margin-top: 0.3rem; font-family: 'Space Grotesk', sans-serif; }
+    .url-status.ok    { color: var(--success); }
+    .url-status.empty { color: var(--text-sub); }
+
+    /* ───── Toast ───── */
+    .toast-container {
+      position: fixed; bottom: 5.5rem; right: 1.2rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      z-index: 9999; pointer-events: none;
+    }
+    .toast {
+      background: rgba(255,255,255,0.96); color: var(--text);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.65rem; padding: 0.65rem 1rem; font-size: 0.88rem;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-md);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+      max-width: 320px; pointer-events: auto;
+    }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error   { border-left: 3px solid var(--pink); }
+    .toast.info    { border-left: 3px solid var(--accent); }
+    @keyframes toastIn  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+    /* ───── Action Bar ───── */
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(18px) saturate(170%);
+      -webkit-backdrop-filter: blur(18px) saturate(170%);
+      border-top: 1px solid var(--glass-border);
+      padding: 0.7rem 1.5rem;
+      display: none; align-items: center; justify-content: space-between; gap: 0.6rem;
+      z-index: 100; flex-wrap: wrap;
+      box-shadow: 0 -4px 18px rgba(31,37,64,0.05);
+    }
+    .action-bar.show { display: flex; }
+    .action-bar-left  { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .action-bar-right { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .draft-label { font-size: 0.78rem; color: var(--text-sub); font-family: 'Space Grotesk', sans-serif; }
+
+    /* ───── Modal ───── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(31,37,64,0.55); backdrop-filter: blur(4px);
+      z-index: 9000; overflow-y: auto; padding: 2rem 1rem;
+    }
+    .modal-box {
+      max-width: 720px; margin: 0 auto;
+      background: #fff; border: 1px solid var(--glass-border);
+      border-radius: 1.1rem; padding: 1.5rem; box-shadow: var(--shadow-lg);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .modal-header h2 { font-size: 1.1rem; color: var(--primary); }
+    .modal-body p, .modal-body li { font-size: 0.9rem; color: var(--text-sub); line-height: 1.7; }
+    .modal-body strong { color: var(--text); }
+    .modal-body code {
+      background: rgba(46,197,224,0.12); color: var(--accent);
+      padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.85em;
+      font-family: 'Consolas', monospace;
+    }
+    .modal-body ol, .modal-body ul { padding-left: 1.5rem; }
+    .modal-body ol li, .modal-body ul li { margin-bottom: 0.5rem; }
+
+    /* ───── Print ───── */
+    .print-header { display: none; }
+    @media print {
+      body { background: #fff; color: #111; background-image: none; padding: 0; }
+      .page-header, .action-bar, .settings-panel, .modal-overlay,
+      .header-actions, .add-row-btn, .del-btn, .image-upload-zone .upload-cta,
+      .image-upload-zone .upload-sub, .prompt-actions, .change-btn, .role-grid,
+      .landing-actions { display: none !important; }
+      .main { max-width: 100%; padding: 0; }
+      .form-card { background: #fff; border: 1px solid #d4d4dd; border-radius: 0; margin-bottom: 0.8rem; break-inside: avoid; box-shadow: none; }
+      .form-card-header { background: #f3f1ff; border-bottom: 1px solid #d4d4dd; }
+      .form-card-num { background: #6B5DD3; }
+      .form-card-title, .form-card-desc { color: #111; }
+      input, textarea, select { background: #fff; border: 1px solid #ccc; color: #111; }
+      .hint, .share-hint { background: #f9f9ff; border-color: #c4b0ff; color: #333; }
+      .grid-table thead th { background: #efebff; color: #111; }
+      .prompt-box { background: #f5f5fa; color: #111; }
+      .print-header { display: block !important; text-align: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #6B5DD3; }
+      @page { margin: 1.5cm; size: A4; }
+    }
+
+    /* ───── Responsive ───── */
+    @media (max-width: 720px) {
+      .landing-fields { grid-template-columns: 1fr; }
+      .role-grid { grid-template-columns: 1fr; }
+      .settings-row { flex-direction: column; align-items: stretch; }
+      .action-bar { flex-direction: column; align-items: stretch; }
+      .action-bar-left, .action-bar-right { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-header">
+    <h1>AI × 피지컬컴퓨팅 팀 프로젝트 설계 활동지</h1>
+    <p id="printMeta"></p>
+  </div>
+
+  <header class="page-header">
+    <div class="page-header-left">
+      <span class="page-badge">팀 프로젝트 · 설계 단계</span>
+      <span class="page-title">AI 피지컬 컴퓨팅 제품 설계 활동지</span>
+      <span class="role-pill" id="rolePill"></span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon" id="btnPrint" title="인쇄" aria-label="인쇄">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+      </button>
+      <button class="btn btn-ghost btn-icon" id="btnSettings" title="설정" aria-label="설정">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+      </button>
+      <button class="btn btn-ghost" id="btnBack">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        목록
+      </button>
+    </div>
+  </header>
+
+  <main class="main" id="main">
+
+    <!-- ───── 설정 패널 (교사 전용, 기본 숨김) ───── -->
+    <div class="settings-panel" id="settingsPanel" style="display:none;">
+      <div class="settings-title">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:1em;height:1em;color:var(--accent)" aria-hidden="true"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        구글 시트 연동 설정 <span style="font-size:0.75rem;color:var(--text-sub);">(교사가 Apps Script URL 입력)</span>
+      </div>
+      <div class="settings-row">
+        <div class="field">
+          <label for="scriptUrl">Apps Script 웹앱 URL</label>
+          <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
+          <div class="url-status empty" id="urlStatus">URL을 입력하면 구글 시트에 자동 저장됩니다.</div>
+        </div>
+        <button class="btn btn-ghost" id="btnSaveUrl">저장</button>
+        <button class="btn btn-ghost" id="btnSetupGuide">설정 방법</button>
+      </div>
+    </div>
+
+    <!-- ═════════════════════ 0. 랜딩 — 팀/역할 선택 ═════════════════════ -->
+    <section id="landing" class="landing-wrap">
+      <div class="landing-title">설계 단계에 오신 걸 환영합니다</div>
+      <div class="landing-sub">
+        Teachable Machine 이미지 분류 모델로 동작하는 피지컬 컴퓨팅 제품을 설계합니다.<br>
+        팀 정보를 입력하고 자신이 맡은 <b>핵심 역할</b>을 선택해 주세요.
+      </div>
+
+      <!-- 팀 정보 -->
+      <div class="landing-card">
+        <div class="landing-card-title">팀 정보</div>
+        <div class="landing-fields">
+          <div class="field">
+            <label for="teamName">팀명 <span class="required">*</span></label>
+            <select id="teamName">
+              <option value="">— 팀을 선택하세요 —</option>
+              <option value="사이다">사이다</option>
+              <option value="뉴런">뉴런</option>
+              <option value="엘리자베스는 엘레강스하게 진화한다">엘리자베스는 엘레강스하게 진화한다</option>
+              <option value="쏜다">쏜다</option>
+              <option value="공대조">공대조</option>
+              <option value="데빌다이어트4세">데빌다이어트4세</option>
+              <option value="승민이가캐리해줄거야">승민이가캐리해줄거야</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="classInfo">반/번호</label>
+            <input type="text" id="classInfo" placeholder="예: 2-3 / 15번" maxlength="20">
+          </div>
+          <div class="field">
+            <label for="studentName">이름 <span class="required">*</span></label>
+            <input type="text" id="studentName" placeholder="홍길동" maxlength="20">
+          </div>
+        </div>
+      </div>
+
+      <!-- 역할 선택 -->
+      <div class="landing-card">
+        <div class="landing-card-title">역할 선택</div>
+        <div class="role-grid">
+          <button type="button" class="role-card designer" data-role="designer">
+            <div class="role-icon">✏️</div>
+            <div class="role-name">제품 디자이너</div>
+            <div class="role-desc">제품의 외관(2~3개 구도)을 MOCK 스케치로 그리고 ChatGPT 블루프린트로 발전시킵니다.</div>
+          </button>
+          <button type="button" class="role-card coder" data-role="coder">
+            <div class="role-icon">💻</div>
+            <div class="role-name">프로그래밍 코드 설계</div>
+            <div class="role-desc">사용 부품·핀 매핑·동작 시나리오를 정리하고 Arduino + HTML 코드 생성 프롬프트를 만듭니다.</div>
+          </button>
+          <button type="button" class="role-card circuit" data-role="circuit">
+            <div class="role-icon">🔌</div>
+            <div class="role-name">아두이노 장치 설계</div>
+            <div class="role-desc">UNO 핀 매핑을 결정하고 회로 고려사항에 답한 뒤 회로도 설명 프롬프트를 만듭니다.</div>
+          </button>
+          <button type="button" class="role-card tm" data-role="tm">
+            <div class="role-icon">🧠</div>
+            <div class="role-name">이미지 분류 모델 생성</div>
+            <div class="role-desc">Teachable Machine으로 클래스를 설계하고 이미지를 수집·학습해 분류 모델을 만듭니다.</div>
+          </button>
+        </div>
+        <div class="hint" style="margin-top:0.9rem;">
+          🤝 <strong>역할별 활동지는 다르지만</strong> 부품·핀 선택은 회로/코드 역할이 함께 결정해야 합니다.
+          서로 다른 역할의 활동지를 들여다보면서 어떤 부품을 어느 핀에 연결할지 <strong>팀 내에서 합의</strong>해 주세요.
+        </div>
+        <div class="landing-actions">
+          <button class="btn btn-primary btn-big" id="btnStart">활동 시작하기 →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════════════════════ A. 제품 디자이너 ═════════════════════ -->
+    <section id="role-designer" class="activity-section">
+      <div class="team-banner" id="banner-designer">
+        <span>팀: <b id="bdTeam"></b></span><span>이름: <b id="bdName"></b></span>
+        <span class="role-pill designer show">✏️ 제품 디자이너</span>
+        <button class="change-btn" data-back-to-landing>↺ 팀/역할 변경</button>
+      </div>
+
+      <!-- 1. 디자인 컨셉 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">1</div>
+          <span class="form-card-title">디자인 컨셉</span>
+          <span class="form-card-desc">제품 외관 아이디어 정리</span>
+        </div>
+        <div class="form-card-body">
+          <div class="field">
+            <label for="d_concept">제품 컨셉 한 줄 설명 <span class="required">*</span></label>
+            <input type="text" id="d_concept" placeholder="예: 책상에 두는 미니 도우미 / 손목에 차는 알림 밴드 / 자전거 핸들에 부착하는 신호기">
+          </div>
+          <div class="field">
+            <label for="d_target">타깃 사용자 · 사용 장소</label>
+            <textarea id="d_target" placeholder="예: 야간자율학습 중인 고등학생, 책상 위 / 어두운 실내, 손이 닿기 좋은 위치"></textarea>
+          </div>
+          <div class="share-hint">
+            🤝 <strong>회로/코드 역할과 공유</strong> — 제품 크기와 무게는 사용할 부품에 따라 달라집니다. 사용 부품 목록을 코드/회로 담당과 함께 확인하세요.
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 사용할 부품 (참고) -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">2</div>
+          <span class="form-card-title">사용할 부품 (외관 영향)</span>
+          <span class="form-card-desc">디자인 크기·형태를 결정하는 부품</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">💡 부품의 실제 크기·형태와 너무 어긋나지 않게 디자인합니다. 팀에서 코드/회로 담당이 결정한 부품 목록을 참고하세요.</div>
+          <div class="parts-grid" id="dParts" role="group"></div>
+          <div class="field">
+            <label for="d_partsMemo">기타 메모 (추가 부품, 외장 재료, 색상 계획)</label>
+            <input type="text" id="d_partsMemo" placeholder="예: 외장은 두꺼운 종이로 제작, 상단에 투명 아크릴, 메인 컬러는 라벤더">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. MOCK 스케치 첨부 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">3</div>
+          <span class="form-card-title">MOCK 스케치 첨부</span>
+          <span class="form-card-desc">2~3개 구도(정면 · 측면 · 입체)</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            ① 종이에 손으로 스케치하거나 그림판/굿노트로 그립니다.<br>
+            ② <strong>2~3개 구도</strong>를 카메라로 찍거나 캡처해 아래에 업로드합니다.<br>
+            ③ 각 부품(LCD, LED, 부저 등)이 어디에 위치하는지 그림에 표시해 주세요.
+          </div>
+          <div class="image-upload-zone" data-upload="d_sketch">
+            <input type="file" id="d_sketchInput" accept="image/*" multiple hidden>
+            <div class="upload-cta">📷 스케치 이미지 업로드</div>
+            <div class="upload-sub">최대 5장 · 각 5MB 이하 · 클릭하거나 드래그</div>
+            <div class="image-preview-grid" id="d_sketchPreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. ChatGPT 블루프린트 생성 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">4</div>
+          <span class="form-card-title">블루프린트 생성</span>
+          <span class="form-card-desc">ChatGPT에 스케치 + 프롬프트 전달</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            ChatGPT(또는 동급 이미지 생성 AI)에 <strong>스케치 이미지를 첨부</strong>하고 아래 프롬프트를 함께 보내세요.<br>
+            생성된 블루프린트 이미지를 받으면 다음 섹션에 업로드합니다.
+          </div>
+          <div class="prompt-box" id="d_blueprintPrompt"></div>
+          <div class="prompt-actions">
+            <button class="btn btn-purple" type="button" data-copy="d_blueprintPrompt">📋 프롬프트 복사</button>
+            <button class="btn btn-ghost"  type="button" data-download-prompt="d_blueprintPrompt" data-filename="블루프린트_프롬프트.txt">💾 .txt로 저장</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. 블루프린트 결과 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">5</div>
+          <span class="form-card-title">블루프린트 결과 첨부</span>
+          <span class="form-card-desc">ChatGPT가 생성한 이미지</span>
+        </div>
+        <div class="form-card-body">
+          <div class="image-upload-zone" data-upload="d_blueprint">
+            <input type="file" id="d_blueprintInput" accept="image/*" multiple hidden>
+            <div class="upload-cta">🖼️ 블루프린트 이미지 업로드</div>
+            <div class="upload-sub">최대 3장 · 각 5MB 이하</div>
+            <div class="image-preview-grid" id="d_blueprintPreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 디자인 과정 회고 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">6</div>
+          <span class="form-card-title">디자인 자기 평가</span>
+          <span class="form-card-desc">고려사항 · 장점 · 한계</span>
+        </div>
+        <div class="form-card-body">
+          <div class="field">
+            <label for="d_consider">디자인 과정에서 고려한 내용 <span class="required">*</span></label>
+            <textarea id="d_consider" placeholder="예: 사용자가 쉽게 조작할 수 있는 버튼 위치, 부품 발열 처리, 휴대성, 안정적인 무게중심 등"></textarea>
+          </div>
+          <div class="field">
+            <label for="d_strength">제출한 디자인의 장점 <span class="required">*</span></label>
+            <textarea id="d_strength" placeholder="예: 직관적인 형태, 부품을 모두 수용하면서도 작은 크기, 책상 위에서 안정적으로 서 있는 구조"></textarea>
+          </div>
+          <div class="field">
+            <label for="d_limit">한계와 개선 아이디어 <span class="required">*</span></label>
+            <textarea id="d_limit" placeholder="예: 모터의 진동을 충분히 흡수하지 못함 / 배터리를 어떻게 넣을지 정해지지 않음 / 색상이 단조로움"></textarea>
+          </div>
+          <div class="share-hint">
+            🤝 <strong>코드 역할과 공유</strong> — 디자인에서 결정한 LED 위치·LCD 위치는 코드 담당이 핀 매핑에 반영해야 합니다.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════════════════════ B. 프로그래밍 코드 설계 ═════════════════════ -->
+    <section id="role-coder" class="activity-section">
+      <div class="team-banner" id="banner-coder">
+        <span>팀: <b id="bcTeam"></b></span><span>이름: <b id="bcName"></b></span>
+        <span class="role-pill coder show">💻 프로그래밍 코드 설계</span>
+        <button class="change-btn" data-back-to-landing>↺ 팀/역할 변경</button>
+      </div>
+
+      <!-- 1. 사용할 부품 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">1</div>
+          <span class="form-card-title">사용할 부품 선택</span>
+          <span class="form-card-desc">Arduino UNO + 기본 부품</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">💡 체크한 부품은 아래 표에 자동으로 추가됩니다. 각 부품의 <strong>역할</strong>과 <strong>핀</strong>은 회로 담당과 함께 결정해 주세요.</div>
+          <div class="parts-grid" id="cParts" role="group"></div>
+          <div class="field">
+            <label for="c_partsExtra">추가 부품 (수동 입력)</label>
+            <input type="text" id="c_partsExtra" placeholder="예: NeoPixel 8개, DHT11 온습도 센서">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 부품별 역할 및 핀 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">2</div>
+          <span class="form-card-title">부품별 역할 · 핀 연결</span>
+          <span class="form-card-desc">활용 방법 · digital/analog 핀</span>
+        </div>
+        <div class="form-card-body">
+          <div class="share-hint">🤝 <strong>회로 담당과 동일한 핀 매핑</strong>을 사용해야 합니다. 사전에 합의 후 같은 값을 입력하세요.</div>
+          <div class="grid-table-wrap">
+            <table class="grid-table" id="c_partsTable" aria-label="부품 역할 및 핀">
+              <thead>
+                <tr>
+                  <th style="width:24%">부품</th>
+                  <th style="width:45%">역할/활용 방법</th>
+                  <th style="width:23%">연결 핀</th>
+                  <th style="width:8%"></th>
+                </tr>
+              </thead>
+              <tbody id="c_partsTbody"></tbody>
+            </table>
+          </div>
+          <button class="add-row-btn" id="c_addPart" type="button">+ 부품 행 추가</button>
+        </div>
+      </div>
+
+      <!-- 3. 클래스별 동작 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">3</div>
+          <span class="form-card-title">분류 결과별 동작</span>
+          <span class="form-card-desc">Teachable Machine 클래스 → 명령 신호 → 동작</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">예: <code>class A → 'A\n' → LED 빨간색 켜기</code> 처럼 매핑합니다. 신호는 한 글자 또는 짧은 문자열로 설계합니다.</div>
+          <div class="grid-table-wrap">
+            <table class="grid-table" id="c_classTable" aria-label="클래스별 동작">
+              <thead>
+                <tr>
+                  <th style="width:22%">클래스명</th>
+                  <th style="width:18%">전송 신호</th>
+                  <th style="width:50%">아두이노 동작</th>
+                  <th style="width:10%"></th>
+                </tr>
+              </thead>
+              <tbody id="c_classTbody"></tbody>
+            </table>
+          </div>
+          <button class="add-row-btn" id="c_addClass" type="button">+ 클래스 행 추가</button>
+        </div>
+      </div>
+
+      <!-- 4. 추가 정보 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">4</div>
+          <span class="form-card-title">추가 정보</span>
+          <span class="form-card-desc">시나리오 · 모델 URL · 특수 조건</span>
+        </div>
+        <div class="form-card-body">
+          <div class="field">
+            <label for="c_projectInfo">프로젝트 한 줄 설명 <span class="required">*</span></label>
+            <input type="text" id="c_projectInfo" placeholder="예: 졸음을 감지하면 LED와 부저로 깨우고 LCD에 메시지를 띄우는 학습 도우미">
+          </div>
+          <div class="field">
+            <label for="c_scenario">구체적인 동작 시나리오 <span class="required">*</span></label>
+            <textarea id="c_scenario" placeholder="예: 시작 시 LCD에 '학습 시작' 표시 → 졸음 감지 시 부저 3번 → 일정 시간 졸음 지속 시 빨간 LED 깜빡임 → 깨어났을 때 LCD에 '잘했어요' 1초 표시"></textarea>
+          </div>
+          <div class="field">
+            <label for="c_modelUrl">Teachable Machine 모델 URL</label>
+            <input type="text" id="c_modelUrl" placeholder="https://teachablemachine.withgoogle.com/models/.../">
+          </div>
+          <div class="field">
+            <label for="c_extra">추가 조건/제약 (선택)</label>
+            <textarea id="c_extra" placeholder="예: confidence가 0.90 이상일 때만 동작, 같은 명령은 1.5초 동안 중복 무시, 시작 후 5초간 워밍업"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Arduino 프롬프트 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">5</div>
+          <span class="form-card-title">Arduino 코드 생성 프롬프트</span>
+          <span class="form-card-desc">자동 생성 — 복사해서 ChatGPT/Claude로</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">아래 프롬프트는 위 입력 내용을 바탕으로 <strong>자동 생성</strong>됩니다. 입력을 수정하면 프롬프트도 자동 갱신됩니다.</div>
+          <div class="prompt-box" id="c_arduinoPrompt"></div>
+          <div class="prompt-actions">
+            <button class="btn btn-purple" type="button" data-copy="c_arduinoPrompt">📋 프롬프트 복사</button>
+            <button class="btn btn-ghost"  type="button" data-download-prompt="c_arduinoPrompt" data-filename="Arduino_프롬프트.txt">💾 .txt로 저장</button>
+          </div>
+          <div class="field" style="margin-top:0.8rem;">
+            <label for="c_arduinoCode">⬇ 생성된 Arduino 코드 붙여넣기</label>
+            <textarea id="c_arduinoCode" placeholder="ChatGPT/Claude가 생성한 Arduino 코드 전체를 여기에 붙여넣으세요." style="min-height:240px;font-family:Consolas,Monaco,monospace;font-size:0.82rem;"></textarea>
+          </div>
+          <div class="prompt-actions">
+            <button class="btn btn-ghost" type="button" data-copy="c_arduinoCode">📋 코드 복사</button>
+            <button class="btn btn-ghost" type="button" data-download-prompt="c_arduinoCode" data-filename="ai_physical_project.ino">💾 .ino로 저장</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. HTML 프롬프트 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">6</div>
+          <span class="form-card-title">HTML 페이지 생성 프롬프트</span>
+          <span class="form-card-desc">Teachable Machine + Web Serial API</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">웹캠으로 분류하고 Arduino에 신호를 보내는 HTML 페이지를 생성하는 프롬프트입니다. Web Serial API 사용으로 <strong>Chrome/Edge</strong>에서 동작합니다.</div>
+          <div class="prompt-box" id="c_htmlPrompt"></div>
+          <div class="prompt-actions">
+            <button class="btn btn-purple" type="button" data-copy="c_htmlPrompt">📋 프롬프트 복사</button>
+            <button class="btn btn-ghost"  type="button" data-download-prompt="c_htmlPrompt" data-filename="HTML_프롬프트.txt">💾 .txt로 저장</button>
+          </div>
+          <div class="field" style="margin-top:0.8rem;">
+            <label for="c_htmlCode">⬇ 생성된 HTML 코드 붙여넣기</label>
+            <textarea id="c_htmlCode" placeholder="ChatGPT/Claude가 생성한 HTML 페이지 전체 코드를 여기에 붙여넣으세요." style="min-height:240px;font-family:Consolas,Monaco,monospace;font-size:0.82rem;"></textarea>
+          </div>
+          <div class="prompt-actions">
+            <button class="btn btn-ghost" type="button" data-copy="c_htmlCode">📋 코드 복사</button>
+            <button class="btn btn-ghost" type="button" data-download-prompt="c_htmlCode" data-filename="ai_physical_project.html">💾 .html로 저장</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════════════════════ C. 아두이노 장치 설계 ═════════════════════ -->
+    <section id="role-circuit" class="activity-section">
+      <div class="team-banner" id="banner-circuit">
+        <span>팀: <b id="brTeam"></b></span><span>이름: <b id="brName"></b></span>
+        <span class="role-pill circuit show">🔌 아두이노 장치 설계</span>
+        <button class="change-btn" data-back-to-landing>↺ 팀/역할 변경</button>
+      </div>
+
+      <!-- 1. 사용할 부품 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">1</div>
+          <span class="form-card-title">사용할 부품 선택</span>
+          <span class="form-card-desc">코드 담당과 동일하게 선택</span>
+        </div>
+        <div class="form-card-body">
+          <div class="share-hint">🤝 <strong>코드 담당과 동일한 부품 목록</strong>이어야 합니다. 다른 부품을 선택하면 핀이 어긋납니다.</div>
+          <div class="parts-grid" id="rParts" role="group"></div>
+          <div class="field">
+            <label for="r_partsExtra">추가 부품 (수동 입력)</label>
+            <input type="text" id="r_partsExtra" placeholder="예: NeoPixel 8개, DHT11 온습도 센서">
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 부품 실물 사진 첨부 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">2</div>
+          <span class="form-card-title">부품 실물 사진 첨부</span>
+          <span class="form-card-desc">팀이 준비한 실제 부품 모습</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            팀에서 준비한 <strong>실제 부품의 사진</strong>을 찍어 업로드하세요. 같은 이름의 부품이라도 모델·핀 배치가 다를 수 있으니 <strong>핀이 잘 보이는 각도</strong>로 찍는 것이 좋습니다.<br>
+            이 사진들은 다음 단계에서 ChatGPT에 함께 첨부해 정확한 회로도 안내를 받기 위한 자료입니다.
+          </div>
+          <div class="image-upload-zone" data-upload="r_parts">
+            <input type="file" id="r_partsInput" accept="image/*" multiple hidden>
+            <div class="upload-cta">📷 부품 사진 업로드</div>
+            <div class="upload-sub">최대 10장 · 각 5MB 이하 · 정면 + 핀이 보이는 각도 권장</div>
+            <div class="image-preview-grid" id="r_partsPreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 회로도 프롬프트 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">3</div>
+          <span class="form-card-title">회로도 생성 프롬프트</span>
+          <span class="form-card-desc">언어로 표현된 회로도 + ASCII 회로도 생성</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            아래 프롬프트를 <strong>ChatGPT/Claude</strong>에 복사해 붙여넣고,
+            <strong>위에서 첨부한 부품 사진도 함께 첨부</strong>하세요.<br>
+            AI가 사진을 보고 실제 부품의 핀 배치를 인식해 훨씬 정확한 회로 설명과 텍스트 회로도를 생성해 줍니다.
+          </div>
+          <div class="prompt-box" id="r_circuitPrompt"></div>
+          <div class="prompt-actions">
+            <button class="btn btn-purple" type="button" data-copy="r_circuitPrompt">📋 프롬프트 복사</button>
+            <button class="btn btn-ghost"  type="button" data-download-prompt="r_circuitPrompt" data-filename="회로도_프롬프트.txt">💾 .txt로 저장</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 회로도 결과 캡처 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">4</div>
+          <span class="form-card-title">회로도 결과 캡처</span>
+          <span class="form-card-desc">AI가 생성한 회로도 설명 캡처</span>
+        </div>
+        <div class="form-card-body">
+          <div class="image-upload-zone" data-upload="r_diagram">
+            <input type="file" id="r_diagramInput" accept="image/*" multiple hidden>
+            <div class="upload-cta">🖼️ 회로도 캡처 업로드</div>
+            <div class="upload-sub">AI 응답 화면 캡처 · 최대 5장 · 각 5MB 이하</div>
+            <div class="image-preview-grid" id="r_diagramPreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Arduino UNO 핀 매핑 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">5</div>
+          <span class="form-card-title">Arduino UNO 핀 매핑</span>
+          <span class="form-card-desc">AI 안내를 바탕으로 핀 연결 정리</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">AI 회로도 안내를 바탕으로 각 핀에 무엇을 연결할지 정리합니다. 같은 핀에 여러 부품을 연결하지 않도록 주의하고, <strong>D0/D1</strong>은 시리얼 통신용이라 가능하면 피하세요. <strong>코드 담당</strong>도 동일한 핀 매핑을 사용해야 합니다.</div>
+          <div class="grid-table-wrap">
+            <table class="grid-table" id="r_pinTable" aria-label="UNO 핀 매핑">
+              <thead>
+                <tr>
+                  <th style="width:14%">핀</th>
+                  <th style="width:18%">타입</th>
+                  <th style="width:58%">연결 부품 / 용도</th>
+                  <th style="width:10%">메모</th>
+                </tr>
+              </thead>
+              <tbody id="r_pinTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════════════════════ D. 이미지 분류 모델 생성 ═════════════════════ -->
+    <section id="role-tm" class="activity-section">
+      <div class="team-banner" id="banner-tm">
+        <span>팀: <b id="btTeam"></b></span><span>이름: <b id="btName"></b></span>
+        <span class="role-pill tm show">🧠 이미지 분류 모델 생성</span>
+        <button class="change-btn" data-back-to-landing>↺ 팀/역할 변경</button>
+      </div>
+
+      <!-- 1. 모델이 분류할 것 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">1</div>
+          <span class="form-card-title">모델 목적</span>
+          <span class="form-card-desc">무엇을 분류하는 모델인가</span>
+        </div>
+        <div class="form-card-body">
+          <div class="field">
+            <label for="t_purpose">한 줄 목적 <span class="required">*</span></label>
+            <input type="text" id="t_purpose" placeholder="예: 웹캠 영상에서 학생의 졸음 상태를 분류 / 손동작 3종을 분류">
+          </div>
+          <div class="field">
+            <label for="t_input">입력 (웹캠으로 인식할 대상)</label>
+            <textarea id="t_input" placeholder="예: 사용자의 얼굴(눈 영역 중심), PC 웹캠으로 정면 촬영. 모자·안경 착용 상황도 포함."></textarea>
+          </div>
+          <div class="share-hint">
+            🤝 <strong>코드 담당과 공유</strong> — 여기서 정한 클래스 이름과 개수는 코드 담당의 "분류 결과별 동작" 표에 그대로 반영돼야 합니다. 클래스명을 임의로 바꾸면 신호가 어긋납니다.
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 클래스 설계 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">2</div>
+          <span class="form-card-title">학습시킬 클래스 설계</span>
+          <span class="form-card-desc">2~6개 권장</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">각 클래스는 <strong>최소 10장</strong> 이상의 이미지를 확보해야 합니다. 클래스 간 차이가 분명하지 않으면 모델이 혼동하니 인식 대상을 구체적으로 적어 주세요.</div>
+          <div class="grid-table-wrap">
+            <table class="grid-table" id="t_classTable" aria-label="클래스 설계">
+              <thead>
+                <tr>
+                  <th style="width:22%">클래스명</th>
+                  <th style="width:42%">인식 대상 설명</th>
+                  <th style="width:16%">이미지 수</th>
+                  <th style="width:14%">수집 방법</th>
+                  <th style="width:6%"></th>
+                </tr>
+              </thead>
+              <tbody id="t_classTbody"></tbody>
+            </table>
+          </div>
+          <button class="add-row-btn" id="t_addClass" type="button">+ 클래스 행 추가</button>
+        </div>
+      </div>
+
+      <!-- 3. 이미지 수집 방법 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">3</div>
+          <span class="form-card-title">이미지 수집 방법</span>
+          <span class="form-card-desc">어떻게 / 어디서</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            이번 프로젝트는 <strong>인터넷에서 이미지를 검색·다운로드</strong>해 학습 데이터를 만듭니다. <strong>클래스당 최소 10장</strong>씩 확보하세요.<br>
+            추천 출처: 구글 이미지 검색 / Unsplash / Pexels / Pixabay (가능하면 무료·상업이용 가능한 이미지를 우선).
+          </div>
+          <div class="field">
+            <label for="t_collectHow">수집 방식 — 검색 키워드와 출처 <span class="required">*</span></label>
+            <textarea id="t_collectHow" placeholder="예: 구글 이미지에서 'drowsy student face', 'sleeping student', '졸린 학생'으로 검색해 각 클래스당 12장씩 다운로드. Unsplash에서 'tired face' 키워드로 5장 추가."></textarea>
+          </div>
+          <div class="field">
+            <label for="t_diversity">데이터 다양성 확보 — 어떤 이미지를 의도적으로 섞었는가? <span class="required">*</span></label>
+            <textarea id="t_diversity" placeholder="예: 인물(남/여, 다양한 연령), 조명(밝음/어두움), 각도(정면/측면), 배경(실내/실외) 이미지를 의도적으로 골고루 모음. 검색어를 한국어/영어 둘 다 사용."></textarea>
+          </div>
+          <div class="field">
+            <label for="t_consider">정확한 모델을 만들기 위해 추가로 고려한 내용 <span class="required">*</span></label>
+            <textarea id="t_consider" placeholder="예: 클래스 간 이미지 수를 비슷하게 맞춤(불균형 방지). 워터마크/큰 글자가 있는 이미지는 제외(모델이 텍스트를 학습할 수 있음). 다른 클래스와 헷갈리는 애매한 이미지는 제외. 실제 사용 상황(웹캠 정면 얼굴)과 비슷한 구도의 이미지를 우선 선택."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 학습 이미지 첨부 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">4</div>
+          <span class="form-card-title">학습 이미지 첨부</span>
+          <span class="form-card-desc">클래스당 최소 10장</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            인터넷에서 다운로드한 학습 이미지를 <strong>클래스당 최소 10장씩</strong> 업로드하세요. (3클래스면 30장 이상)<br>
+            파일명을 <code>클래스명_01.png</code>처럼 정리하면 어떤 이미지가 어떤 클래스인지 한눈에 보입니다.
+          </div>
+          <div class="image-upload-zone" data-upload="t_train">
+            <input type="file" id="t_trainInput" accept="image/*" multiple hidden>
+            <div class="upload-cta">🖼️ 학습 이미지 업로드</div>
+            <div class="upload-sub">최대 60장 · 각 5MB 이하 · 클래스당 10장 이상 권장</div>
+            <div class="image-preview-grid" id="t_trainPreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. 모델 학습 / 테스트 결과 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">5</div>
+          <span class="form-card-title">학습 · 테스트 결과</span>
+          <span class="form-card-desc">정확도 · 혼동 사례</span>
+        </div>
+        <div class="form-card-body">
+          <div class="field">
+            <label for="t_accuracy">테스트 정확도 (체감 또는 수치) <span class="required">*</span></label>
+            <input type="text" id="t_accuracy" placeholder="예: 약 90% / Teachable Machine 미리보기에서 거의 안 틀림 / 클래스 A는 95%, B는 70%">
+          </div>
+          <div class="field">
+            <label for="t_confuse">혼동되는 클래스 / 자주 틀리는 상황</label>
+            <textarea id="t_confuse" placeholder="예: '눈 감음'과 '아래 보기'를 혼동. 배경이 어두울 때 정확도가 떨어짐. 안경 쓴 경우 인식 실패가 늘어남."></textarea>
+          </div>
+          <div class="field">
+            <label for="t_improve">개선 아이디어</label>
+            <textarea id="t_improve" placeholder="예: '아래 보기' 클래스를 추가 수집해서 차이를 학습시킴. 어두운 환경 데이터 30장 추가. 안경 쓴 샘플 보강."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 테스트 결과 캡처 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">6</div>
+          <span class="form-card-title">테스트 결과 캡처</span>
+          <span class="form-card-desc">클래스당 최소 2장</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            Teachable Machine 미리보기에서 <strong>웹캠으로 직접 테스트한 화면</strong>(인식되는 클래스명 + confidence 값이 보이는 상태)을 캡처해 업로드합니다.<br>
+            <strong>각 클래스당 최소 2장씩</strong>(3클래스면 6장 이상) — 잘 인식되는 모습과 혼동되는 모습을 골고루 포함하면 좋습니다.
+          </div>
+          <div class="image-upload-zone" data-upload="t_test">
+            <input type="file" id="t_testInput" accept="image/*" multiple hidden>
+            <div class="upload-cta">📸 테스트 결과 캡처 업로드</div>
+            <div class="upload-sub">최대 16장 · 각 5MB 이하 · 클래스당 2장 이상</div>
+            <div class="image-preview-grid" id="t_testPreview"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. 모델 URL -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-num">7</div>
+          <span class="form-card-title">모델 내보내기 URL</span>
+          <span class="form-card-desc">Teachable Machine "모델 내보내기 → 공유 가능한 링크"</span>
+        </div>
+        <div class="form-card-body">
+          <div class="hint">
+            ① Teachable Machine 우측 상단 <strong>"모델 내보내기"</strong> 클릭<br>
+            ② <strong>Tensorflow.js</strong> 탭 → <strong>"모델 업로드(공유 가능한 링크)"</strong> 클릭<br>
+            ③ 생성된 URL을 아래에 붙여넣고, 코드 담당에게도 같은 URL을 전달
+          </div>
+          <div class="field">
+            <label for="t_modelUrl">모델 URL <span class="required">*</span></label>
+            <input type="text" id="t_modelUrl" placeholder="https://teachablemachine.withgoogle.com/models/.../">
+          </div>
+          <div class="share-hint">
+            🤝 <strong>코드 담당과 공유</strong> — 위 URL은 코드 담당의 HTML 페이지 상단 <code>MODEL_URL</code> 상수에 동일하게 입력돼야 합니다.
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ───── Action Bar ───── -->
+  <div class="action-bar" id="actionBar">
+    <div class="action-bar-left">
+      <button class="btn btn-ghost" id="btnLoad" title="JSON 파일로부터 불러오기">
+        📂 불러오기
+      </button>
+      <span class="draft-label" id="draftLabel">임시저장: 대기 중</span>
+    </div>
+    <div class="action-bar-right">
+      <button class="btn btn-danger" id="btnClear">초기화</button>
+      <button class="btn btn-warn" id="btnDraft" title="JSON 파일로 임시저장 다운로드">💾 임시저장</button>
+      <button class="btn btn-primary" id="btnSubmit">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        제출하기
+      </button>
+    </div>
+  </div>
+  <input type="file" id="fileInput" accept=".json" hidden>
+
+  <!-- ───── Toast ───── -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ───── Setup Guide Modal ───── -->
+  <div class="modal-overlay" id="guideModal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Google Apps Script 설정 방법</h2>
+        <button class="btn btn-ghost" id="closeGuide">✕ 닫기</button>
+      </div>
+      <div class="modal-body">
+        <ol>
+          <li><strong>구글 시트 열기</strong> — sheets.google.com에서 새 시트 생성 (탭 이름은 자동으로 <code>팀프로젝트_설계</code>가 됩니다).</li>
+          <li><strong>Apps Script 열기</strong> — 상단 메뉴 <strong>확장 프로그램 → Apps Script</strong>.</li>
+          <li><strong>코드 붙여넣기</strong> — 이 폴더의 <code>apps-script.js</code> 파일 내용을 복사해 붙여넣고 <code>Ctrl+S</code>.</li>
+          <li><strong>웹앱 배포</strong> — <strong>배포 → 새 배포</strong> → 유형: <code>웹 앱</code> → 실행 계정: <code>나</code> → 액세스: <code>모든 사용자 (익명 포함)</code>.</li>
+          <li><strong>URL 복사</strong> — 배포 후 표시되는 URL을 위 설정 패널 입력란에 붙여넣고 <strong>저장</strong>.</li>
+          <li><strong>이미지 저장 폴더</strong> — apps-script.js의 <code>DRIVE_FOLDER_ID</code> 상수에 Drive 폴더 ID를 입력하면 첨부 이미지가 그 폴더에 저장됩니다 (선택).</li>
+        </ol>
+        <p style="margin-top:0.8rem;color:var(--text-muted);font-size:0.82rem;">
+          ※ 팀별로 한 행에 저장됩니다. 같은 팀명으로 다른 역할 학생이 제출하면 그 행의 해당 역할 컬럼만 업데이트됩니다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    /* ═══════════════════════════════════════════════════════════════
+       0. 상수 / 키 / 부품 목록 / 핀 목록
+       ═══════════════════════════════════════════════════════════════ */
+    var SOURCE_ID  = 'ai_physical_design';
+    var DRAFT_KEY  = 'aiphysical_design_draft';
+    var URL_KEY    = 'aiphysical_design_url';
+    var DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+
+    var PARTS_LIST = [
+      'LED 단색', 'RGB LED', '피에조 부저', 'LCD1602 (I2C)', 'SG90 서보모터',
+      '미니 워터펌프', '5V 릴레이 모듈', '소형 팬 (DC)', 'DC모터 + L298N',
+      '진동 모터', '220Ω 저항', '버튼 스위치', '브레드보드', '점퍼선', '외부 5V 어댑터'
+    ];
+
+    var UNO_PINS = [
+      { name: 'D2',  type: 'digital' },
+      { name: 'D3',  type: 'digital (PWM)' },
+      { name: 'D4',  type: 'digital' },
+      { name: 'D5',  type: 'digital (PWM)' },
+      { name: 'D6',  type: 'digital (PWM)' },
+      { name: 'D7',  type: 'digital' },
+      { name: 'D8',  type: 'digital' },
+      { name: 'D9',  type: 'digital (PWM)' },
+      { name: 'D10', type: 'digital (PWM)' },
+      { name: 'D11', type: 'digital (PWM)' },
+      { name: 'D12', type: 'digital' },
+      { name: 'D13', type: 'digital (LED 내장)' },
+      { name: 'A0',  type: 'analog' },
+      { name: 'A1',  type: 'analog' },
+      { name: 'A2',  type: 'analog' },
+      { name: 'A3',  type: 'analog' },
+      { name: 'A4',  type: 'analog / I2C SDA' },
+      { name: 'A5',  type: 'analog / I2C SCL' },
+      { name: '5V',  type: '전원' },
+      { name: '3.3V',type: '전원' },
+      { name: 'GND', type: '접지' },
+      { name: 'VIN', type: '외부 전원 입력' }
+    ];
+
+    /* ═══════════════════════════════════════════════════════════════
+       1. 유틸 — DOM 안전 헬퍼, Toast
+       ═══════════════════════════════════════════════════════════════ */
+    function $(id) { return document.getElementById(id); }
+    function $$ (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+    function showToast(msg, type, duration) {
+      type = type || 'info'; duration = duration || 3000;
+      var t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.textContent = msg;
+      $('toastContainer').appendChild(t);
+      setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, duration + 400);
+    }
+
+    function clearChildren(el) { while (el && el.firstChild) el.removeChild(el.firstChild); }
+
+    /* ═══════════════════════════════════════════════════════════════
+       2. 부품 체크리스트 렌더링 (디자이너/코더/회로 공통)
+       ═══════════════════════════════════════════════════════════════ */
+    function renderPartsGrid(containerId, prefix) {
+      var c = $(containerId);
+      clearChildren(c);
+      PARTS_LIST.forEach(function(name) {
+        var lbl = document.createElement('label');
+        lbl.className = 'part-check';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.name = prefix + '_parts';
+        cb.value = name;
+        cb.dataset.partName = name;
+        var sp = document.createElement('span');
+        sp.textContent = name;
+        lbl.appendChild(cb);
+        lbl.appendChild(sp);
+        c.appendChild(lbl);
+      });
+    }
+
+    function getCheckedParts(prefix) {
+      return $$('input[name="' + prefix + '_parts"]:checked').map(function(el) { return el.value; });
+    }
+    function setCheckedParts(prefix, arr) {
+      $$('input[name="' + prefix + '_parts"]').forEach(function(el) {
+        el.checked = arr && arr.indexOf(el.value) !== -1;
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       3. 코더 — 부품 표 (자동 동기화)
+       ═══════════════════════════════════════════════════════════════ */
+    function makeInput(placeholder, value, opts) {
+      opts = opts || {};
+      var i = document.createElement('input');
+      i.type = 'text'; i.placeholder = placeholder; i.value = value || '';
+      if (opts.cls) i.className = opts.cls;
+      return i;
+    }
+    function makeTextarea(placeholder, value) {
+      var t = document.createElement('textarea');
+      t.placeholder = placeholder; t.value = value || '';
+      return t;
+    }
+    function makeDelBtn(onClick) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'del-btn'; b.textContent = '✕';
+      b.setAttribute('aria-label', '행 삭제');
+      b.addEventListener('click', onClick);
+      return b;
+    }
+
+    /* 코더 부품 표 */
+    function addCoderPartRow(part, role, pin) {
+      var tbody = $('c_partsTbody');
+      var tr = document.createElement('tr');
+      var td1 = document.createElement('td');
+      td1.appendChild(makeInput('부품명', part));
+      var td2 = document.createElement('td');
+      td2.appendChild(makeTextarea('예: 졸음 감지 시 깜빡임, 0.5초 간격', role));
+      var td3 = document.createElement('td');
+      td3.appendChild(makeInput('예: D2, A0', pin));
+      var td4 = document.createElement('td');
+      td4.appendChild(makeDelBtn(function() {
+        tr.parentNode.removeChild(tr);
+        scheduleDraft();
+      }));
+      [td1, td2, td3, td4].forEach(function(td) { tr.appendChild(td); });
+      tbody.appendChild(tr);
+    }
+    function syncCoderPartsTable() {
+      var checked = getCheckedParts('c');
+      var extra = $('c_partsExtra').value.trim();
+      var allParts = checked.slice();
+      if (extra) extra.split(/[,，、]/).forEach(function(s) {
+        var v = s.trim(); if (v && allParts.indexOf(v) === -1) allParts.push(v);
+      });
+      var current = $$('#c_partsTbody tr').map(function(tr) {
+        var inputs = tr.querySelectorAll('input[type="text"], textarea');
+        return {
+          part: inputs[0] ? inputs[0].value.trim() : '',
+          role: inputs[1] ? inputs[1].value.trim() : '',
+          pin:  inputs[2] ? inputs[2].value.trim() : ''
+        };
+      });
+      var keep = current.filter(function(r) { return allParts.indexOf(r.part) !== -1 || r.role || r.pin; });
+      var keepNames = keep.map(function(r) { return r.part; });
+      allParts.forEach(function(p) {
+        if (keepNames.indexOf(p) === -1) keep.push({ part: p, role: '', pin: '' });
+      });
+      clearChildren($('c_partsTbody'));
+      keep.forEach(function(r) { addCoderPartRow(r.part, r.role, r.pin); });
+      if (keep.length === 0) addCoderPartRow('', '', '');
+    }
+
+    /* TM 클래스 표 (5열) */
+    function addTmClassRow(name, desc, count, method) {
+      var tbody = $('t_classTbody');
+      var tr = document.createElement('tr');
+      var td1 = document.createElement('td');
+      td1.appendChild(makeInput('예: 졸음', name));
+      var td2 = document.createElement('td');
+      td2.appendChild(makeTextarea('예: 눈이 감겨 있거나 고개가 기울어진 사람 사진', desc));
+      var td3 = document.createElement('td');
+      var cn = document.createElement('input');
+      cn.type = 'number'; cn.placeholder = '예: 10 이상'; cn.min = '0'; cn.value = count || '';
+      td3.appendChild(cn);
+      var td4 = document.createElement('td');
+      var sel = document.createElement('select');
+      ['', '인터넷 검색·다운로드', '구글 이미지 검색', 'Unsplash/Pexels 등 무료 이미지', '혼합'].forEach(function(opt, i) {
+        var o = document.createElement('option');
+        o.value = i === 0 ? '' : opt; o.textContent = i === 0 ? '(선택)' : opt;
+        sel.appendChild(o);
+      });
+      sel.value = method || '';
+      td4.appendChild(sel);
+      var td5 = document.createElement('td');
+      td5.appendChild(makeDelBtn(function() {
+        if ($('t_classTbody').rows.length > 1) {
+          tr.parentNode.removeChild(tr); scheduleDraft();
+        } else { showToast('최소 1개 클래스가 필요합니다.', 'error'); }
+      }));
+      [td1, td2, td3, td4, td5].forEach(function(td) { tr.appendChild(td); });
+      tbody.appendChild(tr);
+    }
+
+    /* 코더 클래스 표 */
+    function addClassRow(name, signal, action) {
+      var tbody = $('c_classTbody');
+      var tr = document.createElement('tr');
+      var td1 = document.createElement('td');
+      td1.appendChild(makeInput('예: 졸음', name));
+      var td2 = document.createElement('td');
+      var sig = makeInput('예: A', signal);
+      sig.maxLength = 6;
+      td2.appendChild(sig);
+      var td3 = document.createElement('td');
+      td3.appendChild(makeTextarea('예: 빨간 LED 깜빡임 + 부저 3번 + LCD 표시', action));
+      var td4 = document.createElement('td');
+      td4.appendChild(makeDelBtn(function() {
+        if ($('c_classTbody').rows.length > 1) {
+          tr.parentNode.removeChild(tr); scheduleDraft();
+        } else { showToast('최소 1개 클래스가 필요합니다.', 'error'); }
+      }));
+      [td1, td2, td3, td4].forEach(function(td) { tr.appendChild(td); });
+      tbody.appendChild(tr);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       4. 회로 — UNO 핀 표 (고정 행)
+       ═══════════════════════════════════════════════════════════════ */
+    function renderPinTable() {
+      var tbody = $('r_pinTbody');
+      clearChildren(tbody);
+      UNO_PINS.forEach(function(p) {
+        var tr = document.createElement('tr');
+        tr.dataset.pinName = p.name;
+
+        var td1 = document.createElement('td');
+        var label = document.createElement('span');
+        label.className = 'pin-label';
+        if (p.name === '5V' || p.name === '3.3V' || p.name === 'VIN') label.className += ' power';
+        else if (p.name === 'GND') label.className += ' ground';
+        else if (p.name[0] === 'A') label.className += ' analog';
+        label.textContent = p.name;
+        td1.appendChild(label);
+
+        var td2 = document.createElement('td');
+        td2.textContent = p.type;
+        td2.style.fontSize = '0.82rem';
+        td2.style.color = 'var(--text-sub)';
+
+        var td3 = document.createElement('td');
+        var sel = document.createElement('select');
+        sel.dataset.pinSelect = p.name;
+        var optBlank = document.createElement('option');
+        optBlank.value = ''; optBlank.textContent = '(연결 없음)';
+        sel.appendChild(optBlank);
+        td3.appendChild(sel);
+
+        var td4 = document.createElement('td');
+        td4.appendChild(makeInput('메모', ''));
+
+        [td1, td2, td3, td4].forEach(function(td) { tr.appendChild(td); });
+        tbody.appendChild(tr);
+      });
+    }
+    function syncPinSelects() {
+      var parts = getCheckedParts('r').slice();
+      var extra = $('r_partsExtra').value.trim();
+      if (extra) extra.split(/[,，、]/).forEach(function(s) {
+        var v = s.trim(); if (v && parts.indexOf(v) === -1) parts.push(v);
+      });
+      parts = parts.concat([
+        '시리얼 통신 (RX/TX)', '전원 공급', 'GND 공통', '외부 5V 전원'
+      ]);
+      $$('#r_pinTbody select[data-pin-select]').forEach(function(sel) {
+        var current = sel.value;
+        clearChildren(sel);
+        var optBlank = document.createElement('option');
+        optBlank.value = ''; optBlank.textContent = '(연결 없음)';
+        sel.appendChild(optBlank);
+        parts.forEach(function(p) {
+          var o = document.createElement('option');
+          o.value = p; o.textContent = p;
+          sel.appendChild(o);
+        });
+        sel.value = current;
+      });
+    }
+    function getPinMappings() {
+      return $$('#r_pinTbody tr').map(function(tr) {
+        var pin = tr.dataset.pinName;
+        var sel = tr.querySelector('select');
+        var memo = tr.querySelector('input[type="text"]');
+        return { pin: pin, part: sel ? sel.value : '', memo: memo ? memo.value.trim() : '' };
+      }).filter(function(r) { return r.part || r.memo; });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       5. 이미지 첨부 (base64)
+       ═══════════════════════════════════════════════════════════════ */
+    var imageStore = { d_sketch: [], d_blueprint: [], r_parts: [], r_diagram: [], t_train: [], t_test: [] };
+    var MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+    function setupImageZone(key, maxCount) {
+      var zone = document.querySelector('[data-upload="' + key + '"]');
+      var input = $(key + 'Input');
+      var preview = $(key + 'Preview');
+      if (!zone || !input || !preview) return;
+
+      zone.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-btn') || e.target.tagName === 'IMG') return;
+        input.click();
+      });
+      zone.addEventListener('dragover', function(e) {
+        e.preventDefault(); zone.style.background = 'rgba(107,93,211,0.15)';
+      });
+      zone.addEventListener('dragleave', function() { zone.style.background = ''; });
+      zone.addEventListener('drop', function(e) {
+        e.preventDefault(); zone.style.background = '';
+        handleFiles(e.dataTransfer.files);
+      });
+      input.addEventListener('change', function() { handleFiles(input.files); input.value = ''; });
+
+      function handleFiles(files) {
+        Array.prototype.slice.call(files || []).forEach(function(file) {
+          if (!file.type.indexOf || file.type.indexOf('image/') !== 0) {
+            showToast('이미지 파일만 업로드 가능합니다: ' + file.name, 'error'); return;
+          }
+          if (file.size > MAX_FILE_SIZE) {
+            showToast('5MB 이하 이미지만 가능합니다: ' + file.name, 'error'); return;
+          }
+          if (imageStore[key].length >= maxCount) {
+            showToast('최대 ' + maxCount + '장까지 업로드 가능합니다.', 'error'); return;
+          }
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            imageStore[key].push({ name: file.name, dataUrl: ev.target.result });
+            renderPreview(key);
+            scheduleDraft();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    }
+    function renderPreview(key) {
+      var preview = $(key + 'Preview');
+      var zone = document.querySelector('[data-upload="' + key + '"]');
+      if (!preview) return;
+      clearChildren(preview);
+      var arr = imageStore[key] || [];
+      if (zone) {
+        if (arr.length) zone.classList.add('has-files');
+        else            zone.classList.remove('has-files');
+      }
+      arr.forEach(function(item, idx) {
+        var div = document.createElement('div');
+        div.className = 'image-preview-item';
+        var img = document.createElement('img');
+        img.src = item.dataUrl; img.alt = item.name;
+        var btn = document.createElement('button');
+        btn.className = 'remove-btn'; btn.type = 'button'; btn.textContent = '✕';
+        btn.setAttribute('aria-label', '삭제');
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          imageStore[key].splice(idx, 1);
+          renderPreview(key); scheduleDraft();
+        });
+        div.appendChild(img); div.appendChild(btn);
+        preview.appendChild(div);
+      });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       6. 프롬프트 생성기
+       ═══════════════════════════════════════════════════════════════ */
+    var DESIGN_PROMPT = [
+      '학생이 스케치한 피지컬 컴퓨팅 장치(mockup sketch)를 기반으로 한 초고해상도 산업디자인 블루프린트 포스터.',
+      '',
+      '원본 학생 스케치의 형태와 아이디어를 유지하면서,',
+      '전문 엔지니어링 컨셉 디자인 수준으로 정교하게 발전시킨 기술 일러스트레이션.',
+      '',
+      '스타일:',
+      '- 정교한 블루프린트 / 기술 도면 스타일',
+      '- 짙은 네이비 또는 코발트 블루 배경',
+      '- 정밀한 흰색 테크니컬 라인 아트',
+      '- 정투영 도면 구성',
+      '- 정면도, 측면도, 평면도, 원근 투시도 포함',
+      '- 엔지니어링 드래프팅 스타일',
+      '- 얇은 작도선과 치수 가이드',
+      '- 부품 라벨 및 설명 콜아웃',
+      '- 현실적인 장치 비율',
+      '- 은은한 그리드 종이 배경',
+      '- 미니멀하면서 균형 잡힌 인포그래픽 구성',
+      '- 교육용 STEM 프로젝트 발표 스타일',
+      '- 산업 제품 컨셉 시트 느낌',
+      '- 깔끔한 타이포그래피와 기술 기호',
+      '- exploded component diagram(분해도) 섹션 포함',
+      '- 배선 경로 및 센서 위치 표시',
+      '- 미래지향적이지만 실제 제작 가능한 디자인',
+      '',
+      '중요:',
+      '- 학생 스케치의 전체 형태와 아이디어를 유지할 것',
+      '- 원본 컨셉을 과하게 재설계하지 말 것',
+      '- 학생의 창의성을 유지하면서 전문성과 가독성을 향상시킬 것',
+      '- 고등학교 공학 프로젝트 팀의 실제 프로토타입 제안서처럼 보이게 할 것',
+      '- 포토리얼 스타일 금지',
+      '- 기술 일러스트 및 블루프린트 표현에 집중',
+      '- 복잡하거나 지저분한 배경 금지',
+      '- 깔끔하고 균형 잡힌 포스터 레이아웃',
+      '',
+      '렌더링 품질:',
+      '- ultra detailed',
+      '- extremely high resolution',
+      '- sharp technical lines',
+      '- blueprint line subtle glow',
+      '- professional industrial design presentation'
+    ].join('\n');
+
+    function buildDesignerPrompt(d) {
+      var lines = [];
+      lines.push(DESIGN_PROMPT);
+      lines.push('');
+      lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      lines.push('# 이 팀의 제품 정보 (참고로 반영)');
+      if (d.d_concept)   lines.push('- 제품 컨셉: ' + d.d_concept);
+      if (d.d_target)    lines.push('- 사용자/장소: ' + d.d_target);
+      var parts = getCheckedParts('d');
+      if (parts.length)  lines.push('- 사용 부품: ' + parts.join(', '));
+      if (d.d_partsMemo) lines.push('- 외장/추가: ' + d.d_partsMemo);
+      lines.push('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      lines.push('※ 위 내용을 반영해 블루프린트 일러스트를 생성하고,');
+      lines.push('   학생 스케치 이미지(첨부)의 형태를 충실히 유지해 주세요.');
+      return lines.join('\n');
+    }
+
+    function buildArduinoPrompt(d) {
+      var parts = getCheckedParts('c');
+      var extra = (d.c_partsExtra || '').split(/[,，、]/).map(function(s){return s.trim();}).filter(Boolean);
+      var partsAll = parts.concat(extra);
+      var rows = $$('#c_partsTbody tr').map(function(tr) {
+        var ins = tr.querySelectorAll('input[type="text"], textarea');
+        return { part: ins[0]?ins[0].value.trim():'', role: ins[1]?ins[1].value.trim():'', pin: ins[2]?ins[2].value.trim():'' };
+      }).filter(function(r) { return r.part; });
+      var classes = $$('#c_classTbody tr').map(function(tr) {
+        var ins = tr.querySelectorAll('input[type="text"], textarea');
+        return { name: ins[0]?ins[0].value.trim():'', signal: ins[1]?ins[1].value.trim():'', action: ins[2]?ins[2].value.trim():'' };
+      }).filter(function(c) { return c.name || c.signal || c.action; });
+
+      var lines = [];
+      lines.push('너는 고등학교 메이커 교육 및 피지컬 컴퓨팅 프로젝트를 지도하는 전문 아두이노 개발자이다.');
+      lines.push('아래 조건을 기반으로 학생 프로젝트용 아두이노 코드를 생성하라.');
+      lines.push('');
+      lines.push('# 프로젝트 정보');
+      lines.push(d.c_projectInfo || '(미입력)');
+      lines.push('');
+      lines.push('# 사용할 부품');
+      lines.push(partsAll.length ? partsAll.join(', ') : '(미선택)');
+      lines.push('');
+      lines.push('# 부품별 동작 설명');
+      if (rows.length) rows.forEach(function(r) { if (r.role) lines.push('- ' + r.part + ': ' + r.role); });
+      else lines.push('(미입력)');
+      lines.push('');
+      lines.push('# 부품별 핀 연결 (Arduino UNO)');
+      if (rows.length) rows.forEach(function(r) { if (r.pin) lines.push('- ' + r.part + ' → ' + r.pin); });
+      else lines.push('(미입력)');
+      lines.push('');
+      lines.push('# 구체적인 동작 시나리오');
+      lines.push(d.c_scenario || '(미입력)');
+      lines.push('');
+      lines.push('# Teachable Machine 분류 결과별 동작');
+      if (classes.length) classes.forEach(function(c) {
+        lines.push('- class "' + c.name + '" (신호 "' + c.signal + '") → ' + c.action);
+      });
+      else lines.push('(미입력)');
+      lines.push('');
+      if (d.c_extra) { lines.push('# 추가 조건'); lines.push(d.c_extra); lines.push(''); }
+      lines.push('# 코드 작성 규칙');
+      lines.push('- 반드시 Arduino UNO 기준으로 작성');
+      lines.push('- 초보 학생도 이해할 수 있도록 쉬운 변수명 사용');
+      lines.push('- 모든 코드에 한국어 주석 추가');
+      lines.push('- delay() 남용 최소화, 가능한 millis() 기반 작성');
+      lines.push('- 시리얼 통신: Serial.readStringUntil(\'\\n\') 방식, 9600 baud');
+      lines.push('- 센서 오동작 방지 로직 포함');
+      lines.push('');
+      lines.push('# 반드시 출력할 내용');
+      lines.push('1. 사용 부품 목록과 역할 표');
+      lines.push('2. 핀 연결 표');
+      lines.push('3. 전체 동작 과정 설명');
+      lines.push('4. Arduino UNO 전체 코드 (상세한 한국어 주석)');
+      lines.push('5. 필요한 라이브러리 설명 (설치 방법 포함)');
+      lines.push('6. 오류 발생 가능 부분과 해결 방법');
+      lines.push('7. 확장 아이디어 2가지');
+      return lines.join('\n');
+    }
+
+    function buildHtmlPrompt(d) {
+      var classes = $$('#c_classTbody tr').map(function(tr) {
+        var ins = tr.querySelectorAll('input[type="text"], textarea');
+        return { name: ins[0]?ins[0].value.trim():'', signal: ins[1]?ins[1].value.trim():'', action: ins[2]?ins[2].value.trim():'' };
+      }).filter(function(c) { return c.name || c.signal; });
+
+      var lines = [];
+      lines.push('너는 Teachable Machine과 Arduino UNO를 연결하는 HTML 페이지를 만드는 전문가다.');
+      lines.push('아래 조건을 만족하는 HTML 페이지(HTML+CSS+JavaScript를 하나의 파일에) 코드를 작성하라.');
+      lines.push('');
+      lines.push('# 프로젝트 정보');
+      lines.push(d.c_projectInfo || '(미입력)');
+      lines.push('');
+      lines.push('# 핵심 요구사항');
+      lines.push('- Teachable Machine 이미지 분류 모델을 HTML 페이지에서 불러와 실시간으로 웹캠 이미지를 분류한다.');
+      lines.push('- 분류 결과(class label)에 따라 Web Serial API로 Arduino UNO에 명령을 전송한다.');
+      lines.push('- "Arduino 연결" 버튼으로 사용자가 직접 포트를 선택한다.');
+      lines.push('- "웹캠 시작" 버튼을 포함한다.');
+      lines.push('- 현재 인식된 class label과 confidence 값을 화면에 표시한다.');
+      lines.push('- confidence가 0.85 이상일 때만 Arduino로 명령을 보낸다.');
+      lines.push('- 동일 명령은 최소 1000ms 간격으로만 전송한다 (중복 전송 방지).');
+      lines.push('');
+      lines.push('# Teachable Machine 모델 URL (상수)');
+      lines.push('const MODEL_URL = "' + (d.c_modelUrl || '여기에 Teachable Machine 모델 URL 입력') + '";');
+      lines.push('');
+      lines.push('# 분류 결과 → 전송 신호 매핑');
+      if (classes.length) classes.forEach(function(c) {
+        lines.push('- "' + c.name + '" → "' + c.signal + '\\n"' + (c.action ? '  (아두이노 측: ' + c.action + ')' : ''));
+      });
+      else lines.push('(미입력 — 1글자 또는 짧은 문자열로 설계할 것)');
+      lines.push('');
+      lines.push('# 추가 조건');
+      lines.push('- Web Serial API는 Chrome/Edge에서, HTTPS 또는 localhost 환경에서만 동작한다는 안내를 페이지 상단에 표시.');
+      lines.push('- 모든 코드에 한국어 주석을 자세히 작성.');
+      lines.push('- 보안: innerHTML에 사용자 입력값을 직접 넣지 말 것 (textContent 또는 createElement 사용).');
+      lines.push('- 기본 UI: 깔끔한 카드형 디자인, 상태 표시(연결됨/대기/송신).');
+      if (d.c_extra) { lines.push(''); lines.push('# 학생이 추가로 요청한 조건'); lines.push(d.c_extra); }
+      lines.push('');
+      lines.push('# 출력 형식');
+      lines.push('1. 완성된 HTML 파일 (전체 코드)');
+      lines.push('2. 페이지 사용 방법 설명');
+      lines.push('3. Arduino 측 코드(수신 부분)와 어떻게 연결되는지 설명');
+      return lines.join('\n');
+    }
+
+    function buildCircuitPrompt(d) {
+      var parts = getCheckedParts('r').slice();
+      var extra = (d.r_partsExtra || '').split(/[,，、]/).map(function(s){return s.trim();}).filter(Boolean);
+      var partsAll = parts.concat(extra);
+
+      var lines = [];
+      lines.push('너는 Arduino UNO 기반 회로를 설계하는 전문 회로 엔지니어이자 메이커 교육 지도자다.');
+      lines.push('아래 정보를 바탕으로 학생 프로젝트의 회로도를 **언어와 ASCII 회로도**로 작성하라.');
+      lines.push('');
+      lines.push('# 첨부 자료');
+      lines.push('- 이 메시지에는 학생이 직접 촬영한 **실제 부품 사진**이 첨부되어 있다.');
+      lines.push('- 사진을 보고 각 부품의 모델·핀 배치를 인식해 정확한 연결 설명을 작성한다.');
+      lines.push('- 첨부 사진과 아래 부품 목록이 일치하지 않으면, 사진을 우선으로 판단한다.');
+      lines.push('');
+      lines.push('# 사용 부품 (학생이 선택한 목록)');
+      lines.push(partsAll.length ? partsAll.join(', ') : '(미선택 — 첨부된 사진을 보고 판단)');
+      lines.push('');
+      lines.push('# 반드시 출력할 내용');
+      lines.push('1. 첨부된 부품 사진에서 파악한 각 부품의 핵심 정보 (모델/핀 위치)');
+      lines.push('2. 부품별 연결 설명 (UNO의 어떤 핀에, 어떤 저항을 거쳐, 외부 전원이 필요한지)');
+      lines.push('3. 추천 핀 매핑 (D2~D13, A0~A5 중 어느 핀을 쓰면 좋은지 — 학생이 핀 매핑 표에 채울 수 있게)');
+      lines.push('4. 전체 회로 흐름 (전원 → 입력 → 처리 → 출력 순서로)');
+      lines.push('5. 주의할 점 (역전압, 단락, 모터 보호, 발열, 공통 GND 등)');
+      lines.push('6. 텍스트 회로도 (ASCII art 형태로 부품과 핀 연결을 한눈에)');
+      lines.push('7. 학생이 직접 연결할 때 점검할 체크리스트 (단계별 확인 항목)');
+      lines.push('');
+      lines.push('# 작성 톤');
+      lines.push('- 고등학생도 이해할 수 있게 쉬운 용어로');
+      lines.push('- 필요한 경우 회로 용어는 괄호로 짧게 설명');
+      lines.push('- 사진에서 못 알아본 부분은 추측하지 말고 솔직히 명시할 것');
+      return lines.join('\n');
+    }
+
+    function updateAllPrompts() {
+      var d = getRawData();
+      var role = state.role;
+      if (role === 'designer') {
+        $('d_blueprintPrompt').textContent = buildDesignerPrompt(d);
+      } else if (role === 'coder') {
+        $('c_arduinoPrompt').textContent = buildArduinoPrompt(d);
+        $('c_htmlPrompt').textContent    = buildHtmlPrompt(d);
+      } else if (role === 'circuit') {
+        $('r_circuitPrompt').textContent = buildCircuitPrompt(d);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       7. 데이터 수집 / 적용
+       ═══════════════════════════════════════════════════════════════ */
+    function val(id) { var el = $(id); return el ? (el.value || '').trim() : ''; }
+    function setVal(id, v) { var el = $(id); if (el) el.value = v || ''; }
+
+    function getRawData() {
+      return {
+        teamName:    val('teamName'),
+        classInfo:   val('classInfo'),
+        studentName: val('studentName'),
+
+        /* designer */
+        d_concept:    val('d_concept'),
+        d_target:     val('d_target'),
+        d_partsMemo:  val('d_partsMemo'),
+        d_consider:   val('d_consider'),
+        d_strength:   val('d_strength'),
+        d_limit:      val('d_limit'),
+
+        /* coder */
+        c_partsExtra:  val('c_partsExtra'),
+        c_projectInfo: val('c_projectInfo'),
+        c_scenario:    val('c_scenario'),
+        c_modelUrl:    val('c_modelUrl'),
+        c_extra:       val('c_extra'),
+        c_arduinoCode: val('c_arduinoCode'),
+        c_htmlCode:    val('c_htmlCode'),
+
+        /* circuit */
+        r_partsExtra: val('r_partsExtra'),
+
+        /* tm */
+        t_purpose:   val('t_purpose'),
+        t_input:     val('t_input'),
+        t_collectHow:val('t_collectHow'),
+        t_diversity: val('t_diversity'),
+        t_consider:  val('t_consider'),
+        t_accuracy:  val('t_accuracy'),
+        t_confuse:   val('t_confuse'),
+        t_improve:   val('t_improve'),
+        t_modelUrl:  val('t_modelUrl')
+      };
+    }
+
+    function getFormData() {
+      var d = getRawData();
+      d.source = SOURCE_ID;
+      d.role   = state.role || '';
+
+      d.d_parts = getCheckedParts('d');
+      d.c_parts = getCheckedParts('c');
+      d.r_parts = getCheckedParts('r');
+
+      d.c_partsTable = $$('#c_partsTbody tr').map(function(tr) {
+        var ins = tr.querySelectorAll('input[type="text"], textarea');
+        return { part: ins[0]?ins[0].value.trim():'', role: ins[1]?ins[1].value.trim():'', pin: ins[2]?ins[2].value.trim():'' };
+      }).filter(function(r){ return r.part || r.role || r.pin; });
+
+      d.c_classes = $$('#c_classTbody tr').map(function(tr) {
+        var ins = tr.querySelectorAll('input[type="text"], textarea');
+        return { name: ins[0]?ins[0].value.trim():'', signal: ins[1]?ins[1].value.trim():'', action: ins[2]?ins[2].value.trim():'' };
+      }).filter(function(c){ return c.name || c.signal || c.action; });
+
+      d.r_pinMappings = getPinMappings();
+
+      /* TM 클래스 */
+      d.t_classes = $$('#t_classTbody tr').map(function(tr) {
+        var ins = tr.querySelectorAll('input[type="text"], input[type="number"], textarea, select');
+        return {
+          name:   ins[0] ? ins[0].value.trim() : '',
+          desc:   ins[1] ? ins[1].value.trim() : '',
+          count:  ins[2] ? ins[2].value.trim() : '',
+          method: ins[3] ? ins[3].value : ''
+        };
+      }).filter(function(c){ return c.name || c.desc || c.count; });
+
+      d.d_sketchImages    = imageStore.d_sketch.slice();
+      d.d_blueprintImages = imageStore.d_blueprint.slice();
+      d.r_partsImages     = imageStore.r_parts.slice();
+      d.r_diagramImages   = imageStore.r_diagram.slice();
+      d.t_trainImages     = imageStore.t_train.slice();
+      d.t_testImages      = imageStore.t_test.slice();
+
+      /* 자동 생성 프롬프트 (시트에 같이 저장) */
+      if (d.role === 'designer')      d.d_blueprintPromptText = buildDesignerPrompt(d);
+      else if (d.role === 'coder')   { d.c_arduinoPromptText  = buildArduinoPrompt(d); d.c_htmlPromptText = buildHtmlPrompt(d); }
+      else if (d.role === 'circuit')  d.r_circuitPromptText   = buildCircuitPrompt(d);
+
+      d.savedAt = new Date().toISOString();
+      return d;
+    }
+
+    function setFormData(d) {
+      if (!d) return;
+      setVal('teamName', d.teamName);
+      setVal('classInfo', d.classInfo);
+      setVal('studentName', d.studentName);
+
+      setVal('d_concept', d.d_concept);
+      setVal('d_target', d.d_target);
+      setVal('d_partsMemo', d.d_partsMemo);
+      setVal('d_consider', d.d_consider);
+      setVal('d_strength', d.d_strength);
+      setVal('d_limit', d.d_limit);
+
+      setVal('c_partsExtra', d.c_partsExtra);
+      setVal('c_projectInfo', d.c_projectInfo);
+      setVal('c_scenario', d.c_scenario);
+      setVal('c_modelUrl', d.c_modelUrl);
+      setVal('c_extra', d.c_extra);
+      setVal('c_arduinoCode', d.c_arduinoCode);
+      setVal('c_htmlCode', d.c_htmlCode);
+
+      setVal('r_partsExtra', d.r_partsExtra);
+
+      setVal('t_purpose', d.t_purpose); setVal('t_input', d.t_input);
+      setVal('t_collectHow', d.t_collectHow); setVal('t_diversity', d.t_diversity);
+      setVal('t_consider', d.t_consider); setVal('t_accuracy', d.t_accuracy);
+      setVal('t_confuse', d.t_confuse); setVal('t_improve', d.t_improve);
+      setVal('t_modelUrl', d.t_modelUrl);
+
+      setCheckedParts('d', d.d_parts || []);
+      setCheckedParts('c', d.c_parts || []);
+      setCheckedParts('r', d.r_parts || []);
+
+      clearChildren($('c_partsTbody'));
+      (d.c_partsTable && d.c_partsTable.length ? d.c_partsTable : [{part:'',role:'',pin:''}])
+        .forEach(function(r) { addCoderPartRow(r.part, r.role, r.pin); });
+
+      clearChildren($('c_classTbody'));
+      (d.c_classes && d.c_classes.length ? d.c_classes : [{name:'',signal:'',action:''},{name:'',signal:'',action:''},{name:'',signal:'',action:''}])
+        .forEach(function(c) { addClassRow(c.name, c.signal, c.action); });
+
+      syncPinSelects();
+      if (d.r_pinMappings && d.r_pinMappings.length) {
+        d.r_pinMappings.forEach(function(m) {
+          var tr = document.querySelector('#r_pinTbody tr[data-pin-name="' + m.pin + '"]');
+          if (!tr) return;
+          var sel = tr.querySelector('select');
+          var memo = tr.querySelector('input[type="text"]');
+          if (sel) sel.value = m.part || '';
+          if (memo) memo.value = m.memo || '';
+        });
+      }
+
+      clearChildren($('t_classTbody'));
+      var tClasses = (d.t_classes && d.t_classes.length) ? d.t_classes :
+        [{name:'',desc:'',count:'',method:''},{name:'',desc:'',count:'',method:''},{name:'',desc:'',count:'',method:''}];
+      tClasses.forEach(function(c) { addTmClassRow(c.name, c.desc, c.count, c.method); });
+
+      imageStore.d_sketch    = (d.d_sketchImages    || []).slice();
+      imageStore.d_blueprint = (d.d_blueprintImages || []).slice();
+      imageStore.r_parts     = (d.r_partsImages     || []).slice();
+      imageStore.r_diagram   = (d.r_diagramImages   || []).slice();
+      imageStore.t_train     = (d.t_trainImages     || []).slice();
+      imageStore.t_test      = (d.t_testImages      || []).slice();
+      renderPreview('d_sketch');
+      renderPreview('d_blueprint');
+      renderPreview('r_parts');
+      renderPreview('r_diagram');
+      renderPreview('t_train');
+      renderPreview('t_test');
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       8. 자동 임시저장 (localStorage)
+       ═══════════════════════════════════════════════════════════════ */
+    var draftTimer = null;
+    function scheduleDraft() {
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(function() {
+        try {
+          var data = getFormData();
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+          var now = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+          $('draftLabel').textContent = '임시저장: ' + now;
+          updateAllPrompts();
+        } catch (e) {
+          if (e && e.name === 'QuotaExceededError') {
+            $('draftLabel').textContent = '임시저장 용량 부족 (이미지 .json 사용 권장)';
+          }
+        }
+      }, 1200);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       9. 검증
+       ═══════════════════════════════════════════════════════════════ */
+    function validateLanding() {
+      var ok = true;
+      ['teamName', 'studentName'].forEach(function(id) {
+        var el = $(id);
+        if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
+        else el.classList.remove('invalid');
+      });
+      return ok;
+    }
+    function validateRole() {
+      var role = state.role;
+      var requiredByRole = {
+        designer: ['d_concept', 'd_consider', 'd_strength', 'd_limit'],
+        coder:    ['c_projectInfo', 'c_scenario'],
+        circuit:  [],
+        tm:       ['t_purpose', 't_collectHow', 't_diversity', 't_consider', 't_accuracy', 't_modelUrl']
+      };
+      var ids = (requiredByRole[role] || []).concat(['teamName', 'studentName']);
+      var ok = true; var firstInvalid = null;
+      ids.forEach(function(id) {
+        var el = $(id); if (!el) return;
+        if (!el.value.trim()) { el.classList.add('invalid'); ok = false; if (!firstInvalid) firstInvalid = el; }
+        else el.classList.remove('invalid');
+      });
+      if (!ok && firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return ok;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       10. TXT 생성 (역할별)
+       ═══════════════════════════════════════════════════════════════ */
+    function buildTxt(d) {
+      var lines = [];
+      var now = new Date().toLocaleString('ko-KR');
+      var roleLabel = { designer: '제품 디자이너', coder: '프로그래밍 코드 설계', circuit: '아두이노 장치 설계', tm: '이미지 분류 모델 생성' }[d.role] || '';
+      lines.push('═══════════════════════════════════════════════════');
+      lines.push('  AI × 피지컬컴퓨팅 팀 프로젝트 설계 활동지');
+      lines.push('  역할: ' + roleLabel);
+      lines.push('  작성일시: ' + now);
+      lines.push('═══════════════════════════════════════════════════');
+      lines.push('');
+      lines.push('【 팀 정보 】');
+      lines.push('팀명: ' + (d.teamName || ''));
+      lines.push('반/번호: ' + (d.classInfo || ''));
+      lines.push('이름: ' + (d.studentName || ''));
+      lines.push('');
+
+      if (d.role === 'designer') {
+        lines.push('【 디자인 컨셉 】');
+        lines.push('- 제품 컨셉: ' + (d.d_concept || ''));
+        lines.push('- 타깃/장소: ' + (d.d_target || ''));
+        lines.push('');
+        lines.push('【 사용 부품 】');
+        lines.push((d.d_parts || []).join(', ') + (d.d_partsMemo ? ' / 메모: ' + d.d_partsMemo : ''));
+        lines.push('');
+        lines.push('【 MOCK 스케치 】 ' + ((d.d_sketchImages || []).length) + '장 첨부');
+        lines.push('【 블루프린트 결과 】 ' + ((d.d_blueprintImages || []).length) + '장 첨부');
+        lines.push('');
+        lines.push('【 디자인 자기 평가 】');
+        lines.push('고려사항: ' + (d.d_consider || ''));
+        lines.push('장점: ' + (d.d_strength || ''));
+        lines.push('한계/개선: ' + (d.d_limit || ''));
+        lines.push('');
+        lines.push('【 블루프린트 생성 프롬프트 】');
+        lines.push(d.d_blueprintPromptText || '');
+      } else if (d.role === 'coder') {
+        lines.push('【 사용 부품 】');
+        lines.push((d.c_parts || []).concat((d.c_partsExtra || '').split(/[,，、]/).map(function(s){return s.trim();}).filter(Boolean)).join(', '));
+        lines.push('');
+        lines.push('【 부품별 역할·핀 】');
+        (d.c_partsTable || []).forEach(function(r) {
+          lines.push('- [' + r.part + '] 핀: ' + r.pin + ' / 역할: ' + r.role);
+        });
+        lines.push('');
+        lines.push('【 분류 결과별 동작 】');
+        (d.c_classes || []).forEach(function(c) {
+          lines.push('- ' + c.name + ' → 신호 "' + c.signal + '" → ' + c.action);
+        });
+        lines.push('');
+        lines.push('【 동작 시나리오 】 ' + (d.c_projectInfo || ''));
+        lines.push(d.c_scenario || '');
+        lines.push('');
+        if (d.c_modelUrl) lines.push('TM 모델 URL: ' + d.c_modelUrl);
+        if (d.c_extra)    lines.push('추가 조건: ' + d.c_extra);
+        lines.push('');
+        lines.push('───────── Arduino 프롬프트 ─────────');
+        lines.push(d.c_arduinoPromptText || '');
+        lines.push('');
+        lines.push('───────── 생성된 Arduino 코드 ─────────');
+        lines.push(d.c_arduinoCode || '(미입력)');
+        lines.push('');
+        lines.push('───────── HTML 프롬프트 ─────────');
+        lines.push(d.c_htmlPromptText || '');
+        lines.push('');
+        lines.push('───────── 생성된 HTML 코드 ─────────');
+        lines.push(d.c_htmlCode || '(미입력)');
+      } else if (d.role === 'circuit') {
+        lines.push('【 사용 부품 】');
+        lines.push((d.r_parts || []).concat((d.r_partsExtra || '').split(/[,，、]/).map(function(s){return s.trim();}).filter(Boolean)).join(', '));
+        lines.push('');
+        lines.push('【 부품 실물 사진 】 ' + ((d.r_partsImages || []).length) + '장 첨부');
+        lines.push('');
+        lines.push('【 UNO 핀 매핑 】');
+        (d.r_pinMappings || []).forEach(function(m) {
+          lines.push('- ' + m.pin + ' → ' + m.part + (m.memo ? ' (' + m.memo + ')' : ''));
+        });
+        lines.push('');
+        lines.push('【 회로도 캡처 】 ' + ((d.r_diagramImages || []).length) + '장 첨부');
+        lines.push('');
+        lines.push('───────── 회로도 프롬프트 ─────────');
+        lines.push(d.r_circuitPromptText || '');
+      } else if (d.role === 'tm') {
+        lines.push('【 모델 목적 】');
+        lines.push('- 한 줄 목적: ' + (d.t_purpose || ''));
+        lines.push('- 입력 (인식 대상): ' + (d.t_input || ''));
+        lines.push('');
+        lines.push('【 학습 클래스 】');
+        (d.t_classes || []).forEach(function(c, i) {
+          lines.push((i+1) + '. [' + c.name + '] ' + c.desc + ' / 이미지 ' + (c.count||'?') + '장 / 수집: ' + (c.method||'-'));
+        });
+        lines.push('');
+        lines.push('【 데이터 수집 】');
+        lines.push('- 수집 방법: ' + (d.t_collectHow || ''));
+        lines.push('- 다양성 확보: ' + (d.t_diversity || ''));
+        lines.push('- 정확도 향상 고려사항: ' + (d.t_consider || ''));
+        lines.push('');
+        lines.push('【 학습 · 테스트 결과 】');
+        lines.push('- 정확도: ' + (d.t_accuracy || ''));
+        lines.push('- 혼동/오류 상황: ' + (d.t_confuse || ''));
+        lines.push('- 개선 아이디어: ' + (d.t_improve || ''));
+        lines.push('');
+        lines.push('【 모델 URL 】 ' + (d.t_modelUrl || ''));
+        lines.push('【 학습 이미지 샘플 】 ' + ((d.t_trainImages || []).length) + '장 첨부');
+        lines.push('【 테스트 결과 캡처 】 ' + ((d.t_testImages || []).length) + '장 첨부');
+      }
+      lines.push('');
+      lines.push('───────────────────────────────────────────────────');
+      return lines.join('\n');
+    }
+
+    function downloadTxt(d) {
+      var txt = buildTxt(d);
+      var blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      var safeTeam = (d.teamName || '팀').replace(/\s+/g, '_');
+      var roleKey  = { designer: '디자이너', coder: '코드', circuit: '회로', tm: 'TM모델' }[d.role] || '';
+      var stamp = new Date().toISOString().slice(0, 10);
+      a.download = '설계_' + safeTeam + '_' + roleKey + '_' + (d.studentName || '학생').replace(/\s+/g, '') + '_' + stamp + '.txt';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       11. 상태 / 화면 전환
+       ═══════════════════════════════════════════════════════════════ */
+    var state = { role: null };
+
+    function selectRoleCard(role) {
+      $$('.role-card').forEach(function(c) { c.classList.remove('active'); });
+      var card = document.querySelector('.role-card[data-role="' + role + '"]');
+      if (card) card.classList.add('active');
+      state.role = role;
+    }
+
+    function showRoleSection(role) {
+      $$('.activity-section').forEach(function(s) { s.classList.remove('show'); });
+      var sec = $('role-' + role);
+      if (sec) sec.classList.add('show');
+      $('landing').style.display = 'none';
+      $('actionBar').classList.add('show');
+
+      var pill = $('rolePill');
+      pill.className = 'role-pill ' + role + ' show';
+      pill.textContent = { designer: '✏️ 제품 디자이너', coder: '💻 프로그래밍 코드 설계', circuit: '🔌 아두이노 장치 설계', tm: '🧠 이미지 분류 모델 생성' }[role];
+
+      var team = val('teamName'); var name = val('studentName');
+      if (role === 'designer') { $('bdTeam').textContent = team; $('bdName').textContent = name; }
+      else if (role === 'coder') { $('bcTeam').textContent = team; $('bcName').textContent = name; }
+      else if (role === 'circuit') { $('brTeam').textContent = team; $('brName').textContent = name; }
+      else if (role === 'tm') { $('btTeam').textContent = team; $('btName').textContent = name; }
+
+      $('printMeta').textContent = '팀: ' + team + ' · 이름: ' + name + ' · 역할: ' + ({ designer: '제품 디자이너', coder: '프로그래밍 코드 설계', circuit: '아두이노 장치 설계', tm: '이미지 분류 모델 생성' }[role] || '');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      updateAllPrompts();
+    }
+
+    function backToLanding() {
+      $$('.activity-section').forEach(function(s) { s.classList.remove('show'); });
+      $('landing').style.display = '';
+      $('actionBar').classList.remove('show');
+      $('rolePill').className = 'role-pill';
+      $('rolePill').textContent = '';
+      state.role = null;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       12. 이벤트 바인딩
+       ═══════════════════════════════════════════════════════════════ */
+    $$('.role-card').forEach(function(card) {
+      card.addEventListener('click', function() { selectRoleCard(card.dataset.role); });
+    });
+
+    $('btnStart').addEventListener('click', function() {
+      if (!validateLanding()) { showToast('팀명과 이름을 입력해 주세요.', 'error'); return; }
+      if (!state.role) { showToast('역할을 선택해 주세요.', 'error'); return; }
+      showRoleSection(state.role);
+      scheduleDraft();
+    });
+
+    $$('[data-back-to-landing]').forEach(function(b) {
+      b.addEventListener('click', backToLanding);
+    });
+
+    /* 부품 체크 변경 시 표 동기화 */
+    document.addEventListener('change', function(e) {
+      if (e.target.name === 'c_parts') syncCoderPartsTable();
+      if (e.target.name === 'r_parts') syncPinSelects();
+      scheduleDraft();
+    });
+    $('c_partsExtra').addEventListener('input', function() { syncCoderPartsTable(); scheduleDraft(); });
+    $('r_partsExtra').addEventListener('input', function() { syncPinSelects(); scheduleDraft(); });
+
+    /* 모든 input/textarea 변경 → draft */
+    document.addEventListener('input', function(e) {
+      if (e.target.matches('input, textarea, select')) scheduleDraft();
+    });
+
+    /* 부품/클래스 행 추가 */
+    $('c_addPart').addEventListener('click', function() { addCoderPartRow('', '', ''); scheduleDraft(); });
+    $('c_addClass').addEventListener('click', function() {
+      if ($('c_classTbody').rows.length >= 6) { showToast('최대 6개까지 추가할 수 있습니다.', 'error'); return; }
+      addClassRow('', '', ''); scheduleDraft();
+    });
+    $('t_addClass').addEventListener('click', function() {
+      if ($('t_classTbody').rows.length >= 6) { showToast('최대 6개까지 추가할 수 있습니다.', 'error'); return; }
+      addTmClassRow('', '', '', ''); scheduleDraft();
+    });
+
+    /* 프롬프트 복사·다운로드 */
+    document.addEventListener('click', function(e) {
+      var copyTarget = e.target.closest('[data-copy]');
+      var dlTarget   = e.target.closest('[data-download-prompt]');
+      function readContent(el) {
+        if (!el) return '';
+        if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') return el.value || '';
+        return el.textContent || '';
+      }
+      if (copyTarget) {
+        var id = copyTarget.dataset.copy;
+        var text = readContent($(id));
+        if (!text) { showToast('복사할 내용이 없습니다.', 'error'); return; }
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text)
+            .then(function() { showToast('복사했습니다.', 'success'); })
+            .catch(function() { showToast('복사 실패. 직접 선택하세요.', 'error'); });
+        } else {
+          showToast('이 브라우저는 자동 복사를 지원하지 않습니다.', 'error');
+        }
+      }
+      if (dlTarget) {
+        var id2 = dlTarget.dataset.downloadPrompt;
+        var fn = dlTarget.dataset.filename || 'prompt.txt';
+        var text2 = readContent($(id2));
+        if (!text2) { showToast('저장할 내용이 없습니다.', 'error'); return; }
+        var blob = new Blob([text2], { type: 'text/plain;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = fn;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       13. 제출 / 임시저장 / 불러오기 / 초기화
+       ═══════════════════════════════════════════════════════════════ */
+    var formSubmitted = false;
+
+    $('btnSubmit').addEventListener('click', function() {
+      if (!validateRole()) { showToast('필수 항목(*)을 모두 입력해 주세요.', 'error'); return; }
+      var roleLabel = { designer: '제품 디자이너', coder: '프로그래밍 코드 설계', circuit: '아두이노 장치 설계', tm: '이미지 분류 모델 생성' }[state.role];
+      if (!confirm('제출하시겠습니까?\n· 역할: ' + roleLabel + '\n· TXT 파일이 다운로드됩니다\n· 구글 시트로 자동 전송됩니다')) return;
+
+      var data = getFormData();
+      var btn = this; btn.disabled = true;
+      formSubmitted = true;
+
+      downloadTxt(data);
+
+      var url = localStorage.getItem(URL_KEY) || DEFAULT_SCRIPT_URL;
+      if (!url) {
+        showToast('TXT는 저장됐습니다. 시트 URL이 설정되지 않아 시트 전송은 생략됩니다.', 'info', 5000);
+        btn.disabled = false;
+        return;
+      }
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function() {
+        showToast('제출 완료 — TXT 저장 + 시트 전송', 'success', 4500);
+      }).catch(function(err) {
+        showToast('TXT는 저장됐습니다. 시트 전송 오류: ' + err.message, 'error', 5000);
+      }).finally(function() { btn.disabled = false; });
+    });
+
+    $('btnDraft').addEventListener('click', function() {
+      var data = getFormData();
+      var meta = { savedAt: new Date().toISOString(), source: data.source, role: data.role, version: 1 };
+      var out = {}; for (var k in data) out[k] = data[k]; out._draftMeta = meta;
+      var blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      var stamp = new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+      var safe = (data.studentName || '학생').replace(/\s+/g, '');
+      a.download = safe + '_설계_' + (data.role || 'unknown') + '_임시저장_' + stamp + '.json';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      showToast('임시저장 .json 파일을 내려받았습니다.', 'success');
+    });
+
+    $('btnLoad').addEventListener('click', function() { $('fileInput').click(); });
+    $('fileInput').addEventListener('change', function(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          var data = JSON.parse(ev.target.result);
+          setFormData(data);
+          if (data.role) {
+            state.role = data.role;
+            showRoleSection(data.role);
+          }
+          scheduleDraft();
+          showToast('불러왔습니다.', 'success');
+        } catch (err) { showToast('JSON 파일을 읽을 수 없습니다: ' + err.message, 'error'); }
+      };
+      reader.readAsText(file, 'utf-8');
+      e.target.value = '';
+    });
+
+    $('btnClear').addEventListener('click', function() {
+      if (!confirm('이 역할의 입력 내용과 첨부를 모두 초기화할까요?\n(팀명·이름은 유지됩니다)')) return;
+      var role = state.role;
+      if (role === 'designer') {
+        ['d_concept','d_target','d_partsMemo','d_consider','d_strength','d_limit'].forEach(function(id){ setVal(id,''); });
+        setCheckedParts('d', []);
+        imageStore.d_sketch = []; imageStore.d_blueprint = [];
+        renderPreview('d_sketch'); renderPreview('d_blueprint');
+      } else if (role === 'coder') {
+        ['c_partsExtra','c_projectInfo','c_scenario','c_modelUrl','c_extra','c_arduinoCode','c_htmlCode'].forEach(function(id){ setVal(id,''); });
+        setCheckedParts('c', []);
+        clearChildren($('c_partsTbody')); addCoderPartRow('','','');
+        clearChildren($('c_classTbody')); addClassRow('','',''); addClassRow('','',''); addClassRow('','','');
+      } else if (role === 'circuit') {
+        setVal('r_partsExtra', '');
+        setCheckedParts('r', []);
+        $$('#r_pinTbody select').forEach(function(s){ s.value = ''; });
+        $$('#r_pinTbody input[type="text"]').forEach(function(i){ i.value = ''; });
+        imageStore.r_parts = []; renderPreview('r_parts');
+        imageStore.r_diagram = []; renderPreview('r_diagram');
+        syncPinSelects();
+      } else if (role === 'tm') {
+        ['t_purpose','t_input','t_collectHow','t_diversity','t_consider','t_accuracy','t_confuse','t_improve','t_modelUrl']
+          .forEach(function(id){ setVal(id,''); });
+        clearChildren($('t_classTbody'));
+        addTmClassRow('','','',''); addTmClassRow('','','',''); addTmClassRow('','','','');
+        imageStore.t_train = []; imageStore.t_test = [];
+        renderPreview('t_train'); renderPreview('t_test');
+      }
+      $$('.invalid').forEach(function(el){ el.classList.remove('invalid'); });
+      scheduleDraft();
+      showToast('이 역할의 입력을 초기화했습니다.', 'info');
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       14. 설정 패널 (URL)
+       ═══════════════════════════════════════════════════════════════ */
+    function updateUrlStatus(url) {
+      var el = $('urlStatus');
+      if (url && url.indexOf('script.google.com') !== -1) {
+        el.textContent = '✔ URL이 저장되었습니다. 구글 시트 자동 전송이 활성화됩니다.';
+        el.className = 'url-status ok';
+      } else {
+        el.textContent = 'URL을 입력하면 구글 시트에 자동 저장됩니다.';
+        el.className = 'url-status empty';
+      }
+    }
+    $('btnSettings').addEventListener('click', function() {
+      var p = $('settingsPanel');
+      p.style.display = p.style.display === 'none' ? '' : 'none';
+    });
+    $('btnSaveUrl').addEventListener('click', function() {
+      var url = $('scriptUrl').value.trim();
+      localStorage.setItem(URL_KEY, url);
+      updateUrlStatus(url);
+      showToast('URL이 저장되었습니다.', 'success');
+    });
+    $('btnSetupGuide').addEventListener('click', function() { $('guideModal').style.display = 'block'; });
+    $('closeGuide').addEventListener('click', function() { $('guideModal').style.display = 'none'; });
+    $('guideModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
+    $('btnPrint').addEventListener('click', function() { window.print(); });
+    $('btnBack').addEventListener('click', function() { location.href = '.'; });
+
+    window.addEventListener('beforeunload', function(e) {
+      if (formSubmitted) return;
+      var hasInput = ['teamName','studentName','d_concept','c_projectInfo','t_purpose']
+        .some(function(id){ var el = $(id); return el && el.value.trim(); })
+        || imageStore.d_sketch.length || imageStore.d_blueprint.length
+        || imageStore.r_parts.length  || imageStore.r_diagram.length
+        || imageStore.t_train.length  || imageStore.t_test.length;
+      if (hasInput) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       15. 초기화
+       ═══════════════════════════════════════════════════════════════ */
+    (function init() {
+      renderPartsGrid('dParts', 'd');
+      renderPartsGrid('cParts', 'c');
+      renderPartsGrid('rParts', 'r');
+      renderPinTable();
+      syncPinSelects();
+      addCoderPartRow('', '', '');
+      addClassRow('', '', ''); addClassRow('', '', ''); addClassRow('', '', '');
+
+      ['d_sketch', 'd_blueprint'].forEach(function(k) { setupImageZone(k, 5); });
+      setupImageZone('r_parts', 10);
+      setupImageZone('r_diagram', 5);
+      setupImageZone('t_train', 60);
+      setupImageZone('t_test', 16);
+      addTmClassRow('','','',''); addTmClassRow('','','',''); addTmClassRow('','','','');
+
+      var savedUrl = localStorage.getItem(URL_KEY) || DEFAULT_SCRIPT_URL;
+      $('scriptUrl').value = savedUrl;
+      updateUrlStatus(savedUrl);
+
+      try {
+        var saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+        if (saved && saved.teamName) {
+          setFormData(saved);
+          if (saved.role) { state.role = saved.role; selectRoleCard(saved.role); }
+          showToast('이전에 작성하던 내용을 불러왔습니다. 역할 선택 후 [활동 시작하기]를 눌러주세요.', 'info', 5000);
+        }
+      } catch (e) {}
+    })();
+
+  })();
+  </script>
+</body>
+</html>

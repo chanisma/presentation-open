@@ -1,0 +1,651 @@
+{
+  "scenarios": [
+    {
+      "id": "cycle3-1-world-heritage",
+      "title": "세계의 명소와 문화유산",
+      "titleEn": "World Heritage Sites",
+      "target": "중학교 2학년 학생",
+      "style": "Editorial Magazine",
+      "styleNumber": 15,
+      "slideCount": 10,
+      "imageStrategy": "heavy",
+      "totalImages": 14,
+      "slides": [
+        {
+          "number": 1,
+          "type": "cover",
+          "title": "세계의 명소와 문화유산",
+          "subtitle": "인류가 남긴 위대한 유산을 찾아서",
+          "content": [],
+          "images": [
+            {
+              "keyword": "world heritage sites collage aerial view",
+              "type": "photo",
+              "usage": "cover-bg",
+              "filename": "img-01-cover.jpg"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "type": "section-overview",
+          "title": "문화유산이란 무엇인가?",
+          "content": [
+            "유네스코 세계유산의 정의와 등재 기준",
+            "문화유산 vs 자연유산 vs 복합유산",
+            "2024년 기준 전 세계 1,199건 등재"
+          ],
+          "images": [
+            {
+              "keyword": "UNESCO world heritage logo monument",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-02-unesco.jpg"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "type": "image-focus",
+          "title": "마추픽추 (페루)",
+          "content": [
+            "잉카 제국의 잃어버린 도시",
+            "해발 2,430m 안데스 산맥 위에 건설",
+            "1983년 유네스코 세계유산 등재"
+          ],
+          "images": [
+            {
+              "keyword": "Machu Picchu panoramic view mountains",
+              "type": "photo",
+              "usage": "image-focus",
+              "filename": "img-03-machu-picchu.jpg"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "type": "image-focus",
+          "title": "콜로세움 (이탈리아)",
+          "content": [
+            "로마 제국의 거대한 원형 경기장",
+            "5만 명 수용 가능한 건축 걸작",
+            "검투사 경기와 공연의 무대"
+          ],
+          "images": [
+            {
+              "keyword": "Colosseum Rome Italy sunset",
+              "type": "photo",
+              "usage": "image-focus",
+              "filename": "img-04-colosseum.jpg"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "type": "two-column",
+          "title": "앙코르 와트 (캄보디아)",
+          "content": [
+            "세계 최대의 종교 건축물",
+            "12세기 크메르 제국의 힌두교 사원",
+            "정교한 부조와 탑 구조"
+          ],
+          "images": [
+            {
+              "keyword": "Angkor Wat temple Cambodia sunrise reflection",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-05-angkor-wat.jpg"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "type": "two-column",
+          "title": "만리장성 (중국)",
+          "content": [
+            "총 길이 약 21,196km",
+            "2,000년에 걸쳐 건설된 방어 시설",
+            "우주에서도 보인다는 전설 (실제로는 불가능)"
+          ],
+          "images": [
+            {
+              "keyword": "Great Wall of China aerial landscape",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-06-great-wall.jpg"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "type": "image-focus",
+          "title": "타지마할 (인도)",
+          "content": [
+            "무굴 제국 황제의 사랑의 기념물",
+            "대리석으로 지어진 무덤 건축물",
+            "완벽한 대칭 구조와 정원"
+          ],
+          "images": [
+            {
+              "keyword": "Taj Mahal India reflection pool",
+              "type": "photo",
+              "usage": "image-focus",
+              "filename": "img-07-taj-mahal.jpg"
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "type": "card-grid",
+          "title": "한국의 세계유산",
+          "content": [
+            "석굴암과 불국사",
+            "해인사 장경판전",
+            "수원 화성",
+            "경주 역사유적지구"
+          ],
+          "images": [
+            {
+              "keyword": "Bulguksa temple Gyeongju Korea",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08a-bulguksa.jpg"
+            },
+            {
+              "keyword": "Hwaseong Fortress Suwon Korea",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08b-hwaseong.jpg"
+            },
+            {
+              "keyword": "Seokguram Grotto Korea Buddha",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08c-seokguram.jpg"
+            },
+            {
+              "keyword": "Haeinsa Temple Tripitaka Koreana",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08d-haeinsa.jpg"
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "type": "two-column",
+          "title": "세계유산 보호의 중요성",
+          "content": [
+            "기후변화로 인한 유산 훼손 위기",
+            "관광객 증가와 보존의 균형",
+            "디지털 기술을 활용한 보존 노력"
+          ],
+          "images": [
+            {
+              "keyword": "heritage site conservation restoration work",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-09-conservation.jpg"
+            }
+          ]
+        },
+        {
+          "number": 10,
+          "type": "closing",
+          "title": "우리가 지켜야 할 인류의 유산",
+          "content": [
+            "문화유산은 과거와 현재를 잇는 다리",
+            "다음 세대를 위한 보존 실천"
+          ],
+          "images": [
+            {
+              "keyword": "children visiting world heritage site education",
+              "type": "photo",
+              "usage": "cover-bg",
+              "filename": "img-10-closing.jpg"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cycle3-2-ai-careers",
+      "title": "인공지능과 미래 직업",
+      "titleEn": "AI and Future Careers",
+      "target": "고등학교 1학년 학생",
+      "style": "Glassmorphism",
+      "styleNumber": 1,
+      "slideCount": 10,
+      "imageStrategy": "mixed",
+      "totalImages": 10,
+      "emojiOnlySlides": [2, 6, 10],
+      "slides": [
+        {
+          "number": 1,
+          "type": "cover",
+          "title": "인공지능과 미래 직업",
+          "subtitle": "AI 시대, 나의 진로를 설계하다",
+          "content": [],
+          "images": [
+            {
+              "keyword": "artificial intelligence futuristic digital brain",
+              "type": "illustration",
+              "usage": "cover-bg",
+              "filename": "img-01-cover.jpg"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "type": "section-overview",
+          "title": "AI란 무엇인가?",
+          "content": [
+            "인공지능의 정의: 인간의 학습·추론·판단을 모방하는 기술",
+            "약한 AI vs 강한 AI vs 초지능",
+            "머신러닝, 딥러닝, 생성형 AI의 차이"
+          ],
+          "images": [],
+          "emoji": "🤖"
+        },
+        {
+          "number": 3,
+          "type": "two-column",
+          "title": "AI의 역사와 발전",
+          "content": [
+            "1956년 다트머스 회의에서 AI 개념 탄생",
+            "2016년 알파고 vs 이세돌",
+            "2022년 ChatGPT 등장과 생성형 AI 혁명"
+          ],
+          "images": [
+            {
+              "keyword": "AlphaGo vs Lee Sedol Go game 2016",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-03-alphago.jpg"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "type": "card-grid",
+          "title": "AI가 바꾸는 산업 분야",
+          "content": [
+            "의료: AI 진단 보조, 신약 개발",
+            "금융: 로보어드바이저, 사기 탐지",
+            "교육: 맞춤형 학습, AI 튜터",
+            "제조: 스마트 팩토리, 품질 관리"
+          ],
+          "images": [
+            {
+              "keyword": "AI medical diagnosis healthcare robot",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-04a-medical-ai.jpg"
+            },
+            {
+              "keyword": "smart factory robot manufacturing",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-04b-smart-factory.jpg"
+            }
+          ],
+          "emojiCards": [
+            { "emoji": "💰", "label": "금융" },
+            { "emoji": "📚", "label": "교육" }
+          ]
+        },
+        {
+          "number": 5,
+          "type": "image-focus",
+          "title": "사라지는 직업 vs 새로 생기는 직업",
+          "content": [
+            "사라질 가능성 높은 직업: 단순 반복 업무, 데이터 입력, 텔레마케팅",
+            "새로 생기는 직업: AI 트레이너, 프롬프트 엔지니어, 데이터 라벨러",
+            "변화하는 직업: 의사, 변호사, 교사 → AI와 협업"
+          ],
+          "images": [
+            {
+              "keyword": "future jobs artificial intelligence infographic",
+              "type": "illustration",
+              "usage": "image-focus",
+              "filename": "img-05-future-jobs.jpg"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "type": "two-column",
+          "title": "AI 시대에 필요한 역량",
+          "content": [
+            "컴퓨팅 사고력과 코딩 능력",
+            "창의성과 비판적 사고",
+            "감성 지능과 협업 능력",
+            "평생 학습 자세"
+          ],
+          "images": [],
+          "emoji": "🧠 💡 🤝 📖"
+        },
+        {
+          "number": 7,
+          "type": "two-column",
+          "title": "프롬프트 엔지니어링이란?",
+          "content": [
+            "AI에게 효과적인 질문을 설계하는 기술",
+            "2025년 가장 주목받는 신직업 중 하나",
+            "프롬프트의 구조: 역할 + 맥락 + 지시 + 형식"
+          ],
+          "images": [
+            {
+              "keyword": "prompt engineering ChatGPT interface example",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-07-prompt-eng.jpg"
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "type": "card-grid",
+          "title": "AI 관련 진로 탐색",
+          "content": [
+            "AI 연구원 / 머신러닝 엔지니어",
+            "데이터 사이언티스트",
+            "AI 윤리 전문가",
+            "로봇 공학자"
+          ],
+          "images": [
+            {
+              "keyword": "data scientist working with code",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08a-data-scientist.jpg"
+            },
+            {
+              "keyword": "robotics engineer building robot",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08b-robotics.jpg"
+            },
+            {
+              "keyword": "AI ethics researcher discussion",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08c-ai-ethics.jpg"
+            },
+            {
+              "keyword": "machine learning engineer deep learning",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08d-ml-engineer.jpg"
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "type": "two-column",
+          "title": "AI 윤리와 책임",
+          "content": [
+            "AI 편향성 문제 (학습 데이터의 편견)",
+            "딥페이크와 허위 정보",
+            "AI 의사결정의 투명성",
+            "일자리 대체와 사회 안전망"
+          ],
+          "images": [
+            {
+              "keyword": "AI ethics bias fairness concept",
+              "type": "illustration",
+              "usage": "two-column",
+              "filename": "img-09-ai-ethics.jpg"
+            }
+          ]
+        },
+        {
+          "number": 10,
+          "type": "closing",
+          "title": "AI와 함께 성장하는 나의 미래",
+          "content": [
+            "AI는 도구, 활용하는 것은 사람",
+            "나만의 강점 + AI = 무한한 가능성"
+          ],
+          "images": [],
+          "emoji": "🚀 ✨"
+        }
+      ]
+    },
+    {
+      "id": "cycle3-3-korean-food",
+      "title": "한국의 전통 음식과 영양",
+      "titleEn": "Korean Traditional Food and Nutrition",
+      "target": "학부모",
+      "style": "Soft Pink Card UI",
+      "styleNumber": 31,
+      "slideCount": 10,
+      "imageStrategy": "complex",
+      "totalImages": 14,
+      "slides": [
+        {
+          "number": 1,
+          "type": "cover",
+          "title": "한국의 전통 음식과 영양",
+          "subtitle": "건강한 밥상, 현명한 선택",
+          "content": [],
+          "images": [
+            {
+              "keyword": "Korean traditional food table banchan beautiful",
+              "type": "photo",
+              "usage": "cover-bg",
+              "filename": "img-01-cover.jpg"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "type": "section-overview",
+          "title": "한식의 특징과 우수성",
+          "content": [
+            "균형 잡힌 영양소 구성 (탄수화물, 단백질, 지방, 비타민)",
+            "발효 음식의 건강 효능",
+            "채소 중심의 식단 구성",
+            "세계가 인정한 건강식"
+          ],
+          "images": [
+            {
+              "keyword": "Korean food hansik balanced meal",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-02-hansik.jpg"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "type": "image-focus",
+          "title": "비빔밥 — 영양의 보물 상자",
+          "content": [
+            "5색 나물의 의미와 영양소 (빨강, 노랑, 초록, 흰색, 검정)",
+            "한 그릇에 담긴 균형 잡힌 영양",
+            "칼로리: 약 500-600kcal",
+            "비타민 A, C, 철분, 식이섬유 풍부"
+          ],
+          "images": [
+            {
+              "keyword": "bibimbap Korean mixed rice bowl colorful",
+              "type": "photo",
+              "usage": "image-focus",
+              "filename": "img-03-bibimbap.jpg"
+            }
+          ]
+        },
+        {
+          "number": 4,
+          "type": "two-column",
+          "title": "김치 — 세계가 인정한 슈퍼푸드",
+          "content": [
+            "유산균이 풍부한 발효 식품",
+            "비타민 C, B, 베타카로틴 함유",
+            "면역력 강화, 항산화 효과",
+            "종류: 배추김치, 깍두기, 파김치, 동치미 등 200여 종"
+          ],
+          "images": [
+            {
+              "keyword": "kimchi varieties Korean fermented vegetables",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-04-kimchi.jpg"
+            }
+          ]
+        },
+        {
+          "number": 5,
+          "type": "card-grid",
+          "title": "건강을 지키는 전통 반찬",
+          "content": [
+            "잡채: 당면과 채소의 조화",
+            "된장찌개: 식물성 단백질의 보고",
+            "나물 무침: 비타민과 미네랄 공급원",
+            "생선구이: 오메가-3 지방산"
+          ],
+          "images": [
+            {
+              "keyword": "japchae Korean glass noodle dish",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-05a-japchae.jpg"
+            },
+            {
+              "keyword": "doenjang jjigae Korean soybean paste stew",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-05b-doenjang.jpg"
+            },
+            {
+              "keyword": "Korean namul seasoned vegetables side dish",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-05c-namul.jpg"
+            },
+            {
+              "keyword": "grilled fish Korean style mackerel",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-05d-fish.jpg"
+            }
+          ]
+        },
+        {
+          "number": 6,
+          "type": "image-focus",
+          "title": "한식 vs 패스트푸드 영양 비교",
+          "content": [
+            "비빔밥 (500kcal) vs 햄버거 세트 (900kcal)",
+            "된장찌개 정식 (나트륨 주의) vs 피자 (포화지방 과다)",
+            "한식의 식이섬유 함량이 2-3배 높음",
+            "한식의 항산화 성분 우수"
+          ],
+          "images": [
+            {
+              "keyword": "Korean food vs fast food nutrition comparison",
+              "type": "diagram",
+              "usage": "image-focus",
+              "filename": "img-06-comparison.jpg"
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "type": "two-column",
+          "title": "발효 음식의 과학",
+          "content": [
+            "된장, 간장, 고추장 — 콩 발효의 힘",
+            "젓갈 — 아미노산과 미네랄의 보고",
+            "식초, 막걸리 — 유기산과 유산균",
+            "장 건강과 면역력의 관계"
+          ],
+          "images": [
+            {
+              "keyword": "Korean fermented foods jang soy sauce gochujang",
+              "type": "photo",
+              "usage": "two-column",
+              "filename": "img-07-fermented.jpg"
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "type": "card-grid",
+          "title": "아이를 위한 건강 한식 레시피",
+          "content": [
+            "영양 주먹밥 (채소 + 참치)",
+            "호박 죽 (소화가 잘 되는 이유식)",
+            "두부 채소전 (식물성 단백질)",
+            "미역국 (칼슘과 요오드)"
+          ],
+          "images": [
+            {
+              "keyword": "Korean rice ball jumeokbap children food",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08a-jumeokbap.jpg"
+            },
+            {
+              "keyword": "Korean pumpkin porridge hobak juk",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08b-hobak-juk.jpg"
+            },
+            {
+              "keyword": "Korean tofu vegetable pancake jeon",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08c-tofu-jeon.jpg"
+            },
+            {
+              "keyword": "miyeokguk Korean seaweed soup",
+              "type": "photo",
+              "usage": "card-image",
+              "filename": "img-08d-miyeokguk.jpg"
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "type": "two-column",
+          "title": "현명한 한식 식단 구성법",
+          "content": [
+            "아침: 죽 또는 간단한 국밥",
+            "점심: 비빔밥, 보리밥 정식",
+            "저녁: 생선구이 + 나물 + 된장찌개",
+            "간식: 떡, 과일, 견과류",
+            "나트륨 줄이기: 국물 섭취량 조절"
+          ],
+          "images": [
+            {
+              "keyword": "Korean daily meal plan balanced diet table",
+              "type": "diagram",
+              "usage": "two-column",
+              "filename": "img-09-meal-plan.jpg"
+            }
+          ]
+        },
+        {
+          "number": 10,
+          "type": "closing",
+          "title": "전통 밥상에서 찾는 건강의 지혜",
+          "content": [
+            "한식은 조상이 남긴 건강 레시피",
+            "가정에서 실천하는 바른 먹거리 교육",
+            "아이와 함께 만드는 건강한 식습관"
+          ],
+          "images": [
+            {
+              "keyword": "Korean family cooking together traditional food",
+              "type": "photo",
+              "usage": "cover-bg",
+              "filename": "img-10-closing.jpg"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>생성형 AI 활용 수업 설계 워크숍</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #FFFFFF;
+      --style-primary: #111111;
+      --style-accent: #E8000D;
+      --style-text: #111111;
+      --style-text-secondary: #444444;
+      --divider: #DDDDDD;
+      --main: #E8000D;
+      --dark: #111111;
+      --light: #F5F5F5;
+      --white: #FFFFFF;
+      --gray-200: #DDDDDD;
+      --gray-600: #444444;
+      --gray-700: #111111;
+    }
+
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden; height: 100%;
+    }
+
+    h1, h2, h3 { font-family: 'Helvetica Neue', Arial, sans-serif; color: var(--style-primary); }
+    h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: -0.02em; }
+    h2 { font-size: 1.5rem; font-weight: 700; }
+    h3 { font-size: 1.15rem; font-weight: 600; }
+    p { font-size: 1rem; line-height: 1.7; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-accent); color: var(--white); padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-contrast: high) {
+      :root { --style-accent: #CC0000; }
+      .browser-card { border: 2px solid #000000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--style-accent);
+      z-index: 1000; transition: width 0.3s ease;
+      will-change: width; transform: translateZ(0);
+    }
+
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transform: translateZ(0); backface-visibility: hidden;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* Swiss minimal card */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--white);
+      border: 1px solid var(--divider);
+      border-left: 5px solid var(--style-accent);
+      position: relative;
+    }
+
+    .browser-topbar {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.4rem 1rem;
+      border-bottom: 1px solid var(--divider);
+    }
+    .topbar-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0 auto;
+    }
+
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    .browser-card--frameless {
+      background: var(--white);
+      border: none; border-left: 5px solid var(--style-accent);
+    }
+    .browser-card--frameless .browser-topbar { display: none; }
+
+    /* Section header with horizontal rule */
+    .section-header { margin-bottom: 0.4rem; border-bottom: 2px solid var(--style-primary); padding-bottom: 0.3rem; }
+    .section-header h2 { margin-bottom: 0.1rem; }
+    .section-icon { display: inline; font-size: 1.1em; margin-right: 0.3em; vertical-align: -0.05em; color: var(--style-accent); }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; letter-spacing: 0.04em; }
+
+    /* Highlight box */
+    .highlight-box {
+      background: var(--light);
+      border-left: 3px solid var(--style-accent);
+      padding: 0.5rem 1rem;
+      margin: 0.4rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* Badge */
+    .badge { display: inline-block; padding: 0.15rem 0.6rem; font-size: 0.82rem; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: 0.04em; }
+    .badge-red { background: var(--style-accent); color: var(--white); }
+    .badge-gray { background: var(--light); color: var(--style-text-secondary); border: 1px solid var(--divider); }
+
+    /* Card grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .card {
+      background: var(--white);
+      border: 1px solid var(--divider);
+      padding: 0.7rem 0.9rem;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: var(--style-accent); }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
+    .card-title { font-size: 1.05rem; margin-bottom: 0.15rem; }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* TOC */
+    .toc-list { list-style: none; padding: 0; counter-reset: toc; }
+    .toc-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.45rem 0.5rem;
+      border-bottom: 1px solid var(--divider);
+      cursor: pointer; transition: background 0.2s;
+    }
+    .toc-item:hover { background: var(--light); }
+    .toc-num { font-family: 'Space Mono', monospace; font-size: 0.88rem; color: var(--style-accent); font-weight: 700; min-width: 2rem; }
+    .toc-text { flex: 1; font-size: 0.95rem; }
+    .toc-arrow { color: var(--style-text-secondary); font-size: 0.88rem; }
+
+    /* Two column */
+    .two-col { display: flex; gap: 1rem; align-items: flex-start; }
+    .col-left, .col-right { flex: 1; }
+    .col-title { font-size: 1.05rem; margin-bottom: 0.3rem; padding-bottom: 0.2rem; border-bottom: 2px solid var(--style-accent); }
+    .col-divider { width: 1px; background: var(--divider); align-self: stretch; }
+    .col-list { list-style: none; padding: 0; }
+    .col-list li { padding: 0.2rem 0; font-size: 0.95rem; border-bottom: 1px solid var(--light); }
+
+    /* Activity / Task list */
+    .activity-list, .task-list { list-style: none; padding: 0; }
+    .activity-item, .task-item { display: flex; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid var(--divider); }
+    .activity-icon { font-size: 1.2rem; flex-shrink: 0; color: var(--style-accent); }
+    .activity-body, .task-body { flex: 1; }
+    .activity-title, .task-title { font-size: 1rem; margin-bottom: 0.1rem; }
+    .activity-desc, .task-desc { font-size: 0.88rem; color: var(--style-text-secondary); }
+    .task-num { font-family: 'Space Mono', monospace; font-size: 0.88rem; color: var(--style-accent); font-weight: 700; min-width: 2rem; flex-shrink: 0; }
+
+    /* Timeline (horizontal) */
+    .timeline { display: flex; gap: 0.4rem; margin-top: 0.4rem; position: relative; padding-top: 1rem; }
+    .timeline::before {
+      content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 2px;
+      background: var(--style-accent); opacity: 0.3;
+    }
+    .timeline-item { flex: 1; text-align: center; position: relative; }
+    .timeline-marker { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--style-accent); background: var(--white); margin: 0 auto 0.25rem; }
+    .timeline-item.highlight .timeline-marker { background: var(--style-accent); }
+    .timeline-date { font-family: 'Space Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--style-accent); display: block; }
+    .timeline-title { font-size: 0.88rem; font-weight: 600; margin: 0.1rem 0; }
+    .timeline-desc { font-size: 0.8rem; color: var(--style-text-secondary); }
+
+    /* Showcase grid */
+    .showcase-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.4rem; }
+    .showcase-item { text-align: center; padding: 0.5rem 0.3rem; border: 1px solid var(--divider); transition: border-color 0.2s; }
+    .showcase-item:hover { border-color: var(--style-accent); }
+    .showcase-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.1rem; }
+    .showcase-desc { font-size: 0.82rem; color: var(--style-text-secondary); }
+
+    /* Comparison table */
+    .table-wrapper { overflow-x: auto; margin-top: 0.4rem; }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .comparison-table th, .comparison-table td { padding: 0.4rem 0.6rem; text-align: left; border: 1px solid var(--divider); }
+    .comparison-table thead th { background: var(--style-primary); color: var(--white); font-weight: 700; }
+    .comparison-table tbody tr:nth-child(even) { background: var(--light); }
+
+    /* Stat highlight */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.4rem 0; }
+    .stat-item { text-align: center; padding: 0.5rem; border: 1px solid var(--divider); }
+    .stat-number { display: block; font-size: 1.8rem; font-weight: 700; color: var(--style-accent); }
+    .stat-label { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* Cover */
+    .cover-slide { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 50vh; padding-left: 1rem; }
+    .cover-title { margin: 0.4rem 0 0.3rem; line-height: 1.2; }
+    .cover-subtitle { font-size: 1rem; color: var(--style-text-secondary); }
+    .cover-divider { width: 60px; height: 3px; background: var(--style-accent); margin: 0.6rem 0; }
+    .cover-meta { display: flex; gap: 0.5rem; font-size: 0.88rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; letter-spacing: 0.04em; flex-wrap: wrap; }
+
+    /* End slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .end-header { margin-bottom: 0.6rem; }
+    .end-title { font-size: 1.8rem; }
+    .end-subtitle { font-size: 0.95rem; color: var(--style-text-secondary); margin-top: 0.2rem; }
+    .end-summary { text-align: left; max-width: 600px; width: 100%; }
+    .summary-title { font-size: 1.05rem; margin-bottom: 0.2rem; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 0.15rem 0; font-size: 0.88rem; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; height: 1px; }
+      .showcase-grid { grid-template-columns: repeat(3, 1fr); }
+      .timeline { flex-direction: column; align-items: flex-start; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .showcase-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+    }
+
+    /* Nav bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--divider);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--divider);
+      border-radius: 50%; background: var(--white);
+      cursor: pointer; font-size: 0;
+      color: var(--style-text); transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-accent); background: var(--style-accent); color: var(--white); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700; color: var(--style-text-secondary);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+      font-family: inherit; padding: 0; outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-accent); }
+    .slide-input:focus { border-bottom-color: var(--style-accent); background: var(--light); border-radius: 4px; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide.active { animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="14" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <span class="badge badge-red">AI 전문적학습공동체 연수</span>
+          <h1 class="cover-title">생성형 AI 활용<br>수업 설계 워크숍</h1>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>강사: 홍길동</span>
+            <span aria-hidden="true">|</span>
+            <span>○○고등학교</span>
+            <span aria-hidden="true">|</span>
+            <span><time datetime="2026-03">2026.03</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: TOC -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">CONTENTS</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>목차</h2>
+          </div>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                <span class="toc-num">01</span><span class="toc-text">배경 및 필요성</span><span class="toc-arrow">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num">02</span><span class="toc-text">AI 도구 소개</span><span class="toc-arrow">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num">03</span><span class="toc-text">프롬프트 엔지니어링</span><span class="toc-arrow">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num">04</span><span class="toc-text">수업 설계 프레임워크</span><span class="toc-arrow">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                <span class="toc-num">05</span><span class="toc-text">실습 1: 학습지 생성</span><span class="toc-arrow">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(8)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(8)">
+                <span class="toc-num">06</span><span class="toc-text">실습 2: 평가 문항 생성</span><span class="toc-arrow">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(9)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(9)">
+                <span class="toc-num">07</span><span class="toc-text">실습 3: 피드백 자동화</span><span class="toc-arrow">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(13)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(13)">
+                <span class="toc-num">08</span><span class="toc-text">마무리</span><span class="toc-arrow">→</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 배경 & 필요성 (two-column) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 배경 및 필요성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">BACKGROUND</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">※</span> 배경 및 필요성</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">현재 교육 현황</h3>
+              <ul class="col-list" role="list">
+                <li>교사 1인당 업무 과중 심화</li>
+                <li>개별화 수업 설계 시간 부족</li>
+                <li>평가·피드백 자동화 필요</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">AI 도입 필요성</h3>
+              <ul class="col-list" role="list">
+                <li>반복 업무 자동화로 수업 집중</li>
+                <li>학생별 맞춤형 자료 생성</li>
+                <li>데이터 기반 학습 분석 가능</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: AI 도구 소개 (card-grid 3x1) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: AI 도구 소개">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">AI TOOLS</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 주요 생성형 AI 도구</h2>
+          </div>
+          <div class="grid-3 card-grid" role="list">
+            <div class="card" role="listitem">
+              <h3 class="card-title">ChatGPT <span class="badge badge-gray">OpenAI</span></h3>
+              <p class="card-desc">대화형 AI. 텍스트 생성, 요약, 번역에 강점이 있습니다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">Claude <span class="badge badge-gray">Anthropic</span></h3>
+              <p class="card-desc">긴 문서 분석, 코딩, 논리적 추론에 뛰어난 성능을 보입니다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">Gemini <span class="badge badge-gray">Google</span></h3>
+              <p class="card-desc">멀티모달(텍스트+이미지) 처리. Google 생태계와 연동됩니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 프롬프트 엔지니어링 기초 (section-overview) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 프롬프트 엔지니어링 기초">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">PROMPT ENGINEERING</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프롬프트 엔지니어링 기초</h2>
+            <p class="section-subtitle">좋은 프롬프트의 3요소</p>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>프롬프트는 AI에게 보내는 지시문입니다. 명확하고 구체적일수록 원하는 결과를 얻을 수 있습니다.</p>
+          </div>
+          <div class="grid-3 card-grid" role="list">
+            <div class="card" role="listitem">
+              <h3 class="card-title">역할 지정</h3>
+              <p class="card-desc">"너는 고등학교 수학 교사야"처럼 AI에게 역할을 부여합니다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">맥락 제공</h3>
+              <p class="card-desc">학년, 단원, 수준 등 구체적 배경 정보를 제공합니다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">출력 형식</h3>
+              <p class="card-desc">"표 형태로", "5개 문항으로" 등 원하는 형식을 명시합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 프롬프트 작성법 (activity-list) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 프롬프트 작성법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">PROMPT WRITING</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 프롬프트 작성 실전 팁</h2>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">①</span>
+              <div class="activity-body">
+                <h3 class="activity-title">역할 + 대상 지정</h3>
+                <p class="activity-desc">"중학교 2학년 과학 교사로서 학생들에게 설명할 학습지를 만들어 줘"</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">②</span>
+              <div class="activity-body">
+                <h3 class="activity-title">구체적 맥락 추가</h3>
+                <p class="activity-desc">"단원: 화학 반응, 수준: 중하위, 분량: A4 1장 이내"</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">③</span>
+              <div class="activity-body">
+                <h3 class="activity-title">출력 형식 명시</h3>
+                <p class="activity-desc">"빈칸 채우기 5문항 + 서술형 2문항, 정답과 해설 포함"</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 수업 설계 프레임워크 (timeline) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 수업 설계 프레임워크">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">FRAMEWORK</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">※</span> AI 수업 설계 5단계</h2>
+          </div>
+          <div class="timeline" role="list" aria-label="수업 설계 5단계 타임라인">
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 1</span>
+              <h3 class="timeline-title">분석</h3>
+              <p class="timeline-desc">학습자·교육과정 분석</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 2</span>
+              <h3 class="timeline-title">설계</h3>
+              <p class="timeline-desc">AI 활용 지점 결정</p>
+            </div>
+            <div class="timeline-item highlight" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 3</span>
+              <h3 class="timeline-title">개발</h3>
+              <p class="timeline-desc">프롬프트·자료 생성</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 4</span>
+              <h3 class="timeline-title">적용</h3>
+              <p class="timeline-desc">수업 실행·관찰</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 5</span>
+              <h3 class="timeline-title">평가</h3>
+              <p class="timeline-desc">효과성 검증·개선</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 실습 1 (task-list) -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 실습 1 - 학습지 생성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">LAB 01</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 실습 1: AI로 학습지 만들기</h2>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <h3 class="task-title">담당 교과 단원 선택</h3>
+                <p class="task-desc">자신의 교과에서 다음 주 수업할 단원을 선택합니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <h3 class="task-title">프롬프트 작성 및 생성</h3>
+                <p class="task-desc">3요소(역할·맥락·형식)를 포함한 프롬프트를 작성하고 AI에 입력합니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <h3 class="task-title">결과물 검토 및 수정</h3>
+                <p class="task-desc">생성된 학습지의 정확성, 난이도, 분량을 점검하고 수정합니다.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: 실습 2 (task-list) -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 실습 2 - 평가 문항 생성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">LAB 02</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 실습 2: AI로 평가 문항 만들기</h2>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <h3 class="task-title">평가 목표 설정</h3>
+                <p class="task-desc">성취기준에 맞는 평가 목표와 문항 유형(선택형/서술형)을 결정합니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <h3 class="task-title">문항 생성 프롬프트</h3>
+                <p class="task-desc">"블룸 분류 체계 적용 단계 명시" 등 상세 요구 조건을 포함합니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <h3 class="task-title">채점 기준표 생성</h3>
+                <p class="task-desc">서술형 문항의 채점 루브릭을 AI로 함께 생성하여 객관성을 확보합니다.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: 실습 3 (task-list) -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 실습 3 - 피드백 자동화">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">LAB 03</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">※</span> 실습 3: AI 피드백 자동화</h2>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <h3 class="task-title">피드백 템플릿 설계</h3>
+                <p class="task-desc">칭찬·개선점·다음 단계를 포함하는 구조화된 피드백 틀을 만듭니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <h3 class="task-title">학생 답안 입력 및 생성</h3>
+                <p class="task-desc">샘플 학생 답안을 AI에 입력하고 개별 피드백을 생성합니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <h3 class="task-title">피드백 품질 검증</h3>
+                <p class="task-desc">생성된 피드백의 교육적 적절성, 긍정적 어조를 확인합니다.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: 적용 사례 (showcase-grid) -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 교과별 적용 사례">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">CASE STUDIES</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>교과별 AI 적용 사례</h2>
+          </div>
+          <div class="showcase-grid" role="list">
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <h3 class="showcase-name">국어</h3>
+              <p class="showcase-desc">글쓰기 첨삭, 독서록 분석</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <h3 class="showcase-name">수학</h3>
+              <p class="showcase-desc">유사 문제 자동 생성</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <h3 class="showcase-name">영어</h3>
+              <p class="showcase-desc">회화 시뮬레이션</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <h3 class="showcase-name">과학</h3>
+              <p class="showcase-desc">실험 설계 보조</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <h3 class="showcase-name">사회</h3>
+              <p class="showcase-desc">시사 자료 요약·비교</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 12: 윤리적 고려사항 (comparison) -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: 윤리적 고려사항">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">ETHICS</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> AI 활용 윤리 가이드</h2>
+          </div>
+          <div class="table-wrapper" role="region" aria-label="AI 활용 DO vs DON'T" tabindex="0">
+            <table class="comparison-table">
+              <caption class="sr-only">AI 활용 시 권장 사항과 금지 사항 비교</caption>
+              <thead>
+                <tr><th scope="col">구분</th><th scope="col">DO (권장)</th><th scope="col">DON'T (지양)</th></tr>
+              </thead>
+              <tbody>
+                <tr><th scope="row">자료 생성</th><td>AI 결과물을 검토 후 수정하여 사용</td><td>AI 생성물을 검증 없이 그대로 배포</td></tr>
+                <tr><th scope="row">학생 정보</th><td>익명화된 데이터만 AI에 입력</td><td>학생 이름·성적 등 개인정보 입력</td></tr>
+                <tr><th scope="row">평가</th><td>AI를 보조 도구로 활용, 최종 판단은 교사</td><td>AI 채점 결과를 그대로 성적에 반영</td></tr>
+                <tr><th scope="row">저작권</th><td>AI 활용 사실을 명시, 출처 표기</td><td>AI 생성물을 교사 창작물로 제출</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 13: 참고 자료 (card-grid 2x2) -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 13: 참고 자료">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">RESOURCES</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>참고 자료</h2>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <h3 class="card-title">교육부 AI 가이드라인</h3>
+              <p class="card-desc">교실에서의 AI 활용에 관한 교육부 공식 지침서입니다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">KERIS AI 교육 포털</h3>
+              <p class="card-desc">한국교육학술정보원의 AI 교육 자료 모음입니다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">Prompt Engineering Guide</h3>
+              <p class="card-desc">프롬프트 작성법을 체계적으로 정리한 오픈소스 가이드입니다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">AI for Education (UNESCO)</h3>
+              <p class="card-desc">유네스코의 교육 분야 AI 활용 권고안입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 14: 마무리 (end) -->
+    <div class="slide" data-slide="13" role="region" aria-label="슬라이드 14: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <h2 class="end-title">감사합니다</h2>
+            <p class="end-subtitle">오늘 실습한 내용을 수업에 바로 적용해 보시기 바랍니다.</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="핵심 요약">
+            <h3 class="summary-title">핵심 요약</h3>
+            <ul class="summary-list" role="list">
+              <li>✦ 프롬프트 3요소: 역할 + 맥락 + 출력 형식</li>
+              <li>✦ AI는 보조 도구, 최종 판단은 교사의 몫</li>
+              <li>✦ 학생 개인정보 보호를 항상 최우선으로</li>
+            </ul>
+          </div>
+          <div class="cover-meta" style="margin-top: 0.6rem;">
+            <span class="badge badge-red">연수 설문 QR</span>
+            <span>연수 관련 문의: ai-edu@school.kr</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">14</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = `슬라이드 ${current + 1} / ${total}`;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { diff < 0 ? nextSlide() : prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => {
+      const n = parseInt(slideInput.value);
+      if (n >= 1 && n <= totalSlides) goToSlide(n - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    updateNav();
+  </script>
+</body>
+</html>

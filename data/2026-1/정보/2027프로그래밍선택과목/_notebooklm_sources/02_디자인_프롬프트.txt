@@ -1,0 +1,11 @@
+Visual style: "My Neighbor Totoro" Studio-Ghibli watercolor forest aesthetic. Format: 16:9 landscape.
+
+Every slide must look like a gentle, hand-painted Studio Ghibli scene:
+- Soft watercolor background with a light gradient from pale sky-blue (#7EB6D9) at the top into warm cream (#FCF6E3) and soft leaf-green (#A8D5BA) toward the bottom. Visible paper texture and soft watercolor bleeding edges.
+- Rounded, warm, hand-lettered Korean titles that feel friendly and storybook-like (not sharp digital fonts). Body text is clean and highly readable, placed on soft translucent cream cards or leaf-shaped ribbons so it stays legible over the painting.
+- Recurring Totoro-world motifs: a big soft watercolor tree, an acorn (도토리), floating leaves, small fluffy clouds, and a rounded gray Totoro silhouette (chubby, friendly, cartoon, never scary). A tiny white/blue soot-sprite dust may float around.
+- Palette: leaf-green #A8D5BA and #6FAE7E, cream #FCF6E3, sky-blue #7EB6D9, warm bark-brown #B08968, soft charcoal #5C5853 for text. No harsh neon, no hard black fills, no sharp vector edges — everything soft, painterly, cozy, nostalgic.
+- Mood: warm, hopeful, calm, inviting — like the opening of a Ghibli film. Plenty of soft empty sky/space for breathing room.
+- Consistent motif per slide follows the Visual Concept in the lesson plan (signpost path, tree full of fruit, bus-stop ending scene, etc.).
+
+Use the reference image 03_스타일_참조.png for the exact color mood and Totoro-forest atmosphere. Keep all four slides visually consistent as one calm watercolor storybook.

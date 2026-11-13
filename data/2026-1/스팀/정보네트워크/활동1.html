@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>활동 1 · 파이썬으로 우리 반 그리기 — 디지털 네트워크와 행렬 [정보편]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FDFDFB;--card:#FFFFFF;--ink:#33415C;--ink-soft:#7B8698;--rule:#D5DBE1;--teal:#3E9C93;--coral:#E8705A;--mustard:#E4B04A;--teal-wash:rgba(62,156,147,0.09);--coral-wash:rgba(232,112,90,0.10);--mustard-wash:rgba(228,176,74,0.16);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.6;padding-bottom:96px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;}
+  header{background:var(--paper);border-bottom:1px solid var(--rule);padding:20px 28px 0;position:relative;}
+  .backlink{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--teal);text-decoration:none;font-weight:500;margin-bottom:12px;}
+  .backlink:hover{text-decoration:underline;}
+  header h1{font-size:24px;font-weight:700;color:var(--teal);letter-spacing:-0.01em;}
+  header .sub{font-size:13.5px;color:var(--ink-soft);margin-top:5px;}
+  .head-actions{position:absolute;top:18px;right:28px;display:flex;gap:8px;}
+  .icon-btn{background:transparent;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;border-radius:8px;cursor:pointer;font:500 13px 'Noto Sans KR';}
+  .icon-btn:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttabs{display:flex;gap:4px;margin-top:16px;flex-wrap:wrap;}
+  .acttab{font-size:12.5px;padding:8px 14px;border:1px solid var(--rule);border-bottom:none;border-radius:9px 9px 0 0;background:var(--paper);color:var(--ink-soft);text-decoration:none;}
+  .acttab:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttab.on{background:var(--card);color:var(--teal);font-weight:700;border-color:var(--teal);border-bottom:1px solid var(--card);position:relative;top:1px;}
+  #settingsPanel{display:none;max-width:960px;margin:16px auto 0;padding:16px 18px;background:var(--card);border:1px dashed var(--rule);border-radius:12px;}
+  #settingsPanel label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
+  #settingsPanel input{width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:8px;font:14px 'Noto Sans KR';color:var(--ink);}
+  #settingsPanel .row{display:flex;gap:8px;margin-top:10px;}
+  main{max-width:960px;margin:0 auto;padding:24px 28px;}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .card>h2{font-size:18px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .badge{font-size:12px;font-weight:700;letter-spacing:0.04em;background:var(--teal);color:#fff;padding:3px 10px;border-radius:20px;flex:none;}
+  .card>.hint{font-size:13.5px;color:var(--ink-soft);margin-bottom:16px;}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;}
+  .field label .req{color:var(--coral);}
+  .field input,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:9px;font:14px 'Noto Sans KR';color:var(--ink);background:var(--paper);}
+  .field textarea{resize:vertical;min-height:76px;line-height:1.65;}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--teal);background:#fff;}
+  .members{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:4px;}
+  .member{display:flex;align-items:center;gap:8px;}
+  .member svg{width:30px;height:30px;flex:none;}
+  .member input{flex:1;padding:8px 10px;border:1px solid var(--rule);border-radius:8px;font:14px 'Noto Sans KR';background:var(--paper);}
+  .buildarea{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start;margin-top:18px;}
+  .mtable{border-collapse:collapse;}
+  .mtable th{font-size:12px;font-weight:500;color:var(--ink-soft);padding:4px;max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mtable th.rowh{text-align:right;padding-right:8px;}
+  .cell{width:40px;height:40px;border:1px solid var(--rule);border-radius:7px;background:var(--paper);color:var(--ink);font:600 15px 'Noto Sans KR';cursor:pointer;}
+  .cell:hover:not(:disabled){border-color:var(--teal);}
+  .cell.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .cell:disabled{background:#F1F3F5;color:#B6BCC5;cursor:default;border-style:dashed;}
+  .codebox{flex:1;min-width:280px;background:#FBFAF7;border:1px solid var(--rule);border-radius:12px;padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);white-space:pre;overflow-x:auto;line-height:1.7;}
+  .codebox .kw{color:var(--coral);} .codebox .cm{color:var(--ink-soft);} .codebox .res{color:var(--teal);font-weight:600;}
+  .btn{padding:10px 18px;border:none;border-radius:9px;cursor:pointer;font:600 14px 'Noto Sans KR';transition:opacity .15s;}
+  .btn:hover{opacity:.88;}.btn:active{transform:translateY(1px);}
+  .btn-teal{background:var(--teal);color:#fff;}.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}
+  .btn-sm{padding:8px 14px;font-size:13px;}
+  .btn-colab{background:var(--mustard);color:#3D2E06;text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+  .runbar{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap;}
+  .copiedmsg{font-size:12.5px;color:var(--teal);font-weight:600;opacity:0;transition:opacity .2s;}
+  .copiedmsg.on{opacity:1;}
+  .runhint{font-size:12.5px;color:var(--ink-soft);margin-top:10px;line-height:1.65;}
+  .runhint b{color:var(--ink);}
+  .btn-draft{background:var(--mustard);color:#3D2E06;}.btn-load{background:#7C3AED;color:#fff;}
+  .btn-reset{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}.btn-submit{background:var(--teal);color:#fff;padding:10px 24px;}
+  .actionbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(253,253,251,0.97);border-top:1px solid var(--rule);padding:12px 28px;}
+  .actionbar .inner{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+  .actionbar .spacer{flex:1;}.draft-label{font-size:12.5px;color:var(--ink-soft);}
+  #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:60;max-width:88vw;text-align:center;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}#toast.success{background:var(--teal);}#toast.error{background:var(--coral);}
+  @media print{.head-actions,.actionbar,#settingsPanel,.acttabs,.backlink,#toast{display:none!important;}body{padding-bottom:0;}}
+  @media(max-width:640px){main{padding:18px 14px;}.card{padding:18px 16px;}.cell{width:34px;height:34px;font-size:13px;}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="a-fox"><polygon points="-16,-12 -9,-25 -3,-13" fill="#E8705A"/><polygon points="16,-12 9,-25 3,-13" fill="#E8705A"/><circle cx="0" cy="0" r="20" fill="#E8705A"/><circle cx="0" cy="6" r="12" fill="#FDFDFB"/><circle cx="-7" cy="-2" r="2.5" fill="#33415C"/><circle cx="7" cy="-2" r="2.5" fill="#33415C"/></g>
+  <g id="a-rabbit"><ellipse cx="-7" cy="-22" rx="4.5" ry="12" fill="#E4B04A"/><ellipse cx="7" cy="-22" rx="4.5" ry="12" fill="#E4B04A"/><circle cx="0" cy="0" r="20" fill="#E4B04A"/><circle cx="-7" cy="-2" r="2.5" fill="#33415C"/><circle cx="7" cy="-2" r="2.5" fill="#33415C"/></g>
+  <g id="a-bear"><circle cx="-13" cy="-14" r="7" fill="#3E9C93"/><circle cx="13" cy="-14" r="7" fill="#3E9C93"/><circle cx="0" cy="0" r="20" fill="#3E9C93"/><circle cx="0" cy="7" r="9" fill="#FDFDFB"/><circle cx="-7" cy="-2" r="2.5" fill="#33415C"/><circle cx="7" cy="-2" r="2.5" fill="#33415C"/></g>
+  <g id="a-cat"><polygon points="-15,-11 -10,-24 -3,-12" fill="#33415C"/><polygon points="15,-11 10,-24 3,-12" fill="#33415C"/><circle cx="0" cy="0" r="20" fill="#33415C"/><circle cx="-7" cy="-2" r="2.5" fill="#FDFDFB"/><circle cx="7" cy="-2" r="2.5" fill="#FDFDFB"/></g>
+  <g id="a-bird"><circle cx="0" cy="0" r="18" fill="#B9C6C4"/><polygon points="15,0 24,3 15,7" fill="#E4B04A"/><circle cx="5" cy="-4" r="2.4" fill="#33415C"/></g>
+</defs></svg>
+
+<header>
+  <div class="wrap">
+    <a class="backlink" href="index.html">← 슬라이드덱으로 돌아가기</a>
+    <h1>활동 1 · 파이썬으로 우리 반 그리기</h1>
+    <div class="sub">우리 모둠 관계를 표로 만들면 파이썬 코드가 자동으로 완성됩니다. 코드를 실행해 보고 관찰한 것을 기록하세요 &nbsp;·&nbsp; 슬라이드 3~9</div>
+    <div class="acttabs">
+      <a class="acttab on" href="활동1.html">활동 1 · 파이썬 실습</a>
+      <a class="acttab" href="활동2.html">활동 2 · 중심성 비교</a>
+      <a class="acttab" href="활동3.html">활동 3 · AI 프롬프트</a>
+      <a class="acttab" href="활동4.html">활동 4 · 프로젝트 설계</a>
+      <a class="acttab" href="활동5.html">활동 5 · 프로젝트 진행</a>
+      <a class="acttab" href="활동6.html">활동 6 · 심화 결과물</a>
+    </div>
+  </div>
+  <div class="head-actions">
+    <button class="icon-btn" id="btnPrint" type="button">인쇄</button>
+    <button class="icon-btn" id="btnSettings" type="button" title="교사 설정">⚙</button>
+  </div>
+</header>
+
+<div id="settingsPanel">
+  <label for="urlInput">Apps Script 배포 URL (교사 전용)</label>
+  <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row"><button class="btn btn-teal" id="btnSaveUrl" type="button">URL 저장</button><button class="btn btn-ghost" id="btnClearUrl" type="button">초기화</button></div>
+</div>
+
+<main>
+  <section class="card">
+    <h2>기본 정보</h2>
+    <div class="grid2">
+      <div class="field"><label for="studentName">이름 <span class="req">*</span></label><input type="text" id="studentName" placeholder="홍길동"></div>
+      <div class="field"><label for="classInfo">반 / 번호 <span class="req">*</span></label><input type="text" id="classInfo" placeholder="1학년 3반 12번"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge">만들기</span> 표를 누르면 파이썬 코드가 완성된다</h2>
+    <div class="hint">모둠원 이름을 적고, 표의 칸을 눌러 관계를 기록하세요(친구=1). 오른쪽에 <b>리스트의 리스트</b> 코드와 <code>A.sum(axis=1)</code> 결과(차수)가 자동으로 만들어집니다 — 슬라이드 3·6에서 본 그대로입니다.</div>
+    <div class="members" id="members"></div>
+    <div class="buildarea">
+      <div><table class="mtable" id="matrixA"></table></div>
+      <div class="codebox" id="codebox"></div>
+    </div>
+    <div class="runbar">
+      <button class="btn btn-teal btn-sm" id="btnCopyCode" type="button">📋 코드 복사</button>
+      <a class="btn btn-colab btn-sm" href="https://colab.research.google.com/#create=true" target="_blank" rel="noopener">▶ Colab에서 열기</a>
+      <span class="copiedmsg" id="copiedMsg">복사됐어요!</span>
+    </div>
+    <div class="runhint">① <b>코드 복사</b> → ② <b>Colab에서 열기</b>(새 창) → ③ 빈 셀에 붙여넣고 <b>Shift+Enter</b>로 실행. numpy·networkx는 Colab에 이미 설치돼 있어요.</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge">관찰·성찰</span> 코드를 실행하며 발견하기</h2>
+    <div class="field" style="margin-bottom:16px;"><label for="q1"><code>A.sum(axis=1)</code> 결과(차수)와 <code>A @ A</code>의 <b>대각선</b>을 비교해 보세요. 무엇을 발견했나요?</label><textarea id="q1" placeholder="예) A.sum 결과와 A@A 대각선이 똑같았습니다. 나에서 친구를 거쳐 다시 나로 돌아오는 길이라서..."></textarea></div>
+    <div class="field" style="margin-bottom:16px;"><label for="q2"><code>nx.draw(G)</code>로 그린 그래프에서 <b>가장 크게(친구 많게) 보이는 사람</b>은 누구였나요? 표의 어떤 값과 연결되나요?</label><textarea id="q2" placeholder="예) 다온이가 가장 컸는데, 행 합(차수)이 가장 커서 그런 것 같습니다."></textarea></div>
+    <div class="field"><label for="q3">코드에서 <b>숫자 하나(0↔1)를 바꿔</b> 실행하면 그래프가 어떻게 달라지나요? 직접 바꿔 보고 관찰한 것을 적어 보세요.</label><textarea id="q3" placeholder="예) 마루-가은을 1로 바꿨더니 마루에서 나가는 선이 하나 더 생기고..."></textarea></div>
+  </section>
+</main>
+
+<div class="actionbar"><div class="inner">
+  <button class="btn btn-load" id="btnLoad" type="button">불러오기</button>
+  <span class="draft-label" id="draftLabel">임시저장: —</span>
+  <span class="spacer"></span>
+  <button class="btn btn-reset" id="btnReset" type="button">초기화</button>
+  <button class="btn btn-draft" id="btnDraft" type="button">임시저장</button>
+  <button class="btn btn-submit" id="btnSubmit" type="button">제출하기</button>
+</div></div>
+<input type="file" id="fileInput" accept=".json" hidden>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var DEFAULT_URL='https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+  var URL_KEY='sheets_url_net_activities';
+  var DRAFT_KEY='draft_net_python_2026';
+  var INFO_KEY='net_student_info';
+  var SOURCE='net_python';
+  var N=5;
+  var ANIMALS=['a-fox','a-rabbit','a-bear','a-cat','a-bird'];
+  var SAMPLE=['가은','나래','다온','라온','마루'];
+  var A=[], names=[];
+  var codeForRun='';
+
+  function zeros(n){var m=[],i,j;for(i=0;i<n;i++){m.push([]);for(j=0;j<n;j++)m[i].push(0);}return m;}
+  function matmul(X,Y){var n=X.length,R=zeros(n),i,j,k,s;for(i=0;i<n;i++)for(j=0;j<n;j++){s=0;for(k=0;k<n;k++)s+=X[i][k]*Y[k][j];R[i][j]=s;}return R;}
+  function deg(){return A.map(function(r){return r.reduce(function(a,b){return a+b;},0);});}
+  function dname(i){var v=(names[i]||'').trim();return v||('학생'+(i+1));}
+
+  function renderMembers(){
+    var box=document.getElementById('members');box.textContent='';
+    for(var i=0;i<N;i++){
+      var w=document.createElement('div');w.className='member';
+      var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','-26 -28 52 56');
+      var use=document.createElementNS('http://www.w3.org/2000/svg','use');use.setAttribute('href','#'+ANIMALS[i]);svg.appendChild(use);
+      var inp=document.createElement('input');inp.type='text';inp.placeholder=SAMPLE[i];inp.value=names[i]||'';inp.setAttribute('aria-label',(i+1)+'번째 모둠원');
+      (function(idx){inp.addEventListener('input',function(){names[idx]=this.value;renderMatrix();renderCode();scheduleDraft();});})(i);
+      w.appendChild(svg);w.appendChild(inp);box.appendChild(w);
+    }
+  }
+  function renderMatrix(){
+    var t=document.getElementById('matrixA');t.textContent='';
+    var hr=document.createElement('tr');hr.appendChild(document.createElement('th'));
+    for(var c=0;c<N;c++){var th=document.createElement('th');th.textContent=dname(c);hr.appendChild(th);}
+    t.appendChild(hr);
+    for(var i=0;i<N;i++){
+      var tr=document.createElement('tr');var rh=document.createElement('th');rh.className='rowh';rh.textContent=dname(i);tr.appendChild(rh);
+      for(var j=0;j<N;j++){
+        var td=document.createElement('td');var b=document.createElement('button');b.type='button';b.className='cell'+(A[i][j]?' on':'');b.textContent=String(A[i][j]);
+        if(i===j){b.disabled=true;b.title='자기 자신과의 관계는 0';}
+        else{(function(x,y){b.addEventListener('click',function(){var v=A[x][y]?0:1;A[x][y]=v;A[y][x]=v;renderMatrix();renderCode();scheduleDraft();});})(i,j);}
+        td.appendChild(b);tr.appendChild(td);
+      }
+      t.appendChild(tr);
+    }
+  }
+  function renderCode(){
+    var box=document.getElementById('codebox');
+    var rows=A.map(function(r){return '     ['+r.join(',')+']';});
+    rows[0]='A = ['+rows[0].trim();
+    for(var i=1;i<rows.length;i++) rows[i]='     '+rows[i].trim();
+    var matrixLines=rows.map(function(r,i){return r+(i<rows.length-1?',':']');}).join('\n');
+    var code='';
+    code+='<span class="cm"># 리스트의 리스트 = 행렬</span>\n';
+    code+=matrixLines+'\n\n';
+    code+='<span class="kw">import</span> numpy <span class="kw">as</span> np\n';
+    code+='A = np.array(A)\n';
+    code+='A.sum(axis=<span class="kw">1</span>)  <span class="cm"># 차수</span>\n';
+    code+='<span class="res">→ ['+deg().join(' ')+']</span>\n\n';
+    code+='<span class="kw">import</span> networkx <span class="kw">as</span> nx\n';
+    code+='G = nx.from_numpy_array(A)\n';
+    code+='nx.draw(G, with_labels=<span class="kw">True</span>)  <span class="cm"># 그래프 그림</span>';
+    box.innerHTML=code;
+    // Colab 붙여넣기용 실행 가능 코드(결과 줄은 print로, 그래프 표시 import 추가)
+    codeForRun='# 리스트의 리스트 = 행렬\n'+matrixLines+'\n\n'+
+      'import numpy as np\n'+
+      'A = np.array(A)\n'+
+      'print("차수:", A.sum(axis=1))   # 각 사람의 친구 수\n\n'+
+      'import networkx as nx\n'+
+      'import matplotlib.pyplot as plt\n'+
+      'G = nx.from_numpy_array(A)\n'+
+      'nx.draw(G, with_labels=True)    # 관계망 그림\n'+
+      'plt.show()';
+  }
+
+  function val(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+  function getFormData(){
+    var d=deg();var A2=matmul(A,A);var diag=A2.map(function(r,i){return r[i];});
+    return {source:SOURCE, activity:'1_파이썬실습',
+      studentName:val('studentName'),classInfo:val('classInfo'),
+      members:names.slice(0,N).map(function(_,i){return dname(i);}).join(', '),
+      matrixA:A.map(function(r){return r.join(' ');}).join(' | '),
+      degrees:d.join(' '),
+      a2diag:diag.join(' '),
+      q1:val('q1'),q2:val('q2'),q3:val('q3')};
+  }
+  function setFormData(d){
+    if(!d)return;
+    ['studentName','classInfo','q1','q2','q3'].forEach(function(k){var e=document.getElementById(k);if(e&&typeof d[k]==='string')e.value=d[k];});
+    if(typeof d.members==='string'&&d.members)names=d.members.split(',').map(function(s){return s.trim();});
+    A=zeros(N);
+    if(typeof d.matrixA==='string'&&d.matrixA){d.matrixA.split('|').forEach(function(rs,i){if(i>=N)return;rs.trim().split(/\s+/).forEach(function(v,j){if(j<N)A[i][j]=parseInt(v,10)===1?1:0;});});}
+    renderMembers();renderMatrix();renderCode();saveInfo();
+  }
+  function validate(){
+    if(!val('studentName'))return '이름을 입력해 주세요.';
+    if(!val('classInfo'))return '반 / 번호를 입력해 주세요.';
+    if(deg().reduce(function(a,b){return a+b;},0)===0)return '표에서 관계를 하나 이상 만들어 주세요.';
+    if(!val('q1'))return '관찰·성찰 1에 답해 주세요.';
+    return '';
+  }
+  function buildTxt(d){
+    var L=[];L.push('═══════════════════════════════════════');
+    L.push('  디지털 네트워크와 행렬 [정보편]');L.push('  활동 1 · 파이썬으로 우리 반 그리기');
+    L.push('  작성일시: '+new Date().toLocaleString('ko-KR'));L.push('═══════════════════════════════════════');L.push('');
+    L.push('이름: '+d.studentName);L.push('반/번호: '+d.classInfo);L.push('모둠원: '+d.members);L.push('');
+    L.push('【 인접행렬 A 】');d.matrixA.split('|').forEach(function(r){L.push('   [ '+r.trim()+' ]');});
+    L.push('차수 A.sum(axis=1): '+d.degrees);L.push('A @ A 대각선: '+d.a2diag);L.push('');
+    L.push('【 관찰·성찰 】');
+    L.push('1) 차수 vs A@A 대각선: '+d.q1);L.push('');
+    L.push('2) 가장 큰 노드: '+d.q2);L.push('');
+    L.push('3) 숫자를 바꿨을 때: '+d.q3);L.push('');
+    L.push('═══════════════════════════════════════');return L.join('\n');
+  }
+
+  function saveInfo(){try{localStorage.setItem(INFO_KEY,JSON.stringify({studentName:val('studentName'),classInfo:val('classInfo')}));}catch(e){}}
+  function loadInfo(){try{var r=localStorage.getItem(INFO_KEY);if(!r)return;var d=JSON.parse(r);if(!val('studentName')&&d.studentName)document.getElementById('studentName').value=d.studentName;if(!val('classInfo')&&d.classInfo)document.getElementById('classInfo').value=d.classInfo;}catch(e){}}
+  function downloadBlob(c,fn,mime){var b=new Blob([c],{type:mime});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+  function stamp(){return new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');}
+  function safeName(d){return (d.studentName||'학생').replace(/[\\/:*?"<>|\s]/g,'');}
+  var draftTimer=null;function scheduleDraft(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,1200);}
+  function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(getFormData()));document.getElementById('draftLabel').textContent='임시저장: '+new Date().toLocaleTimeString('ko-KR');saveInfo();}catch(e){}}
+  function loadDraft(){try{var r=localStorage.getItem(DRAFT_KEY);if(!r)return;setFormData(JSON.parse(r));document.getElementById('draftLabel').textContent='임시저장: 복원됨';}catch(e){}}
+  var toastTimer=null;function showToast(m,t,ms){var el=document.getElementById('toast');el.textContent=m;el.className='show'+(t?' '+t:'');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.className='';},ms||2600);}
+  function sendToSheet(data){var url=localStorage.getItem(URL_KEY)||DEFAULT_URL;if(!url){showToast('파일은 저장됐습니다. (시트 URL 미설정)','error',4200);return;}fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(){showToast('제출 완료! 파일 저장 + 시트 전송','success',4200);}).catch(function(e){showToast('파일은 저장됐습니다. 시트 오류: '+e.message,'error',4600);});}
+  function fallbackCopy(txt){var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);}
+  function copyCode(){function done(){var m=document.getElementById('copiedMsg');m.classList.add('on');setTimeout(function(){m.classList.remove('on');},1800);showToast('코드를 복사했어요. Colab에 붙여넣어 실행해 보세요.','success');}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(codeForRun).then(done,function(){fallbackCopy(codeForRun);done();});}else{fallbackCopy(codeForRun);done();}}
+
+  function init(){
+    A=zeros(N);names=[];
+    renderMembers();renderMatrix();renderCode();
+    loadInfo();loadDraft();
+    document.getElementById('btnPrint').addEventListener('click',function(){window.print();});
+    document.getElementById('btnCopyCode').addEventListener('click',copyCode);
+    document.getElementById('btnSettings').addEventListener('click',function(){var p=document.getElementById('settingsPanel');p.style.display=(p.style.display==='block')?'none':'block';document.getElementById('urlInput').value=localStorage.getItem(URL_KEY)||'';});
+    document.getElementById('btnSaveUrl').addEventListener('click',function(){var u=document.getElementById('urlInput').value.trim();if(!u){showToast('URL을 입력해 주세요.','error');return;}localStorage.setItem(URL_KEY,u);showToast('URL이 저장되었습니다.','success');});
+    document.getElementById('btnClearUrl').addEventListener('click',function(){localStorage.removeItem(URL_KEY);document.getElementById('urlInput').value='';showToast('URL이 초기화되었습니다.');});
+    document.getElementById('btnDraft').addEventListener('click',function(){var d=getFormData();d._draftMeta={savedAt:new Date().toISOString(),source:SOURCE,version:1};downloadBlob(JSON.stringify(d,null,2),safeName(d)+'_활동1_파이썬_'+stamp()+'.json','application/json;charset=utf-8');saveDraft();showToast('임시저장 파일(.json) 다운로드됨','success');});
+    var fi=document.getElementById('fileInput');
+    document.getElementById('btnLoad').addEventListener('click',function(){fi.click();});
+    fi.addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){try{setFormData(JSON.parse(ev.target.result));saveDraft();showToast('불러왔습니다.','success');}catch(err){showToast('파일을 읽을 수 없습니다: '+err.message,'error');}};rd.readAsText(f,'utf-8');e.target.value='';});
+    document.getElementById('btnReset').addEventListener('click',function(){if(!confirm('작성한 내용을 지웁니다. 계속할까요?'))return;localStorage.removeItem(DRAFT_KEY);location.reload();});
+    document.getElementById('btnSubmit').addEventListener('click',function(){var msg=validate();if(msg){showToast(msg,'error',3400);return;}if(!confirm('제출하시겠습니까?\n· TXT 파일 다운로드\n· 구글 시트로 전송'))return;var btn=this;btn.disabled=true;var d=getFormData();downloadBlob(buildTxt(d),safeName(d)+'_활동1_파이썬_'+stamp()+'.txt','text/plain;charset=utf-8');sendToSheet(d);setTimeout(function(){btn.disabled=false;},1500);});
+    document.querySelectorAll('input, textarea').forEach(function(el){el.addEventListener('input',scheduleDraft);el.addEventListener('change',function(){scheduleDraft();saveInfo();});});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>

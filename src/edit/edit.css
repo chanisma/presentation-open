@@ -1,0 +1,703 @@
+/* 로컬 덱 에디터 — ?app=edit (dev 전용)
+   덱이 아니라 "도구"의 화면이다. 덱 크롬(base.css의 .noir-*)과 섞이지 않도록
+   모든 클래스에 ed- 접두사를 붙이고, 색은 tokens.css 변수에서만 끌어온다.
+
+   토큰 설계는 inspo MCP로 조회한 Figma의 DESIGN.md를 참고했다 — 잉크 한 색에서
+   color-mix로 면·선·입력창을 유도하고, 간격은 4px 배수, 구역 라벨은 고정폭 작은 글자,
+   모서리는 작게. 덱의 둥근 모서리(--radius 22px)를 도구에 그대로 쓰면 무르게 보인다. */
+
+.ed-root {
+  --ed-ink: var(--fg);
+  --ed-bg: #080b10;
+  --ed-panel: color-mix(in oklch, var(--ed-ink), transparent 97%);
+  --ed-raise: color-mix(in oklch, var(--ed-ink), transparent 94%);
+  --ed-line: color-mix(in oklch, var(--ed-ink), transparent 90%);
+  --ed-line-hi: color-mix(in oklch, var(--ed-ink), transparent 78%);
+  --ed-r: 8px;
+  --ed-r-sm: 5px;
+
+  position: fixed;
+  inset: 0;
+  background: var(--ed-bg);
+  color: var(--ed-ink);
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow: hidden;
+}
+
+/* 구역 라벨 — 고정폭 대문자 작은 글자. 화면을 읽는 눈금 역할만 한다 */
+.ed-label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+}
+.ed-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-faint);
+}
+.ed-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── 공통 부품 ─────────────────────────────────────────────────── */
+.ed-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-r-sm);
+  background: var(--ed-raise);
+  color: var(--ed-ink);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.ed-btn:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--ed-ink), transparent 88%);
+  border-color: var(--ed-line-hi);
+}
+.ed-btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+.ed-btn--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.ed-btn--primary:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--primary), white 12%);
+  border-color: color-mix(in oklch, var(--primary), white 12%);
+}
+.ed-btn--ghost {
+  background: transparent;
+}
+.ed-btn kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  opacity: 0.65;
+}
+
+.ed-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-r-sm);
+  background: color-mix(in oklch, var(--ed-ink), transparent 96%);
+  color: var(--ed-ink);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.ed-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--ed-ink), transparent 93%);
+}
+.ed-input::placeholder {
+  color: var(--fg-faint);
+}
+
+.ed-seg {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-r-sm);
+  background: var(--ed-panel);
+}
+.ed-seg button {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.ed-seg button.is-on {
+  background: color-mix(in oklch, var(--ed-ink), transparent 86%);
+  color: var(--ed-ink);
+}
+
+.ed-note code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ed-ink);
+}
+.ed-note {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--ed-r-sm);
+  background: var(--ed-panel);
+  border-left: 2px solid var(--ed-line-hi);
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+.ed-note--ok {
+  border-left-color: var(--primary);
+  color: var(--ed-ink);
+}
+.ed-note--bad {
+  border-left-color: #ff8a8a;
+  color: #ffc9c9;
+  background: color-mix(in oklch, #ff8a8a, transparent 92%);
+}
+
+/* ── 덱 고르기 ─────────────────────────────────────────────────── */
+.ed-picker {
+  overflow-y: auto;
+  padding: 48px clamp(20px, 5vw, 64px) 64px;
+}
+.ed-picker-head {
+  max-width: 560px;
+  margin: 0 auto 32px;
+  display: grid;
+  gap: 8px;
+}
+.ed-picker-head h1 {
+  margin: 0;
+  font-family: var(--font-head);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.ed-picker-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.ed-picker-cols section {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+.ed-picker-cols .ed-label {
+  padding: 0 0 6px;
+}
+.ed-row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--ed-r-sm);
+  color: inherit;
+  text-decoration: none;
+}
+.ed-row:hover {
+  background: var(--ed-raise);
+  border-color: var(--ed-line);
+}
+.ed-row strong {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ed-row em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--fg-faint);
+}
+
+/* ── 작업 화면 ─────────────────────────────────────────────────── */
+.ed-work {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr) 372px;
+  grid-template-rows: 48px minmax(0, 1fr);
+  grid-template-areas:
+    'top  top   top'
+    'rail stage side';
+}
+
+.ed-top {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--ed-line);
+  background: var(--ed-panel);
+}
+.ed-back {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--ed-r-sm);
+  color: var(--fg-muted);
+  text-decoration: none;
+  font-size: 15px;
+}
+.ed-back:hover {
+  background: var(--ed-raise);
+  color: var(--ed-ink);
+}
+.ed-title {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  max-width: 320px;
+}
+.ed-title strong {
+  font-weight: 600;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ed-spacer {
+  flex: 1;
+}
+
+/* 슬라이드 레일 */
+.ed-rail {
+  grid-area: rail;
+  display: grid;
+  align-content: start;
+  gap: 1px;
+  padding: 12px 8px 24px;
+  border-right: 1px solid var(--ed-line);
+  overflow-y: auto;
+}
+.ed-rail > .ed-label {
+  padding: 0 8px 8px;
+}
+/* 레일 한 줄 = 이름 + (고른 줄에만) 아랫단 도구. 도구를 옆에 두면 이름이 잘리고,
+   마우스를 올릴 때만 띄우면 줄 높이가 출렁인다. 고른 줄은 하나뿐이라 흔들리지 않는다. */
+.ed-rail-item {
+  position: relative;
+  display: grid;
+  border-radius: var(--ed-r-sm);
+  color: var(--fg-muted);
+  font-size: 12px;
+}
+.ed-rail-item:hover {
+  background: var(--ed-raise);
+}
+.ed-rail-item.is-on {
+  background: color-mix(in oklch, var(--primary), transparent 88%);
+  color: var(--ed-ink);
+}
+.ed-rail-item.is-on .ed-num {
+  color: var(--primary);
+}
+.ed-rail-go {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ed-rail-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ed-rail-tools {
+  display: none;
+  gap: 2px;
+  padding: 0 6px 6px 30px;
+}
+.ed-rail-item.is-on .ed-rail-tools {
+  display: flex;
+}
+.ed-rail-tools button {
+  flex: 1;
+  height: 21px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--fg-faint);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+}
+.ed-rail-tools button {
+  border: 1px solid var(--ed-line);
+  background: var(--ed-bg);
+}
+.ed-rail-tools button:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--ed-ink), transparent 84%);
+  color: var(--ed-ink);
+  border-color: var(--ed-line-hi);
+}
+.ed-rail-tools button:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+/* 숨긴 슬라이드 — 자리는 지키되 화면에 없다는 것이 보여야 한다 */
+.ed-rail-item.is-hidden .ed-rail-label {
+  opacity: 0.45;
+  text-decoration: line-through;
+  text-decoration-color: var(--ed-line-hi);
+}
+.ed-rail-item.is-hidden .ed-rail-go {
+  cursor: default;
+}
+.ed-rail-item.is-adding {
+  outline: 1px dashed color-mix(in oklch, var(--primary), transparent 50%);
+}
+
+.ed-row-btns {
+  display: flex;
+  gap: 6px;
+}
+
+/* 자리·크기 — 숫자 네 칸. 값을 다 열지 않고 통째로 옮기고 키우는 것만 다룬다 */
+.ed-geo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 6px;
+}
+.ed-geo label {
+  display: grid;
+  gap: 3px;
+}
+.ed-geo span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--fg-faint);
+}
+.ed-geo input {
+  font-family: var(--font-mono);
+  padding: 6px 8px;
+}
+.ed-geo-pick {
+  justify-self: start;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.ed-rail > .ed-note {
+  margin: 10px 4px 0;
+}
+
+/* 무대 */
+.ed-stage {
+  grid-area: stage;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  place-items: center;
+  min-width: 0;
+  padding: 24px 24px 0;
+  background: #05070a;
+}
+.ed-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-r);
+  background: #000;
+  box-shadow: 0 24px 70px -30px rgba(0, 0, 0, 0.9);
+}
+.ed-frame.is-pick {
+  border-color: color-mix(in oklch, var(--primary), transparent 55%);
+}
+.ed-frame iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  transform-origin: 0 0;
+}
+.ed-stage-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 14px;
+}
+
+/* 오른쪽 패널 */
+.ed-side {
+  grid-area: side;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: start;
+  border-left: 1px solid var(--ed-line);
+  overflow: hidden;
+}
+.ed-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 12px 0;
+  border-bottom: 1px solid var(--ed-line);
+}
+.ed-tabs button {
+  padding: 7px 12px 9px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--fg-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.ed-tabs button.is-on {
+  border-bottom-color: var(--primary);
+  color: var(--ed-ink);
+}
+/* 알림 줄은 탭과 본문 사이에 끼므로 행을 하나 더 쓴다 */
+.ed-side > .ed-note {
+  margin: 10px 12px 0;
+  border-radius: var(--ed-r-sm);
+}
+.ed-side:has(> .ed-note) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+.ed-panel {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 14px 12px 32px;
+  overflow-y: auto;
+}
+.ed-panel > .ed-label {
+  padding-top: 6px;
+}
+.ed-panel > .ed-btn {
+  justify-self: start;
+}
+
+.ed-cands {
+  display: grid;
+  gap: 3px;
+  max-height: 208px;
+  overflow-y: auto;
+}
+.ed-cand {
+  display: grid;
+  gap: 3px;
+  padding: 7px 9px;
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-r-sm);
+  background: var(--ed-panel);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.ed-cand:hover {
+  border-color: var(--ed-line-hi);
+}
+.ed-cand.is-on {
+  border-color: var(--primary);
+  background: color-mix(in oklch, var(--primary), transparent 92%);
+}
+/* 여러 곳이 잡혔을 때 어느 것이 방금 누른 자리인지 */
+.ed-here {
+  margin-left: 6px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: color-mix(in oklch, var(--primary), transparent 80%);
+  color: var(--primary);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+}
+.ed-cand code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--fg-muted);
+  overflow-wrap: anywhere;
+}
+
+.ed-notes {
+  margin: 0;
+  padding: 10px 11px;
+  border-radius: var(--ed-r-sm);
+  background: var(--ed-panel);
+  color: var(--fg-muted);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* ── 문항(quiz.json) ───────────────────────────────────────────── */
+.ed-quiz {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 12px 12px 32px;
+  overflow-y: auto;
+}
+.ed-quiz-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+.ed-quiz-bar .ed-path {
+  min-width: 0;
+}
+
+.ed-act {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid var(--ed-line);
+  border-radius: var(--ed-r);
+  background: var(--ed-panel);
+}
+/* 지금 보고 있는 쪽에 걸린 문항 — 왼쪽에 악센트 한 줄 */
+.ed-act.is-here {
+  border-left: 2px solid var(--primary);
+}
+/* 한 줄에 다 들어가야 문항 카드가 납작하게 읽힌다 — 패널 폭 372px 기준으로 맞췄다 */
+.ed-act-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.ed-act-head select {
+  min-width: 0;
+}
+.ed-act-head select,
+.ed-act-slide input {
+  padding: 4px 6px;
+  border: 1px solid var(--ed-line);
+  border-radius: 4px;
+  background: var(--ed-raise);
+  color: var(--ed-ink);
+  font: inherit;
+  font-size: 11px;
+}
+.ed-act-slide {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--fg-muted);
+}
+.ed-act-slide input {
+  width: 46px;
+  font-family: var(--font-mono);
+}
+.ed-act-slide input:disabled {
+  opacity: 0.4;
+}
+.ed-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--fg-muted);
+  cursor: pointer;
+}
+.ed-act-tools {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+}
+.ed-act-tools button {
+  width: 20px;
+  height: 20px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fg-faint);
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+.ed-act-tools button:hover {
+  background: var(--ed-raise);
+  color: var(--ed-ink);
+}
+
+.ed-opts {
+  display: grid;
+  gap: 4px;
+}
+.ed-opt {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+}
+.ed-opt input[type='radio'] {
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+.ed-opt > button {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--fg-faint);
+  font-size: 11px;
+  cursor: pointer;
+}
+.ed-opt > button:hover {
+  background: var(--ed-raise);
+  color: var(--ed-ink);
+}
+.ed-opts > .ed-btn {
+  justify-self: start;
+  padding: 3px 9px;
+  font-size: 11px;
+}
+.ed-quiz .ed-seg {
+  justify-self: start;
+}
+.ed-add {
+  justify-self: start;
+  margin-top: 4px;
+}
+
+/* 좁은 화면 — 레일을 접고 무대와 패널만 남긴다 */
+@media (max-width: 1180px) {
+  .ed-work {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-areas:
+      'top   top'
+      'stage side';
+  }
+  .ed-rail {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ed-btn {
+    transition: none;
+  }
+}

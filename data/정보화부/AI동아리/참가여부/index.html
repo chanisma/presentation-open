@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026년 해봄 X 디지털활용 AI 동아리 · 참가 신청</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #0E0B2C;
+      --bg-2: #1B1340;
+      --bg-3: #2D1B5C;
+      --ink: #F5F3FF;
+      --ink-soft: rgba(245,243,255,0.65);
+      --ink-mute: rgba(245,243,255,0.4);
+      --accent: #C8FF3A;
+      --accent-dim: rgba(200,255,58,0.15);
+      --magenta: #FF4D8D;
+      --line: rgba(245,243,255,0.12);
+      --card: rgba(255,255,255,0.04);
+      --radius: 18px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 0%, rgba(255,77,141,0.25), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 100% 100%, rgba(200,255,58,0.18), transparent 55%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 50%, var(--bg-3) 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(245,243,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,243,255,0.04) 1px, transparent 1px);
+      background-size: 56px 56px;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 80%);
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      max-width: 560px;
+      z-index: 1;
+    }
+
+    /* ── 상단 메타 ── */
+    .meta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink-mute); margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    .meta-dot {
+      display: inline-block; width: 6px; height: 6px;
+      background: var(--accent); border-radius: 50%; margin-right: 0.5rem;
+      box-shadow: 0 0 12px var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── 메인 카드 ── */
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    /* ── 타이틀 영역 ── */
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 1.25rem;
+    }
+    .eyebrow span.tag {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    h1 {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: clamp(1.6rem, 4.5vw, 2rem);
+      font-weight: 900;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    h1 .accent {
+      color: var(--accent);
+      position: relative;
+    }
+    .subtitle {
+      color: var(--ink-soft);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    /* ── 날짜 박스 ── */
+    .date-box {
+      display: flex; align-items: stretch;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, rgba(255,77,141,0.08), rgba(200,255,58,0.04));
+    }
+    .date-label {
+      padding: 1rem 1.1rem;
+      background: rgba(0,0,0,0.2);
+      display: flex; align-items: center;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--ink-mute);
+      border-right: 1px solid var(--line);
+    }
+    .date-value {
+      flex: 1;
+      padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .date-num {
+      font-family: 'Inter', sans-serif;
+      font-size: 2rem; font-weight: 800;
+      color: var(--ink);
+      line-height: 1;
+      letter-spacing: -0.04em;
+    }
+    .date-month {
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .date-month strong {
+      color: var(--accent);
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 800;
+      margin-bottom: 0.15rem;
+    }
+
+    /* ── 입력 ── */
+    .form-row { margin-bottom: 1.5rem; }
+    .form-row label {
+      display: block;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 0.6rem;
+    }
+    .form-row input {
+      width: 100%;
+      padding: 1rem 1.1rem;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--ink);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    }
+    .form-row input::placeholder { color: var(--ink-mute); }
+    .form-row input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(0,0,0,0.4);
+      box-shadow: 0 0 0 4px var(--accent-dim);
+    }
+
+    /* ── CTA ── */
+    .cta {
+      width: 100%;
+      padding: 1.15rem 1.5rem;
+      background: var(--accent);
+      color: var(--bg-1);
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    }
+    .cta:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(200,255,58,0.35);
+    }
+    .cta:active:not(:disabled) { transform: translateY(0); }
+    .cta:disabled {
+      background: rgba(245,243,255,0.15);
+      color: var(--ink-mute);
+      cursor: not-allowed;
+    }
+    .cta .arrow {
+      transition: transform 0.2s;
+    }
+    .cta:hover:not(:disabled) .arrow { transform: translateX(4px); }
+
+    .footer-note {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--ink-mute);
+      margin-top: 1.5rem;
+      line-height: 1.6;
+    }
+
+    /* ── 성공 화면 ── */
+    .success {
+      display: none;
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .success.active { display: block; animation: fadeUp 0.5s ease-out; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .success-icon {
+      width: 72px; height: 72px;
+      margin: 0 auto 1.25rem;
+      border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 8px var(--accent-dim);
+    }
+    .success-icon svg {
+      width: 36px; height: 36px; stroke: var(--bg-1); stroke-width: 3;
+      fill: none; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .success-title {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 1.4rem; font-weight: 900;
+      margin-bottom: 0.5rem;
+    }
+    .success-msg {
+      color: var(--ink-soft);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      margin-bottom: 1.75rem;
+    }
+    .success-msg strong { color: var(--accent); font-weight: 700; }
+    .reset-btn {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--ink-soft);
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .reset-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── 토스트 ── */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg-1);
+      border: 1px solid var(--magenta);
+      color: var(--ink);
+      padding: 0.85rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.88rem; font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: transform 0.3s, opacity 0.3s;
+      z-index: 100;
+      max-width: 90vw;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.5rem; }
+      .date-num { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <div class="meta-row">
+      <span><span class="meta-dot"></span>모집 진행 중</span>
+      <span>참가 신청</span>
+    </div>
+
+    <section class="card" id="formCard">
+      <div class="eyebrow">
+        <span class="tag">2026</span>
+        <span>해봄 × 디지털활용</span>
+      </div>
+
+      <h1>
+        <span class="accent">AI 동아리</span>에<br>
+        함께하실래요?
+      </h1>
+      <p class="subtitle">
+        2026년 해봄 X 디지털활용 AI 동아리 활동에<br>
+        참가하고 싶다면 아래 버튼을 눌러 신청해 주세요.
+      </p>
+
+      <div class="date-box" aria-label="활동 일자">
+        <div class="date-label">활동일</div>
+        <div class="date-value">
+          <span class="date-num">11</span>
+          <span class="date-month">
+            <strong>MAY</strong>
+            5월 11일
+          </span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label for="nameInput">이름</label>
+        <input
+          type="text"
+          id="nameInput"
+          placeholder="이름을 입력해 주세요"
+          autocomplete="off"
+          maxlength="20"
+        >
+      </div>
+
+      <button type="button" class="cta" id="submitBtn">
+        <span>참가 신청</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+
+      <p class="footer-note">
+        제출된 정보는 동아리 명단 작성 용도로만 사용됩니다.
+      </p>
+    </section>
+
+    <section class="card success" id="successCard">
+      <div class="success-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg>
+      </div>
+      <h2 class="success-title">신청 완료!</h2>
+      <p class="success-msg">
+        <strong id="successName">_</strong> 님,<br>
+        <strong>5월 11일</strong> 활동에서 만나요.
+      </p>
+      <button type="button" class="reset-btn" id="resetBtn">다시 신청하기</button>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="alert"></div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+      var URL_KEY = 'club_apply_url';
+
+      var nameInput  = document.getElementById('nameInput');
+      var submitBtn  = document.getElementById('submitBtn');
+      var formCard   = document.getElementById('formCard');
+      var successCard = document.getElementById('successCard');
+      var successName = document.getElementById('successName');
+      var resetBtn   = document.getElementById('resetBtn');
+      var toastEl    = document.getElementById('toast');
+      var toastTimer = null;
+
+      function showToast(msg, ms) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() {
+          toastEl.classList.remove('show');
+        }, ms || 3000);
+      }
+
+      function setSubmitting(on) {
+        submitBtn.disabled = on;
+        submitBtn.querySelector('span').textContent = on ? '신청 중…' : '참가 신청';
+      }
+
+      function showSuccess(name) {
+        successName.textContent = name;
+        formCard.style.display = 'none';
+        successCard.classList.add('active');
+      }
+
+      function showForm() {
+        successCard.classList.remove('active');
+        formCard.style.display = '';
+        nameInput.value = '';
+        nameInput.focus();
+      }
+
+      submitBtn.addEventListener('click', function() {
+        var name = (nameInput.value || '').trim();
+        if (!name) {
+          showToast('이름을 입력해 주세요.');
+          nameInput.focus();
+          return;
+        }
+        if (name.length < 2) {
+          showToast('이름을 2글자 이상 입력해 주세요.');
+          nameInput.focus();
+          return;
+        }
+
+        setSubmitting(true);
+
+        var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+        var payload = {
+          source: 'club-apply',
+          name: name,
+          club: '2026년 해봄 X 디지털활용 AI 동아리',
+          eventDate: '5월 11일'
+        };
+
+        fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(function() {
+          showSuccess(name);
+        }).catch(function(err) {
+          showToast('전송 오류: ' + (err && err.message ? err.message : '잠시 후 다시 시도해 주세요.'), 4500);
+        }).finally(function() {
+          setSubmitting(false);
+        });
+      });
+
+      resetBtn.addEventListener('click', showForm);
+
+      nameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitBtn.click();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

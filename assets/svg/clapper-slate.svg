@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 정면에서 본 영화 촬영용 클래퍼보드(슬레이트)의 몸판 - 아래쪽 고정 막대 + 칠판 몸판.
+       위쪽 움직이는 막대는 clapper-stick.svg로 따로 그렸다(덱이 경첩을 축으로 회전시켜 닫는다).
+       칠판 칸은 비워 두었다 - 장면·숏 번호 글씨는 덱이 얹는다. 텍스트 없음.
+       팔레트: ink #1d1b22 · slate #2b2933 · slateEdge #3b3846 · chalk #f3ede1 · stripe #f6f2ea · hinge #b8b2c4
+       앵커: 위 막대가 얹히는 선 y=8 (x 14~306) · 경첩 중심 (20, 8) · 칠판 칸 위쪽 x 30~290 y 46~108 (세로선 x=114, 204), 아래쪽 x 30~290 y 116~228 (가로선 y=168) -->
+  <defs>
+    <clipPath id="cs-bar"><rect x="14" y="8" width="292" height="24" rx="3" /></clipPath>
+  </defs>
+  <path d="M24 236 L304 236" stroke="#1d1b22" stroke-width="6" opacity=".07" />
+  <!-- 아래 고정 막대 -->
+  <rect x="14" y="8" width="292" height="24" rx="3" fill="#2b2933" />
+  <g clip-path="url(#cs-bar)" fill="#f6f2ea">
+    <path d="M40 8 L66 8 L52 32 L26 32 Z" /><path d="M92 8 L118 8 L104 32 L78 32 Z" /><path d="M144 8 L170 8 L156 32 L130 32 Z" />
+    <path d="M196 8 L222 8 L208 32 L182 32 Z" /><path d="M248 8 L274 8 L260 32 L234 32 Z" /><path d="M300 8 L326 8 L312 32 L286 32 Z" />
+  </g>
+  <rect x="14" y="8" width="292" height="24" rx="3" stroke="#1d1b22" stroke-width="2.4" />
+  <!-- 칠판 몸판 -->
+  <path d="M20 34 L300 34 C305 34 308 37 308 42 L308 222 C308 228 304 232 298 232 L22 232 C16 232 12 228 12 222 L12 42 C12 37 15 34 20 34 Z"
+        fill="#2b2933" stroke="#1d1b22" stroke-width="2.4" />
+  <path d="M22 44 L22 220" stroke="#3b3846" stroke-width="4" opacity=".9" />
+  <path d="M30 44 L120 44" stroke="#ffffff" stroke-width="3" opacity=".18" />
+  <!-- 분필 칸 나눔선 -->
+  <g stroke="#f3ede1" stroke-width="1.6" opacity=".55">
+    <path d="M26 112 L294 112" />
+    <path d="M114 46 L114 108" /><path d="M204 46 L204 108" />
+    <path d="M26 168 L294 168" opacity=".6" />
+  </g>
+  <!-- 분필 가루 결 -->
+  <g stroke="#f3ede1" stroke-width="1.2" opacity=".14">
+    <path d="M40 200 C80 196 130 198 170 194" /><path d="M200 210 C230 206 260 208 288 204" /><path d="M60 140 C90 138 110 140 140 136" />
+  </g>
+  <!-- 경첩 -->
+  <circle cx="20" cy="8" r="7" fill="#b8b2c4" stroke="#1d1b22" stroke-width="2.2" />
+  <circle cx="20" cy="8" r="2" fill="#1d1b22" />
+</svg>

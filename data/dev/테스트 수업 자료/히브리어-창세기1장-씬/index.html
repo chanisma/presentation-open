@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>히브리어로 보는 창세기 1장 — 동적 씬</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Serif+Hebrew:wght@400;600;700;800&family=Noto+Serif:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  /* Deck Contract v1 — 크롬·네비는 deck.js가 제공. 여기는 이 덱의 디자인 언어만. */
+  :root{
+    --void:#0e0b10; --void-2:#171119; --ink:#f3ede2; --ink-dim:#a99f8d; --ink-faint:#6b6458;
+    --gold:#e7b158; --gold-deep:#a97a2e; --gold-pale:#f6dfa8;
+    --teal:#3a5f72; --teal-deep:#1f3742;
+    --crimson:#a63b32; --crimson-deep:#7a2a24;
+    --dk-accent: linear-gradient(90deg, var(--teal), var(--gold));
+    --dk-chrome-bg: rgba(14,11,16,.8); --dk-chrome-fg:#c9beac; --dk-chrome-line: rgba(231,177,88,.28);
+    --dk-chrome-title:#f3ede2;
+    --f-kr:'Noto Sans KR','Pretendard',sans-serif;
+    --f-heb:'Noto Serif Hebrew','Times New Roman',serif;
+    --f-grk:'Noto Serif',Georgia,serif;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden;
+    font-family: var(--f-kr); background: var(--void); color: var(--ink);
+    font-size: clamp(13px, 1.1vw, 20px); }
+  .presentation { width: 100%; height: 100%; position: relative; }
+  .slide { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+    transition: opacity .5s ease; overflow: hidden; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .heb{ font-family: var(--f-heb); }
+  .grk{ font-family: var(--f-grk); }
+</style>
+</head>
+<body data-deck-title="히브리어로 보는 창세기 1장" data-subject="테스트 수업 자료">
+<div class="presentation">
+
+<!-- scene: sc-01 | metaphor: 삼각측량 | intent: 세 번역이 각자 다른 방향에서 같은 원문 한 점을 가리키는 삼각측량으로, 오늘 읽을 것은 번역이 아니라 그 원문임을 예고한다 -->
+<div class="slide active" data-scene="sc-01">
+  <style>
+    [data-scene="sc-01"] { background: radial-gradient(120% 90% at 72% 38%, var(--void-2) 0%, var(--void) 60%); }
+    [data-scene="sc-01"] svg.lines { position:absolute; inset:0; width:100%; height:100%; }
+    [data-scene="sc-01"] .lines path { fill:none; stroke: var(--teal); stroke-width:2; opacity:.8; }
+    [data-scene="sc-01"] .sat { position:absolute; width:15vw; min-width:150px; padding: 1.1vw 1.4vw;
+      background: var(--void-2); border:1px solid rgba(231,177,88,.22); border-radius: 10px;
+      box-shadow: 0 14px 30px rgba(0,0,0,.4); will-change: opacity, transform; }
+    [data-scene="sc-01"] .sat .tag{ font-size:.72em; color:var(--ink-faint); letter-spacing:.14em; }
+    [data-scene="sc-01"] .sat .word{ font-size:1.15em; font-weight:700; margin-top:.3vh; color:var(--ink); }
+    [data-scene="sc-01"] .satA{ left:12%; top:8%; transform: rotate(-5deg); }
+    [data-scene="sc-01"] .satB{ left:7%; top:37%; transform: rotate(3deg); }
+    [data-scene="sc-01"] .satC{ left:15%; top:54%; transform: rotate(-3deg); }
+    [data-scene="sc-01"] .focal{ position:absolute; left:56%; top:34%; width:30vw; min-width:320px;
+      background: var(--void-2); border:1px solid var(--gold); border-radius:14px; padding: 2.4vh 2vw;
+      text-align:center; box-shadow: 0 0 0 1px rgba(231,177,88,.15), 0 24px 60px rgba(0,0,0,.55);
+      will-change: opacity, transform; }
+    [data-scene="sc-01"] .focal .heb{ font-size:3.6vw; font-weight:700; color:var(--gold-pale); line-height:1.1; }
+    [data-scene="sc-01"] .focal .pron{ font-size:1.05em; color:var(--ink-dim); margin-top:1vh; }
+    [data-scene="sc-01"] .focal .mean{ font-size:1.3em; font-weight:700; margin-top:.4vh; }
+    [data-scene="sc-01"] .kicker{ position:absolute; left:6vw; bottom:27vh; font-size:.85em;
+      letter-spacing:.3em; color:var(--teal); font-weight:700; text-transform:uppercase; }
+    [data-scene="sc-01"] h1{ position:absolute; left:6vw; bottom:6vh; width:44vw;
+      font-size:3vw; font-weight:900; line-height:1.28; letter-spacing:-.01em;
+      margin-inline:0; word-break:keep-all; }
+    [data-scene="sc-01"] h1 em{ font-style:normal; color:var(--gold); }
+  </style>
+  <svg class="lines" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
+    <path data-ln="0" d="M 224 90 L 620 220"></path>
+    <path data-ln="1" d="M 220 250 L 620 220"></path>
+    <path data-ln="2" d="M 260 345 L 620 260"></path>
+  </svg>
+  <div class="sat satA"><div class="tag">개역개정</div><div class="word">태초에</div></div>
+  <div class="sat satB"><div class="tag">새번역</div><div class="word">한처음에</div></div>
+  <div class="sat satC"><div class="tag">KJV</div><div class="word">In the beginning</div></div>
+  <div class="focal">
+    <div class="heb">בְּרֵאשִׁית</div>
+    <div class="pron">베레쉬트</div>
+    <div class="mean">태초에</div>
+  </div>
+  <div class="kicker">창조 · 원문으로 읽기</div>
+  <h1>번역 세 개가 가리키는,<br><em>단 하나의 원문</em></h1>
+</div>
+
+<!-- scene: sc-02 | metaphor: 발굴 | intent: 표층 언어 아래 파묻힌 뿌리 רֹאשׁ를 발굴 현장처럼 캐내어 심어두고, 전쟁의 결말 장면에서 다시 캐낼 씨앗으로 남긴다 -->
+<div class="slide" data-scene="sc-02">
+  <style>
+    [data-scene="sc-02"] { background: linear-gradient(180deg, var(--void) 0%, #12100f 100%); }
+    [data-scene="sc-02"] .pit{ position:absolute; left:8vw; top:10vh; width:46vw; height:72vh; }
+    [data-scene="sc-02"] .layer{ position:absolute; left:0; width:100%; border-radius:6px;
+      display:flex; align-items:center; padding: 0 1.6vw; overflow:hidden; will-change: opacity, height; }
+    [data-scene="sc-02"] .layer-1{ top:0; height:26vh; background: linear-gradient(180deg,#2a2420,#1c1815); }
+    [data-scene="sc-02"] .layer-2{ top:26vh; height:22vh; background: linear-gradient(180deg,#221d1a,#171310); }
+    [data-scene="sc-02"] .layer-3{ top:48vh; height:24vh; background: radial-gradient(80% 100% at 50% 100%, rgba(231,177,88,.14), transparent 70%), #0f0d0c;
+      border: 1px solid rgba(231,177,88,.3); }
+    [data-scene="sc-02"] .lw{ font-size:1.6vw; font-weight:700; color: var(--ink-dim); }
+    [data-scene="sc-02"] .lw .heb{ font-size:1.5em; color:var(--ink); margin-right:.5vw; }
+    [data-scene="sc-02"] .lw small{ display:block; font-size:.6em; font-weight:400; color:var(--ink-faint); margin-top:.3vh; }
+    [data-scene="sc-02"] .artifact{ position:absolute; top:48vh; right:1.4vw; text-align:right;
+      opacity:0; transform: translateY(14px) scale(.85); will-change: opacity, transform; }
+    [data-scene="sc-02"] .artifact .heb{ font-size:2.6vw; font-weight:800; color: var(--gold-pale); }
+    [data-scene="sc-02"] .artifact .pron{ font-size:1.1em; color: var(--gold); font-weight:700; margin-top:.3vh; }
+    [data-scene="sc-02"] .artifact .mean{ font-size:1.15em; color:var(--ink); }
+    [data-scene="sc-02"] .compass{ position:absolute; right:9vw; top:8vh; text-align:right; }
+    [data-scene="sc-02"] .compass .lab{ font-size:.8em; color:var(--teal); font-weight:700; letter-spacing:.12em; }
+    [data-scene="sc-02"] .compass svg{ margin-top:.6vh; }
+    [data-scene="sc-02"] .headline{ position:absolute; right:7vw; top:20vh; width:32vw; text-align:right; }
+    [data-scene="sc-02"] .headline h2{ font-size:2.3vw; font-weight:900; line-height:1.3; word-break:keep-all; }
+    [data-scene="sc-02"] .headline h2 b{ color:var(--gold); }
+    [data-scene="sc-02"] .seed{ position:absolute; right:7vw; bottom:9vh; width:32vw; text-align:right;
+      color: var(--ink-dim); font-size:1.05em; line-height:1.7; border-right: 3px solid var(--gold-deep); padding-right:1.2vw; }
+  </style>
+  <div class="compass">
+    <div class="lab">읽는 방향</div>
+    <svg width="120" height="34" viewBox="0 0 120 34"><path d="M110 17 L14 17" stroke="var(--ink-faint)" stroke-width="2"></path><path d="M28 9 L14 17 L28 25" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  </div>
+  <div class="headline"><h2>단어 하나를 <b>파 내려가면</b><br>뿌리에 닿는다</h2></div>
+  <div class="pit">
+    <div class="layer layer-1"><div class="lw"><span class="heb">בְּרֵאשִׁית</span>베레쉬트<small>표층 · 태초에</small></div></div>
+    <div class="layer layer-2"><div class="lw"><span class="heb">רֵאשִׁית</span>레쉬트<small>중간층 · 시작</small></div></div>
+    <div class="layer layer-3"></div>
+    <div class="artifact">
+      <div class="heb">רֹאשׁ</div>
+      <div class="pron">로쉬</div>
+      <div class="mean">머리</div>
+    </div>
+  </div>
+  <div class="seed">이 뿌리, 전쟁의 결말에서<br>다시 캐낸다</div>
+</div>
+
+<!-- scene: sc-03 | metaphor: 봉인 도장 | intent: בָּרָא에는 하나님만 찍는 도장이 있고, 복수형 주어에 단수형 동사라는 문법 자체가 이미 힌트임을 보인다 -->
+<div class="slide" data-scene="sc-03">
+  <style>
+    [data-scene="sc-03"] { background: radial-gradient(90% 70% at 30% 20%, var(--void-2), var(--void) 60%); }
+    [data-scene="sc-03"] .discard{ position:absolute; left:6vw; top:14vh; width:15vw; }
+    [data-scene="sc-03"] .dc{ background:#1a1613; border:1px solid rgba(255,255,255,.06); border-radius:8px;
+      padding:1vw 1.2vw; margin-bottom:1.1vh; opacity:.55; filter: grayscale(.4); }
+    [data-scene="sc-03"] .dc:nth-child(1){ transform: rotate(-4deg) translateX(-6px); }
+    [data-scene="sc-03"] .dc:nth-child(2){ transform: rotate(3deg) translateX(10px); }
+    [data-scene="sc-03"] .dc .heb{ font-size:1.5em; color:var(--ink-faint); }
+    [data-scene="sc-03"] .dc .p{ font-size:.72em; color:var(--ink-faint); margin-top:.2vh; }
+    [data-scene="sc-03"] .lab-reject{ font-size:.72em; letter-spacing:.16em; color:var(--ink-faint); margin-bottom:1vh; }
+    [data-scene="sc-03"] .tablet{ position:absolute; left:26vw; top:20vh; width:34vw; min-width:340px;
+      background: #16130f; border:1px solid rgba(231,177,88,.25); border-radius:10px; padding: 3vh 2.4vw;
+      text-align:center; box-shadow: 0 30px 70px rgba(0,0,0,.5); }
+    [data-scene="sc-03"] .tablet .heb{ font-size:4.4vw; font-weight:700; color:var(--gold-pale); }
+    [data-scene="sc-03"] .tablet .pron{ font-size:1.15em; color:var(--gold); font-weight:700; margin-top:1vh; }
+    [data-scene="sc-03"] .tablet .mean{ font-size:1.3em; margin-top:.3vh; }
+    [data-scene="sc-03"] .seal{ position:absolute; left:39vw; top:2vh; width:12vw; min-width:120px; aspect-ratio:1;
+      border-radius:50%; border: .5vw solid var(--gold); display:flex; align-items:center; justify-content:center;
+      color:var(--gold); font-weight:900; font-size:.95vw; text-align:center; letter-spacing:.08em;
+      background: rgba(231,177,88,.06); will-change: transform, opacity; transform-origin:50% 0%; }
+    [data-scene="sc-03"] .gram{ position:absolute; right:6vw; bottom:8vh; width:26vw; background:#16130f;
+      border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:1.6vh 1.6vw; opacity:0;
+      will-change: opacity, transform; }
+    [data-scene="sc-03"] .gram .row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.6vh; }
+    [data-scene="sc-03"] .gram .row .heb{ font-family:var(--f-heb); font-size:1.3em; }
+    [data-scene="sc-03"] .gram .row .tag{ font-size:.68em; padding:.2vh .8vw; border-radius:999px; font-weight:700; }
+    [data-scene="sc-03"] .gram .row.plural .tag{ color:#c9a3ff; background:rgba(201,163,255,.12); }
+    [data-scene="sc-03"] .gram .row.single .tag{ color:var(--gold); background:rgba(231,177,88,.12); }
+    [data-scene="sc-03"] .gram .q{ text-align:center; color:var(--ink-dim); font-size:.85em; margin-top:.6vh; }
+    [data-scene="sc-03"] h1{ position:absolute; left:6vw; top:5vh; width:34vw; font-size:2vw; font-weight:900;
+      line-height:1.35; word-break:keep-all; }
+  </style>
+  <h1>히브리어에는 <span style="color:var(--gold)">하나님만</span> 쓰는<br>창조의 동사가 있다</h1>
+  <div class="discard">
+    <div class="lab-reject">쓰이지 않은 동사들</div>
+    <div class="dc"><div class="heb">עָשָׂה</div><div class="p">아사 · 만들다 (사람도 함)</div></div>
+    <div class="dc"><div class="heb">יָצַר</div><div class="p">야차르 · 빚다 (토기장이도 함)</div></div>
+  </div>
+  <div class="tablet">
+    <div class="heb">בָּרָא</div>
+    <div class="pron">바라</div>
+    <div class="mean">창조하다 — 주어는 언제나 하나님</div>
+  </div>
+  <div class="seal">CREATOR<br>ONLY</div>
+  <div class="gram">
+    <div class="row plural"><span class="heb">אֱלֹהִים</span><span class="tag">복수형</span></div>
+    <div class="row single"><span class="heb">בָּרָא</span><span class="tag">단수형 동사</span></div>
+    <div class="q">여럿이신 한 분?</div>
+  </div>
+</div>
+
+<!-- scene: sc-04 | metaphor: 이중 계기판 | intent: 창조 이전의 문제가 정확히 두 가지(형태 없음·비어 있음)임을 두 개의 빈 계기판으로 정량화한다 -->
+<div class="slide" data-scene="sc-04">
+  <style>
+    [data-scene="sc-04"] { background: var(--void); }
+    [data-scene="sc-04"] .noise{ position:absolute; inset:0; }
+    [data-scene="sc-04"] .noise i{ position:absolute; width:3px; height:3px; border-radius:50%;
+      background: rgba(58,95,114,.5); will-change: opacity; }
+    [data-scene="sc-04"] .gauges{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; gap:6vw; }
+    [data-scene="sc-04"] .g{ text-align:center; position:relative; }
+    [data-scene="sc-04"] .g svg{ display:block; }
+    [data-scene="sc-04"] .g .heb{ font-size:2.6vw; font-weight:700; color:var(--ink); margin-top:1vh; }
+    [data-scene="sc-04"] .g .p{ font-size:1.1em; color:var(--ink-dim); margin-top:.4vh; }
+    [data-scene="sc-04"] .g .pct{ position:absolute; font-size:1vw; fill:var(--ink-faint); font-family:var(--f-kr); }
+    [data-scene="sc-04"] .lock{ position:absolute; left:50%; top:-1.6vh; transform:translateX(-50%);
+      will-change: transform, opacity; }
+    [data-scene="sc-04"] h1{ position:absolute; left:6vw; top:8vh; width:36vw; font-size:2vw; font-weight:900;
+      line-height:1.35; word-break:keep-all; }
+    [data-scene="sc-04"] .cap{ position:absolute; left:6vw; bottom:8vh; color:var(--ink-dim); font-size:1.05em; }
+  </style>
+  <div class="noise" data-noise>
+    <i style="left:12%; top:18%"></i><i style="left:30%; top:12%"></i><i style="left:52%; top:15%"></i>
+    <i style="left:70%; top:20%"></i><i style="left:20%; top:78%"></i><i style="left:44%; top:82%"></i>
+    <i style="left:64%; top:76%"></i><i style="left:82%; top:70%"></i><i style="left:8%; top:52%"></i>
+    <i style="left:90%; top:44%"></i>
+  </div>
+  <h1>태초의 땅에는<br><span style="color:var(--gold)">두 가지</span>가 없었다</h1>
+  <div class="gauges">
+    <div class="g">
+      <svg width="180" height="110" viewBox="0 0 180 110">
+        <path d="M20 100 A70 70 0 0 1 160 100" fill="none" stroke="rgba(169,159,141,.32)" stroke-width="14" stroke-linecap="round"></path>
+        <path data-arc="0" d="M20 100 A70 70 0 0 1 160 100" fill="none" stroke="var(--crimson)" stroke-width="14" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="220"></path>
+      </svg>
+      <div class="lock" data-lock="0"><svg width="26" height="30" viewBox="0 0 26 30"><rect x="4" y="13" width="18" height="15" rx="2" fill="var(--gold-deep)"></rect><path d="M8 13 V9 a5 5 0 0 1 10 0 v4" fill="none" stroke="var(--gold-deep)" stroke-width="3"></path></svg></div>
+      <div class="heb">תֹהוּ</div>
+      <div class="p">토후 · 형태 없음</div>
+    </div>
+    <div class="g">
+      <svg width="180" height="110" viewBox="0 0 180 110">
+        <path d="M20 100 A70 70 0 0 1 160 100" fill="none" stroke="rgba(169,159,141,.32)" stroke-width="14" stroke-linecap="round"></path>
+        <path data-arc="1" d="M20 100 A70 70 0 0 1 160 100" fill="none" stroke="var(--teal)" stroke-width="14" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="220"></path>
+      </svg>
+      <div class="lock" data-lock="1"><svg width="26" height="30" viewBox="0 0 26 30"><rect x="4" y="13" width="18" height="15" rx="2" fill="var(--gold-deep)"></rect><path d="M8 13 V9 a5 5 0 0 1 10 0 v4" fill="none" stroke="var(--gold-deep)" stroke-width="3"></path></svg></div>
+      <div class="heb">בֹהוּ</div>
+      <div class="p">보후 · 비어 있음</div>
+    </div>
+  </div>
+  <div class="cap">창세기 1:2 — 땅이 혼돈하고 공허하며</div>
+</div>
+
+<!-- scene: sc-05 | metaphor: 품는 새 | intent: 혼돈의 수면 위에 있던 것이 무관심이 아니라 알을 품는 새처럼 돌보는 임재였음을 보인다 -->
+<div class="slide" data-scene="sc-05">
+  <style>
+    [data-scene="sc-05"] { background: linear-gradient(180deg, var(--void) 0%, #101a1e 100%); }
+    [data-scene="sc-05"] .water{ position:absolute; left:0; right:0; bottom:0; height:34vh; }
+    [data-scene="sc-05"] .bird{ position:absolute; left:50%; top:20vh; width:22vw; min-width:220px;
+      transform: translateX(-50%); will-change: transform; }
+    [data-scene="sc-05"] .bird .wingL, [data-scene="sc-05"] .bird .wingR{ transform-origin: 50% 20%; will-change: transform; }
+    [data-scene="sc-05"] .word{ position:absolute; right:8vw; top:16vh; text-align:right; opacity:0;
+      will-change: opacity, transform; }
+    [data-scene="sc-05"] .word .heb{ font-size:3vw; font-weight:700; color:var(--gold-pale); }
+    [data-scene="sc-05"] .word .p{ font-size:1.2em; color:var(--ink-dim); margin-top:.6vh; }
+    [data-scene="sc-05"] .word .m{ font-size:1.3em; font-weight:700; margin-top:.2vh; }
+    [data-scene="sc-05"] .ref{ position:absolute; left:6vw; bottom:11vh; width:22vw; background:#101a1e;
+      border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:1.4vh 1.2vw; opacity:0;
+      will-change: opacity, transform; }
+    [data-scene="sc-05"] .ref .cap{ font-size:.72em; color:var(--ink-faint); margin-bottom:.6vh; }
+    [data-scene="sc-05"] .ref svg{ display:block; margin:0 auto; }
+    [data-scene="sc-05"] .cap2{ position:absolute; left:6vw; top:8vh; width:36vw; font-size:1.9vw;
+      font-weight:900; line-height:1.35; word-break:keep-all; }
+  </style>
+  <svg class="water" viewBox="0 0 1000 300" preserveAspectRatio="none">
+    <path d="M0 60 Q125 20 250 60 T500 60 T750 60 T1000 60 V300 H0 Z" fill="#132a33"></path>
+    <path d="M0 110 Q125 70 250 110 T500 110 T750 110 T1000 110 V300 H0 Z" fill="#0f2229"></path>
+  </svg>
+  <div class="cap2">혼돈 위에 있던 것은<br><span style="color:var(--gold)">돌봄</span>이었다</div>
+  <div class="bird">
+    <svg viewBox="0 0 200 120" width="100%">
+      <g class="wingL"><path d="M100 60 C60 30 20 40 6 62 C34 62 66 66 100 60 Z" fill="var(--teal)"></path></g>
+      <g class="wingR"><path d="M100 60 C140 30 180 40 194 62 C166 62 134 66 100 60 Z" fill="var(--teal)"></path></g>
+      <ellipse cx="100" cy="66" rx="16" ry="12" fill="#4a7387"></ellipse>
+      <circle cx="100" cy="52" r="9" fill="#4a7387"></circle>
+    </svg>
+  </div>
+  <div class="word">
+    <div class="heb">רוּחַ מְרַחֶפֶת</div>
+    <div class="p">루아흐 메라헤페트</div>
+    <div class="m">품다 · 날개 치며 맴돌다</div>
+  </div>
+  <div class="ref">
+    <div class="cap">신명기 32:11 — 같은 단어</div>
+    <svg width="140" height="70" viewBox="0 0 140 70">
+      <path d="M20 55 L120 55 L100 40 L40 40 Z" fill="#3a2e22"></path>
+      <circle cx="52" cy="46" r="6" fill="#4a7387"></circle>
+      <circle cx="80" cy="46" r="6" fill="#4a7387"></circle>
+      <path d="M66 20 C50 8 30 12 22 26 C40 26 56 30 66 20 Z" fill="var(--teal)"></path>
+      <path d="M66 20 C82 8 102 12 110 26 C92 26 76 30 66 20 Z" fill="var(--teal)"></path>
+    </svg>
+  </div>
+</div>
+
+<!-- scene: sc-06 | metaphor: 점화 스위치 | intent: 명령과 결과 사이에 어떤 간극도 없음을, 스위치를 젖히는 즉시 빛이 터지는 인과로 체감시킨다 -->
+<div class="slide" data-scene="sc-06">
+  <style>
+    [data-scene="sc-06"] { background: var(--void); }
+    [data-scene="sc-06"] .switchbox{ position:absolute; left:7vw; top:30vh; text-align:center; z-index:3; }
+    [data-scene="sc-06"] .switchbox svg{ width:11vw; height:auto; display:block; margin:0 auto; }
+    [data-scene="sc-06"] .lever{ transform-origin: 45px 90px; will-change: transform; }
+    [data-scene="sc-06"] .cmd{ margin-top:2.4vh; }
+    [data-scene="sc-06"] .cmd .heb{ font-size:2.3vw; font-weight:700; }
+    [data-scene="sc-06"] .cmd .p{ font-size:1.05em; color:var(--ink-dim); margin-top:.4vh; }
+    [data-scene="sc-06"] .afterglow{ position:absolute; left:50%; top:50%; width:10vw; height:10vw;
+      transform: translate(-50%,-50%) scale(0); border-radius:50%;
+      background: radial-gradient(circle, rgba(246,223,168,.5) 0%, rgba(231,177,88,.22) 45%, rgba(231,177,88,0) 75%);
+      will-change: transform, opacity; z-index:1; }
+    [data-scene="sc-06"] .burst{ position:absolute; left:50%; top:50%; width:6vw; height:6vw; border-radius:50%;
+      background: radial-gradient(circle, var(--gold-pale) 0%, var(--gold) 45%, rgba(231,177,88,0) 75%);
+      transform: translate(-50%,-50%) scale(0); will-change: transform, opacity; z-index:2; }
+    [data-scene="sc-06"] .bridge{ position:absolute; left:50%; top:30vh; transform:translateX(-50%); text-align:center;
+      color:var(--ink-faint); font-size:.85em; opacity:0; will-change:opacity; z-index:3; }
+    [data-scene="sc-06"] .result{ position:absolute; right:7vw; top:30vh; text-align:right; opacity:0; will-change:opacity, transform; z-index:3; }
+    [data-scene="sc-06"] .result .heb{ font-size:2.3vw; font-weight:700; }
+    [data-scene="sc-06"] .result .heb .echo{ color:var(--gold); }
+    [data-scene="sc-06"] .result .p{ font-size:1.05em; color:var(--ink-dim); margin-top:.4vh; }
+    [data-scene="sc-06"] h1{ position:absolute; left:6vw; top:8vh; width:44vw; font-size:2vw; font-weight:900;
+      line-height:1.35; word-break:keep-all; z-index:3; }
+    [data-scene="sc-06"] .note{ position:absolute; left:50%; bottom:9vh; transform:translateX(-50%);
+      color:var(--ink-dim); font-size:1.05em; z-index:3; }
+  </style>
+  <h1>말과 사건 사이에는<br><span style="color:var(--gold)">아무 틈이 없다</span></h1>
+  <div class="switchbox">
+    <svg viewBox="0 0 90 140">
+      <rect x="26" y="88" width="38" height="46" rx="8" fill="#2a2420"></rect>
+      <g data-lever class="lever">
+        <line x1="45" y1="90" x2="45" y2="26" stroke="var(--gold-pale)" stroke-width="11" stroke-linecap="round"></line>
+        <circle data-knob cx="45" cy="26" r="13" fill="var(--gold-pale)" stroke="var(--void)" stroke-width="2"></circle>
+      </g>
+    </svg>
+    <div class="cmd"><div class="heb"><span class="heb">יְהִי אוֹר</span></div><div class="p">예히 오르 · 빛이 있으라</div></div>
+  </div>
+  <div class="afterglow" data-afterglow></div>
+  <div class="burst" data-burst></div>
+  <div class="bridge" data-bridge>사이에<br>아무것도 없음</div>
+  <div class="result">
+    <div class="heb"><span class="echo">וַיְהִי</span>־אוֹר</div>
+    <div class="p">바예히 오르 · 빛이 있었다</div>
+  </div>
+  <div class="note">도구도, 재료도, 시간차도 없다</div>
+</div>
+
+<!-- scene: sc-07 | metaphor: 대칭 블루프린트 | intent: 앞 3일이 형태를 짓고 뒤 3일이 그 형태를 채우는 완벽한 대칭 구조임을 건축 도면으로 증명한다 (이 덱의 핵심 주장) -->
+<div class="slide" data-scene="sc-07">
+  <style>
+    [data-scene="sc-07"] { background:
+      repeating-linear-gradient(0deg, rgba(231,177,88,.05) 0 1px, transparent 1px 42px),
+      repeating-linear-gradient(90deg, rgba(231,177,88,.05) 0 1px, transparent 1px 42px), var(--void); }
+    [data-scene="sc-07"] .col-lab{ position:absolute; top:6vh; font-size:.85em; letter-spacing:.14em; font-weight:700;
+      padding:.6vh 1vw; border-radius:999px; }
+    [data-scene="sc-07"] .col-lab.l{ left:9vw; color: var(--teal); border:1px solid var(--teal); }
+    [data-scene="sc-07"] .col-lab.r{ right:9vw; color: var(--gold); border:1px solid var(--gold); }
+    [data-scene="sc-07"] .room{ position:absolute; width:23vw; height:13vh; border-radius:8px;
+      display:flex; align-items:center; gap:.8vw; padding:0 1vw; opacity:0; will-change: opacity, transform; }
+    [data-scene="sc-07"] .room.l{ background:#161a1c; border:1.5px dashed var(--teal); }
+    [data-scene="sc-07"] .room.r{ border:1.5px solid var(--gold-deep); background: linear-gradient(120deg, rgba(231,177,88,.16), rgba(231,177,88,.03)); }
+    [data-scene="sc-07"] .room.r.day6{ border-color: var(--gold); box-shadow: 0 0 0 3px rgba(231,177,88,.18); }
+    [data-scene="sc-07"] .room .t{ font-size:1.05em; font-weight:700; }
+    [data-scene="sc-07"] .room .t small{ display:block; font-weight:400; color:var(--ink-dim); font-size:.72em; }
+    [data-scene="sc-07"] .room1{ left:9vw; top:22vh; } [data-scene="sc-07"] .room2{ left:11vw; top:40vh; } [data-scene="sc-07"] .room3{ left:13vw; top:58vh; }
+    [data-scene="sc-07"] .room4{ right:9vw; top:22vh; } [data-scene="sc-07"] .room5{ right:11vw; top:40vh; } [data-scene="sc-07"] .room6{ right:13vw; top:58vh; }
+    [data-scene="sc-07"] svg.links{ position:absolute; inset:0; width:100%; height:100%; }
+    [data-scene="sc-07"] svg.links path{ fill:none; stroke: var(--gold-deep); stroke-width:2; stroke-dasharray:6 6; }
+    [data-scene="sc-07"] .pair-tag{ position:absolute; font-size:.7em; color:var(--gold); background:var(--void);
+      padding:.1vh .6vw; border-radius:999px; border:1px solid var(--gold-deep); opacity:0; }
+    [data-scene="sc-07"] .bottom{ position:absolute; left:9vw; right:9vw; bottom:9vh; }
+    [data-scene="sc-07"] .track{ height:1.2vh; border-radius:999px; background:#211c19; overflow:hidden; }
+    [data-scene="sc-07"] .fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--teal), var(--gold)); }
+    [data-scene="sc-07"] .bottom .lbl{ text-align:center; margin-top:1vh; font-weight:700; color:var(--ink-dim); font-size:.95em; }
+    [data-scene="sc-07"] h1{ position:absolute; left:50%; top:2vh; transform:translateX(-50%); text-align:center;
+      font-size:1.7vw; font-weight:900; }
+  </style>
+  <h1>짓다 (1~3일) → 채우다 (4~6일)</h1>
+  <div class="col-lab l">만들기 · 토후 해결</div>
+  <div class="col-lab r">채우기 · 보후 해결</div>
+  <svg class="links" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
+    <path data-link="0" d="M 400 195 L 600 195"></path>
+    <path data-link="1" d="M 420 285 L 580 285"></path>
+    <path data-link="2" d="M 440 375 L 560 375"></path>
+  </svg>
+  <div class="pair-tag" style="left:47.5%; top:32vh;">짝</div>
+  <div class="pair-tag" style="left:47.5%; top:47vh;">짝</div>
+  <div class="pair-tag" style="left:47.5%; top:62vh;">짝</div>
+  <div class="room l room1"><div class="t">1일<small>빛과 어둠</small></div></div>
+  <div class="room l room2"><div class="t">2일<small>하늘과 바다</small></div></div>
+  <div class="room l room3"><div class="t">3일<small>땅과 식물</small></div></div>
+  <div class="room r room4"><div class="t">4일<small>해·달·별</small></div></div>
+  <div class="room r room5"><div class="t">5일<small>새와 물고기</small></div></div>
+  <div class="room r day6 room6"><div class="t">6일<small>짐승과 사람</small></div></div>
+  <div class="bottom">
+    <div class="track"><div class="fill" data-fill></div></div>
+    <div class="lbl">집이 완성됨</div>
+  </div>
+</div>
+
+<!-- scene: sc-08 | metaphor: 도장 컨베이어 | intent: 좋다는 평가가 정확히 일곱 번 찍히고 마지막 한 번만 성격이 다름을 보여 사람 창조 이후의 전환을 강조한다 -->
+<div class="slide" data-scene="sc-08">
+  <style>
+    [data-scene="sc-08"] { background: linear-gradient(180deg, var(--void) 0%, #14100c 100%); }
+    [data-scene="sc-08"] .belt{ position:absolute; left:6vw; right:6vw; top:46vh; height:1.4vh; border-radius:999px;
+      background: repeating-linear-gradient(90deg, #2a2420 0 18px, #201b18 18px 36px); }
+    [data-scene="sc-08"] .stamp{ position:absolute; top:-6.4vh; width:7.4vw; aspect-ratio:1; border-radius:50%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      border:3px solid var(--gold-deep); color:var(--gold); font-weight:800; transform: translateY(10px) scale(0);
+      will-change: transform, opacity; background:rgba(231,177,88,.05); }
+    [data-scene="sc-08"] .stamp .heb{ font-size:1.5em; }
+    [data-scene="sc-08"] .stamp .n{ position:absolute; bottom:-2.6vh; font-size:.8em; color:var(--ink-faint); font-weight:700; }
+    [data-scene="sc-08"] .stamp.big{ width:12vw; top:-9.4vh; border-color:var(--gold); box-shadow:0 0 26px rgba(231,177,88,.32); }
+    [data-scene="sc-08"] .stamp.big .heb{ font-size:1.3em; }
+    [data-scene="sc-08"] .stamp.big .p{ font-size:.44em; margin-top:.4vh; color:var(--gold-pale); font-weight:700; }
+    [data-scene="sc-08"] .stamp.big .n{ color:var(--crimson); font-size:1em; }
+    [data-scene="sc-08"] h1{ position:absolute; left:50%; top:9vh; transform:translateX(-50%); text-align:center;
+      font-size:2vw; font-weight:900; }
+    [data-scene="sc-08"] .ratio{ position:absolute; left:50%; top:20vh; transform:translateX(-50%);
+      font-size:2.6vw; font-weight:900; color:var(--gold); font-variant-numeric: tabular-nums; }
+  </style>
+  <h1>'좋다'는 도장이<br>일곱 번 찍힌다</h1>
+  <div class="ratio" data-ratio>0 / 7</div>
+  <div class="belt">
+    <div class="stamp" style="left:6%"><div class="heb">טוֹב</div><div class="n">1</div></div>
+    <div class="stamp" style="left:19%"><div class="heb">טוֹב</div><div class="n">2</div></div>
+    <div class="stamp" style="left:32%"><div class="heb">טוֹב</div><div class="n">3</div></div>
+    <div class="stamp" style="left:45%"><div class="heb">טוֹב</div><div class="n">4</div></div>
+    <div class="stamp" style="left:58%"><div class="heb">טוֹב</div><div class="n">5</div></div>
+    <div class="stamp" style="left:71%"><div class="heb">טוֹב</div><div class="n">6</div></div>
+    <div class="stamp big" style="left:84%"><div class="heb">טוֹב<br>מְאֹד</div><div class="p">토브 메오드 · 심히 좋았더라</div><div class="n">7</div></div>
+  </div>
+</div>
+
+<!-- scene: sc-09 | metaphor: 조각과 흙 | intent: 가장 낮은 재료에서 가장 높은 것을 닮은 존재가 나오고, 사람 앞에서만 명령이 상의로 바뀌었음을 보인다 -->
+<div class="slide" data-scene="sc-09">
+  <style>
+    [data-scene="sc-09"] { background: var(--void); }
+    [data-scene="sc-09"] .figure{ position:absolute; left:50%; top:14vh; width:14vw; height:60vh; transform:translateX(-50%); }
+    [data-scene="sc-09"] .figure svg{ width:100%; height:100%; }
+    [data-scene="sc-09"] .beam{ position:absolute; left:50%; top:0; width:16vw; height:30vh; transform:translateX(-50%);
+      background: linear-gradient(180deg, rgba(231,177,88,.5), rgba(231,177,88,0));
+      clip-path: polygon(38% 0, 62% 0, 100% 100%, 0% 100%); opacity:0; will-change: opacity, height; }
+    [data-scene="sc-09"] .lab-top{ position:absolute; left:63%; top:16vh; }
+    [data-scene="sc-09"] .lab-bot{ position:absolute; left:63%; top:60vh; }
+    [data-scene="sc-09"] .lab-top .heb, [data-scene="sc-09"] .lab-bot .heb{ font-size:1.9vw; font-weight:700; }
+    [data-scene="sc-09"] .lab-top .p, [data-scene="sc-09"] .lab-bot .p{ font-size:1em; color:var(--ink-dim); }
+    [data-scene="sc-09"] .arrow{ position:absolute; left:60%; top:70vh; font-size:1em; color:var(--ink-faint); }
+    [data-scene="sc-09"] .strip{ position:absolute; left:6vw; top:12vh; display:flex; gap:.8vw; }
+    [data-scene="sc-09"] .strip .tiny{ background:#181310; border:1px solid rgba(255,255,255,.08); border-radius:6px;
+      padding:.5vh .7vw; font-size:.85vw; color:var(--ink-faint); will-change: opacity, transform; }
+    [data-scene="sc-09"] .strip .tiny .heb{ font-size:1.2em; }
+    [data-scene="sc-09"] .callout{ position:absolute; left:5vw; top:24vh; width:34vw; background:#181310;
+      border:2px solid var(--gold); border-radius:14px; padding:2vh 1.6vw; transform: scale(.6); opacity:0;
+      transform-origin: 0% 0%; will-change: opacity, transform; }
+    [data-scene="sc-09"] .callout .heb{ font-size:2.6vw; font-weight:800; color:var(--gold-pale); }
+    [data-scene="sc-09"] .callout .p{ font-size:1.05em; color:var(--ink-dim); margin-top:.6vh; }
+    [data-scene="sc-09"] .callout .m{ font-size:1.15em; font-weight:700; }
+    [data-scene="sc-09"] .foot{ position:absolute; left:5vw; bottom:7vh; width:34vw; color:var(--ink-dim);
+      font-size:1em; line-height:1.6; }
+  </style>
+  <div class="strip">
+    <div class="tiny"><span class="heb">יְהִי</span> 1일</div>
+    <div class="tiny"><span class="heb">יְהִי</span> 2일</div>
+    <div class="tiny"><span class="heb">יְהִי</span> 3일</div>
+    <div class="tiny"><span class="heb">יְהִי</span> 4일</div>
+    <div class="tiny"><span class="heb">יְהִי</span> 5일</div>
+  </div>
+  <div class="callout">
+    <div class="heb">נַעֲשֶׂה אָדָם</div>
+    <div class="p">나아세 아담</div>
+    <div class="m">우리가 사람을 만들자</div>
+  </div>
+  <div class="foot">명령이 아니라 상의, 단수가 아니라 복수 —<br>אֱלֹהִים 의 복수형 힌트와 여기서 만난다</div>
+  <div class="beam" data-beam></div>
+  <div class="figure">
+    <svg viewBox="0 0 140 400" preserveAspectRatio="xMidYMax meet">
+      <defs>
+        <linearGradient id="fig" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="var(--gold-pale)"></stop>
+          <stop offset="46%" stop-color="var(--gold-deep)"></stop>
+          <stop offset="46%" stop-color="#5b4630"></stop>
+          <stop offset="100%" stop-color="#33281a"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M70 10 a24 24 0 1 1 0 48 a24 24 0 1 1 0 -48 Z M32 70 Q70 52 108 70 L120 260 Q70 280 20 260 Z" fill="url(#fig)"></path>
+    </svg>
+  </div>
+  <div class="lab-top"><div class="heb">צֶלֶם</div><div class="p">첼렘 · 형상</div></div>
+  <div class="lab-bot"><div class="heb">אֲדָמָה → אָדָם</div><div class="p">아다마 · 흙 → 아담 · 사람</div></div>
+</div>
+
+<!-- scene: sc-10 | metaphor: 균열과 전선 지도 | intent: 사람이 숨은 바로 그 상처 위에 전쟁이 선포됨을, 갈라진 균열 자체에 찍히는 도장으로 보인다 -->
+<div class="slide" data-scene="sc-10">
+  <style>
+    [data-scene="sc-10"] { background: var(--void); }
+    [data-scene="sc-10"] .half{ position:absolute; top:0; bottom:0; width:52%; }
+    [data-scene="sc-10"] .half.left{ left:0; background: radial-gradient(80% 60% at 30% 30%, rgba(231,177,88,.18), var(--void) 70%);
+      clip-path: polygon(0 0, 54% 0, 46% 100%, 0 100%); }
+    [data-scene="sc-10"] .half.right{ right:0; background: radial-gradient(80% 60% at 70% 60%, rgba(58,95,114,.1), #0a0809 70%);
+      clip-path: polygon(46% 0, 100% 0, 100% 100%, 54% 100%); }
+    [data-scene="sc-10"] .cap-l, [data-scene="sc-10"] .cap-r{ position:absolute; top:8vh; font-size:1em; font-weight:700; }
+    [data-scene="sc-10"] .cap-l{ left:8vw; color: var(--gold); } [data-scene="sc-10"] .cap-r{ right:8vw; color: var(--ink-faint); }
+    [data-scene="sc-10"] .fig{ position:absolute; bottom:16vh; width:6vw; }
+    [data-scene="sc-10"] .fig.l{ left:20vw; }
+    [data-scene="sc-10"] .fig.r{ right:18vw; }
+    [data-scene="sc-10"] svg.crack{ position:absolute; inset:0; width:100%; height:100%; }
+    [data-scene="sc-10"] svg.crack path{ fill:none; stroke:#0a0809; stroke-width:5; }
+    [data-scene="sc-10"] svg.crack path.hi{ stroke: var(--crimson); stroke-width:2; opacity:.7; }
+    [data-scene="sc-10"] .banner{ position:absolute; bottom:6vh; width:19vw; text-align:center; padding:1.4vh 0;
+      border-radius:8px; font-weight:700; opacity:0; will-change: opacity, transform; }
+    [data-scene="sc-10"] .banner.l{ left:6vw; background:#1a1613; color:var(--ink-dim); border:1px solid rgba(255,255,255,.1); }
+    [data-scene="sc-10"] .banner.r{ right:6vw; background: rgba(231,177,88,.1); color:var(--gold-pale); border:1px solid var(--gold-deep); }
+    [data-scene="sc-10"] .warseal{ position:absolute; left:50%; top:44vh; transform:translate(-50%,-50%) scale(0);
+      width:11vw; aspect-ratio:1; border-radius:50%; border:3px solid var(--crimson);
+      background: rgba(166,59,50,.12); display:flex; flex-direction:column; align-items:center; justify-content:center;
+      color:var(--crimson); font-weight:800; will-change: transform, opacity; }
+    [data-scene="sc-10"] .warseal .heb{ font-size:1.5em; } [data-scene="sc-10"] .warseal .p{ font-size:.6em; margin-top:.4vh; }
+    [data-scene="sc-10"] .caption{ position:absolute; left:50%; bottom:12vh; transform:translateX(-50%);
+      font-size:.85em; color:var(--ink-faint); white-space:nowrap; }
+  </style>
+  <div class="half left"></div>
+  <div class="half right"></div>
+  <div class="cap-l">창세기 1장 — 심히 좋았더라</div>
+  <div class="cap-r">창세기 3장 — 어디 있느냐</div>
+  <div class="fig l"><svg viewBox="0 0 60 140"><path d="M30 10a12 12 0 1 1 0 24 12 12 0 1 1 0-24Z M12 40h36l-4 90H16Z" fill="var(--gold)"></path></svg></div>
+  <div class="fig r"><svg viewBox="0 0 60 140"><path d="M20 40a10 10 0 1 1 0 20 10 10 0 1 1 0-20Z M8 62q20-8 34 4l6 60H10Z" fill="#3a352f"></path><path d="M46 30 L50 130" stroke="#241f1a" stroke-width="6"></path></svg></div>
+  <svg class="crack" viewBox="0 0 1000 562.5" preserveAspectRatio="none">
+    <path data-crack d="M 520 0 L 500 90 L 540 170 L 490 260 L 530 340 L 480 430 L 510 562"></path>
+    <path class="hi" data-crackhi d="M 520 0 L 500 90 L 540 170 L 490 260 L 530 340 L 480 430 L 510 562"></path>
+  </svg>
+  <div class="banner l">뱀의 후손</div>
+  <div class="banner r">여자의 후손</div>
+  <div class="warseal"><div class="heb">אֵיבָה</div><div class="p">에이바 · 원수 됨</div></div>
+  <div class="caption">심판의 한가운데 놓인 첫 약속 — 창세기 3:15</div>
+</div>
+
+<!-- scene: sc-11 | metaphor: 저울과 판결 봉인 | intent: 발꿈치와 머리의 값이 같지 않음을 저울로 보이고, '다 이루었다'의 봉인이 찍히는 순간 첫 장면의 뿌리를 다시 불러 승리로 닫는다 -->
+<div class="slide" data-scene="sc-11">
+  <style>
+    [data-scene="sc-11"] { background: radial-gradient(70% 60% at 50% 20%, #1a1410, var(--void) 60%); }
+    [data-scene="sc-11"] .scale{ position:absolute; left:50%; top:6vh; width:56vw; height:34vh; transform:translateX(-50%); }
+    [data-scene="sc-11"] .pillar{ position:absolute; left:50%; bottom:0; width:.8vw; height:20vh; transform:translateX(-50%);
+      background:#241f1a; border-radius:6px; }
+    [data-scene="sc-11"] .beam{ position:absolute; left:50%; top:8vh; width:44vw; height:.7vw; background:#3a332b;
+      border-radius:6px; transform-origin:50% 50%; will-change: transform; }
+    [data-scene="sc-11"] .plate{ position:absolute; top:.6vw; width:9vw; text-align:center; }
+    [data-scene="sc-11"] .plate.l{ left:-1vw; } [data-scene="sc-11"] .plate.r{ right:-1vw; }
+    [data-scene="sc-11"] .plate .card{ background:#181310; border:1px solid rgba(255,255,255,.08); border-radius:8px;
+      padding:.8vh .6vw; opacity:0; will-change: opacity, transform; }
+    [data-scene="sc-11"] .plate .heb{ font-size:1.5vw; font-weight:700; }
+    [data-scene="sc-11"] .plate .p{ font-size:.62vw; color:var(--ink-dim); }
+    [data-scene="sc-11"] .plate.l .tag{ color:var(--ink-dim); font-size:.6vw; }
+    [data-scene="sc-11"] .plate.r .tag{ color:var(--crimson); font-weight:700; font-size:.65vw; }
+    [data-scene="sc-11"] .seal{ position:absolute; left:50%; top:34vh; width:13vw; aspect-ratio:1;
+      transform:translate(-50%,0) scale(0); border-radius:50%; border:3px solid var(--gold);
+      background: rgba(231,177,88,.12); display:flex; flex-direction:column; align-items:center; justify-content:center;
+      color:var(--gold-pale); text-align:center; will-change: transform, opacity; }
+    [data-scene="sc-11"] .seal .grk{ font-size:1.1vw; font-weight:700; } [data-scene="sc-11"] .seal .p{ font-size:.55vw; margin-top:.3vh; }
+    [data-scene="sc-11"] .echo{ position:absolute; right:6vw; top:36vh; width:24vw; opacity:0; will-change:opacity;
+      font-size:.85em; color:var(--ink-dim); text-align:right; border-right:2px solid var(--gold-deep); padding-right:1vw; }
+    [data-scene="sc-11"] .closing{ position:absolute; left:8vw; right:8vw; bottom:6vh; display:flex; justify-content:space-between;
+      align-items:center; opacity:0; will-change:opacity; }
+    [data-scene="sc-11"] .cc{ background:#161310; border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:1vh 1.4vw; text-align:center; }
+    [data-scene="sc-11"] .cc .heb{ font-size:1.6vw; font-weight:700; } [data-scene="sc-11"] .cc .grk{ font-size:1.4vw; font-weight:700; }
+    [data-scene="sc-11"] .cc .r{ font-size:.72em; color:var(--ink-faint); margin-top:.4vh; }
+    [data-scene="sc-11"] .mid{ color:var(--gold); font-size:.85em; font-weight:700; }
+  </style>
+  <div class="scale">
+    <div class="pillar"></div>
+    <div class="beam" data-beam>
+      <div class="plate l"><div class="card"><div class="heb">עָקֵב</div><div class="p">아케브 · 발꿈치</div><div class="tag">상처</div></div></div>
+      <div class="plate r"><div class="card"><div class="heb">רֹאשׁ</div><div class="p">로쉬 · 머리</div><div class="tag">끝</div></div></div>
+    </div>
+  </div>
+  <div class="seal"><div class="grk">τετέλεσται</div><div class="p">테텔레스타이 · 다 이루었다</div></div>
+  <div class="echo">이 '머리'는 태초의 그 뿌리다 —<br>בְּרֵאשִׁית 와 같은 어근</div>
+  <div class="closing">
+    <div class="cc"><div class="heb">בְּרֵאשִׁית</div><div class="r">창세기 1:1</div></div>
+    <div class="mid">같은 말</div>
+    <div class="cc"><div class="grk">ἐν ἀρχῇ</div><div class="r">요한복음 1:1</div></div>
+  </div>
+</div>
+
+</div>
+
+<!-- Deck Contract v1: 네비·크롬·모션 런타임·라이브 연동은 공통 컨트롤러가 제공 -->
+<script type="module" src="../../../../live/runtime/deck.js?v=1"></script>
+<script type="module">
+/* 씬 타임라인 — deck.js가 전역으로 제공하는 SceneMotion·interpolate·easeOut·easeInOut·springy 사용 */
+
+/* ── sc-01 삼각측량: 위성 카드 순차 등장 → 수렴선 드로잉 → 초점 카드 스프링 ── */
+SceneMotion.register('sc-01', (t, el) => {
+  ['satA','satB','satC'].forEach((c, i) => {
+    const k = springy(t, 0.1 + i * 0.14, 0.55);
+    const node = el.querySelector('.' + c);
+    node.style.opacity = Math.min(1, k * 1.3);
+    node.style.transform = `translateY(${(1 - k) * 14}px)`;
+  });
+  el.querySelectorAll('.lines path').forEach((p, i) => {
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = interpolate(t, [0.5 + i * 0.12, 1.1 + i * 0.12], [len, 0], easeInOut);
+  });
+  const f = springy(t, 1.15, 0.6);
+  const focal = el.querySelector('.focal');
+  focal.style.opacity = Math.min(1, f * 1.4);
+  focal.style.transform = `scale(${0.85 + 0.15 * f})`;
+});
+
+/* ── sc-02 발굴: 표층부터 순차 노출 → 뿌리 유물 스프링 등장 ── */
+SceneMotion.register('sc-02', (t, el) => {
+  const l1 = el.querySelector('.layer-1'), l2 = el.querySelector('.layer-2');
+  l1.style.opacity = Math.min(1, interpolate(t, [0, 0.4], [0, 1], easeOut));
+  l2.style.opacity = Math.min(1, interpolate(t, [0.35, 0.75], [0, 1], easeOut));
+  const s = springy(t, 0.9, 0.6);
+  const art = el.querySelector('.artifact');
+  art.style.opacity = Math.min(1, s * 1.4);
+  art.style.transform = `translateY(${(1 - s) * 14}px) scale(${0.85 + 0.15 * s})`;
+});
+
+/* ── sc-03 서명 도장: 봉인 낙하 스탬프 → 거부된 동사 슬라이드인 → 문법 태그 페이드 ── */
+SceneMotion.register('sc-03', (t, el) => {
+  const drop = interpolate(t, [0.15, 0.55], [-40, 0], easeOut);
+  const squash = t > 0.5 && t < 0.66 ? 1 - Math.sin((t - 0.5) / 0.16 * Math.PI) * 0.12 : 1;
+  el.querySelector('.seal').style.transform = `translateY(${drop}px) scaleY(${squash})`;
+  el.querySelectorAll('.dc').forEach((d, i) => {
+    const k = easeOut(Math.max(0, Math.min(1, (t - i * 0.15) / 0.5)));
+    d.style.opacity = 0.55 * k;
+  });
+  const g = el.querySelector('.gram');
+  const gk = easeOut(Math.max(0, Math.min(1, (t - 1.0) / 0.5)));
+  g.style.opacity = gk;
+  g.style.transform = `translateY(${(1 - gk) * 10}px)`;
+});
+
+/* ── sc-04 이중 계기판: 정적 노이즈 명멸(위상차만, 비난수) → 자물쇠 닫힘 ── */
+SceneMotion.register('sc-04', (t, el) => {
+  el.querySelectorAll('[data-noise] i').forEach((dot, i) => {
+    dot.style.opacity = 0.3 + 0.3 * (0.5 + 0.5 * Math.sin(t * 1.6 + i * 1.7));
+  });
+  el.querySelectorAll('[data-arc]').forEach((arc) => {
+    arc.setAttribute('stroke-dashoffset', String(interpolate(t, [0.2, 0.9], [220, 205], easeOut)));
+  });
+  el.querySelectorAll('[data-lock]').forEach((lock, i) => {
+    const k = springy(t, 0.7 + i * 0.25, 0.5);
+    lock.style.transform = `translate(-50%, ${(1 - k) * -10}px)`;
+    lock.style.opacity = String(Math.min(1, k * 1.4));
+  });
+});
+
+/* ── sc-05 품는 새: 날개 사인파 퍼덕임 + 완만한 하강, 단어·참조 카드 순차 등장 ── */
+SceneMotion.register('sc-05', (t, el) => {
+  const flap = Math.sin(t * 2.2) * 14;
+  el.querySelector('.wingL').style.transform = `rotate(${flap}deg)`;
+  el.querySelector('.wingR').style.transform = `rotate(${-flap}deg)`;
+  el.querySelector('.bird').style.transform = `translate(-50%, ${interpolate(t, [0, 1.3], [0, 12], easeOut)}px)`;
+  const w = easeOut(Math.max(0, Math.min(1, (t - 0.4) / 0.6)));
+  const word = el.querySelector('.word');
+  word.style.opacity = w; word.style.transform = `translateY(${(1 - w) * 10}px)`;
+  const r = easeOut(Math.max(0, Math.min(1, (t - 1.0) / 0.5)));
+  const ref = el.querySelector('.ref');
+  ref.style.opacity = r; ref.style.transform = `translateY(${(1 - r) * 10}px)`;
+});
+
+/* ── sc-06 점화 스위치: 레버 회전(급전환) → 방사 버스트 → 결과 단어 페이드 ── */
+SceneMotion.register('sc-06', (t, el) => {
+  const angle = interpolate(t, [0.2, 0.4], [0, -34], easeOut);
+  el.querySelector('[data-lever]').setAttribute('transform', `rotate(${angle} 45 90)`);
+  const b = springy(t, 0.4, 0.4);
+  const burst = el.querySelector('[data-burst]');
+  burst.style.transform = `translate(-50%,-50%) scale(${b * 4.4})`;
+  burst.style.opacity = String(Math.min(1, b * 1.3));
+  const ag = interpolate(t, [0.45, 1.1], [0, 1], easeOut);
+  const afterglow = el.querySelector('[data-afterglow]');
+  afterglow.style.transform = `translate(-50%,-50%) scale(${ag * 4.6})`;
+  afterglow.style.opacity = String(ag * 0.55);
+  const br = easeOut(Math.max(0, Math.min(1, (t - 0.55) / 0.4)));
+  el.querySelector('[data-bridge]').style.opacity = String(br);
+  const r = easeOut(Math.max(0, Math.min(1, (t - 0.75) / 0.5)));
+  const res = el.querySelector('.result');
+  res.style.opacity = r; res.style.transform = `translateY(${(1 - r) * 10}px)`;
+});
+
+/* ── sc-07 대칭 블루프린트(핵심): 좌열 순차 등장 → 연결선 드로잉 → 우열 순차 등장 → 완성 막대 ── */
+SceneMotion.register('sc-07', (t, el) => {
+  ['room1','room2','room3'].forEach((c, i) => {
+    const k = easeOut(Math.max(0, Math.min(1, (t - 0.1 - i * 0.16) / 0.4)));
+    const n = el.querySelector('.' + c);
+    n.style.opacity = k; n.style.transform = `translateX(${(1 - k) * -14}px)`;
+  });
+  el.querySelectorAll('[data-link]').forEach((p, i) => {
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = String(interpolate(t, [0.5 + i * 0.12, 0.85 + i * 0.12], [len, 0], easeInOut));
+  });
+  el.querySelectorAll('.pair-tag').forEach((tag, i) => {
+    tag.style.opacity = String(easeOut(Math.max(0, Math.min(1, (t - 0.7 - i * 0.12) / 0.3))));
+  });
+  ['room4','room5','room6'].forEach((c, i) => {
+    const k = easeOut(Math.max(0, Math.min(1, (t - 0.75 - i * 0.16) / 0.4)));
+    const n = el.querySelector('.' + c);
+    n.style.opacity = k; n.style.transform = `translateX(${(1 - k) * 14}px)`;
+  });
+  el.querySelector('[data-fill]').style.width = interpolate(t, [1.2, 1.5], [0, 100], easeOut) + '%';
+});
+
+/* ── sc-08 도장 컨베이어: 7개 순차 스프링 팝인 + 비율 카운트업, 7번째만 확대 ── */
+SceneMotion.register('sc-08', (t, el) => {
+  const stamps = el.querySelectorAll('.stamp');
+  let done = 0;
+  stamps.forEach((s, i) => {
+    const s2 = springy(t, 0.15 + i * 0.15, 0.5);
+    s.style.opacity = String(Math.min(1, s2 * 1.4));
+    s.style.transform = `translateY(${(1 - s2) * 10}px) scale(${s2})`;
+    if (t >= 0.15 + i * 0.15 + 0.5) done = i + 1;
+  });
+  el.querySelector('[data-ratio]').textContent = `${done} / 7`;
+});
+
+/* ── sc-09 조각과 흙: 5개 미니 명령 축소 소멸 → 큰 상의 스프링 등장 → 빛줄기 하강 ── */
+SceneMotion.register('sc-09', (t, el) => {
+  el.querySelectorAll('.strip .tiny').forEach((tag, i) => {
+    const k = Math.max(0, Math.min(1, (t - i * 0.08) / 0.35));
+    tag.style.opacity = String(1 - k);
+    tag.style.transform = `scale(${1 - 0.4 * k})`;
+  });
+  const c = springy(t, 0.5, 0.65);
+  const callout = el.querySelector('.callout');
+  callout.style.opacity = String(Math.min(1, c * 1.3));
+  callout.style.transform = `scale(${0.6 + 0.4 * c})`;
+  const beam = el.querySelector('.beam');
+  const bh = interpolate(t, [0.9, 1.4], [0, 30], easeOut);
+  beam.style.height = bh + 'vh';
+  beam.style.opacity = String(Math.min(0.9, bh / 30));
+});
+
+/* ── sc-10 균열과 전선 지도: 균열 드로잉(급) → 배너 상승 → 전쟁 봉인 스탬프 ── */
+SceneMotion.register('sc-10', (t, el) => {
+  ['[data-crack]', '[data-crackhi]'].forEach((sel) => {
+    const p = el.querySelector(sel);
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = String(interpolate(t, [0, 0.6], [len, 0], easeOut));
+  });
+  ['.banner.l', '.banner.r'].forEach((sel, i) => {
+    const k = easeOut(Math.max(0, Math.min(1, (t - 0.7 - i * 0.1) / 0.4)));
+    const b = el.querySelector(sel);
+    b.style.opacity = String(k);
+    b.style.transform = `translateY(${(1 - k) * 16}px)`;
+  });
+  const s = springy(t, 1.1, 0.4);
+  el.querySelector('.warseal').style.transform = `translate(-50%,-50%) scale(${s})`;
+});
+
+/* ── sc-11 저울과 판결 봉인: 저울 기울기 → 접시 카드 스프링 → 판결 봉인 낙하 → 회수 에코 → 종결 페어 ── */
+SceneMotion.register('sc-11', (t, el) => {
+  const tilt = interpolate(t, [0.1, 0.6], [0, 9], easeInOut);
+  el.querySelector('[data-beam]').style.transform = `translateX(-50%) rotate(${tilt}deg)`;
+  const l = springy(t, 0.15, 0.45), r = springy(t, 0.35, 0.45);
+  el.querySelector('.plate.l .card').style.opacity = String(l);
+  el.querySelector('.plate.l .card').style.transform = `translateY(${(1 - l) * 8}px)`;
+  el.querySelector('.plate.r .card').style.opacity = String(r);
+  el.querySelector('.plate.r .card').style.transform = `translateY(${(1 - r) * 8}px)`;
+  const s = springy(t, 0.75, 0.45);
+  el.querySelector('.seal').style.transform = `translate(-50%,0) scale(${s})`;
+  const e = easeOut(Math.max(0, Math.min(1, (t - 1.15) / 0.3)));
+  el.querySelector('.echo').style.opacity = String(e);
+  const cl = easeOut(Math.max(0, Math.min(1, (t - 1.25) / 0.25)));
+  el.querySelector('.closing').style.opacity = String(cl);
+});
+</script>
+</body>
+</html>

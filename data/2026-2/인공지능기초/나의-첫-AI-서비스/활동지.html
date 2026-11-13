@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>나의 첫 AI 서비스 — 설계·제작·제출</title>
+<style>
+  :root {
+    --bg: #0f1d19; --card: #16281f; --line: #24483a; --ink: #0c1714;
+    --fg: #e7f4ec; --faint: #9db8a9;
+    --accent: #fb923c; --mint: #5eead4; --rose: #fda4af; --amber: #fcd34d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    line-height: 1.65; padding: 24px 14px 128px;
+  }
+  main { max-width: 760px; margin: 0 auto; display: grid; gap: 18px; }
+  h1 { font-size: 1.55rem; letter-spacing: -0.02em; }
+  .sub { color: var(--faint); margin-top: 6px; font-size: 0.93rem; }
+  .rules {
+    background: #241a0d; border: 1px solid #6b4a1f; border-radius: 12px;
+    padding: 12px 14px; font-size: 0.88rem; color: #fcd9a8;
+  }
+  .rules b { color: #ffe1b0; }
+  section.card {
+    background: var(--card); border: 1px solid var(--line);
+    border-left: 5px solid var(--sec, var(--mint));
+    border-radius: 14px; padding: 18px;
+  }
+  section.card h2 { font-size: 1.05rem; margin-bottom: 4px; }
+  section.card .desc { color: var(--faint); font-size: 0.88rem; margin-bottom: 12px; }
+  label { display: block; font-weight: 700; font-size: 0.92rem; margin-top: 12px; }
+  label .opt { color: var(--faint); font-weight: 400; font-size: 0.82rem; }
+  input[type=text], input[type=password], input[type=date], textarea, select {
+    width: 100%; margin-top: 5px; padding: 9px 11px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--ink); color: var(--fg);
+    font: inherit; resize: vertical;
+  }
+  textarea { min-height: 74px; overflow-y: hidden; }
+  textarea.tall { min-height: 130px; }
+  textarea.grow { min-height: 42px; resize: none; }
+  #fCode { overflow-y: auto; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  /* 그리드 칸은 기본이 stretch라, 자동 확장이 height를 auto로 되돌려 재는 순간
+     이웃 칸의 높이만큼 늘어난 값이 scrollHeight로 잡힌다. 그러면 빈 칸도 이웃을
+     따라 커지고 한 번 커지면 되돌아가지 않는다 — 각 칸이 제 내용만큼만 갖도록 한다. */
+  .row2 > textarea, .row3 > textarea { align-self: start; }
+  /* label 안팎 어디에 있든 한 줄 칸의 글씨 크기를 같게 (label은 0.92rem) */
+  textarea.grow { font-size: 0.92rem; }
+  /* 이 칸들은 label 밖이라 body의 16px를 물려받아 다른 칸(0.92rem)보다 글씨가
+     컸다. 폭이 230px 남짓이라 열두어 글자만 넘어도 줄이 바뀌었다. */
+  .row2 > textarea, .row3 > textarea { font-size: 0.92rem; }
+  @media (max-width: 560px) { .row2, .row3 { grid-template-columns: 1fr; } }
+  .hint { font-size: 0.8rem; color: var(--faint); margin-top: 4px; }
+  .hint.err { color: var(--rose); }
+  .hint.ok { color: var(--mint); }
+  .seeds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  @media (max-width: 560px) { .seeds { grid-template-columns: 1fr; } }
+  .seeds button {
+    text-align: left; padding: 9px 11px; border-radius: 9px; cursor: pointer;
+    border: 1px dashed var(--line); background: var(--ink); color: var(--fg); font: inherit;
+    font-size: 0.85rem;
+  }
+  .seeds button:hover { border-color: var(--accent); }
+  .radios { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .radios label {
+    display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 500;
+    border: 1px solid var(--line); border-radius: 9px; padding: 8px 12px;
+    cursor: pointer; background: var(--ink); font-size: 0.88rem;
+  }
+  .radios input { accent-color: var(--accent); }
+  details { margin-top: 12px; border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; }
+  details summary { cursor: pointer; font-weight: 700; font-size: 0.88rem; color: var(--mint); }
+  details pre, details .ex {
+    white-space: pre-wrap; font-family: inherit; font-size: 0.84rem;
+    color: var(--faint); margin-top: 8px;
+  }
+  #dPreview {
+    white-space: pre-wrap; word-break: break-word; background: var(--ink);
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+    font-size: 0.8rem; color: var(--faint); max-height: 340px; overflow-y: auto;
+    margin-top: 10px; font-family: Consolas, "Courier New", monospace;
+  }
+  .btn {
+    display: inline-block; border: 0; border-radius: 10px; cursor: pointer;
+    font: inherit; font-weight: 800; padding: 12px 18px;
+  }
+  .btn-copy { background: var(--accent); color: #241203; width: 100%; margin-top: 12px; font-size: 1rem; }
+  .btn-copy:disabled { background: #57493c; color: #a99e93; cursor: not-allowed; }
+  .btn-submit { background: var(--mint); color: #062a22; width: 100%; margin-top: 14px; font-size: 1.05rem; }
+  .btn-submit:disabled { background: #3a5a51; color: #89a49b; cursor: not-allowed; }
+  .btn-ghost {
+    background: none; border: 1px solid var(--line); color: var(--faint);
+    font-weight: 600; padding: 8px 12px; font-size: 0.85rem;
+  }
+  #codeMeta { display: flex; justify-content: space-between; font-size: 0.8rem; margin-top: 4px; color: var(--faint); }
+  #codeCount.warn { color: var(--amber); font-weight: 700; }
+  #codeCount.over { color: var(--rose); font-weight: 800; }
+  #toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+    background: #0b241c; border: 1px solid var(--mint); color: var(--fg);
+    border-radius: 12px; padding: 12px 18px; font-size: 0.9rem; display: none;
+    max-width: 90vw; z-index: 50;
+  }
+  #toast.err { border-color: var(--rose); }
+  #settingsPanel {
+    display: none; background: var(--ink); border: 1px dashed var(--line);
+    border-radius: 10px; padding: 12px; font-size: 0.85rem;
+  }
+  footer { text-align: center; color: var(--faint); font-size: 0.78rem; }
+  footer a { color: var(--mint); }
+
+  /* ── 하단 액션 바 — 어디까지 작성했든 여기서 제출한다 ── */
+  .actionbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: rgba(12, 23, 20, 0.94); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line); padding: 11px 14px;
+  }
+  .actionbar .inner {
+    max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 10px;
+  }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  #draftStatus { font-size: 0.78rem; color: var(--faint); }
+  #draftStatus.pending { color: var(--amber); }
+  #draftStatus.saved { color: var(--mint); }
+  #draftStatus.failed { color: var(--rose); font-weight: 700; }
+  .draft-note { font-size: 0.72rem; color: var(--faint); opacity: 0.75; }
+  .actionbar .btn-ghost { white-space: nowrap; }
+  .actionbar .btn-submit { width: auto; margin-top: 0; font-size: 0.95rem; padding: 11px 22px; }
+  @media (max-width: 560px) {
+    .actionbar .inner { flex-wrap: wrap; }
+    .draft-wrap { flex: 1 1 100%; }
+    .actionbar .btn-ghost, .actionbar .btn-submit { flex: 1 1 auto; text-align: center; }
+  }
+  .gear { float: right; background: none; border: 0; color: var(--faint); cursor: pointer; font-size: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <button class="gear" id="btnGear" type="button" title="교사 설정">⚙</button>
+    <h1>🛠️ 나의 첫 AI 서비스</h1>
+    <p class="sub">설계(A·B·C) → 코드 생성 프롬프트 조립(D) → 기능 테스트·개선(E) → 제출(F).
+    입력할 때마다 이 브라우저에 임시저장되고, 제출하면 Google Sheets에 기록됩니다.</p>
+  </header>
+
+  <div class="rules">
+    <b>설계 원칙 세 가지</b><br>
+    ① 사람을 평가·비교·진단(외모·성격·정신건강·의료·법률)하거나 특정인을 겨냥하는 서비스는 만들지 않습니다.<br>
+    ② 이름·연락처 같은 개인정보를 입력받지 않습니다.<br>
+    ③ 주제가 고민되면 D로 가기 전에 선생님께 확인받습니다.
+  </div>
+
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정 — Apps Script 배포 URL</strong><br>
+    <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus"></span>
+  </div>
+
+  <!-- 학생 정보 -->
+  <section class="card" style="--sec:#94a3b8;">
+    <h2>나의 정보</h2>
+    <p class="desc">암호는 나중에 내 제출을 다시 열어 이어 쓸 때 필요합니다. 기억할 수 있는 것으로 정하되,
+    학교 계정이나 다른 사이트의 비밀번호는 절대 쓰지 마세요 — 이 활동에서만 쓸 새 암호여야 합니다.</p>
+    <div class="row3">
+      <label>이름 *<input type="text" id="studentName" autocomplete="off"></label>
+      <label>학번 * <span class="opt">(5자리: 학년1+반2+번호2)</span><input type="text" id="studentId" maxlength="5" inputmode="numeric"></label>
+      <label>날짜<input type="date" id="today"></label>
+    </div>
+    <label>제출 암호 *<input type="password" id="password" autocomplete="off"></label>
+    <p class="hint">이름·학번·암호를 채운 뒤 화면 맨 아래 <b style="color:var(--mint);">[이전 제출 불러오기]</b>를 누르면 지난 제출본을 그대로 열어 이어 쓸 수 있어요.</p>
+  </section>
+
+  <!-- A 기획 -->
+  <section class="card" style="--sec:#60a5fa;">
+    <h2>A. 기획 — 왜 만드는가</h2>
+    <p class="desc">서비스는 문제에서 시작합니다. 떠오르지 않으면 아래 <b>아이디어 씨앗 카드</b>를 하나 골라 두 가지 이상 바꿔 보세요.</p>
+
+    <label>A1. 누가, 언제, 어떤 문제를 겪나요? *
+      <textarea id="a1Problem" placeholder="예: 수행평가 발표 전날, 대본을 어떻게 짜야 할지 막막한 우리 반 친구"></textarea>
+    </label>
+    <label>A2. 서비스 한 문장 소개 * <span class="opt">「○○을 넣으면 △△을 주는 서비스」</span>
+      <textarea rows="1" class="grow" id="a2Pitch" placeholder="예: 발표 주제와 시간을 넣으면 대본 뼈대를 주는 서비스"></textarea>
+    </label>
+    <label>A3. 왜 LLM이어야 하나요?</label>
+    <div class="row2">
+      <select id="a3Ability">
+        <option value="">— 내 서비스가 쓰는 능력 고르기 —</option>
+        <option>문장 만들기 (설명·대본·문구를 새로 쓴다)</option>
+        <option>요약·정리 (긴 글을 짧게 간추린다)</option>
+        <option>상담·조언 (상황을 읽고 그에 맞는 말을 고른다)</option>
+      </select>
+      <textarea rows="1" class="grow" id="a3Why" placeholder="검색·계산기로는 안 되는 이유 한 줄"></textarea>
+    </div>
+
+    <details id="seedBox">
+      <summary>아이디어가 막히면 — 아이디어 씨앗 카드 열기 <span class="opt">(골라서 시작하되, 두 요소 이상 바꿔야 합니다)</span></summary>
+      <div class="seeds" id="seeds"></div>
+      <label>참고한 카드와 바꾼 것 <span class="opt">(카드를 고르면 앞부분이 자동으로 적힙니다)</span>
+        <textarea rows="1" class="grow" id="aSeed" placeholder="예: '발표 대본 도우미' 참고 — 대상을 후배로, 출력을 질문 목록으로 바꿈"></textarea>
+      </label>
+    </details>
+  </section>
+
+  <!-- B 입출력 설계 -->
+  <section class="card" style="--sec:#a78bfa;">
+    <h2>B. 입출력 설계 — 무엇을 받고, 무엇을 줄 것인가</h2>
+    <p class="desc">입력 칸은 1~3개면 충분합니다. 출력은 내가 정하지 않으면 기계가 확률로 정해 버립니다.</p>
+
+    <label>B1. 서비스 이름 *<textarea rows="1" class="grow" id="b1Name" placeholder="예: 대본 뼈대 메이커"></textarea></label>
+
+    <label>B2. 입력 칸 (1개는 필수, 최대 3개)</label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="b2Name1" placeholder="① 칸 이름 *"></textarea>
+      <textarea rows="1" class="grow" id="b2Ex1" placeholder="예시 값 *"></textarea>
+      <textarea rows="1" class="grow" id="b2Why1" placeholder="이 칸이 필요한 이유"></textarea>
+    </div>
+    <div class="row3" style="margin-top:8px;">
+      <textarea rows="1" class="grow" id="b2Name2" placeholder="② 칸 이름"></textarea>
+      <textarea rows="1" class="grow" id="b2Ex2" placeholder="예시 값"></textarea>
+      <textarea rows="1" class="grow" id="b2Why2" placeholder="이 칸이 필요한 이유"></textarea>
+    </div>
+    <div class="row3" style="margin-top:8px;">
+      <textarea rows="1" class="grow" id="b2Name3" placeholder="③ 칸 이름"></textarea>
+      <textarea rows="1" class="grow" id="b2Ex3" placeholder="예시 값"></textarea>
+      <textarea rows="1" class="grow" id="b2Why3" placeholder="이 칸이 필요한 이유"></textarea>
+    </div>
+
+    <label>B3. 출력 설계</label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="b3Content" placeholder="내용 * — 무엇을 답하나"></textarea>
+      <textarea rows="1" class="grow" id="b3Format" placeholder="형식 * — 몇 줄·어떤 짜임"></textarea>
+      <textarea rows="1" class="grow" id="b3Length" placeholder="길이 * — 얼마나 길게"></textarea>
+    </div>
+    <div class="row2" style="margin-top:8px;">
+      <textarea rows="1" class="grow" id="b3Tone" placeholder="말투 (선택) — 예: 존댓말, 다정하게"></textarea>
+      <textarea rows="1" class="grow" id="b3Ban" placeholder="금지 (선택) — 예: 별표·머리기호 없이"></textarea>
+    </div>
+
+    <label>B4. temperature(온도) — 경향이지 보장이 아닙니다</label>
+    <div class="radios">
+      <label><input type="radio" name="b4Temp" value="0.3">0.3 변화 적게 <span class="opt">(벼락치기 설계사)</span></label>
+      <label><input type="radio" name="b4Temp" value="0.7" checked>0.7 중간 <span class="opt">(면접 리허설 코치)</span></label>
+      <label><input type="radio" name="b4Temp" value="1.1">1.1 변화 많게 <span class="opt">(3줄 위로)</span></label>
+    </div>
+    <label>이 값을 고른 이유 <span class="opt">(가설 한 줄)</span>
+      <textarea rows="1" class="grow" id="b4Why" placeholder="예: 대본 뼈대는 매번 새로우면 좋아서 높게 골랐다"></textarea>
+    </label>
+  </section>
+
+  <!-- C 프롬프트 -->
+  <section class="card" style="--sec:#fb923c;">
+    <h2>C. 프롬프트 — 서비스의 동작 규칙을 쓴다</h2>
+    <p class="desc">C1은 서비스의 동작 규칙(시스템 프롬프트), C2는 사용자 입력이 앉는 문장 틀입니다.
+    자리표시자 <b>{칸이름}</b>은 C2에만 씁니다.</p>
+
+    <label>C1. 시스템 프롬프트 * <span class="opt">— 역할 · 규칙 · 출력 형식 · 예외 처리 네 부분을 담으세요</span>
+      <textarea id="c1System" class="tall" placeholder="너는 ~하는 ○○이다. (역할)
+항상 ~하고, 절대 ~하지 않는다. (규칙)
+답은 ~형식으로 쓴다. (출력 형식 — B3을 문장으로)
+서비스와 상관없는 입력이 오면 ~라고 안내한다. (예외 처리)"></textarea>
+    </label>
+    <p class="hint" id="c1Hint"></p>
+
+    <label>C2. 사용자 메시지 틀(프롬프트 템플릿) * <span class="opt">— B2의 칸 이름을 {칸이름}으로 끼우세요. 입력값이 끼워져 실제 사용자 메시지가 됩니다</span>
+      <textarea id="c2Template" placeholder="예: 발표 주제: {발표 주제}
+발표 시간(분): {발표 시간}"></textarea>
+    </label>
+    <p class="hint" id="c2Hint"></p>
+
+    <details>
+      <summary>C1·C2 완성 예시 한 세트 보기 (주말 계획 코치)</summary>
+      <pre>[C1 시스템 프롬프트]
+너는 고등학생의 주말 계획을 도와주는 코치다.
+항상 존댓말을 쓰고, 무리한 계획을 잡지 않는다.
+하고 싶은 것을 받으면 오전·오후·저녁 세 구간으로 나눈 계획을 각 한 줄로 만든다.
+마지막 줄에는 "쉬는 시간도 계획입니다"라는 문장을 넣는다.
+별표, 머리기호 없이 쓴다.
+주말 계획과 상관없는 입력이 오면 하고 싶은 일을 알려 달라고 정중히 안내한다.
+
+[C2 사용자 메시지 틀]
+이번 주말에 하고 싶은 것: {이번 주말에 하고 싶은 것}
+(이때 B2의 입력 칸 이름도 "이번 주말에 하고 싶은 것"이어야 합니다)</pre>
+    </details>
+  </section>
+
+  <!-- D 조립 -->
+  <section class="card" style="--sec:#34d399;">
+    <h2>D. 코드 생성 프롬프트 조립 — ChatGPT에 맡길 준비</h2>
+    <p class="desc">여러분이 쓴 설계(A~C)와 선생님이 준비한 기술 명세가 한 장으로 합쳐집니다.
+    [전체 복사] 후 <a href="https://chatgpt.com" target="_blank" rel="noopener" style="color:var(--mint);">chatgpt.com</a>에 붙여넣으세요.
+    <b>ChatGPT에 로그인한 상태</b>여야 합니다. 코드가 완성되면 코드 블록 위에 재생 버튼 <b>[▶]</b>이 생기는데,
+    그걸 누르면 코드가 그 자리에서 <b>실제 화면</b>이 됩니다 — 파일을 받지 않아도 바로 써 볼 수 있어요.</p>
+    <div id="dPreview"></div>
+    <label style="display:flex; gap:9px; align-items:flex-start; font-weight:600; font-size:0.86rem; margin-top:12px; cursor:pointer;">
+      <input type="checkbox" id="dConfirm" style="width:auto; margin-top:4px; accent-color:var(--accent);">
+      <span>B3에서 정한 내용·형식·길이를 <b>C1의 출력 형식 부분에도 옮겨 썼습니다</b> — 실제 API 요청에는 C1이 들어갑니다.</span>
+    </label>
+    <button class="btn btn-copy" id="btnCopy" type="button" disabled>📋 전체 복사</button>
+    <p class="hint" id="dHint"></p>
+    <details>
+      <summary>받은 코드가 이상할 때 — 자주 막히는 문제 3가지</summary>
+      <div class="ex">· 코드가 중간에 끊기거나 여러 조각으로 나뉨 → "완전한 HTML 전체를 처음부터 끝까지 하나의 코드 블록으로 다시 출력해 줘" (마지막 줄이 &lt;/html&gt;인지 확인)
+· 재생 버튼 [▶]이 안 보임 → 먼저 로그인 상태인지 확인. 그래도 없으면 [다운로드]로 .html 파일을 받아 더블클릭
+· 받은 파일을 열었더니 글자가 깨짐 → 메모장으로 저장했다면 인코딩이 UTF-8인지 확인</div>
+    </details>
+  </section>
+
+  <!-- E 테스트·개선 -->
+  <section class="card" style="--sec:#fbbf24;">
+    <h2>E. 기능 테스트 · 개선 기록</h2>
+    <p class="desc">기대와 실제의 차이가 개선의 재료입니다. 기본 두 가지 입력은 꼭 넣어 보세요.</p>
+    <p class="desc">고칠 때는 <b>코드를 직접 손대지 않고 같은 ChatGPT 대화에 요청</b>합니다 — <b>증상 · 고칠 곳 · 원하는 결과</b> 세 가지를 말하세요.
+    예: "답이 너무 길고 별표가 섞여 나옵니다. 시스템 프롬프트의 「답은 짧게 써라」를 「답은 3줄 이내로, 별표 없이 써라」로 바꿔서, 수정된 전체 HTML을 하나의 코드 블록으로 다시 주세요."
+    바뀐 부분만 오면 전체 코드를 다시 달라고 하면 되고, 새로 받은 코드의 [▶]을 다시 눌러 확인합니다.
+    <b>고칠 때마다 코드가 새로 나오니 제출은 마지막에 받은 코드로</b> 하세요.</p>
+
+    <label>E1. 정상 입력 테스트 (기본)</label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="e1In" placeholder="넣은 입력"></textarea>
+      <textarea rows="1" class="grow" id="e1Hope" placeholder="기대한 답"></textarea>
+      <textarea rows="1" class="grow" id="e1Real" placeholder="실제 답 (요약)"></textarea>
+    </div>
+    <label>E2. 상관없는 말·장난 입력 테스트 (기본) <span class="opt">— 예외 처리가 일하는가</span></label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="e2In" placeholder="넣은 입력"></textarea>
+      <textarea rows="1" class="grow" id="e2Hope" placeholder="기대한 답"></textarea>
+      <textarea rows="1" class="grow" id="e2Real" placeholder="실제 답 (요약)"></textarea>
+    </div>
+    <label>E3. 경계·누락 입력 테스트 <span class="opt">(선택 — 아주 짧게 · 아주 길게 · 빈칸)</span></label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="e3In" placeholder="넣은 입력"></textarea>
+      <textarea rows="1" class="grow" id="e3Hope" placeholder="기대한 답"></textarea>
+      <textarea rows="1" class="grow" id="e3Real" placeholder="실제 답 (요약)"></textarea>
+    </div>
+
+    <label>발견한 문제 한 가지
+      <textarea rows="1" class="grow" id="eProblem" placeholder="예: 답이 너무 길고 별표가 찍혀 나온다"></textarea>
+    </label>
+    <label>고친 위치</label>
+    <div class="radios">
+      <label><input type="radio" name="eWhere" value="시스템 프롬프트">시스템 프롬프트</label>
+      <label><input type="radio" name="eWhere" value="사용자 메시지 틀">사용자 메시지 틀</label>
+      <label><input type="radio" name="eWhere" value="화면·기능">화면·기능 (ChatGPT에 코드 수정 요청)</label>
+    </div>
+    <label>고친 내용 (전 → 후)
+      <textarea rows="1" class="grow" id="eFix" placeholder="예: '짧게 써라' → '3줄 이내로, 별표 없이 써라'"></textarea>
+    </label>
+
+    <label>개선 효과 — 고친 뒤 다시 시험한 기록</label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="eSameInput" placeholder="넣은 입력"></textarea>
+      <textarea rows="1" class="grow" id="eAfterOut" placeholder="실제 답 (요약)"></textarea>
+      <textarea rows="1" class="grow" id="eJudge" placeholder="나아졌다고 판단한 근거"></textarea>
+    </div>
+  </section>
+
+  <!-- F 제출 -->
+  <section class="card" style="--sec:#5eead4;">
+    <h2>F. 제출 — 완성본 코드를 낸다</h2>
+    <p class="desc"><b>마지막에 받은 코드</b>를 냅니다 — ChatGPT 코드 블록 위의 <b>[복사]</b>를 눌러 아래 칸에 붙여넣거나,
+    <b>[다운로드]</b>로 받은 HTML 파일을 올리면 코드가 자동으로 채워집니다.
+    수업용 키는 자동으로 가려져 저장됩니다. 미완성이어도 수업 안에 일단 제출하세요 — 자정까지 몇 번이든 다시 제출할 수 있고, 마지막에 낸 것이 최종 제출본이 됩니다.</p>
+
+    <label>서비스 소개 한 줄 *
+      <textarea rows="1" class="grow" id="fIntro" placeholder="예: 대본 뼈대 메이커 — 발표 주제와 시간을 넣으면 대본 뼈대를 주는 서비스"></textarea>
+    </label>
+    <label>최종 HTML 코드 전체 *
+      <input type="file" id="fFile" accept=".html,.htm,text/html" style="margin-top:6px; padding:8px; border:1px dashed var(--line); border-radius:9px; width:100%; background:var(--ink); color:var(--faint); font-size:0.85rem;">
+      <textarea id="fCode" class="tall" style="min-height:180px; font-family:Consolas,monospace; font-size:0.78rem;" placeholder="파일을 위에서 올리거나, 여기로 끌어다 놓거나, 코드를 붙여넣으세요 (<!doctype html> 부터 </html> 까지)"></textarea>
+    </label>
+    <div id="codeMeta"><span id="keyMasked"></span><span id="codeCount">0자</span></div>
+
+    <label>개발 후기 — 내 서비스는 어떤 서비스가 되었나 *
+      <span class="opt" style="display:block; font-weight:400; margin-top:3px; line-height:1.6;">
+        세 가지를 이어서 씁니다. ① 프롬프트를 설계하면서 <b>어떤 점을 특히 신경 썼고, 왜</b> 그랬는지 (내 서비스의 강점이 될 부분)
+        ② 만들면서 <b>뜻대로 되지 않은 것</b>이 있었다면 무엇이었고, 해결했다면 어떻게 했는지
+        ③ 그래서 <b>결과적으로 어떤 장점을 가진 서비스</b>가 되었는지
+      </span>
+      <textarea id="fReview" class="grow" rows="4" style="min-height:118px;" placeholder="예: ① 답이 길어지면 발표 전날 읽을 시간이 없을 것 같아 '정확히 세 줄'과 '별표 없이'를 프롬프트에 못 박았습니다. 짧고 바로 읽히는 것이 이 서비스의 강점이라고 봤습니다. ② 그런데 세 줄로 쓰라고 해도 두 줄로 나오거나 한 덩어리로 나올 때가 있었습니다. 시스템 프롬프트에 각 줄이 맡을 임무(도입·본론·마무리)를 따로 적어 주니 형식이 훨씬 안정됐습니다. ③ 결과적으로 발표 주제만 넣으면 바로 읽을 수 있는 세 줄 뼈대를 주는, 시간 없을 때 쓸 만한 서비스가 되었습니다."></textarea>
+    </label>
+    <label>한 줄 소감
+      <textarea rows="1" class="grow" id="fNote" placeholder="오늘 개발자로 일해 본 소감"></textarea>
+    </label>
+
+    <p class="hint" id="submitHint" style="text-align:center; margin-top:12px;">다 썼으면 화면 맨 아래 <b style="color:var(--mint);">[제출하기]</b>를 누르세요.</p>
+    <p class="hint" style="text-align:center;">제출 후 <a href="../제출현황.html" target="_blank" rel="noopener" style="color:var(--mint);">제출 현황</a>에서 확인할 수 있어요.</p>
+  </section>
+
+  <details>
+    <summary style="cursor:pointer; color:var(--mint); font-weight:700;">📚 읽을거리 — 진짜 세상의 LLM 서비스 네 가지</summary>
+    <div class="ex" style="white-space:normal; color:var(--faint); font-size:0.86rem; margin-top:8px; line-height:1.7;">
+      여러분이 오늘 만든 구조(입력 → 프롬프트 → API → 응답)는 실제 서비스들의 뼈대와 같습니다.<br>
+      · <b>스픽</b> — 내 영어 문장·발음 → 교정과 피드백. 한국 시장에서 널리 쓰이는 영어회화 앱으로, OpenAI 모델을 활용하며 OpenAI 공식 고객 사례로 소개됐습니다.<br>
+      · <b>카카오톡 '안 읽은 대화 요약하기'</b> — 안 읽은 대화 → 한눈 요약.<br>
+      · <b>듀오링고 'Explain My Answer'</b> — 내 답 → 맞고 틀린 이유 설명 (GPT-4 기반 Max 기능으로 시작해, 지금은 더 널리 제공).<br>
+      · <b>네이버 AI 브리핑</b> — 검색어 → 일부 검색에서 생성형 AI가 정리한 요약 답변.<br>
+      스픽·듀오링고는 외부 모델을 API로 활용한 사례이고, 네이버·카카오처럼 자체 모델을 쓰는 회사도 있습니다.
+      어느 쪽이든 실제 제품에는 프롬프트 설계와 함께 검색·음성·데이터 기술이 결합됩니다.
+    </div>
+  </details>
+
+  <footer>인공지능 기초 (2026-2) · 나의 첫 AI 서비스</footer>
+</main>
+
+<!-- 액션 바 — 제출·초기화·임시저장 상태 -->
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <button class="btn btn-ghost" id="btnLookup" type="button" title="이름·학번·암호로 지난 제출본을 불러옵니다">이전 제출 불러오기</button>
+    <a class="btn btn-ghost" href="../제출현황.html" target="_blank" rel="noopener" style="text-decoration:none;">제출 현황</a>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-submit" id="btnSubmit" type="button">제출하기</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SOURCE = 'first_ai_service';
+  var DRAFT_KEY = 'draft_first_ai_service';
+  var URL_KEY = 'gas_url_ai_basics_2026_2'; // 과목 공용 — 다른 활동지와 같은 키
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+
+  /* 오늘 날짜(현지 기준) — toISOString()은 UTC라서 한국 시간 0~9시에 열면
+     하루 전 날짜가 채워진다. 1교시 수업이 그 구간에 걸린다. */
+  function todayLocal() {
+    var d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  }
+
+  var SID_RE = /^\d{5}$/;
+  var KEY_RE = /up_[A-Za-z0-9]{8,}/g;   // 수업용 키 가림 패턴
+  var WARN_LEN = 45000, MAX_LEN = 50000; // Google Sheets 셀 한도 50,000자
+
+  var $ = function (id) { return document.getElementById(id); };
+  var v = function (id) { return $(id).value.trim(); };
+  function radio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function setRadio(name, val) {
+    var els = document.querySelectorAll('input[name="' + name + '"]');
+    for (var i = 0; i < els.length; i++) els[i].checked = (els[i].value === val);
+  }
+
+  /* ── 토스트 ── */
+  var toastTimer = null;
+  function showToast(msg, kind, ms) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = kind === 'err' ? 'err' : '';
+    t.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.style.display = 'none'; }, ms || 3200);
+  }
+
+  /* ── 씨앗 카드 6종 — 골라서 시작하되 두 요소 이상 변형 ── */
+  var SEEDS = [
+    { name: '발표 대본 도우미',
+      a1: '수행평가 발표 전날, 대본을 어떻게 짜야 할지 막막한 우리 반 친구',
+      a2: '발표 주제와 발표 시간을 넣으면 대본 뼈대를 주는 서비스' },
+    { name: '시험 불안 다독이기',
+      a1: '시험 기간마다 불안해서 집중이 안 되는 친구',
+      a2: '지금 걱정을 넣으면 마음을 가라앉히는 세 문장을 주는 서비스' },
+    { name: '동아리 홍보 문구',
+      a1: '신입 부원 모집 문구가 안 떠오르는 동아리 부장',
+      a2: '동아리 이름과 자랑거리를 넣으면 홍보 문구 3개를 주는 서비스' },
+    { name: '급식 기반 저녁 메뉴 추천',
+      a1: '오늘 급식과 겹치지 않는 저녁 메뉴를 고민하는 나',
+      a2: '오늘 급식 메뉴를 넣으면 겹치지 않는 저녁 메뉴를 추천하는 서비스' },
+    { name: '독서기록 한 줄 평 도우미',
+      a1: '독서기록장 한 줄 평이 늘 비슷해지는 친구',
+      a2: '책 제목과 기억나는 장면을 넣으면 한 줄 평 후보 3개를 주는 서비스' },
+    { name: '알림장 요약기',
+      a1: '단체방에 쌓인 공지를 자꾸 놓치는 친구',
+      a2: '공지 글을 붙여 넣으면 해야 할 일만 뽑아 주는 서비스' }
+  ];
+  (function buildSeeds() {
+    var wrap = $('seeds');
+    SEEDS.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.innerHTML = '<b>' + s.name + '</b><br><span style="color:var(--faint);">' + s.a2 + '</span>';
+      b.addEventListener('click', function () {
+        $('a1Problem').value = s.a1;
+        $('a2Pitch').value = s.a2;
+        $('aSeed').value = "'" + s.name + "' 참고 — 바꾼 것: ";
+        $('seedBox').open = true;
+        showToast('씨앗 카드를 담았어요. 그대로 내면 안 됩니다 — 두 요소 이상 바꾸세요!', 'err', 4200);
+        refreshAll();
+        $('aSeed').focus();
+        $('aSeed').setSelectionRange($('aSeed').value.length, $('aSeed').value.length);
+      });
+      wrap.appendChild(b);
+    });
+  })();
+
+  /* ── C1/C2 검사 ── */
+  function b2Names() {
+    return [v('b2Name1'), v('b2Name2'), v('b2Name3')].filter(Boolean);
+  }
+  function c2Placeholders() {
+    var out = [], m, re = /\{([^{}\n]+)\}/g, s = $('c2Template').value;
+    while ((m = re.exec(s)) !== null) out.push(m[1].trim());
+    return out;
+  }
+  var FORBIDDEN = /`|\$\{/; // 백틱·${ 는 생성 코드의 문자열을 깨뜨린다 (적대 검증 반영)
+  function checkC1() {
+    var h = $('c1Hint');
+    if (FORBIDDEN.test($('c1System').value)) {
+      h.className = 'hint err';
+      h.textContent = '⚠ 백틱(`)과 ${ 기호는 코드가 깨질 수 있어 프롬프트에 쓸 수 없습니다 — 다른 표현으로 바꿔 주세요.';
+      return false;
+    }
+    if (/\{[^{}\n]+\}/.test($('c1System').value)) {
+      h.className = 'hint err';
+      h.textContent = '⚠ {칸이름} 자리표시자는 C1이 아니라 C2에 씁니다.';
+      return false;
+    }
+    h.className = 'hint'; h.textContent = '';
+    return true;
+  }
+  function checkC2() {
+    var h = $('c2Hint');
+    if (!v('c2Template')) { h.className = 'hint'; h.textContent = ''; return false; }
+    if (FORBIDDEN.test($('c2Template').value)) {
+      h.className = 'hint err';
+      h.textContent = '⚠ 백틱(`)과 ${ 기호는 코드가 깨질 수 있어 쓸 수 없습니다 — {칸이름} 모양만 쓰세요.';
+      return false;
+    }
+    var names = b2Names(), used = c2Placeholders();
+    var badName = names.find(function (n) { return /[{}`]|\$\{/.test(n); });
+    if (badName) {
+      h.className = 'hint err';
+      h.textContent = '⚠ 칸 이름 「' + badName + '」에는 중괄호·백틱·$ 기호를 쓸 수 없습니다.';
+      return false;
+    }
+    if (new Set(names).size !== names.length) {
+      h.className = 'hint err';
+      h.textContent = '⚠ B2의 칸 이름이 서로 겹칩니다 — 칸 이름은 모두 달라야 합니다.';
+      return false;
+    }
+    var unknown = used.filter(function (u) { return names.indexOf(u) < 0; });
+    var unused = names.filter(function (n) { return used.indexOf(n) < 0; });
+    if (used.length === 0) {
+      h.className = 'hint err';
+      h.textContent = '⚠ 자리표시자가 없습니다 — B2의 칸 이름을 {칸이름} 모양으로 끼우세요.';
+      return false;
+    }
+    if (unknown.length) {
+      h.className = 'hint err';
+      h.textContent = '⚠ B2에 없는 칸을 참조: ' + unknown.join(', ');
+      return false;
+    }
+    if (unused.length) {
+      h.className = 'hint err';
+      h.textContent = '⚠ B2에 있는데 C2에서 안 쓰는 칸: ' + unused.join(', ') + ' — 쓰지 않을 칸이면 B2에서 지우세요.';
+      return false;
+    }
+    h.className = 'hint ok';
+    h.textContent = '✓ 입력 칸 ' + used.length + '개가 모두 제자리에 끼워졌습니다.';
+    return true;
+  }
+
+  /* ── D 조립 — 학생 설계 + 고정 기술 명세 ── */
+  function inputLines() {
+    var rows = [
+      [v('b2Name1'), v('b2Ex1'), v('b2Why1')],
+      [v('b2Name2'), v('b2Ex2'), v('b2Why2')],
+      [v('b2Name3'), v('b2Ex3'), v('b2Why3')]
+    ];
+    return rows.filter(function (r) { return r[0]; }).map(function (r) {
+      var s = '- 「' + r[0] + '」 (예시 값: ' + (r[1] || '-') + ')';
+      if (r[2]) s += ' — ' + r[2];
+      return s;
+    }).join('\n');
+  }
+  function outputLine() {
+    var parts = [];
+    if (v('b3Content')) parts.push('내용: ' + v('b3Content'));
+    if (v('b3Format')) parts.push('형식: ' + v('b3Format'));
+    if (v('b3Length')) parts.push('길이: ' + v('b3Length'));
+    if (v('b3Tone')) parts.push('말투: ' + v('b3Tone'));
+    if (v('b3Ban')) parts.push('금지: ' + v('b3Ban'));
+    return parts.join(' / ');
+  }
+  function buildOrder() {
+    var temp = radio('b4Temp') || '0.7';
+    var L = [];
+    L.push('당신은 웹 서비스를 만드는 개발자입니다. 아래 [서비스 설계]와 [기술 명세]를 그대로 지켜, 완전한 단일 HTML 파일 하나를 만들어 주세요.');
+    L.push('');
+    L.push('[서비스 설계 — 이 서비스의 핵심]');
+    L.push('서비스 이름: ' + v('b1Name'));
+    L.push('한 문장 소개: ' + v('a2Pitch'));
+    L.push('사용자와 문제: ' + v('a1Problem'));
+    L.push('');
+    L.push('입력 칸 (아래 이름 그대로 입력 폼을 만들 것):');
+    L.push(inputLines());
+    L.push('');
+    L.push('출력 설계: ' + outputLine());
+    L.push('');
+    L.push('시스템 프롬프트 (아래 전문을 한 글자도 고치지 말고 SYSTEM_PROMPT 상수에 넣을 것):');
+    L.push('"""');
+    L.push(v('c1System'));
+    L.push('"""');
+    L.push('');
+    L.push('사용자 메시지 틀 (아래 전문을 그대로 PROMPT_TEMPLATE 상수에 넣을 것 — {칸이름} 자리에 그 입력 칸의 값이 끼워짐):');
+    L.push('"""');
+    L.push(v('c2Template'));
+    L.push('"""');
+    L.push('');
+    L.push('[기술 명세 — 그대로 지킬 것]');
+    L.push('1. 결과물은 완전한 단일 HTML 파일 하나다. 외부 라이브러리·CDN 없이, 파일 하나를 더블클릭하면 실행된다. <head>에 <meta charset="UTF-8">를 넣는다.');
+    L.push('2. 되묻지 말고 합리적으로 정해서 바로 완성 코드를 출력한다. 설명 없이 코드 블록 하나만 출력하고, 마지막 줄은 </html>로 끝난다.');
+    L.push('3. <script> 첫머리에 ★ 5개로 눈에 띄는 주석 배너를 만들고 그 바로 아래에 네 상수를 둔다:');
+    L.push('   const SYSTEM_PROMPT = `...`;');
+    L.push('   const PROMPT_TEMPLATE = `...`;');
+    L.push("   const API_KEY = 'YOUR_UPSTAGE_API_KEY';   // 수업용 임시 키");
+    L.push('   const TEMPERATURE = ' + temp + ';');
+    L.push('   두 프롬프트 상수는 반드시 백틱(`) 템플릿 문자열로 쓰고, 위의 [서비스 설계] 문장은 의미를 바꾸지 않되 문자열에 필요한 이스케이프만 적용한다. 배너 주석에 「이 파일의 주인이 나중에 이 안의 문장만 고칩니다 (따옴표·기호는 그대로)」라고 적는다.');
+    L.push('4. 실행 버튼을 누르면 다음 API를 호출한다:');
+    L.push('   POST https://api.upstage.ai/v1/chat/completions');
+    L.push('   헤더: Authorization: Bearer (위 API_KEY) · Content-Type: application/json');
+    L.push('   본문(JSON): model은 "solar-pro3", messages는 [system 역할에 SYSTEM_PROMPT, user 역할에 조립된 사용자 메시지], temperature는 위 TEMPERATURE, max_tokens는 2000, reasoning_effort는 "low", stream은 false.');
+    L.push('   reasoning_effort는 API 필수 항목은 아니지만, 이 수업에서는 응답 지연을 줄이기 위해 "low"로 반드시 포함한다.');
+    L.push('5. 사용자 메시지는 PROMPT_TEMPLATE의 {칸이름} 자리표시자를 해당 입력 칸의 값으로 바꿔 만든다. 같은 자리표시자가 여러 번 나오면 전부 바꾼다. 조립 후에도 {…} 모양이 남아 있으면 API를 호출하지 말고 어떤 칸이 빠졌는지 한국어로 안내한다.');
+    L.push('6. 모든 입력값은 앞뒤 공백을 지우고 검사한다. 하나라도 비어 있으면 API를 호출하지 않고 그 칸을 채워 달라는 안내를 보여 준다.');
+    L.push('7. 화면(UI): 서비스 이름 제목 + 한 문장 소개 + 위 입력 칸들 + 실행 버튼 + 로딩 표시 + 결과 영역(CSS white-space: pre-wrap) + 오류 안내 영역.');
+    L.push('8. 로딩 중에는 버튼을 비활성화한다. 오류는 나눠서 안내한다 — 429: 「지금 서버가 붐빕니다 — N초 뒤 다시」(20~40초 무작위 잠금, 남은 초 표시) · 401/403: 「수업용 키를 선생님과 확인하세요」 · 네트워크 실패: 「인터넷 연결을 확인하세요」 · 그 외: 오류 코드와 함께 「선생님께 보여 주세요」.');
+    L.push('9. 응답에서 choices[0].message.content 문자열만 꺼내 결과 영역에 표시한다. 이때 반드시 textContent로 넣고 innerHTML은 쓰지 않는다 (마크다운 해석 불필요).');
+    L.push('10. 휴대전화 화면에서도 쓸 수 있게 viewport 메타 태그와 반응형 스타일을 넣는다.');
+    L.push('11. 색·모양·분위기는 서비스 성격에 어울리게 자유롭게 디자인한다.');
+    return L.join('\n');
+  }
+
+  var REQUIRED_FOR_D = [
+    ['a1Problem', 'A1 문제'], ['a2Pitch', 'A2 한 문장 소개'], ['b1Name', 'B1 서비스 이름'],
+    ['b2Name1', 'B2 입력 칸 ①'], ['b2Ex1', 'B2 예시 값 ①'],
+    ['b3Content', 'B3 내용'], ['b3Format', 'B3 형식'], ['b3Length', 'B3 길이'],
+    ['c1System', 'C1 시스템 프롬프트'], ['c2Template', 'C2 사용자 메시지 틀']
+  ];
+  function refreshD() {
+    var missing = REQUIRED_FOR_D.filter(function (r) { return !v(r[0]); }).map(function (r) { return r[1]; });
+    var c1ok = checkC1(), c2ok = checkC2();
+    var confirmed = $('dConfirm').checked;
+    var ready = missing.length === 0 && c1ok && c2ok && confirmed;
+    $('btnCopy').disabled = !ready;
+    if (!ready) {
+      $('dHint').className = 'hint err';
+      $('dHint').textContent = missing.length
+        ? '아직 비어 있어요: ' + missing.join(', ')
+        : !(c1ok && c2ok)
+          ? 'C 구역의 ⚠ 표시를 먼저 해결하세요.'
+          : '위 확인 상자에 체크하면 복사 버튼이 열립니다.';
+    } else {
+      $('dHint').className = 'hint ok';
+      $('dHint').textContent = '✓ 조립 완료 — 복사해서 chatgpt.com에 붙여넣으세요.';
+    }
+    $('dPreview').textContent = buildOrder();
+  }
+  $('btnCopy').addEventListener('click', function () {
+    var text = buildOrder();
+    function done() { showToast('복사됐어요! chatgpt.com에 붙여넣으세요.', 'ok', 3600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+    } else { fallbackCopy(text); done(); }
+  });
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+
+  /* ── F 코드 칸 — 키 가림 + 글자 수 ── */
+  function maskKey() {
+    var el = $('fCode');
+    if (KEY_RE.test(el.value)) {
+      el.value = el.value.replace(KEY_RE, '[수업용키]');
+      $('keyMasked').textContent = '🔒 수업용 키를 [수업용키]로 가렸어요 — 제출본에는 키가 담기지 않습니다.';
+    }
+    var n = el.value.length;
+    var c = $('codeCount');
+    c.textContent = n.toLocaleString('ko-KR') + '자';
+    c.className = n >= MAX_LEN ? 'over' : n >= WARN_LEN ? 'warn' : '';
+    if (n >= MAX_LEN) c.textContent += ' — 50,000자 이상은 제출할 수 없어요';
+    else if (n >= WARN_LEN) c.textContent += ' (한도 50,000자에 가까워요)';
+  }
+  $('fCode').addEventListener('input', maskKey);
+
+  /* ── F 파일 업로드 — HTML 파일을 올리면 코드 칸이 자동으로 채워진다 ── */
+  function loadCodeFile(file) {
+    if (!file) return;
+    if (!/\.html?$/i.test(file.name) && file.type !== 'text/html') {
+      showToast('HTML 파일(.html)만 올릴 수 있어요.', 'err', 3600); return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      $('fCode').value = String(reader.result || '');
+      maskKey(); saveDraft(); refreshAll();
+      showToast("'" + file.name + "' 파일에서 코드를 불러왔어요 (" +
+        $('fCode').value.length.toLocaleString('ko-KR') + '자).', 'ok', 4200);
+    };
+    reader.onerror = function () {
+      showToast('파일을 읽지 못했어요 — 메모장에서 복사해 붙여넣어 보세요.', 'err', 4200);
+    };
+    reader.readAsText(file, 'utf-8');
+  }
+  $('fFile').addEventListener('change', function () {
+    loadCodeFile(this.files && this.files[0]);
+    this.value = '';
+  });
+  $('fCode').addEventListener('dragover', function (e) { e.preventDefault(); });
+  $('fCode').addEventListener('drop', function (e) {
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) { e.preventDefault(); loadCodeFile(f); }
+  });
+
+  /* ── 폼 데이터 ── */
+  var FIELD_IDS = [
+    'studentName', 'studentId', 'today',
+    'a1Problem', 'a2Pitch', 'a3Why', 'aSeed',
+    'b1Name', 'b2Name1', 'b2Ex1', 'b2Why1', 'b2Name2', 'b2Ex2', 'b2Why2',
+    'b2Name3', 'b2Ex3', 'b2Why3',
+    'b3Content', 'b3Format', 'b3Length', 'b3Tone', 'b3Ban', 'b4Why',
+    'c1System', 'c2Template',
+    'e1In', 'e1Hope', 'e1Real', 'e2In', 'e2Hope', 'e2Real', 'e3In', 'e3Hope', 'e3Real',
+    'eProblem', 'eFix', 'eSameInput', 'eAfterOut', 'eJudge',
+    'fIntro', 'fCode', 'fReview', 'fNote'
+  ];
+  function getFormData() {
+    var d = { source: SOURCE, password: v('password') };
+    FIELD_IDS.forEach(function (id) { d[id] = v(id); });
+    d.a3Ability = v('a3Ability') || $('a3Ability').value;
+    d.b4Temp = radio('b4Temp');
+    d.eWhere = radio('eWhere');
+    return d;
+  }
+  function setFormData(d) {
+    FIELD_IDS.forEach(function (id) { if (d[id] !== undefined) $(id).value = d[id]; });
+    if (d.a3Ability !== undefined) $('a3Ability').value = d.a3Ability;
+    if (d.b4Temp) setRadio('b4Temp', d.b4Temp);
+    if (d.eWhere) setRadio('eWhere', d.eWhere);
+    if (v('aSeed')) $('seedBox').open = true;   // 적어 둔 씨앗 기록이 서랍에 숨지 않게
+    maskKey(); refreshAll();
+  }
+
+  /* ── 임시저장 ── */
+  var draftTimer = null;
+  /* 제출 결과·경고가 떠 있는 동안에는 임시저장 메시지가 그 위를 덮지 않게 잠근다.
+     마지막 칸을 채우고 곧바로 제출을 누르면 blur가 change를 일으켜 임시저장이
+     한 번 더 돌고, 그 결과가 "비어 있는 칸" 안내를 0.5초 만에 지워 버린다. */
+  var draftLocked = false;
+  function draftMsg(text, cls, lock) {
+    var el = $('draftStatus');
+    if (!el) return;
+    el.textContent = text;
+    el.className = cls || '';
+    draftLocked = !!lock;
+  }
+  function saveDraft() {
+    clearTimeout(draftTimer);
+    /* 입력이 시작되면 곧바로 '저장 대기 중'으로 바꾼다 — 그러지 않으면 방금 친
+       내용이 아직 저장되지 않았는데도 앞서 뜬 '임시저장됨'이 그대로 남아,
+       학생이 저장된 줄 알고 창을 닫아 버린다. */
+    if (!draftLocked) draftMsg('입력 중… 잠시 멈추면 임시저장됩니다', 'pending');
+    draftTimer = setTimeout(function () {
+      try {
+        var d = getFormData(); delete d.password;
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+        if (!draftLocked) draftMsg('임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR'), 'saved');
+      } catch (e) {
+        draftMsg('임시저장 실패 — 이 기기에 저장 공간이 부족해요', 'failed');
+      }
+    }, 500);
+  }
+  function loadDraft() {
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) setFormData(JSON.parse(raw));
+    } catch (e) {}
+  }
+
+  /* 장문 칸 자동 확장 — 줄이 늘면 칸도 커진다 (fCode 제외) */
+  function autoGrow(el) {
+    /* 닫힌 <details> 안의 칸은 렌더되지 않아 scrollHeight가 0이다 — 그대로
+       높이를 박으면 서랍을 열었을 때 칸이 찌그러져 있다. 열릴 때 다시 잰다. */
+    if (!el.offsetParent && el.offsetHeight === 0) return;
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight + 2) + 'px';
+  }
+  function autoGrowAll() {
+    var tas = document.querySelectorAll('textarea');
+    for (var i = 0; i < tas.length; i++) { if (tas[i].id !== 'fCode') autoGrow(tas[i]); }
+  }
+  function refreshAll() { refreshD(); autoGrowAll(); }
+  document.querySelectorAll('details').forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (d.open) d.querySelectorAll('textarea').forEach(function (ta) { if (ta.id !== 'fCode') autoGrow(ta); });
+    });
+  });
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.tagName === 'TEXTAREA' && e.target.id !== 'fCode') autoGrow(e.target);
+    draftLocked = false;
+    saveDraft(); refreshAll();
+  });
+  document.addEventListener('change', function () { saveDraft(); refreshAll(); });
+
+  /* ── 초기화 ── */
+  $('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요? 되돌릴 수 없어요.')) return;
+    document.querySelectorAll('input[type="text"], input[type="password"], textarea').forEach(function (e) { e.value = ''; });
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function (e) { e.checked = false; });
+    $('a3Ability').selectedIndex = 0;
+    $('today').value = todayLocal();
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    $('keyMasked').textContent = '';
+    $('seedBox').open = false;
+    $('submitHint').className = 'hint';
+    $('submitHint').textContent = '다 썼으면 화면 맨 아래 [제출하기]를 누르세요.';
+    maskKey(); refreshAll();
+    draftMsg('초기화됨', '');
+    showToast('모든 입력을 지웠어요.', 'ok', 3200);
+  });
+
+  /* ── 설정 패널 ── */
+  var gearCount = 0;
+  $('btnGear').addEventListener('click', function () {
+    gearCount++;
+    if (gearCount >= 3) { $('settingsPanel').style.display = 'block'; }
+  });
+  $('btnSaveUrl').addEventListener('click', function () {
+    var u = v('scriptUrl');
+    if (u) { localStorage.setItem(URL_KEY, u); $('urlStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(URL_KEY); $('urlStatus').textContent = '기본값 사용'; }
+  });
+
+  /* ── 이어쓰기 (lookup — JSONP 우회 포함) ── */
+  function gasUrl() { return localStorage.getItem(URL_KEY) || DEFAULT_URL; }
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'cb_' + Math.random().toString(36).slice(2);
+      window[cb] = function (data) { delete window[cb]; script.remove(); resolve(data); };
+      var script = document.createElement('script');
+      script.src = url + '&callback=' + cb;
+      script.onerror = function () { delete window[cb]; script.remove(); reject(new Error('불러오기 실패')); };
+      document.head.appendChild(script);
+    });
+  }
+  $('btnLookup').addEventListener('click', function () {
+    var sid = v('studentId'), name = v('studentName'), pw = v('password');
+    if (!SID_RE.test(sid) || !name || !pw) {
+      draftMsg('맨 위의 이름·학번(5자리)·암호를 먼저 채워 주세요', 'failed', true);
+      showToast('맨 위의 이름·학번·암호를 먼저 채워 주세요.', 'err', 4000);
+      return;
+    }
+    draftMsg('지난 제출본을 불러오는 중…', 'pending', true);
+    var qs = 'action=lookup&source=' + SOURCE +
+      '&studentId=' + encodeURIComponent(sid) +
+      '&studentName=' + encodeURIComponent(name) +
+      '&password=' + encodeURIComponent(pw);
+    jsonp(gasUrl() + '?' + qs).then(function (res) {
+      if (res.status === 'ok') {
+        setFormData(res.data || {});
+        draftMsg('✓ ' + (res.submittedAt || '') + ' 제출본을 불러왔어요', 'saved', true);
+        showToast('지난 제출본을 불러왔어요 — 이어서 쓰면 됩니다.', 'ok', 4200);
+      } else if (res.status === 'denied') {
+        draftMsg('암호가 달라요 — 제출할 때 정한 암호를 확인하세요', 'failed', true);
+        showToast('암호가 달라요.', 'err', 3600);
+      } else {
+        draftMsg('제출 기록이 없어요 — 처음이라면 그냥 작성하면 됩니다', 'failed', true);
+        showToast('제출 기록이 없어요.', 'err', 3600);
+      }
+    }).catch(function (e) {
+      draftMsg('불러오지 못했어요 — ' + e.message, 'failed', true);
+      showToast('불러오지 못했어요: ' + e.message, 'err', 4200);
+    });
+  });
+
+  /* ── 제출 ── */
+  $('btnSubmit').addEventListener('click', function () {
+    var hint = $('submitHint');
+    var required = [
+      ['studentName', '이름'], ['studentId', '학번'], ['password', '제출 암호'],
+      ['a1Problem', 'A1'], ['a2Pitch', 'A2'], ['b1Name', 'B1'],
+      ['fIntro', 'F 서비스 소개'], ['fCode', 'F 최종 코드'], ['fReview', 'F 개발 후기']
+    ];
+    var missing = required.filter(function (r) { return !v(r[0]); }).map(function (r) { return r[1]; });
+    if (missing.length) {
+      hint.className = 'hint err';
+      hint.textContent = '비어 있어요: ' + missing.join(', ');
+      showToast('아직 비어 있는 칸이 있어요: ' + missing.join(', '), 'err', 4200);
+      draftMsg('비어 있는 칸: ' + missing.join(', '), 'failed', true);
+      return;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      hint.className = 'hint err'; hint.textContent = '학번은 숫자 5자리입니다.';
+      return;
+    }
+    maskKey();
+    if ($('fCode').value.length >= MAX_LEN) {
+      hint.className = 'hint err';
+      hint.textContent = '코드가 50,000자를 넘어 제출할 수 없어요 — 선생님께 말씀해 주세요.';
+      return;
+    }
+
+    var btn = $('btnSubmit');
+    btn.disabled = true;
+    hint.className = 'hint'; hint.textContent = '제출하는 중…';
+    draftMsg('제출하는 중…', 'pending', true);
+
+    fetch(gasUrl(), {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(getFormData())
+    }).then(function () {
+      hint.className = 'hint ok';
+      hint.textContent = '✓ 제출 완료 — 제출 현황에서 확인하세요.';
+      draftMsg('✓ 제출 완료 · ' + new Date().toLocaleTimeString('ko-KR'), 'saved', true);
+      showToast('제출 완료! 첫 서비스를 낸 것을 축하해요 🎉', 'ok', 4600);
+      btn.disabled = false;
+    }).catch(function () {
+      hint.className = 'hint err';
+      hint.textContent = '전송에 실패했어요 — 잠시 후 다시 눌러 주세요.';
+      draftMsg('제출 실패 — 다시 눌러 주세요', 'failed', true);
+      btn.disabled = false;
+    });
+  });
+
+  /* ── 시작 ── */
+  $('today').value = todayLocal();
+  $('scriptUrl').value = localStorage.getItem(URL_KEY) || '';
+  loadDraft();
+  maskKey();
+  refreshAll();
+})();
+</script>
+<!-- 제출 마감 — apps-script.js SOURCES의 deadline과 같은 값 (생성일 + 45일).
+     서버도 마감 뒤 제출을 받지 않는다. 제출 확인(조회)은 마감 뒤에도 쓸 수 있다. -->
+<script>
+(function () {
+  var DEADLINE = '2026-10-10';
+  var end = new Date(DEADLINE + 'T23:59:59+09:00');
+  var closed = Date.now() > end.getTime();
+  var p = DEADLINE.split('-');
+  var label = Number(p[1]) + '월 ' + Number(p[2]) + '일';
+  var lookupBtn = document.getElementById('btnLookup');
+  var lookupName = lookupBtn ? lookupBtn.textContent.trim() : '제출 확인';
+  var box = document.createElement('div');
+  box.id = 'deadlineNotice';
+  box.setAttribute('role', 'status');
+  box.style.cssText = 'margin:14px 0 4px; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; line-height:1.5;' +
+    (closed ? 'background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5;'
+            : 'background:#eef4ff; color:#1e3a8a; border:1px solid #c7d7fe;');
+  box.textContent = closed
+    ? '⏰ 제출이 마감되었습니다 (' + label + ' 23:59까지). 이미 낸 내용은 [' + lookupName + ']에서 볼 수 있습니다.'
+    : '⏰ 제출 마감: ' + label + ' 23:59까지';
+  var hero = document.querySelector('header');
+  if (hero) hero.appendChild(box);
+  if (!closed) return;
+  var btn = document.getElementById('btnSubmit') || document.getElementById('btnSave');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '제출 마감';
+  btn.style.opacity = '0.5';
+  btn.style.cursor = 'not-allowed';
+  btn.title = label + '에 마감되었습니다.';
+  btn.addEventListener('click', function (e) { e.stopImmediatePropagation(); e.preventDefault(); }, true);
+})();
+</script>
+</body>
+</html>

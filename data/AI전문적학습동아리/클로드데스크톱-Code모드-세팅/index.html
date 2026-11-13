@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>클로드 데스크톱 Code 모드 세팅 가이드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & CSS Variables ── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --style-bg: #F8F8F2;
+      --style-primary: #1A1A2E;
+      --style-accent: #E8FF3B;
+      --style-accent2: #FF6B6B;
+      --style-accent3: #4ECDC4;
+      --style-accent4: #FFE66D;
+      --style-text: #1A1A2E;
+      --style-text-secondary: #555555;
+      --cell-dark: #1A1A2E;
+      --cell-teal: #4ECDC4;
+      --cell-coral: #FF6B6B;
+      --cell-lime: #E8FF3B;
+      --cell-warm: #FFE66D;
+      --cell-blue: #3B82F6;
+      --cell-purple: #8B5CF6;
+    }
+
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      overflow: hidden;
+      height: 100%;
+      line-height: 1.6;
+    }
+
+    /* ── Accessibility ── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--style-primary); color: #fff;
+      padding: 8px 16px; z-index: 9999; font-size: 14px;
+      border-radius: 0 0 4px 0; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--cell-teal); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── Progress Bar ── */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--cell-teal), var(--cell-lime));
+      z-index: 1000; width: 0;
+      will-change: width; transform: translateZ(0);
+      transition: width 0.3s ease;
+    }
+
+    /* ── Presentation Container ── */
+    .presentation {
+      height: calc(100vh - 42px);
+      position: relative; overflow: hidden;
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ── Browser Card (Bento) ── */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 24px rgba(26,26,46,0.08), 0 1px 4px rgba(26,26,46,0.04);
+      border: 1px solid rgba(26,26,46,0.06);
+    }
+    .browser-card--frameless {
+      background: transparent;
+      box-shadow: none;
+      border: none;
+      max-width: 1200px;
+    }
+
+    .browser-topbar {
+      display: flex; align-items: center;
+      padding: 0.45rem 0.8rem;
+      background: var(--style-bg);
+      border-bottom: 1px solid rgba(26,26,46,0.06);
+      border-radius: 1rem 1rem 0 0;
+      gap: 0.35rem;
+      min-height: 35px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FEBC2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title {
+      flex: 1; text-align: center;
+      font-size: 0.5rem; font-weight: 600;
+      color: var(--style-text-secondary);
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.05em;
+      margin: 0 auto;
+    }
+
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1.2rem 2rem 1rem;
+    }
+
+    /* ── Section Header ── */
+    .section-header { margin-bottom: 0.7rem; }
+    .section-header h2 {
+      font-size: 1.5rem; font-weight: 800;
+      color: var(--style-primary);
+      line-height: 1.3;
+    }
+    .section-icon {
+      display: inline; font-size: 1.2em;
+      margin-right: 0.4em; vertical-align: -0.1em;
+    }
+    .section-subtitle {
+      font-size: 0.88rem; color: var(--style-text-secondary);
+      margin-top: 0.2rem;
+    }
+
+    /* ── Bento Grid System ── */
+    .bento-grid {
+      display: grid; gap: 0.5rem;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .bento-grid--2col { grid-template-columns: repeat(2, 1fr); }
+    .bento-cell {
+      border-radius: 0.7rem;
+      padding: 0.8rem 1rem;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .bento-cell--dark {
+      background: var(--cell-dark);
+      color: #fff;
+    }
+    .bento-cell--teal {
+      background: var(--cell-teal);
+      color: var(--style-primary);
+    }
+    .bento-cell--coral {
+      background: var(--cell-coral);
+      color: #fff;
+    }
+    .bento-cell--lime {
+      background: var(--cell-lime);
+      color: var(--style-primary);
+    }
+    .bento-cell--warm {
+      background: var(--cell-warm);
+      color: var(--style-primary);
+    }
+    .bento-cell--white {
+      background: #fff;
+      color: var(--style-primary);
+      border: 1px solid rgba(26,26,46,0.08);
+    }
+    .bento-cell--blue {
+      background: var(--cell-blue);
+      color: #fff;
+    }
+    .bento-cell--purple {
+      background: var(--cell-purple);
+      color: #fff;
+    }
+    .bento-cell--span2 { grid-column: span 2; }
+    .bento-cell--span-row { grid-row: span 2; }
+
+    .bento-cell h3 {
+      font-size: 1rem; font-weight: 700;
+      margin-bottom: 0.25rem; line-height: 1.3;
+    }
+    .bento-cell p {
+      font-size: 0.85rem; line-height: 1.5;
+      opacity: 0.9;
+    }
+    .bento-big-num {
+      font-family: 'Inter', sans-serif;
+      font-size: 2.5rem; font-weight: 800;
+      line-height: 1;
+      margin-bottom: 0.15rem;
+    }
+    .bento-label {
+      font-size: 0.82rem; font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.8;
+    }
+    .bento-icon {
+      font-size: 1.6rem;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ── Stagger Animation ── */
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .slide.active .bento-cell {
+      animation: popUp 0.5s ease-out both;
+    }
+    .slide.active .bento-cell:nth-child(2) { animation-delay: 0.06s; }
+    .slide.active .bento-cell:nth-child(3) { animation-delay: 0.12s; }
+    .slide.active .bento-cell:nth-child(4) { animation-delay: 0.18s; }
+    .slide.active .bento-cell:nth-child(5) { animation-delay: 0.24s; }
+    .slide.active .bento-cell:nth-child(6) { animation-delay: 0.30s; }
+
+    /* ── Screenshot Container ── */
+    .screenshot-container {
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 2px solid rgba(26,26,46,0.1);
+      background: #f5f5f5;
+      position: relative;
+    }
+    .screenshot-container img {
+      width: 100%; height: auto;
+      display: block;
+      object-fit: cover;
+    }
+    .screenshot-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      min-height: 180px;
+      background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+      color: var(--style-text-secondary);
+      font-size: 0.85rem;
+      gap: 0.3rem;
+    }
+    .screenshot-placeholder .placeholder-icon {
+      font-size: 2rem;
+      opacity: 0.4;
+    }
+    .screenshot-badge {
+      position: absolute;
+      top: 0.4rem; left: 0.4rem;
+      background: var(--cell-dark);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.3rem;
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Highlight Box ── */
+    .highlight-box {
+      background: linear-gradient(135deg, rgba(232,255,59,0.15), rgba(78,205,196,0.1));
+      border-left: 3px solid var(--cell-teal);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .highlight-box p {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--style-text);
+    }
+
+    /* ── Two Column ── */
+    .two-col {
+      display: flex; gap: 1rem;
+      align-items: stretch;
+    }
+    .col-left, .col-right { flex: 1; }
+    .col-divider {
+      width: 2px; background: rgba(26,26,46,0.08);
+      border-radius: 1px; flex-shrink: 0;
+    }
+
+    /* ── Step List ── */
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+    .step-item {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      padding: 0.5rem 0.7rem;
+      background: rgba(26,26,46,0.03);
+      border-radius: 0.5rem;
+      border-left: 3px solid var(--cell-teal);
+    }
+    .step-num {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      color: var(--cell-teal);
+      min-width: 1.5rem;
+      line-height: 1.4;
+    }
+    .step-body h3 {
+      font-size: 0.95rem; font-weight: 700;
+      color: var(--style-primary);
+      margin-bottom: 0.1rem;
+    }
+    .step-body p {
+      font-size: 0.85rem; color: var(--style-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.55rem;
+      border-radius: 2rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    .badge-dark { background: var(--cell-dark); color: #fff; }
+    .badge-teal { background: rgba(78,205,196,0.15); color: #2a9d8f; }
+    .badge-coral { background: rgba(255,107,107,0.15); color: #e55555; }
+    .badge-lime { background: rgba(232,255,59,0.2); color: #5a6b0a; }
+    .badge-blue { background: rgba(59,130,246,0.12); color: #2563eb; }
+
+    /* ── Code Inline ── */
+    code {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.85em;
+      background: rgba(26,26,46,0.06);
+      padding: 0.1em 0.35em;
+      border-radius: 0.25rem;
+      color: var(--cell-purple);
+      font-weight: 500;
+    }
+
+    /* ── Comparison Table (simple) ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .compare-card {
+      border-radius: 0.6rem;
+      padding: 0.7rem 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .compare-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.15rem; }
+    .compare-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+    .compare-card li {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding-left: 1em;
+      position: relative;
+    }
+    .compare-card li::before {
+      content: ''; position: absolute;
+      left: 0; top: 0.55em;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .compare-card--chat { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); }
+    .compare-card--chat li::before { background: var(--cell-coral); }
+    .compare-card--code { background: rgba(78,205,196,0.08); border: 1px solid rgba(78,205,196,0.2); }
+    .compare-card--code li::before { background: var(--cell-teal); }
+
+    /* ── Cover ── */
+    .cover-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem 2rem;
+      min-height: 100%;
+    }
+    .cover-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.8rem;
+      border-radius: 2rem;
+      margin-bottom: 0.8rem;
+    }
+    .cover-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--style-primary);
+      margin-bottom: 0.4rem;
+    }
+    .cover-subtitle {
+      font-size: 1rem;
+      color: var(--style-text-secondary);
+      max-width: 30rem;
+      line-height: 1.5;
+      margin-bottom: 0.8rem;
+    }
+    .cover-divider {
+      width: 3rem; height: 3px;
+      background: linear-gradient(90deg, var(--cell-teal), var(--cell-lime));
+      border-radius: 2px;
+      margin-bottom: 0.8rem;
+    }
+    .cover-meta {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.82rem; color: var(--style-text-secondary);
+      font-weight: 500;
+    }
+    .cover-icons {
+      display: flex; gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+    .cover-icon-pill {
+      display: flex; align-items: center; gap: 0.3rem;
+      padding: 0.3rem 0.7rem;
+      border-radius: 2rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    /* ── End Slide ── */
+    .end-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 1.5rem 2rem;
+      min-height: 100%;
+    }
+    .end-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--style-primary);
+      margin-bottom: 0.5rem;
+    }
+    .end-subtitle {
+      font-size: 0.95rem;
+      color: var(--style-text-secondary);
+      margin-bottom: 0.8rem;
+    }
+    .end-summary {
+      max-width: 35rem;
+      width: 100%;
+    }
+    .end-summary h3 {
+      font-size: 1rem; font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--style-primary);
+    }
+    .end-summary ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      text-align: left;
+    }
+    .end-summary li {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      padding: 0.3rem 0.5rem;
+      background: rgba(78,205,196,0.06);
+      border-radius: 0.3rem;
+      border-left: 3px solid var(--cell-teal);
+    }
+
+    /* ── Tip Box ── */
+    .tip-box {
+      background: rgba(139,92,246,0.06);
+      border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      margin-top: 0.4rem;
+    }
+    .tip-box p {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--style-text);
+    }
+    .tip-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cell-purple);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.15rem;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── TOC ── */
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.8rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid rgba(26,26,46,0.05);
+    }
+    .toc-item:hover {
+      background: rgba(78,205,196,0.08);
+      border-color: rgba(78,205,196,0.2);
+      transform: translateX(4px);
+    }
+    .toc-num {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.1rem; font-weight: 800;
+      color: var(--cell-teal);
+      min-width: 1.8rem;
+    }
+    .toc-text {
+      font-size: 0.95rem; font-weight: 600;
+      color: var(--style-primary);
+      flex: 1;
+    }
+    .toc-arrow {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .toc-item:hover .toc-arrow { opacity: 1; }
+
+    /* ── Activity List ── */
+    .activity-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.5rem 0;
+    }
+    .activity-icon { font-size: 1.4rem; flex-shrink: 0; line-height: 1.3; }
+    .activity-body { flex: 1; }
+    .activity-title { font-size: 0.95rem; font-weight: 700; color: var(--style-primary); margin-bottom: 0.1rem; }
+    .activity-desc { font-size: 0.85rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* ── Nav Bar ── */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1.5rem;
+      background: rgba(248,248,242,0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(26,26,46,0.06);
+      z-index: 999;
+      font-size: 14px;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid rgba(26,26,46,0.15);
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      font-size: 0;
+      color: var(--style-text-secondary);
+      transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) {
+      border-color: var(--cell-teal);
+      background: var(--cell-teal);
+      color: #fff;
+    }
+    .nav-btn:hover:not(:disabled) svg { fill: #fff; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700;
+      color: var(--style-text-secondary);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem;
+      line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700;
+      color: inherit; font-family: inherit; padding: 0;
+      outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--cell-teal); }
+    .slide-input:focus { border-bottom-color: var(--cell-teal); background: rgba(78,205,196,0.08); border-radius: 4px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-grid--2col { grid-template-columns: 1fr; }
+      .bento-cell--span2 { grid-column: span 1; }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; height: 2px; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .cover-title { font-size: 1.7rem; }
+    }
+    @media (max-width: 480px) {
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      .browser-content { padding: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="11"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ════════════ Slide 1: Cover ════════════ -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card--frameless">
+        <div class="cover-slide">
+          <div class="cover-icons">
+            <span class="cover-icon-pill" style="background:rgba(78,205,196,0.12);color:#2a9d8f;">◆ Code Mode</span>
+            <span class="cover-icon-pill" style="background:rgba(139,92,246,0.12);color:#7c3aed;">◆ Claude Desktop</span>
+          </div>
+          <h1 class="cover-title">클로드 데스크톱<br>Code 모드 세팅 가이드</h1>
+          <p class="cover-subtitle">새로 업데이트된 Claude Desktop의 Code 기능을 활용하여 개발 환경을 구축하는 방법</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>AI 전문적학습동아리</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-04">2026년 4월</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 2: TOC ════════════ -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">TABLE OF CONTENTS</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 오늘의 안내 순서</h2>
+          </div>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" tabindex="0" role="button" aria-label="3번 슬라이드로 이동">
+                <span class="toc-num">01</span>
+                <span class="toc-text">Chat 모드 vs Code 모드</span>
+                <span class="toc-arrow" aria-hidden="true">&rarr;</span>
+              </li>
+              <li class="toc-item" tabindex="0" role="button" aria-label="4번 슬라이드로 이동">
+                <span class="toc-num">02</span>
+                <span class="toc-text">Code 모드란?</span>
+                <span class="toc-arrow" aria-hidden="true">&rarr;</span>
+              </li>
+              <li class="toc-item" tabindex="0" role="button" aria-label="5번 슬라이드로 이동">
+                <span class="toc-num">03</span>
+                <span class="toc-text">Code 모드 진입하기</span>
+                <span class="toc-arrow" aria-hidden="true">&rarr;</span>
+              </li>
+              <li class="toc-item" tabindex="0" role="button" aria-label="6번 슬라이드로 이동">
+                <span class="toc-num">04</span>
+                <span class="toc-text">프로젝트 폴더 연결하기</span>
+                <span class="toc-arrow" aria-hidden="true">&rarr;</span>
+              </li>
+              <li class="toc-item" tabindex="0" role="button" aria-label="7번 슬라이드로 이동">
+                <span class="toc-num">05</span>
+                <span class="toc-text">작업 지시 및 스킬 활용</span>
+                <span class="toc-arrow" aria-hidden="true">&rarr;</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 3: Chat vs Code ════════════ -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: Chat vs Code 비교">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">CHAT VS CODE</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 두 개의 모드, 하나의 앱</h2>
+            <p class="section-subtitle">클로드 데스크톱은 Chat과 Code, 두 가지 모드를 제공합니다</p>
+          </div>
+          <div class="compare-grid">
+            <div class="compare-card compare-card--chat">
+              <h3>Chat 모드 <span class="badge badge-coral">기존</span></h3>
+              <ul>
+                <li>일반 대화 및 질의응답</li>
+                <li>아티팩트(코드/문서) 생성</li>
+                <li>프로젝트 기반 대화 관리</li>
+                <li>파일을 직접 수정하지 않음</li>
+              </ul>
+            </div>
+            <div class="compare-card compare-card--code">
+              <h3>Code 모드 <span class="badge badge-teal">NEW</span></h3>
+              <ul>
+                <li>로컬 프로젝트 폴더에 직접 접근</li>
+                <li>파일 생성, 수정, 삭제 가능</li>
+                <li>터미널 명령어 실행</li>
+                <li>스킬(/) 명령어 시스템 지원</li>
+              </ul>
+            </div>
+          </div>
+          <div class="highlight-box">
+            <p><strong>핵심 차이:</strong> Chat 모드는 <strong>대화</strong> 중심, Code 모드는 <strong>실행</strong> 중심입니다. Code 모드에서는 Claude가 여러분의 컴퓨터에서 직접 코드를 작성하고 실행합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 4: Code 모드란? ════════════ -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: Code 모드란?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">CODE MODE</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⊕</span> Code 모드 핵심 기능</h2>
+            <p class="section-subtitle">터미널 없이도 AI와 함께 개발하는 새로운 방법</p>
+          </div>
+          <div class="bento-grid">
+            <div class="bento-cell bento-cell--dark bento-cell--span2">
+              <div class="bento-label">핵심 개념</div>
+              <h3 style="font-size:1.15rem;">로컬 프로젝트 폴더를 열고, Claude에게 작업을 지시하면 자동으로 코드를 작성합니다</h3>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <div class="bento-label">모델</div>
+              <div class="bento-big-num">Opus 4.6</div>
+              <p>1M 컨텍스트</p>
+            </div>
+            <div class="bento-cell bento-cell--white">
+              <h3>파일 읽기/쓰기</h3>
+              <p>프로젝트 폴더의 파일을 직접 생성하고 수정합니다</p>
+            </div>
+            <div class="bento-cell bento-cell--lime">
+              <h3>터미널 실행</h3>
+              <p>npm, git 등 CLI 명령어를 자동 실행합니다</p>
+            </div>
+            <div class="bento-cell bento-cell--coral">
+              <h3>스킬 시스템</h3>
+              <p><code>/</code> 명령어로 특화된 워크플로우를 실행합니다</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 5: Code 모드 진입 ════════════ -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: Code 모드 진입하기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">STEP 1 — ENTER CODE MODE</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> Code 모드 진입하기</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <ol class="step-list">
+                <li class="step-item">
+                  <span class="step-num">1</span>
+                  <div class="step-body">
+                    <h3>클로드 데스크톱 앱 실행</h3>
+                    <p>Claude Desktop 앱을 실행합니다</p>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <span class="step-num">2</span>
+                  <div class="step-body">
+                    <h3>상단 탭에서 <code>&lt;/&gt; Code</code> 클릭</h3>
+                    <p>좌측 상단의 Chat 옆에 <code>&lt;/&gt; Code</code> 탭이 있습니다</p>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <span class="step-num">3</span>
+                  <div class="step-body">
+                    <h3>Code 모드 화면 확인</h3>
+                    <p>사용 통계 대시보드와 새 세션 버튼이 표시됩니다</p>
+                  </div>
+                </li>
+              </ol>
+              <div class="tip-box">
+                <div class="tip-label">TIP</div>
+                <p>Code 탭이 보이지 않으면 앱을 최신 버전으로 업데이트하세요</p>
+              </div>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <div class="screenshot-container">
+                <img src="screenshot-code-tab.png" alt="Claude Desktop 상단에 Chat과 Code 탭이 나란히 있는 화면"
+                     loading="lazy" referrerpolicy="no-referrer"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="screenshot-placeholder" style="display:none;">
+                  <span class="placeholder-icon">&#128247;</span>
+                  <span>스크린샷 필요: Code 탭 위치</span>
+                </div>
+                <span class="screenshot-badge">SCREENSHOT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 6: 폴더 열기 ════════════ -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 폴더 열기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">STEP 2-1 — OPEN FOLDER</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프로젝트 폴더 열기</h2>
+            <p class="section-subtitle">Code 모드에서 작업할 폴더를 연결합니다</p>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <ol class="step-list">
+                <li class="step-item">
+                  <span class="step-num">1</span>
+                  <div class="step-body">
+                    <h3><code>폴더 열기...</code> 버튼 클릭</h3>
+                    <p>Code 모드 메인 화면에서 폴더 열기를 선택합니다</p>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <span class="step-num">2</span>
+                  <div class="step-body">
+                    <h3><code>로컬</code> 또는 <code>폴더 선택...</code> 클릭</h3>
+                    <p>하단의 버튼으로 프로젝트 디렉토리를 지정합니다. 최근 열었던 프로젝트는 목록에서 바로 선택할 수 있습니다.</p>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <span class="step-num">3</span>
+                  <div class="step-body">
+                    <h3>작업 시작</h3>
+                    <p>폴더가 연결되면 입력창에 작업을 설명하세요</p>
+                  </div>
+                </li>
+              </ol>
+              <div class="highlight-box">
+                <p><strong>권한 안내:</strong> Claude가 폴더 접근 권한을 요청하면 <strong>허용</strong>을 눌러주세요. 선택한 폴더 내에서만 파일을 읽고 수정합니다.</p>
+              </div>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <div class="screenshot-container">
+                <img src="screenshot-folder-select.png" alt="Code 모드에서 폴더 열기 버튼과 로컬/폴더 선택 버튼이 보이는 화면"
+                     loading="lazy" referrerpolicy="no-referrer"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="screenshot-placeholder" style="display:none;">
+                  <span class="placeholder-icon">&#128247;</span>
+                  <span>스크린샷 필요: 폴더 연결 화면</span>
+                </div>
+                <span class="screenshot-badge">CODE MODE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 7: 작업 폴더 찾기 ════════════ -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 작업 폴더 찾기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">STEP 2-2 — FIND YOUR FOLDER</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 작업 폴더 경로 찾기</h2>
+            <p class="section-subtitle">프로젝트 폴더 경로를 모르겠다면 GitHub Desktop에서 확인하세요</p>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <ol class="step-list">
+                <li class="step-item">
+                  <span class="step-num">1</span>
+                  <div class="step-body">
+                    <h3>GitHub Desktop 실행</h3>
+                    <p>작업할 레포지토리를 선택합니다</p>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <span class="step-num">2</span>
+                  <div class="step-body">
+                    <h3>레포지토리 이름 우클릭</h3>
+                    <p>상단 <strong>Current repository</strong> 영역을 우클릭합니다</p>
+                  </div>
+                </li>
+                <li class="step-item">
+                  <span class="step-num">3</span>
+                  <div class="step-body">
+                    <h3><code>Copy repo path</code> 또는 <code>Show in Explorer</code></h3>
+                    <p>경로를 클립보드에 복사하거나, 탐색기에서 해당 폴더를 바로 엽니다</p>
+                  </div>
+                </li>
+              </ol>
+              <div class="tip-box">
+                <div class="tip-label">TIP</div>
+                <p>복사한 경로를 Claude Desktop의 <code>폴더 선택</code> 대화상자 주소창에 붙여넣으면 바로 이동됩니다</p>
+              </div>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <div class="screenshot-container">
+                <img src="screenshot-github-desktop.png" alt="GitHub Desktop에서 우클릭하여 Copy repo path, Show in Explorer 메뉴가 보이는 화면"
+                     loading="lazy" referrerpolicy="no-referrer"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="screenshot-placeholder" style="display:none;">
+                  <span class="placeholder-icon">&#128247;</span>
+                  <span>스크린샷: GitHub Desktop</span>
+                </div>
+                <span class="screenshot-badge">GITHUB DESKTOP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 8: 작업 지시하기 ════════════ -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 작업 지시하기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">STEP 3 — GIVE INSTRUCTIONS</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 작업 지시하기</h2>
+            <p class="section-subtitle">자연어로 원하는 작업을 설명하면 Claude가 실행합니다</p>
+          </div>
+          <div class="bento-grid bento-grid--2col">
+            <div class="bento-cell bento-cell--dark bento-cell--span2">
+              <div class="bento-label">입력창 위치</div>
+              <h3>화면 하단의 "작업을 설명하거나 질문하세요" 입력창에 작성합니다</h3>
+              <p style="margin-top:0.3rem;opacity:0.7;">우측 하단에 사용 중인 모델(Opus 4.6 1M)이 표시됩니다</p>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <div class="bento-label">좋은 예시</div>
+              <h3>"이 폴더에 React 프로젝트를 만들어줘"</h3>
+            </div>
+            <div class="bento-cell bento-cell--warm">
+              <div class="bento-label">좋은 예시</div>
+              <h3>"index.html 파일을 수정해서 다크모드를 추가해줘"</h3>
+            </div>
+            <div class="bento-cell bento-cell--white bento-cell--span2">
+              <h3>Claude의 작업 과정</h3>
+              <p>파일 읽기 &rarr; 수정 계획 수립 &rarr; 코드 작성/수정 &rarr; 테스트 실행 &rarr; 결과 보고</p>
+              <p style="margin-top:0.2rem;font-size:0.82rem;color:var(--style-text-secondary);">각 단계에서 권한 요청이 있을 수 있으며, 허용/거부를 선택할 수 있습니다</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 8: 스킬 활용 ════════════ -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 스킬 활용하기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">SKILLS</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 스킬(/) 명령어 활용</h2>
+            <p class="section-subtitle">입력창에 <code>/</code>를 입력하면 사용 가능한 스킬 목록이 표시됩니다</p>
+          </div>
+          <div class="bento-grid">
+            <div class="bento-cell bento-cell--purple bento-cell--span2">
+              <div class="bento-label">스킬이란?</div>
+              <h3>특정 작업에 최적화된 워크플로우를 한 번에 실행하는 명령어 시스템</h3>
+              <p>입력창에 <code>/presentation-builder</code>처럼 슬래시 명령어를 입력하면 해당 스킬이 자동 실행됩니다</p>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <h3><code>/commit</code></h3>
+              <p>Git 커밋 메시지를 자동 생성하고 커밋합니다</p>
+            </div>
+            <div class="bento-cell bento-cell--white">
+              <h3><code>/presentation-builder</code></h3>
+              <p>수업 발표 자료 HTML을 자동 생성합니다</p>
+            </div>
+            <div class="bento-cell bento-cell--lime">
+              <h3><code>/review-pr</code></h3>
+              <p>코드 리뷰를 자동으로 수행합니다</p>
+            </div>
+            <div class="bento-cell bento-cell--warm">
+              <h3>커스텀 스킬</h3>
+              <p><code>.claude/</code> 폴더에 SKILL.md를 추가하여 나만의 스킬을 만들 수 있습니다</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 9: 실전 팁 ════════════ -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 실전 팁">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">PRACTICAL TIPS</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 효과적인 사용 팁</h2>
+          </div>
+          <div class="bento-grid bento-grid--2col">
+            <div class="bento-cell bento-cell--dark">
+              <h3>CLAUDE.md 파일 활용</h3>
+              <p>프로젝트 루트에 <code>CLAUDE.md</code>를 만들면 Claude가 매 세션마다 이 파일을 읽고 프로젝트 컨텍스트를 파악합니다</p>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <h3>구체적으로 지시하기</h3>
+              <p>"버그 고쳐줘"보다 "login.js의 인증 토큰 만료 처리 로직을 수정해줘"가 더 좋은 결과를 냅니다</p>
+            </div>
+            <div class="bento-cell bento-cell--coral">
+              <h3>권한 요청 확인하기</h3>
+              <p>파일 수정이나 터미널 명령 실행 전 반드시 권한을 요청합니다. 의도치 않은 변경을 방지할 수 있습니다</p>
+            </div>
+            <div class="bento-cell bento-cell--lime">
+              <h3>Git과 함께 사용하기</h3>
+              <p>작업 전 Git 커밋을 해두면 Claude의 변경사항을 언제든 되돌릴 수 있어 안전합니다</p>
+            </div>
+          </div>
+          <div class="tip-box">
+            <div class="tip-label">BONUS</div>
+            <p><strong>편집 수락</strong> 기능으로 Claude가 제안하는 변경사항을 한 줄씩 검토하고 승인할 수 있습니다. 하단의 <code>편집 수락</code> 버튼을 확인하세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════ Slide 10: End ════════════ -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 마무리">
+      <div class="browser-card--frameless">
+        <div class="end-slide">
+          <h2 class="end-title">이제 Code 모드로<br>개발을 시작하세요</h2>
+          <p class="end-subtitle">궁금한 점이 있으시면 언제든 질문해 주세요</p>
+          <div class="end-summary highlight-box">
+            <h3>오늘의 핵심</h3>
+            <ul>
+              <li>상단 <code>&lt;/&gt; Code</code> 탭을 클릭하여 Code 모드로 전환</li>
+              <li><code>폴더 열기</code>로 작업할 프로젝트 디렉토리를 연결</li>
+              <li>자연어로 원하는 작업을 설명하면 Claude가 자동 실행</li>
+              <li><code>/</code> 명령어로 스킬을 활용하여 효율적으로 작업</li>
+              <li>CLAUDE.md 파일로 프로젝트 컨텍스트를 지속적으로 관리</li>
+            </ul>
+          </div>
+          <div class="cover-meta" style="margin-top:0.8rem;">
+            <span>AI 전문적학습동아리</span>
+            <span aria-hidden="true">·</span>
+            <span>2026년 4월</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">11</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const slideInput = document.getElementById('slideInput');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    document.getElementById('totalSlides').textContent = totalSlides;
+
+    function announceSlide(c, t) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (c + 1) + ' / ' + t;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      var content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    function updateNav() {
+      var pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].indexOf(e.key) !== -1) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key) !== -1) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    var wheelLocked = false;
+    document.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(function() { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    var touchStartX = 0;
+    document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      var diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { if (diff < 0) nextSlide(); else prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', function() { this.select(); });
+    slideInput.addEventListener('keydown', function(e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        var val = parseInt(this.value);
+        if (val >= 1 && val <= totalSlides) goToSlide(val - 1);
+        else this.value = currentSlide + 1;
+        this.blur();
+      } else if (e.key === 'Escape') {
+        this.value = currentSlide + 1;
+        this.blur();
+      }
+    });
+    slideInput.addEventListener('blur', function() {
+      var val = parseInt(this.value);
+      if (val >= 1 && val <= totalSlides) goToSlide(val - 1);
+      else this.value = currentSlide + 1;
+    });
+
+    // TOC navigation
+    document.querySelectorAll('.toc-item').forEach(function(item, i) {
+      var slideMap = [2, 3, 4, 5, 7];
+      item.addEventListener('click', function() { goToSlide(slideMap[i]); });
+      item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToSlide(slideMap[i]); }
+      });
+    });
+
+    updateNav();
+  </script>
+  <script type="module" src="../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

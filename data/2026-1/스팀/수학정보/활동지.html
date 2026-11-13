@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디지털 네트워크와 행렬 — 활동지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FDFDFB;
+    --card:#FFFFFF;
+    --ink:#33415C;
+    --ink-soft:#7B8698;
+    --rule:#D5DBE1;
+    --teal:#3E9C93;
+    --coral:#E8705A;
+    --mustard:#E4B04A;
+    --teal-wash:rgba(62,156,147,0.09);
+    --coral-wash:rgba(232,112,90,0.10);
+    --mustard-wash:rgba(228,176,74,0.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans KR',sans-serif;
+    line-height:1.6;
+    padding-bottom:96px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ── 헤더 ── */
+  header{
+    background:var(--paper);
+    border-bottom:1px solid var(--rule);
+    padding:26px 28px 22px;
+    position:relative;
+  }
+  .wrap{max-width:940px;margin:0 auto;}
+  header h1{font-size:27px;font-weight:700;color:var(--teal);letter-spacing:-0.01em;}
+  header .sub{font-size:14px;color:var(--ink-soft);margin-top:6px;}
+  header .rule{width:74px;height:3px;background:var(--mustard);border-radius:2px;margin-top:14px;}
+  .head-actions{position:absolute;top:24px;right:28px;display:flex;gap:8px;}
+  .icon-btn{
+    background:transparent;border:1px solid var(--rule);color:var(--ink-soft);
+    padding:6px 12px;border-radius:8px;cursor:pointer;font:500 13px 'Noto Sans KR';
+  }
+  .icon-btn:hover{background:var(--teal-wash);color:var(--teal);}
+
+  /* ── 설정 패널 (교사 전용) ── */
+  #settingsPanel{
+    display:none;max-width:940px;margin:16px auto 0;padding:16px 18px;
+    background:var(--card);border:1px dashed var(--rule);border-radius:12px;
+  }
+  #settingsPanel label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
+  #settingsPanel input{
+    width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:8px;
+    font:14px 'Noto Sans KR';color:var(--ink);
+  }
+  #settingsPanel .row{display:flex;gap:8px;margin-top:10px;}
+
+  /* ── 카드 ── */
+  main{max-width:940px;margin:0 auto;padding:26px 28px;}
+  .card{
+    background:var(--card);border:1px solid var(--rule);border-radius:14px;
+    padding:24px 26px;margin-bottom:22px;
+  }
+  .card > h2{
+    font-size:19px;font-weight:700;color:var(--ink);
+    display:flex;align-items:center;gap:10px;margin-bottom:6px;
+  }
+  .badge{
+    font-size:12px;font-weight:700;letter-spacing:0.06em;
+    background:var(--teal);color:#fff;padding:3px 10px;border-radius:20px;flex:none;
+  }
+  .badge.b2{background:var(--mustard);}
+  .badge.b3{background:var(--coral);}
+  .card > .hint{font-size:13.5px;color:var(--ink-soft);margin-bottom:18px;}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;}
+  .field label .req{color:var(--coral);}
+  .field input, .field select, .field textarea{
+    width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:9px;
+    font:14px 'Noto Sans KR';color:var(--ink);background:var(--paper);
+  }
+  .field textarea{resize:vertical;min-height:84px;line-height:1.65;}
+  .field input:focus, .field textarea:focus, .field select:focus{
+    outline:none;border-color:var(--teal);background:#fff;
+  }
+
+  /* ── 모둠원 이름 ── */
+  .members{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:6px;}
+  .member{display:flex;align-items:center;gap:9px;}
+  .member svg{width:34px;height:34px;flex:none;}
+  .member input{
+    flex:1;padding:8px 10px;border:1px solid var(--rule);border-radius:8px;
+    font:14px 'Noto Sans KR';background:var(--paper);
+  }
+
+  /* ── 행렬 그리드 ── */
+  .matrix-area{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;margin-top:20px;}
+  .mtable{border-collapse:collapse;}
+  .mtable th{
+    font-size:12px;font-weight:500;color:var(--ink-soft);
+    padding:5px 4px;max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .mtable th.rowh{text-align:right;padding-right:9px;}
+  .mtable td{padding:2px;}
+  .cell{
+    width:44px;height:44px;border:1px solid var(--rule);border-radius:8px;
+    background:var(--paper);color:var(--ink);
+    font:600 16px 'Noto Sans KR';cursor:pointer;
+    transition:background .12s ease, border-color .12s ease;
+  }
+  .cell:hover:not(:disabled){border-color:var(--teal);}
+  .cell.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .cell:disabled{background:#F1F3F5;color:#B6BCC5;cursor:default;border-style:dashed;}
+  .rowsum{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:34px;height:44px;padding:0 8px;margin-left:8px;
+    font:700 16px 'Noto Sans KR';color:var(--ink-soft);
+  }
+  .rowsum.hub{background:var(--mustard-wash);color:#8A6410;border-radius:8px;}
+  .rowsum.low{background:var(--coral-wash);color:#A63B26;border-radius:8px;}
+
+  /* A² 입력 셀 */
+  .cell-in{
+    width:44px;height:44px;border:1px solid var(--rule);border-radius:8px;
+    background:var(--paper);color:var(--ink);text-align:center;
+    font:600 16px 'Noto Sans KR';
+  }
+  .cell-in:focus{outline:none;border-color:var(--teal);background:#fff;}
+  .cell-in.ok{background:var(--teal-wash);border-color:var(--teal);color:#1F6B64;}
+  .cell-in.ng{background:var(--coral-wash);border-color:var(--coral);color:#A63B26;}
+
+  /* ── 그래프 ── */
+  .graph-box{flex:none;}
+  .graph-box .cap{font-size:12.5px;color:var(--ink-soft);text-align:center;margin-top:4px;}
+
+  /* ── 발견 배너 ── */
+  .finding{
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;
+  }
+  .chip{
+    font-size:13px;padding:7px 13px;border-radius:20px;border:1px solid var(--rule);
+    background:var(--paper);color:var(--ink-soft);
+  }
+  .chip b{color:var(--ink);font-weight:700;}
+  .chip.hub{background:var(--mustard-wash);border-color:transparent;color:#8A6410;}
+  .chip.hub b{color:#6F4E06;}
+  .chip.low{background:var(--coral-wash);border-color:transparent;color:#A63B26;}
+  .chip.low b{color:#8B2D1B;}
+
+  /* ── 버튼 ── */
+  .btn{
+    padding:10px 18px;border:none;border-radius:9px;cursor:pointer;
+    font:600 14px 'Noto Sans KR';transition:opacity .15s ease, transform .1s ease;
+  }
+  .btn:hover{opacity:.88;}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:.45;cursor:default;}
+  .btn-teal{background:var(--teal);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}
+  .btn-ghost:hover{background:var(--teal-wash);color:var(--teal);}
+
+  .tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center;}
+  .score{font-size:14px;font-weight:600;color:var(--ink-soft);}
+  .score.good{color:var(--teal);}
+  .score.bad{color:var(--coral);}
+
+  /* ── 후보 비교표 ── */
+  .cmp{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px;}
+  .cmp th{
+    text-align:left;font-weight:600;color:var(--ink-soft);font-size:12.5px;
+    padding:9px 10px;border-bottom:2px solid var(--rule);
+  }
+  .cmp td{padding:11px 10px;border-bottom:1px solid var(--rule);}
+  .cmp tr.best td{background:var(--mustard-wash);font-weight:700;}
+  .cmp td.num{font-variant-numeric:tabular-nums;}
+  .cmp .pick{width:38px;}
+  .empty-note{font-size:13.5px;color:var(--ink-soft);padding:16px;background:var(--paper);
+    border:1px dashed var(--rule);border-radius:10px;margin-top:16px;text-align:center;}
+
+  /* ── 액션바 ── */
+  .actionbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:40;
+    background:rgba(253,253,251,0.97);border-top:1px solid var(--rule);
+    padding:12px 28px;
+  }
+  .actionbar .inner{
+    max-width:940px;margin:0 auto;display:flex;align-items:center;gap:10px;
+  }
+  .actionbar .spacer{flex:1;}
+  .draft-label{font-size:12.5px;color:var(--ink-soft);}
+  .btn-draft{background:var(--mustard);color:#3D2E06;}
+  .btn-load{background:#7C3AED;color:#fff;}
+  .btn-reset{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}
+  .btn-submit{background:var(--teal);color:#fff;padding:10px 24px;}
+
+  /* ── 토스트 ── */
+  #toast{
+    position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(14px);
+    background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;
+    font-size:14px;opacity:0;pointer-events:none;transition:all .25s ease;z-index:60;
+    max-width:88vw;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #toast.success{background:var(--teal);}
+  #toast.error{background:var(--coral);}
+
+  @media print{
+    .head-actions,.actionbar,#settingsPanel,#toast,.tools{display:none !important;}
+    body{padding-bottom:0;background:#fff;}
+    .card{break-inside:avoid;border-color:#CCC;}
+  }
+  @media (max-width:640px){
+    .matrix-area{gap:22px;}
+    .cell,.cell-in{width:38px;height:38px;font-size:14px;}
+    header h1{font-size:21px;}
+    main{padding:18px 14px;}
+    .card{padding:18px 16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- 동물 SVG 정의 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="a-fox">
+      <polygon points="-19,-14 -11,-30 -3,-15" fill="#E8705A"/>
+      <polygon points="19,-14 11,-30 3,-15" fill="#E8705A"/>
+      <circle cx="0" cy="0" r="24" fill="#E8705A"/>
+      <circle cx="0" cy="7" r="15" fill="#FDFDFB"/>
+      <circle cx="-8" cy="-3" r="3" fill="#33415C"/><circle cx="8" cy="-3" r="3" fill="#33415C"/>
+      <circle cx="0" cy="7" r="2.6" fill="#33415C"/>
+    </g>
+    <g id="a-rabbit">
+      <ellipse cx="-8" cy="-27" rx="5.5" ry="15" fill="#E4B04A"/>
+      <ellipse cx="8" cy="-27" rx="5.5" ry="15" fill="#E4B04A"/>
+      <circle cx="0" cy="0" r="24" fill="#E4B04A"/>
+      <circle cx="-8" cy="-2" r="3" fill="#33415C"/><circle cx="8" cy="-2" r="3" fill="#33415C"/>
+      <circle cx="0" cy="8" r="2.6" fill="#33415C"/>
+    </g>
+    <g id="a-bear">
+      <circle cx="-16" cy="-17" r="8" fill="#3E9C93"/><circle cx="16" cy="-17" r="8" fill="#3E9C93"/>
+      <circle cx="0" cy="0" r="24" fill="#3E9C93"/>
+      <circle cx="0" cy="8" r="11" fill="#FDFDFB"/>
+      <circle cx="-8" cy="-3" r="3" fill="#33415C"/><circle cx="8" cy="-3" r="3" fill="#33415C"/>
+      <circle cx="0" cy="6" r="3" fill="#33415C"/>
+    </g>
+    <g id="a-cat">
+      <polygon points="-18,-13 -12,-29 -4,-14" fill="#33415C"/>
+      <polygon points="18,-13 12,-29 4,-14" fill="#33415C"/>
+      <circle cx="0" cy="0" r="24" fill="#33415C"/>
+      <circle cx="-8" cy="-2" r="3" fill="#FDFDFB"/><circle cx="8" cy="-2" r="3" fill="#FDFDFB"/>
+      <path d="M -6 9 Q 0 14 6 9" stroke="#FDFDFB" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </g>
+    <g id="a-bird">
+      <circle cx="0" cy="0" r="21" fill="#B9C6C4"/>
+      <polygon points="17,0 27,4 17,8" fill="#E4B04A"/>
+      <circle cx="6" cy="-5" r="2.8" fill="#33415C"/>
+      <path d="M -12 2 Q -4 10 4 2" stroke="#FDFDFB" stroke-width="2" fill="none"/>
+    </g>
+    <g id="a-turtle">
+      <ellipse cx="0" cy="4" rx="24" ry="17" fill="#3E9C93"/>
+      <path d="M -24 4 a 24 17 0 0 1 48 0" fill="#E4B04A"/>
+      <circle cx="24" cy="-2" r="10" fill="#B9C6C4"/>
+      <circle cx="28" cy="-4" r="2.4" fill="#33415C"/>
+      <ellipse cx="-14" cy="20" rx="6" ry="4" fill="#B9C6C4"/>
+      <ellipse cx="12" cy="20" rx="6" ry="4" fill="#B9C6C4"/>
+    </g>
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap">
+    <h1>디지털 네트워크와 행렬</h1>
+    <div class="sub">“우리”를 잇는 수학과 정보 &nbsp;·&nbsp; 모둠 활동지</div>
+    <div class="rule"></div>
+  </div>
+  <div class="head-actions">
+    <button class="icon-btn" id="btnPrint" type="button">인쇄</button>
+    <button class="icon-btn" id="btnSettings" type="button" title="교사 설정">⚙</button>
+  </div>
+</header>
+
+<div id="settingsPanel">
+  <label for="urlInput">Apps Script 배포 URL (교사 전용)</label>
+  <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row">
+    <button class="btn btn-teal" id="btnSaveUrl" type="button">URL 저장</button>
+    <button class="btn btn-ghost" id="btnClearUrl" type="button">초기화</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- 기본 정보 -->
+  <section class="card">
+    <h2>기본 정보</h2>
+    <div class="grid2">
+      <div class="field">
+        <label for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="홍길동">
+      </div>
+      <div class="field">
+        <label for="classInfo">반 / 번호 <span class="req">*</span></label>
+        <input type="text" id="classInfo" placeholder="1학년 3반 12번">
+      </div>
+      <div class="field">
+        <label for="teamName">모둠명</label>
+        <input type="text" id="teamName" placeholder="네트워크 탐험대">
+      </div>
+      <div class="field">
+        <label for="today">날짜</label>
+        <input type="date" id="today">
+      </div>
+    </div>
+  </section>
+
+  <!-- 활동 1 -->
+  <section class="card">
+    <h2><span class="badge">활동 1</span> 우리 모둠의 인접행렬 A 만들기</h2>
+    <div class="hint">
+      모둠원 이름을 적고, 표의 칸을 눌러 관계를 기록하세요.
+      “이번 학기에 이야기를 나눠 본 적이 있다”면 <b>1</b>, 없으면 <b>0</b>입니다.
+      친구 관계는 쌍방향이므로 한 칸을 누르면 반대쪽 칸도 함께 바뀝니다.
+    </div>
+
+    <div class="field" style="max-width:190px;">
+      <label for="memberCount">모둠 인원</label>
+      <select id="memberCount">
+        <option value="4">4명</option>
+        <option value="5" selected>5명</option>
+        <option value="6">6명</option>
+      </select>
+    </div>
+
+    <div class="members" id="members"></div>
+
+    <div class="matrix-area">
+      <div>
+        <table class="mtable" id="matrixA"></table>
+        <div class="finding" id="findingA"></div>
+      </div>
+      <div class="graph-box">
+        <svg id="graphA" width="330" height="310" viewBox="0 0 330 310" role="img" aria-label="모둠 관계 그래프"></svg>
+        <div class="cap">클릭한 관계가 곧바로 그래프로 그려집니다</div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:20px;">
+      <label for="q1">발견한 것을 적어 보세요 — 허브는 누구이고, 연결이 가장 적은 친구는 누구인가요? 왜 그렇게 되었을까요?</label>
+      <textarea id="q1" placeholder="예) 다온이가 4명과 이어져 허브였습니다. 마루는 다온이 한 명하고만 이어져 있어서..."></textarea>
+    </div>
+  </section>
+
+  <!-- 활동 2 -->
+  <section class="card">
+    <h2><span class="badge b2">활동 2</span> A × A 를 손으로 계산하기</h2>
+    <div class="hint">
+      A의 <b>i행</b>과 A의 <b>j열</b>을 짝지어 곱한 뒤 모두 더하면 A²의 (i, j) 칸이 됩니다.
+      먼저 공책에 계산한 다음, 아래 표에 옮겨 적고 <b>채점하기</b>를 누르세요.
+    </div>
+
+    <div class="matrix-area">
+      <div>
+        <table class="mtable" id="matrixA2"></table>
+      </div>
+    </div>
+
+    <div class="tools">
+      <button class="btn btn-teal" id="btnGrade" type="button">채점하기</button>
+      <button class="btn btn-ghost" id="btnShowAnswer" type="button">정답 보기</button>
+      <button class="btn btn-ghost" id="btnClearA2" type="button">지우기</button>
+      <span class="score" id="scoreLabel"></span>
+    </div>
+
+    <div class="field" style="margin-top:20px;">
+      <label for="q2">A²의 <b>대각선</b> 숫자들을 살펴보세요. 어디서 본 숫자인가요? 왜 그렇게 될까요?</label>
+      <textarea id="q2" placeholder="예) 활동 1에서 구한 친구 수(차수)와 같았습니다. 나에서 출발해 친구를 거쳐 다시 나로 돌아오려면..."></textarea>
+    </div>
+
+    <div class="field" style="margin-top:14px;">
+      <label for="q3">직접 친구인데도 A²의 값이 <b>0</b>인 짝이 있나요? 있다면 누구와 누구이고, 왜 0일까요?</label>
+      <textarea id="q3" placeholder="예) 마루와 다온은 직접 친구인데 0이었습니다. 두 걸음으로 가는 길을 세는 것이라서..."></textarea>
+    </div>
+  </section>
+
+  <!-- 활동 3 -->
+  <section class="card">
+    <h2><span class="badge b3">활동 3</span> 어떤 연결을 추가할까?</h2>
+    <div class="hint">
+      연결이 가장 적은 친구에게 <b>새 친구 한 명</b>을 이어 줄 수 있습니다.
+      후보마다 A²가 어떻게 달라지는지 아래 표에서 확인하고, 우리 모둠의 답을 고르세요.
+    </div>
+    <div id="cmpArea"></div>
+
+    <div class="field" style="margin-top:20px;">
+      <label for="q4">위 표에서 <b>두 지표(경로 총합 · 2걸음 도달 인원)</b>가 서로 다른 후보를 가리키나요? 그렇다면 우리 모둠은 무엇을 더 중요하게 볼지, 그 이유와 함께 적어 보세요.</label>
+      <textarea id="q4" placeholder="예) 경로 총합은 나래가 가장 컸지만 도달 인원은 모두 같았습니다. 우리 모둠은 관계가 튼튼해지는 쪽이 더 중요하다고 보아서..."></textarea>
+    </div>
+  </section>
+
+</main>
+
+<!-- 액션바 -->
+<div class="actionbar">
+  <div class="inner">
+    <button class="btn btn-load" id="btnLoad" type="button">불러오기</button>
+    <span class="draft-label" id="draftLabel">임시저장: —</span>
+    <span class="spacer"></span>
+    <button class="btn btn-reset" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-draft" id="btnDraft" type="button">임시저장</button>
+    <button class="btn btn-submit" id="btnSubmit" type="button">제출하기</button>
+  </div>
+</div>
+<input type="file" id="fileInput" accept=".json" hidden>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ══ 설정 ══ */
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+  var URL_KEY     = 'sheets_url_matrix_network';
+  var DRAFT_KEY   = 'draft_matrix_network_2026';
+  var SOURCE      = 'matrix_network';
+
+  var ANIMALS = ['a-fox','a-rabbit','a-bear','a-cat','a-bird','a-turtle'];
+  var SAMPLE  = ['가은','나래','다온','라온','마루','하늘'];
+
+  var N = 5;
+  var A = [];            // 인접행렬
+  var names = [];        // 이름
+  var answerShown = false;
+
+  /* ══ 행렬 유틸 ══ */
+  function zeros(n){
+    var m = [], i, j;
+    for (i = 0; i < n; i++) { m.push([]); for (j = 0; j < n; j++) m[i].push(0); }
+    return m;
+  }
+  function matmul(X, Y){
+    var n = X.length, R = zeros(n), i, j, k, s;
+    for (i = 0; i < n; i++) for (j = 0; j < n; j++) {
+      s = 0;
+      for (k = 0; k < n; k++) s += X[i][k] * Y[k][j];
+      R[i][j] = s;
+    }
+    return R;
+  }
+  function degrees(M){
+    return M.map(function(row){
+      return row.reduce(function(a,b){ return a + b; }, 0);
+    });
+  }
+  function cloneM(M){ return M.map(function(r){ return r.slice(); }); }
+  function displayName(i){
+    var v = (names[i] || '').trim();
+    return v || ('학생' + (i + 1));
+  }
+
+  /* ══ 모둠원 입력 ══ */
+  function renderMembers(){
+    var box = document.getElementById('members');
+    box.textContent = '';
+    for (var i = 0; i < N; i++) {
+      var wrap = document.createElement('div');
+      wrap.className = 'member';
+
+      var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox','-32 -34 64 64');
+      var use = document.createElementNS('http://www.w3.org/2000/svg','use');
+      use.setAttribute('href','#' + ANIMALS[i]);
+      svg.appendChild(use);
+
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.id = 'member' + i;
+      inp.placeholder = SAMPLE[i];
+      inp.value = names[i] || '';
+      inp.setAttribute('aria-label', (i+1) + '번째 모둠원 이름');
+      (function(idx){
+        inp.addEventListener('input', function(){
+          names[idx] = this.value;      // this = 입력된 칸 (var inp는 루프 종료 후 마지막 칸을 가리킴)
+          renderMatrixA(); renderGraph(); renderMatrixA2(); renderCompare();
+          scheduleDraft();
+        });
+      })(i);
+
+      wrap.appendChild(svg);
+      wrap.appendChild(inp);
+      box.appendChild(wrap);
+    }
+  }
+
+  /* ══ 활동 1: 인접행렬 ══ */
+  function renderMatrixA(){
+    var t = document.getElementById('matrixA');
+    t.textContent = '';
+
+    var thead = document.createElement('tr');
+    thead.appendChild(document.createElement('th'));
+    for (var c = 0; c < N; c++) {
+      var th = document.createElement('th');
+      th.textContent = displayName(c);
+      thead.appendChild(th);
+    }
+    var thSum = document.createElement('th');
+    thSum.textContent = '행 합';
+    thead.appendChild(thSum);
+    t.appendChild(thead);
+
+    var deg = degrees(A);
+    var mx = Math.max.apply(null, deg), mn = Math.min.apply(null, deg);
+
+    for (var i = 0; i < N; i++) {
+      var tr = document.createElement('tr');
+      var rh = document.createElement('th');
+      rh.className = 'rowh';
+      rh.textContent = displayName(i);
+      tr.appendChild(rh);
+
+      for (var j = 0; j < N; j++) {
+        var td = document.createElement('td');
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cell' + (A[i][j] ? ' on' : '');
+        b.textContent = String(A[i][j]);
+        if (i === j) {
+          b.disabled = true;
+          b.title = '자기 자신과의 관계는 항상 0입니다';
+        } else {
+          b.setAttribute('aria-label', displayName(i) + '와 ' + displayName(j) + '의 관계');
+          (function(x,y){
+            b.addEventListener('click', function(){
+              var v = A[x][y] ? 0 : 1;
+              A[x][y] = v; A[y][x] = v;      // 대칭 자동 반영
+              renderMatrixA(); renderGraph(); renderCompare();
+              if (answerShown) { answerShown = false; }
+              clearGrade();
+              scheduleDraft();
+            });
+          })(i,j);
+        }
+        td.appendChild(b);
+        tr.appendChild(td);
+      }
+
+      var tdS = document.createElement('td');
+      var sp = document.createElement('span');
+      sp.className = 'rowsum' + (deg[i] === mx && mx > 0 ? ' hub' : (deg[i] === mn ? ' low' : ''));
+      sp.textContent = String(deg[i]);
+      tdS.appendChild(sp);
+      tr.appendChild(tdS);
+
+      t.appendChild(tr);
+    }
+    renderFinding(deg, mx, mn);
+  }
+
+  function renderFinding(deg, mx, mn){
+    var box = document.getElementById('findingA');
+    box.textContent = '';
+    if (mx === 0) {
+      var c0 = document.createElement('span');
+      c0.className = 'chip';
+      c0.textContent = '아직 연결이 없습니다. 표의 칸을 눌러 관계를 기록해 보세요.';
+      box.appendChild(c0);
+      return;
+    }
+    function chip(cls, label, who){
+      var s = document.createElement('span');
+      s.className = 'chip ' + cls;
+      s.appendChild(document.createTextNode(label + ' '));
+      var b = document.createElement('b');
+      b.textContent = who;
+      s.appendChild(b);
+      box.appendChild(s);
+    }
+    var hubs = [], lows = [], i;
+    for (i = 0; i < N; i++) { if (deg[i] === mx) hubs.push(displayName(i)); }
+    for (i = 0; i < N; i++) { if (deg[i] === mn) lows.push(displayName(i)); }
+    chip('hub', '허브 (연결 ' + mx + '개):', hubs.join(', '));
+    chip('low', '연결이 가장 적은 친구 (' + mn + '개):', lows.join(', '));
+    if (mn === 0) chip('low', '고립 노드:', lows.join(', ') + ' — 아무와도 이어져 있지 않습니다');
+  }
+
+  /* ══ 그래프 ══ */
+  function renderGraph(){
+    var svg = document.getElementById('graphA');
+    svg.textContent = '';
+    var cx = 165, cy = 150, R = 108;
+    var pos = [], i, j;
+    for (i = 0; i < N; i++) {
+      var ang = -Math.PI / 2 + (2 * Math.PI * i) / N;
+      pos.push({ x: cx + R * Math.cos(ang), y: cy + R * Math.sin(ang) });
+    }
+    var deg = degrees(A);
+    var mx = Math.max.apply(null, deg), mn = Math.min.apply(null, deg);
+
+    // 엣지
+    for (i = 0; i < N; i++) for (j = i + 1; j < N; j++) {
+      if (!A[i][j]) continue;
+      var ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1', pos[i].x); ln.setAttribute('y1', pos[i].y);
+      ln.setAttribute('x2', pos[j].x); ln.setAttribute('y2', pos[j].y);
+      ln.setAttribute('stroke', '#33415C');
+      ln.setAttribute('stroke-width', '2.2');
+      ln.setAttribute('stroke-linecap', 'round');
+      ln.setAttribute('opacity', '0.42');
+      svg.appendChild(ln);
+    }
+    // 노드
+    for (i = 0; i < N; i++) {
+      if (mx > 0 && deg[i] === mx) {
+        var halo = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        halo.setAttribute('cx', pos[i].x); halo.setAttribute('cy', pos[i].y);
+        halo.setAttribute('r', '31');
+        halo.setAttribute('fill', '#E4B04A'); halo.setAttribute('opacity', '0.20');
+        svg.appendChild(halo);
+      }
+      if (mx > 0 && deg[i] === mn) {
+        var ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        ring.setAttribute('cx', pos[i].x); ring.setAttribute('cy', pos[i].y);
+        ring.setAttribute('r', '30');
+        ring.setAttribute('fill', 'none');
+        ring.setAttribute('stroke', '#E8705A'); ring.setAttribute('stroke-width', '2');
+        ring.setAttribute('stroke-dasharray', '5 5');
+        svg.appendChild(ring);
+      }
+      var g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      g.setAttribute('transform', 'translate(' + pos[i].x + ',' + pos[i].y + ') scale(0.72)');
+      var use = document.createElementNS('http://www.w3.org/2000/svg','use');
+      use.setAttribute('href', '#' + ANIMALS[i]);
+      g.appendChild(use);
+      svg.appendChild(g);
+
+      var tx = document.createElementNS('http://www.w3.org/2000/svg','text');
+      tx.setAttribute('x', pos[i].x); tx.setAttribute('y', pos[i].y + 36);
+      tx.setAttribute('text-anchor', 'middle');
+      tx.setAttribute('font-size', '12.5');
+      tx.setAttribute('font-family', "'Noto Sans KR',sans-serif");
+      tx.setAttribute('fill', '#33415C'); tx.setAttribute('opacity', '0.8');
+      tx.textContent = displayName(i);
+      svg.appendChild(tx);
+    }
+  }
+
+  /* ══ 활동 2: A² 입력 ══ */
+  function renderMatrixA2(){
+    var t = document.getElementById('matrixA2');
+    var prev = readA2();            // 기존 입력 보존
+    t.textContent = '';
+
+    var thead = document.createElement('tr');
+    thead.appendChild(document.createElement('th'));
+    for (var c = 0; c < N; c++) {
+      var th = document.createElement('th');
+      th.textContent = displayName(c);
+      thead.appendChild(th);
+    }
+    t.appendChild(thead);
+
+    for (var i = 0; i < N; i++) {
+      var tr = document.createElement('tr');
+      var rh = document.createElement('th');
+      rh.className = 'rowh';
+      rh.textContent = displayName(i);
+      tr.appendChild(rh);
+      for (var j = 0; j < N; j++) {
+        var td = document.createElement('td');
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.inputMode = 'numeric';
+        inp.className = 'cell-in';
+        inp.id = 'a2_' + i + '_' + j;
+        inp.maxLength = 2;
+        inp.value = (prev && prev[i] && prev[i][j] !== null) ? String(prev[i][j]) : '';
+        inp.setAttribute('aria-label', 'A제곱 ' + displayName(i) + ' 행 ' + displayName(j) + ' 열');
+        inp.addEventListener('input', function(){
+          this.value = this.value.replace(/[^0-9]/g, '');
+          this.classList.remove('ok','ng');
+          scheduleDraft();
+        });
+        td.appendChild(inp);
+        tr.appendChild(td);
+      }
+      t.appendChild(tr);
+    }
+    clearGrade();
+  }
+
+  function readA2(){
+    var M = [], i, j, el;
+    for (i = 0; i < N; i++) {
+      M.push([]);
+      for (j = 0; j < N; j++) {
+        el = document.getElementById('a2_' + i + '_' + j);
+        if (!el) { M[i].push(null); continue; }
+        M[i].push(el.value === '' ? null : parseInt(el.value, 10));
+      }
+    }
+    return M;
+  }
+
+  function clearGrade(){
+    var lab = document.getElementById('scoreLabel');
+    if (lab) { lab.textContent = ''; lab.className = 'score'; }
+    for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+      var el = document.getElementById('a2_' + i + '_' + j);
+      if (el) el.classList.remove('ok','ng');
+    }
+  }
+
+  function gradeA2(){
+    var truth = matmul(A, A);
+    var mine = readA2();
+    var right = 0, total = N * N, blank = 0, i, j, el;
+    for (i = 0; i < N; i++) for (j = 0; j < N; j++) {
+      el = document.getElementById('a2_' + i + '_' + j);
+      el.classList.remove('ok','ng');
+      if (mine[i][j] === null) { blank++; continue; }
+      if (mine[i][j] === truth[i][j]) { el.classList.add('ok'); right++; }
+      else { el.classList.add('ng'); }
+    }
+    var lab = document.getElementById('scoreLabel');
+    if (blank === total) {
+      lab.textContent = '아직 입력한 칸이 없습니다.';
+      lab.className = 'score';
+      return { right: 0, total: total };
+    }
+    var pct = Math.round((right / total) * 100);
+    lab.textContent = total + '칸 중 ' + right + '칸 정답 (' + pct + '%)' + (blank ? ' · 빈칸 ' + blank + '개' : '');
+    lab.className = 'score ' + (right === total ? 'good' : 'bad');
+    if (right === total) showToast('전부 맞았습니다! A²의 의미를 살펴볼까요?', 'success');
+    return { right: right, total: total };
+  }
+
+  function fillAnswer(){
+    var truth = matmul(A, A);
+    for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+      var el = document.getElementById('a2_' + i + '_' + j);
+      el.value = String(truth[i][j]);
+      el.classList.remove('ng');
+      el.classList.add('ok');
+    }
+    answerShown = true;
+    var lab = document.getElementById('scoreLabel');
+    lab.textContent = '정답을 표시했습니다. 계산 과정을 다시 확인해 보세요.';
+    lab.className = 'score';
+    scheduleDraft();
+  }
+
+  /* ══ 활동 3: 후보 비교 ══
+     연결이 가장 적은 친구(target)에게 엣지 하나를 추가했을 때의 효과를 계산한다.
+       · 경로 총합      = 새 A²의 target 행 합  (= target 친구들의 차수 합)
+       · 2걸음 도달 인원 = (A + A²)의 target 행에서 0이 아닌 사람 수 (자기 제외)
+     두 지표가 서로 다른 후보를 가리킬 수 있다 — 그것이 이 활동의 핵심이다. */
+  function analyzeCandidates(){
+    var deg = degrees(A);
+    var mx = Math.max.apply(null, deg);
+    if (mx === 0) return null;
+
+    var mn = Math.min.apply(null, deg), target = deg.indexOf(mn), i;
+
+    var cands = [];
+    for (i = 0; i < N; i++) {
+      if (i === target || A[target][i] === 1) continue;   // 자기 자신·이미 친구 제외
+      var B = cloneM(A);
+      B[target][i] = 1; B[i][target] = 1;
+      var B2 = matmul(B, B);
+
+      var sum = B2[target].reduce(function(a,b){ return a + b; }, 0);
+      var reach = 0;
+      for (var j = 0; j < N; j++) {
+        if (j === target) continue;
+        if (B[target][j] + B2[target][j] > 0) reach++;
+      }
+      cands.push({ idx: i, name: displayName(i), degBefore: deg[i], sum: sum, reach: reach, row: B2[target].slice() });
+    }
+    return { target: target, targetName: displayName(target), cands: cands };
+  }
+
+  function renderCompare(){
+    var area = document.getElementById('cmpArea');
+    area.textContent = '';
+    var res = analyzeCandidates();
+
+    if (!res || res.cands.length === 0) {
+      var note = document.createElement('div');
+      note.className = 'empty-note';
+      note.textContent = res
+        ? '연결이 가장 적은 친구가 이미 모두와 이어져 있습니다. 활동 1의 관계를 다시 확인해 보세요.'
+        : '활동 1에서 관계를 먼저 기록하면 후보 비교표가 나타납니다.';
+      area.appendChild(note);
+      return;
+    }
+
+    var head = document.createElement('div');
+    head.className = 'hint';
+    head.style.marginBottom = '0';
+    head.appendChild(document.createTextNode('연결이 가장 적은 친구는 '));
+    var strong = document.createElement('b');
+    strong.textContent = res.targetName;
+    head.appendChild(strong);
+    head.appendChild(document.createTextNode(' 입니다. 이 친구에게 이어 줄 후보를 비교해 보세요.'));
+    area.appendChild(head);
+
+    var maxSum = Math.max.apply(null, res.cands.map(function(c){ return c.sum; }));
+    var maxReach = Math.max.apply(null, res.cands.map(function(c){ return c.reach; }));
+
+    var tb = document.createElement('table');
+    tb.className = 'cmp';
+    var hr = document.createElement('tr');
+    ['', '후보', '지금 친구 수', '이었을 때 A² ' + res.targetName + ' 행', '경로 총합', '2걸음 도달 인원'].forEach(function(h){
+      var th = document.createElement('th');
+      th.textContent = h;
+      hr.appendChild(th);
+    });
+    tb.appendChild(hr);
+
+    res.cands.forEach(function(c){
+      var tr = document.createElement('tr');
+      if (c.sum === maxSum) tr.className = 'best';
+
+      var tdPick = document.createElement('td');
+      tdPick.className = 'pick';
+      var rb = document.createElement('input');
+      rb.type = 'radio'; rb.name = 'pickCand'; rb.value = c.name;
+      rb.addEventListener('change', scheduleDraft);
+      tdPick.appendChild(rb);
+      tr.appendChild(tdPick);
+
+      [c.name, c.degBefore + '명', c.row.join(' '), c.sum, c.reach + '명'].forEach(function(v, k){
+        var td = document.createElement('td');
+        if (k >= 2) td.className = 'num';
+        td.textContent = String(v);
+        tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+    area.appendChild(tb);
+
+    var foot = document.createElement('div');
+    foot.className = 'hint';
+    foot.style.marginTop = '14px';
+    foot.style.marginBottom = '0';
+    var same = res.cands.every(function(c){ return c.reach === maxReach; });
+    foot.textContent = same
+      ? '두 지표가 다른 이야기를 합니다 — 경로 총합은 후보마다 다르지만, 2걸음 도달 인원은 모두 같습니다. 무엇을 기준으로 삼아야 할까요?'
+      : '경로 총합이 가장 큰 후보와 도달 인원이 가장 많은 후보를 각각 찾아보세요. 같은가요, 다른가요?';
+    area.appendChild(foot);
+  }
+
+  /* ══ 폼 데이터 ══ */
+  function val(id){ var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+
+  function getFormData(){
+    var deg = degrees(A);
+    var mx = Math.max.apply(null, deg), mn = Math.min.apply(null, deg);
+    var hubs = [], lows = [], i;
+    for (i = 0; i < N; i++) { if (deg[i] === mx) hubs.push(displayName(i)); }
+    for (i = 0; i < N; i++) { if (deg[i] === mn) lows.push(displayName(i)); }
+
+    var truth = matmul(A, A);
+    var mine = readA2();
+    var right = 0;
+    for (i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+      if (mine[i][j] !== null && mine[i][j] === truth[i][j]) right++;
+    }
+
+    var picked = document.querySelector('input[name="pickCand"]:checked');
+    var res = analyzeCandidates();
+    var cmpText = res ? res.cands.map(function(c){
+      return c.name + '(경로합 ' + c.sum + ', 도달 ' + c.reach + '명)';
+    }).join(' / ') : '';
+
+    return {
+      source: SOURCE,
+      studentName: val('studentName'),
+      classInfo:   val('classInfo'),
+      teamName:    val('teamName'),
+      today:       val('today'),
+      memberCount: N,
+      members:     names.slice(0, N).map(function(_, i){ return displayName(i); }).join(', '),
+      matrixA:     A.map(function(r){ return r.join(' '); }).join(' | '),
+      degrees:     deg.join(' '),
+      hub:         hubs.join(', ') + ' (' + mx + ')',
+      lowest:      lows.join(', ') + ' (' + mn + ')',
+      matrixA2Mine: mine.map(function(r){
+        return r.map(function(v){ return v === null ? '·' : v; }).join(' ');
+      }).join(' | '),
+      matrixA2True: truth.map(function(r){ return r.join(' '); }).join(' | '),
+      a2Correct:   right + '/' + (N * N),
+      answerShown: answerShown ? 'Y' : 'N',
+      q1: val('q1'), q2: val('q2'), q3: val('q3'), q4: val('q4'),
+      pickedCandidate: picked ? picked.value : '',
+      candidateTable: cmpText
+    };
+  }
+
+  function setFormData(d){
+    if (!d) return;
+    ['studentName','classInfo','teamName','today','q1','q2','q3','q4'].forEach(function(k){
+      var e = document.getElementById(k);
+      if (e && typeof d[k] === 'string') e.value = d[k];
+    });
+
+    if (d.memberCount) {
+      N = parseInt(d.memberCount, 10) || 5;
+      document.getElementById('memberCount').value = String(N);
+    }
+    if (typeof d.members === 'string' && d.members) {
+      names = d.members.split(',').map(function(s){ return s.trim(); });
+    }
+    A = zeros(N);
+    if (typeof d.matrixA === 'string' && d.matrixA) {
+      d.matrixA.split('|').forEach(function(rowStr, i){
+        if (i >= N) return;
+        rowStr.trim().split(/\s+/).forEach(function(v, j){
+          if (j < N) A[i][j] = parseInt(v, 10) === 1 ? 1 : 0;
+        });
+      });
+    }
+    renderMembers(); renderMatrixA(); renderGraph(); renderMatrixA2(); renderCompare();
+
+    if (typeof d.matrixA2Mine === 'string' && d.matrixA2Mine) {
+      d.matrixA2Mine.split('|').forEach(function(rowStr, i){
+        rowStr.trim().split(/\s+/).forEach(function(v, j){
+          var el = document.getElementById('a2_' + i + '_' + j);
+          if (el) el.value = (v === '·') ? '' : v;
+        });
+      });
+    }
+    if (d.pickedCandidate) {
+      var rbs = document.querySelectorAll('input[name="pickCand"]');
+      Array.prototype.forEach.call(rbs, function(rb){
+        if (rb.value === d.pickedCandidate) rb.checked = true;
+      });
+    }
+  }
+
+  function validate(){
+    if (!val('studentName')) return '이름을 입력해 주세요.';
+    if (!val('classInfo'))   return '반 / 번호를 입력해 주세요.';
+    var deg = degrees(A);
+    if (Math.max.apply(null, deg) === 0) return '활동 1에서 관계를 하나 이상 기록해 주세요.';
+    if (!val('q1')) return '활동 1의 발견을 적어 주세요.';
+    if (!val('q2')) return '활동 2의 대각선 질문에 답해 주세요.';
+    return '';
+  }
+
+  /* ══ TXT ══ */
+  function buildTxt(d){
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  디지털 네트워크와 행렬 — 모둠 활동지');
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    L.push('');
+    L.push('【 기본 정보 】');
+    L.push('이름: ' + d.studentName);
+    L.push('반/번호: ' + d.classInfo);
+    L.push('모둠명: ' + d.teamName);
+    L.push('날짜: ' + d.today);
+    L.push('모둠원(' + d.memberCount + '명): ' + d.members);
+    L.push('');
+    L.push('【 활동 1 · 인접행렬 A 】');
+    d.matrixA.split('|').forEach(function(r){ L.push('   [ ' + r.trim() + ' ]'); });
+    L.push('행 합(차수): ' + d.degrees);
+    L.push('허브: ' + d.hub);
+    L.push('연결이 가장 적은 친구: ' + d.lowest);
+    L.push('');
+    L.push('발견: ' + d.q1);
+    L.push('');
+    L.push('【 활동 2 · A² 계산 】');
+    L.push('학생이 적은 A²:');
+    d.matrixA2Mine.split('|').forEach(function(r){ L.push('   [ ' + r.trim() + ' ]'); });
+    L.push('정답 A²:');
+    d.matrixA2True.split('|').forEach(function(r){ L.push('   [ ' + r.trim() + ' ]'); });
+    L.push('정확도: ' + d.a2Correct + ' 칸' + (d.answerShown === 'Y' ? ' (정답 보기 사용)' : ''));
+    L.push('');
+    L.push('대각선의 의미: ' + d.q2);
+    L.push('');
+    L.push('직접 친구인데 0인 짝: ' + d.q3);
+    L.push('');
+    L.push('【 활동 3 · 연결 추가 설계 】');
+    L.push('후보 비교: ' + d.candidateTable);
+    L.push('우리 모둠이 고른 연결: ' + d.pickedCandidate);
+    L.push('');
+    L.push('근거: ' + d.q4);
+    L.push('');
+    L.push('═══════════════════════════════════════');
+    return L.join('\n');
+  }
+
+  function downloadBlob(content, filename, mime){
+    var blob = new Blob([content], { type: mime });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+  function stamp(){
+    return new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
+  }
+  function safeName(d){
+    return (d.studentName || '학생').replace(/[\\/:*?"<>|\s]/g, '');
+  }
+
+  /* ══ 임시저장 ══ */
+  var draftTimer = null;
+  function scheduleDraft(){
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function saveDraft(){
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(getFormData()));
+      document.getElementById('draftLabel').textContent =
+        '임시저장: ' + new Date().toLocaleTimeString('ko-KR');
+    } catch (e) { /* 저장 실패는 무시 */ }
+  }
+  function loadDraft(){
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return false;
+      setFormData(JSON.parse(raw));
+      document.getElementById('draftLabel').textContent = '임시저장: 복원됨';
+      return true;
+    } catch (e) { return false; }
+  }
+
+  /* ══ 토스트 ══ */
+  var toastTimer = null;
+  function showToast(msg, type, ms){
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.className = ''; }, ms || 2600);
+  }
+
+  /* ══ 시트 전송 ══ */
+  function sendToSheet(data){
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) {
+      showToast('파일은 저장됐습니다. (시트 URL이 설정되지 않음)', 'error', 4200);
+      return;
+    }
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function(){
+      showToast('제출 완료! 파일이 저장되고 시트로 전송되었습니다.', 'success', 4200);
+    }).catch(function(err){
+      showToast('파일은 저장됐습니다. 시트 오류: ' + err.message, 'error', 4600);
+    });
+  }
+
+  /* ══ 이벤트 ══ */
+  function init(){
+    A = zeros(N);
+    names = [];
+    document.getElementById('today').value = new Date().toISOString().slice(0,10);
+    renderMembers(); renderMatrixA(); renderGraph(); renderMatrixA2(); renderCompare();
+    loadDraft();
+
+    document.getElementById('memberCount').addEventListener('change', function(){
+      var newN = parseInt(this.value, 10);
+      var old = A;
+      N = newN;
+      A = zeros(N);
+      for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+        if (old[i] && typeof old[i][j] === 'number') A[i][j] = old[i][j];
+      }
+      renderMembers(); renderMatrixA(); renderGraph(); renderMatrixA2(); renderCompare();
+      scheduleDraft();
+    });
+
+    document.getElementById('btnGrade').addEventListener('click', gradeA2);
+    document.getElementById('btnShowAnswer').addEventListener('click', function(){
+      if (!confirm('정답을 표시하면 제출 기록에 남습니다. 계속할까요?')) return;
+      fillAnswer();
+    });
+    document.getElementById('btnClearA2').addEventListener('click', function(){
+      for (var i = 0; i < N; i++) for (var j = 0; j < N; j++) {
+        var el = document.getElementById('a2_' + i + '_' + j);
+        if (el) { el.value = ''; el.classList.remove('ok','ng'); }
+      }
+      answerShown = false;
+      clearGrade();
+      scheduleDraft();
+    });
+
+    document.getElementById('btnPrint').addEventListener('click', function(){ window.print(); });
+    document.getElementById('btnSettings').addEventListener('click', function(){
+      var p = document.getElementById('settingsPanel');
+      p.style.display = (p.style.display === 'block') ? 'none' : 'block';
+      document.getElementById('urlInput').value = localStorage.getItem(URL_KEY) || '';
+    });
+    document.getElementById('btnSaveUrl').addEventListener('click', function(){
+      var u = document.getElementById('urlInput').value.trim();
+      if (!u) { showToast('URL을 입력해 주세요.', 'error'); return; }
+      localStorage.setItem(URL_KEY, u);
+      showToast('URL이 저장되었습니다.', 'success');
+    });
+    document.getElementById('btnClearUrl').addEventListener('click', function(){
+      localStorage.removeItem(URL_KEY);
+      document.getElementById('urlInput').value = '';
+      showToast('URL이 초기화되었습니다.');
+    });
+
+    document.getElementById('btnDraft').addEventListener('click', function(){
+      var d = getFormData();
+      d._draftMeta = { savedAt: new Date().toISOString(), source: SOURCE, version: 1 };
+      downloadBlob(JSON.stringify(d, null, 2),
+        safeName(d) + '_행렬활동지_임시저장_' + stamp() + '.json',
+        'application/json;charset=utf-8');
+      saveDraft();
+      showToast('임시저장 파일(.json)이 다운로드되었습니다.', 'success');
+    });
+
+    var fileInput = document.getElementById('fileInput');
+    document.getElementById('btnLoad').addEventListener('click', function(){ fileInput.click(); });
+    fileInput.addEventListener('change', function(e){
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function(ev){
+        try {
+          setFormData(JSON.parse(ev.target.result));
+          saveDraft();
+          showToast('불러왔습니다.', 'success');
+        } catch (err) {
+          showToast('파일을 읽을 수 없습니다: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(f, 'utf-8');
+      e.target.value = '';
+    });
+
+    document.getElementById('btnReset').addEventListener('click', function(){
+      if (!confirm('작성한 내용을 모두 지웁니다. 계속할까요?')) return;
+      localStorage.removeItem(DRAFT_KEY);
+      location.reload();
+    });
+
+    document.getElementById('btnSubmit').addEventListener('click', function(){
+      var msg = validate();
+      if (msg) { showToast(msg, 'error', 3400); return; }
+      if (!confirm('제출하시겠습니까?\n· TXT 파일이 다운로드됩니다\n· 구글 시트로 전송됩니다')) return;
+
+      var btn = this;
+      btn.disabled = true;
+      var d = getFormData();
+      downloadBlob(buildTxt(d), safeName(d) + '_행렬활동지_' + stamp() + '.txt', 'text/plain;charset=utf-8');
+      sendToSheet(d);
+      setTimeout(function(){ btn.disabled = false; }, 1500);
+    });
+
+    document.querySelectorAll('input, textarea, select').forEach(function(el){
+      el.addEventListener('input', scheduleDraft);
+      el.addEventListener('change', scheduleDraft);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+</script>
+</body>
+</html>

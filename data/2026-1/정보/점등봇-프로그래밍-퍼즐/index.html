@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1230">
+<title>점등봇 — 명령을 쌓아 밤을 밝히는 프로그래밍 퍼즐</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#eef1fb;--muted:#98a4c8;--line:#2d3a68;--paper:rgba(17,25,60,.86);--accent:#ffc14d;--bg:#0b1230;--stage:radial-gradient(90% 80% at 44% 42%,#27346f 0%,#141d4a 48%,#0a1029 100%);--btn:rgba(255,255,255,.07);--btn-line:#3a4778;
+  --c-walk:#5aa9ff;--c-turn:#9aa8d4;--c-jump:#b78cff;--c-light:#ffc14d;--c-f1:#39d0b4;--c-f2:#ff7fa8;--c-if:#7bd88f;--c-else:#d5c65f}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Segoe UI',sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;color:var(--ink);border:1px solid var(--btn-line);background:var(--btn);border-radius:6px;min-height:32px;padding:4px 12px;white-space:nowrap;font-size:13px;font-weight:500}
+button:hover{border-color:var(--ink)}
+button:disabled{opacity:.4;cursor:default;border-color:var(--btn-line)}
+button[aria-pressed="true"]{background:var(--ink);color:#10183c;border-color:var(--ink)}
+select{border:1px solid var(--btn-line);background:#141d4a;border-radius:6px;min-height:32px;padding:2px 6px;font-size:13px;color:var(--ink)}
+#stage{position:absolute;inset:0;touch-action:none;background:var(--stage)}
+#stage canvas{width:100%;height:100%;display:block;outline:none}
+#ui{position:absolute;inset:0;pointer-events:none}
+#artboard{position:absolute;left:50%;top:50%;width:1672px;height:941px;transform:translate(-50%,-50%) scale(var(--scale,1));transform-origin:center;pointer-events:none}
+#artboard>*{pointer-events:auto}
+.card{padding:11px 13px;background:var(--paper);border:1px solid var(--line);border-radius:8px;backdrop-filter:blur(6px)}
+.card-title{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted)}
+.card-title b{color:var(--ink)}
+.note{margin:6px 0 0;font-size:13px;line-height:1.6;color:#c6cee8;word-break:keep-all}
+
+/* 왼쪽 열: 제목·문제·미션·코드 */
+.left-col{position:absolute;left:32px;top:26px;bottom:26px;width:272px;display:flex;flex-direction:column;gap:9px;pointer-events:none}
+.left-col>*{pointer-events:auto}
+.title{pointer-events:none}
+.kicker{font-size:11.5px;color:var(--accent);font-weight:700;word-break:keep-all}
+.title h1{margin:1px 0 0;font-size:38px;line-height:1.12;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+.chapter{font-size:11.5px;color:var(--muted);font-weight:700;margin:7px 0 4px}
+.chapter:first-child{margin-top:0}
+.levels{display:flex;gap:5px;flex-wrap:wrap}
+.levels button{width:36px;min-height:34px;padding:0;font-weight:700;position:relative}
+.levels button .st{position:absolute;left:0;right:0;bottom:0;font-size:8px;line-height:9px;color:var(--accent);letter-spacing:-.5px}
+.levels button.cur{background:var(--accent);border-color:var(--accent);color:#1c1a10}
+.levels button.cur .st{color:#5b3b00}
+#mission-title{font-size:16px;font-weight:900;margin:3px 0 0;word-break:keep-all}
+.code-card{flex:1;min-height:0;display:flex;flex-direction:column}
+#code{flex:1;min-height:0;overflow:auto;margin:6px 0 0;font:12.5px/1.45 Consolas,'D2Coding','Noto Sans KR',monospace;white-space:pre;color:#c6cee8}
+#code .ln{display:block;padding:0 4px;border-radius:3px}
+#code .ln.head{color:var(--c-f1);font-weight:700}
+#code .ln.current{background:var(--accent);color:#1c1a10;font-weight:700}
+#code .ln.caller{background:rgba(255,193,77,.17)}
+
+/* 오른쪽 열: 명령과 프로그램 */
+.right-col{position:absolute;right:32px;top:26px;width:440px;display:flex;flex-direction:column;gap:9px}
+.palette{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.palette .brk{flex-basis:100%;height:0}
+.blk{width:52px;height:52px;flex:none;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;background:color-mix(in srgb,var(--c) 22%,#121a42);border:1.5px solid var(--c);color:#fff;touch-action:none;user-select:none;cursor:grab;font-size:9.5px;font-weight:700;line-height:1.1;min-height:0}
+.blk:hover{background:color-mix(in srgb,var(--c) 42%,#121a42);border-color:var(--c)}
+.blk svg{width:27px;height:27px;display:block;pointer-events:none}
+.blk.fn{font-size:17px;font-weight:900}
+.blk span{pointer-events:none}
+.blk.cond{border-width:3px;border-style:double;border-radius:16px 8px 16px 8px;font-size:9px}
+.blk.yes{box-shadow:0 0 0 3px var(--c-if),0 0 16px var(--c-if)!important}
+.blk.no{box-shadow:0 0 0 3px #ff6b5e,0 0 16px #ff6b5e!important}
+.blk.orphan{opacity:.5;border-style:dashed}
+.panel{cursor:pointer}
+.panel.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.panel.shake{animation:shake .32s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.slots{display:grid;grid-template-columns:repeat(6,52px);gap:6px;margin-top:6px}
+.cell{position:relative;width:52px;height:52px;border-radius:8px;background:rgba(255,255,255,.035);border:1px dashed #38447a}
+.cell[data-role]::after{content:attr(data-role);position:absolute;left:-3px;top:-6px;padding:0 4px;border-radius:5px;font-size:9.5px;line-height:14px;font-weight:900;color:#10183c;background:var(--c-if);pointer-events:none}
+.cell[data-role="거짓"]::after{background:#ff9d92}
+.cell.drop{border-color:var(--accent);background:rgba(255,193,77,.2)}
+.cell .blk{margin:-1px}
+.blk.caller{box-shadow:0 0 0 2px rgba(255,193,77,.45)}
+.blk.current{box-shadow:0 0 0 3px var(--accent),0 0 16px var(--accent);transform:translateY(-2px)}
+.panel-tag{color:var(--ink);font-weight:900;font-size:13px}
+.stack{display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:25px;margin-top:5px;font-size:12px}
+.chip{padding:1px 8px;border-radius:99px;background:rgba(255,255,255,.09);font-weight:700}
+.chip.top{background:var(--accent);color:#1c1a10}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:7px}
+.stat{font-size:11px;color:var(--muted);line-height:1.3}
+.stat b{display:block;font-size:20px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* 아래쪽: 실행 막대 */
+.transport{position:absolute;left:320px;bottom:42px;width:858px;padding:9px 12px}
+.transport-buttons{display:flex;gap:6px;align-items:center}
+#run{min-width:124px;font-weight:900;background:var(--accent);border-color:var(--accent);color:#1c1a10;height:36px}
+.transport-buttons .sp{flex:1}
+#depth{display:block;width:100%;height:46px;margin-top:7px}
+#t-range{display:block;width:100%;margin:2px 0 0;accent-color:var(--accent);height:20px}
+.depth-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:7px}
+.credit{position:absolute;left:320px;width:858px;bottom:5px;font-size:10.5px;line-height:1.3;color:var(--muted);text-align:center;word-break:keep-all}
+.cam{position:absolute;left:320px;top:26px;display:flex;gap:5px}
+.chars{position:absolute;left:320px;top:66px;display:flex;gap:5px;align-items:center}
+.nights{position:absolute;left:320px;top:106px;display:flex;gap:5px;align-items:center}
+.nights button.ok{border-color:var(--c-if);color:var(--c-if)}
+.nights button.ok[aria-pressed="true"]{background:var(--c-if);color:#10183c}
+#verdict{position:absolute;transform:translate(-50%,-100%);padding:3px 10px;border-radius:99px;font-size:13px;font-weight:900;white-space:nowrap;pointer-events:none;display:none;color:#10183c;background:var(--c-if)}
+#verdict.no{background:#ff9d92}
+.chars small{font-size:11.5px;color:var(--muted);margin-left:3px}
+
+/* 결과 안내 */
+#banner{position:absolute;left:530px;width:640px;top:26px;padding:12px 16px;border-radius:10px;background:rgba(14,21,54,.94);border:1.5px solid var(--line);display:none}
+#banner.show{display:block}
+#banner.win{border-color:var(--accent);box-shadow:0 0 34px rgba(255,193,77,.32)}
+#banner h2{margin:0;font-size:20px;font-weight:900;word-break:keep-all}
+#banner .stars{color:var(--accent);margin-left:6px;letter-spacing:2px}
+#banner p{margin:5px 0 0;font-size:13.5px;line-height:1.6;color:#d4daee;word-break:keep-all}
+#banner .row{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+#banner .primary{background:var(--accent);border-color:var(--accent);color:#1c1a10;font-weight:900}
+#ghost{position:fixed;z-index:20;pointer-events:none;transform:translate(-50%,-50%) scale(1.08);display:none}
+.loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);z-index:9;font-size:14px;color:var(--muted);text-align:center}
+.loading b{font-size:22px;color:var(--ink);font-weight:900}
+.loading[hidden]{display:none}
+.embed .title,.embed .code-card{display:none}
+</style>
+</head>
+<body data-deck-title="점등봇 — 프로그래밍 퍼즐" data-subject="정보">
+<main id="stage" aria-label="점등봇이 서 있는 3D 무대입니다. 드래그로 돌리고 휠로 확대합니다."></main>
+<div id="ui"><div id="artboard">
+
+<div class="left-col">
+  <header class="title">
+    <div class="kicker">명령을 쌓아 밤을 밝히는 프로그래밍 퍼즐</div>
+    <h1>점등봇</h1>
+  </header>
+  <section class="card" id="levels"></section>
+  <section class="card">
+    <div class="card-title"><span id="mission-no"></span><span id="mission-par"></span></div>
+    <div id="mission-title"></div>
+    <p class="note" id="mission-text"></p>
+  </section>
+  <section class="card code-card">
+    <div class="card-title">코드로 읽으면 <span>Python 모양</span></div>
+    <div id="code" aria-label="내가 쌓은 블록을 코드로 옮긴 모습"></div>
+  </section>
+</div>
+
+<div class="cam" id="cam"></div>
+<div class="chars" id="chars"></div>
+<div class="nights" id="nights"></div>
+<div id="verdict"></div>
+<div id="banner" role="status"></div>
+
+<aside class="right-col">
+  <section class="card">
+    <div class="card-title">명령 블록 <span>눌러서 넣기 · 끌어서 끼우기</span></div>
+    <div class="palette" id="palette"></div>
+  </section>
+  <div id="panels" style="display:flex;flex-direction:column;gap:9px"></div>
+  <section class="card">
+    <div class="card-title">호출 스택 <span>지금 누구 안에서 일하는가</span></div>
+    <div class="stack" id="stack"></div>
+    <div class="stats">
+      <div class="stat"><b id="s-blocks">0</b>쌓은 블록</div>
+      <div class="stat"><b id="s-actions">0</b>실제 행동</div>
+      <div class="stat"><b id="s-ratio">–</b>블록당 행동</div>
+      <div class="stat"><b id="s-lit">0/0</b>켠 불</div>
+    </div>
+  </section>
+</aside>
+
+<section class="card transport">
+  <div class="transport-buttons">
+    <button id="run">▶ 실행</button>
+    <button id="step" title="한 단계만 앞으로">한 칸 ▷</button>
+    <button id="stepback" title="한 단계만 뒤로">◁ 한 칸</button>
+    <button id="rewind">⏮ 처음으로</button>
+    <span class="sp"></span>
+    <select id="speed" aria-label="실행 속도"><option value="0.8">천천히</option><option value="0.42" selected>보통</option><option value="0.16">빠르게</option></select>
+    <button id="clear" title="이 문제의 블록을 모두 지웁니다">🗑 모두 지우기</button>
+  </div>
+  <div class="depth-label"><span>호출 깊이 · 막대 하나가 실행 한 단계입니다</span><span id="step-label">0 / 0</span></div>
+  <svg id="depth" viewBox="0 0 834 46" preserveAspectRatio="none" aria-hidden="true"></svg>
+  <input type="range" id="t-range" min="0" max="1000" step="1" value="0" aria-label="실행 되감기">
+</section>
+<div class="credit">Space 실행 · W 앞으로 · A/D 왼쪽/오른쪽 · J 점프 · L 불켜기 · 1/2 함수 · R/G/B 만약 · E 아니면 · Backspace 지우기 · ←→ 한 칸<br>1~15번 문제의 규칙과 지도, 순서는 Coolio-Niato의 플래시 게임 light-Bot 원본을 따랐고, 16번부터의 반복·분기 문제와 3D 그림·코드는 새로 만들었습니다. 캐릭터는 chanisma의 isekai3d에서 만든 샘플고 교복 모델입니다.</div>
+</div></div>
+<div id="ghost"></div>
+<div class="loading" id="loading"><b>점등봇</b><span id="loading-msg">무대를 준비하는 중…</span></div>
+
+<script>
+setTimeout(function(){var l=document.getElementById('loading');if(l&&!l.hidden&&!window.lampApp){document.getElementById('loading-msg').innerHTML='3D 라이브러리를 불러오지 못했습니다.<br>이 페이지는 허브(웹 서버)에서 열어야 합니다. 파일을 직접 두 번 눌러 열면 동작하지 않습니다.';}},8000);
+</script>
+<script src="../game-record.js" data-game="lamp" data-total="21"></script>
+<script type="module">
+import * as THREE from '../../../../assets/vendor/three/three.module.min.js';
+import { GLTFLoader } from '../../../../assets/vendor/three/addons/loaders/GLTFLoader.js';
+import { VRMLoaderPlugin, VRMUtils } from '../../../../assets/vendor/three-vrm/three-vrm.module.min.js';
+const PI=Math.PI,TAU=PI*2,DEG=PI/180;
+const $=id=>document.getElementById(id);
+const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp;
+const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
+const smooth=u=>u*u*(3-2*u);
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+// ───────────────── 스테이지 — 배치는 원본 light-Bot swf의 sceneryArray·tilesArray·startPos에서 옮겼다(8×8, 높이 0~4). 좌표는 원본 (x,y) → 무대 (y, 7−x)로 바꿔 원본과 같은 각도로 보인다. sol은 이 저장소에서 찾은 기준 풀이다 ─────────────────
+const LEVELS=[
+{ch:"순차 — 순서대로 시키기",name:"첫 불",rows:["2 2 2 2 2 2 2 2","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0* 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","2 2 2 2 2 2 2 2"],start:[2,3,1],slots:[12,8,8],sol:{"main":"W W L"},
+ text:"점등봇은 시킨 일만 합니다. 앞으로 두 칸 간 뒤 불을 켜라고 순서대로 적어 보세요.",
+ after:"컴퓨터도 이렇게 적힌 순서대로 한 줄씩 실행합니다. 이것을 순차 구조라고 부릅니다."},
+{ch:"순차 — 순서대로 시키기",name:"돌아서 가기",rows:["3 2 1 1 1 1 2 3","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 2 0 0* 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","3 2 1 1 1 1 2 3"],start:[2,3,1],slots:[12,8,8],sol:{"main":"W D W A W W W A W L"},
+ text:"가운데 높은 기둥은 넘을 수 없습니다. 점프는 한 칸 높이까지만 오를 수 있으므로 옆으로 돌아가야 합니다.",
+ after:"오른쪽과 왼쪽은 점등봇 자신을 기준으로 정해집니다. 방향도 프로그램이 기억하는 상태입니다."},
+{ch:"순차 — 순서대로 시키기",name:"낮은 담장",rows:["0 0 1 0 0 0 0 0","0 0 1 0 0 0 0 0","0 0 1 0 0* 0 0 0","0 0 1 0 0* 0 0 0","0 0 1 0 0* 0 0 0","0 0 1 0 0 0 0 0","0 0 1 0 0 0 0 0","0 0 1 0 0 0 0 0"],start:[0,4,1],slots:[12,8,8],sol:{"main":"W J J W L A W L W L"},
+ text:"걷기는 높이가 같을 때만 됩니다. 담장은 점프로 넘고, 불 세 개를 차례로 켜 보세요.",
+ after:"명령에는 쓸 수 있는 조건이 있습니다. 조건에 맞지 않는 명령은 오류 없이 헛돕니다."},
+{ch:"순차 — 순서대로 시키기",name:"긴 난간",rows:["0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 2 2 2 2 2 2*","0 0 2 0 0 0 0 0","0 0 1 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[2,6,0],slots:[12,8,8],sol:{"main":"W J J W D W W W W W L"},
+ text:"계단을 오른 뒤 난간 끝까지 가야 합니다. 칸이 빠듯하니 하나도 낭비하지 마세요.",
+ after:"같은 칸이 줄줄이 이어졌습니다. 다음 문제부터는 이런 반복을 줄일 도구가 필요합니다."},
+{ch:"순차 — 순서대로 시키기",name:"가장 높은 곳",rows:["0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 4* 3 2 1 0","0 0 0 0 0 0 1 0","0 0 0 0 0 0 1 0","0 0 0 0 1 1 1 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[3,5,1],slots:[12,8,8],sol:{"main":"J W W A W W W A J J J L"},
+ text:"낮은 길을 돌아 계단 아래까지 간 다음, 점프로 꼭대기까지 올라가 보세요.",
+ after:"칸이 꽉 찼습니다. 더 긴 일을 시키려면 프로그램 안에 묶음을 만들어야 합니다."},
+{ch:"함수 — 묶어서 이름 붙이기",name:"세 갈래 길",rows:["0 0 0 0 0 2* 0 0","0 0 0 0 0 2 0 0","0 0 0 0 0 2 0 0","0 0 2 3 4* 2 0 0","0 0 1 0 0 2 0 0","0 0 0 0 0 2 0 0","0 0 0 0 0 2* 0 0","0 0 0 0 0 0 0 0"],start:[2,6,0],slots:[12,8,8],sol:{"main":"W J J D J J L J A 1 L 2","F1":"W W W","F2":"D D 1 1 L"},
+ text:"프로그램 칸만으로는 모자랍니다. 같은 걸음이 되풀이되는 구간을 F1에 넣고 F1을 불러 보세요.",
+ after:"묶음에 이름을 붙이고 불러 썼습니다. 이것이 함수입니다. 갈래마다 같은 묶음을 다시 쓸 수 있다는 것이 함수의 장점입니다."},
+{ch:"함수 — 묶어서 이름 붙이기",name:"두 줄의 불",rows:["0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0* 0* 0* 0* 0* 0* 0*","0 0* 0* 0* 0* 0* 0* 0*","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[0,3,1],slots:[12,8,8],sol:{"main":"1 1 W L D W D L 1 1","F1":"W L W L W L"},
+ text:"불이 14개입니다. 하나씩 적으면 칸이 모자라니 걸음과 점등을 묶어 보세요.",
+ after:"함수를 쓰면 짧게 적고 많이 시킬 수 있습니다. 쌓은 블록 수와 실제 행동 수를 비교해 보세요."},
+{ch:"함수 — 묶어서 이름 붙이기",name:"격자 순찰",rows:["0 0 0 0 0 0 0 0","0 0 1* 1 1* 1 1* 0","0 0 1 0 1 0 1 0","0 0 1* 1 1* 1 1* 0","0 0 1 0 1 0 1 0","0 0 0 0 1* 1 1* 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[2,5,0],slots:[12,8,8],sol:{"main":"J W L 1 D 2 2 1 D 1","F1":"W W L","F2":"1 1 D"},
+ text:"두 칸 가서 불을 켜는 일이 계속 나옵니다. 그 묶음을 부르는 묶음까지 만들어 보세요.",
+ after:"함수가 함수를 불렀습니다. 호출 스택에 이름이 두 층으로 쌓이는 모습을 다시 확인해 보세요."},
+{ch:"함수 — 겹쳐 쓰고 다시 쓰기",name:"네모 성벽",rows:["0 0 1 0 0 1 0 0","0 1 2* 1* 1* 2* 1 0","0 0 1* 0 0 1* 0 0","0 0 1* 0 0 1* 0 0","0 1 2* 1* 1* 2* 1 0","0 0 1 0 0 1 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[1,5,1],slots:[12,8,8],sol:{"main":"J A J L 1 1 1 1","F1":"J L W L J L D"},
+ text:"네 변은 모양이 모두 같습니다. 한 변을 처리한 뒤 돌아서는 데까지 함수 하나에 담아 보세요.",
+ after:"함수가 끝나는 자세가 다음 호출의 시작 자세가 됩니다. 함수를 쓸 때는 끝난 뒤의 상태까지 생각해야 합니다."},
+{ch:"함수 — 겹쳐 쓰고 다시 쓰기",name:"갈림길의 두 불",rows:["0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 4 3 4 2 2*","2* 2 2 4 2 3 2 0","0 0 0 0 1 0 0 0","0 0 0 0 0 0 0 0"],start:[0,6,1],slots:[12,8,8],sol:{"main":"1 2 L A J A 1 D J J W L","F1":"W W W J A J J","F2":"A J A W D J W W"},
+ text:"불은 두 개뿐이지만 서로 반대쪽에 있습니다. 한쪽을 켠 뒤 처음 자리로 내려와, 같은 길을 다시 쓰면 칸을 아낄 수 있습니다.",
+ after:"같은 길을 두 번 갈 때 두 번 적지 않았습니다. 재사용은 불을 많이 켤 때만 쓸모 있는 것이 아닙니다."},
+{ch:"함수 — 겹쳐 쓰고 다시 쓰기",name:"불의 들판",rows:["3 3 3 3 3 3 3 3","2 2 2 2 2 2 2 2","1* 1* 1* 1* 1* 1* 1* 1*","0* 0* 0* 0* 0* 0* 0* 0*","1* 1* 1* 1* 1* 1* 1* 1*","0* 0* 0* 0* 0* 0* 0* 0*","1* 1* 1* 1* 1* 1* 1* 1*","0 0* 0* 0* 0* 0* 0* 0*"],start:[0,7,1],slots:[12,8,8],sol:{"main":"1 J D 1 J D 1","F1":"2 2 A J A 2 2 D","F2":"L W L W L W L W"},
+ text:"불이 47개입니다. 줄 끝에서 한 걸음 더 걸어도 헛돌 뿐이라는 점을 이용해 보세요.",
+ after:"블록 23개로 행동 110번을 시켰습니다. 함수를 겹쳐 쓰면 행동 수가 곱으로 불어납니다."},
+{ch:"함수 — 겹쳐 쓰고 다시 쓰기",name:"8자 고개",rows:["0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 1* 2* 3* 4* 3* 2* 1*","0 2* 0 0 3* 0 0 2*","0 3* 0 0 2* 0 0 3*","0 4* 3* 2* 1* 2* 3* 4*","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[4,7,0],slots:[12,8,8],sol:{"main":"W J L 1 1 1 2 J 1 1 2","F1":"2 J L D","F2":"J L J L"},
+ text:"모든 변을 지나되, 가운데 칸을 두 번 켜면 다시 꺼집니다. 지나갈 때는 켜지 말아야 합니다.",
+ after:"같은 규칙을 찾고 예외 한 곳을 따로 처리하는 것이 프로그래밍의 흔한 모습입니다."},
+{ch:"함수 — 겹쳐 쓰고 다시 쓰기",name:"지그재그 언덕",rows:["0 0 0 0 0 0 3 4*","0 0 0 0 0 0 2 0","0 0 0 0 2 2* 2 0","0 0 0 0 2 0 0 0","0 2 2 2 2* 0 0 0","0 2 0 0 0 0 0 0","0 1* 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[0,7,1],slots:[12,8,8],sol:{"main":"W A J L J W D 1 W L 2","F1":"W W W L A W W D","F2":"W A W J D J L"},
+ text:"되풀이가 뚜렷하지 않은 길입니다. 길을 따라 네 개를 모두 켜 보세요.",
+ after:"한 번만 쓰는 묶음도 함수로 만들 수 있습니다. 이름을 붙여 칸을 나누는 것만으로 쓸 공간이 생깁니다."},
+{ch:"함수 — 겹쳐 쓰고 다시 쓰기",name:"쌍둥이 봉우리",rows:["0 0 0 0 0 0 0 0","0 0 0 0 0 4* 4* 0","0 0 2* 3* 0 2* 3* 0","0 0 2* 3* 0 2* 3* 0","0 0 1* 0 0 1* 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0","0 0 0 0 0 0 0 0"],start:[1,4,1],slots:[12,8,8],sol:{"main":"1 J A 1 D D W J L A W L","F1":"W J L A J L 2","F2":"W L D J L D W L"},
+ text:"왼쪽 봉우리와 오른쪽 봉우리는 거의 같습니다. 같은 부분을 함수로 만들고 다른 부분만 따로 적어 보세요.",
+ after:"헛도는 걸음을 일부러 넣어 같은 함수를 두 곳에서 썼습니다. 명령의 조건을 알면 이런 활용도 할 수 있습니다."},
+{ch:"함수 — 겹쳐 쓰고 다시 쓰기",name:"네 줄 고개",rows:["0 1* 2* 3* 2* 1* 0 0","0 0 0 0 0 0 0 0","0 1* 2* 3* 2* 1* 0 0","0 0 0 0 0 0 0 0","0 1* 2* 3* 2* 1* 0 0","0 0 0 0 0 0 0 0","0 1* 2* 3* 2* 1* 0 0","0 0 0 0 0 0 0 0"],start:[0,6,1],slots:[12,8,8],sol:{"main":"J 1 2 L D J J D 1 2 L","F1":"2 L A J J A","F2":"L J L J L J L J"},
+ text:"함수 단원의 마지막 문제입니다. 고개 네 줄을 오가며 불 20개를 켭니다. 줄을 넘어가는 동작은 왼쪽 끝과 오른쪽 끝에서 서로 대칭입니다.",
+ after:"오른쪽으로 갈 때와 왼쪽으로 갈 때를 한 쌍으로 묶었습니다. 반복되는 단위를 무엇으로 잡느냐가 프로그램의 길이를 정합니다."},
+// 여기부터는 원본에 없는 새 스테이지다. nights의 지도마다 같은 프로그램을 돌려 모두 통과해야 한다. 표기: * 꺼진 불, + 켜진 불, r 빨강 칸, b 파랑 칸
+{ch:"반복 — 스스로 다시 부르기",name:"끝이 다른 복도",conds:[],nights:[["0 0* 0* 0* 0* 0*"],["0 0* 0* 0* 0* 0* 0* 0* 0*"]],start:[0,0,1],slots:[12,8,8],sol:{"main":"1","F1":"W L 1"},
+ text:"복도의 길이가 밤마다 다릅니다. 프로그램 하나로 두 밤을 모두 통과해 보세요. 불을 모두 켜면 점등봇은 저절로 멈춥니다.",
+ after:"함수 안에서 자기 자신을 불러 되풀이했습니다. 몇 번인지 세지 않아도 일이 끝날 때까지 반복할 수 있습니다."},
+{ch:"분기 — 보고 고르기",name:"빨강이면 왼쪽",conds:["R","E"],nights:[["0 0* 0 3r 0 0 0",". . . 3 . . .",". . . 3 . . ."],["0 0 0 3b 0 0* 0",". . . 3 . . .",". . . 3 . . ."]],start:[3,2,0],slots:[12,8,8],sol:{"main":"W W R A E D J W L"},
+ text:"밤마다 불의 위치가 바뀝니다. 한 번 뛰어내리면 돌아올 수 없으니, 칸 색을 보고 방향을 골라야 합니다. [만약] 다음 블록은 참일 때만, [아니면] 다음 블록은 거짓일 때만 실행됩니다.",
+ after:"같은 프로그램이 밤마다 다른 길로 갔습니다. 실행하는 순간의 상황을 보고 다음 일을 고르는 것이 분기입니다."},
+{ch:"분기 — 보고 고르기",name:"켜진 불은 그대로",conds:["G","E"],nights:[["0 0* 0+ 0* 0+ 0*"],["0 0+ 0* 0+ 0* 0+"]],start:[0,0,1],slots:[12,8,8],sol:{"main":"1","F1":"G L W 1"},
+ text:"이미 켜진 불에 불켜기를 하면 꺼집니다. 꺼진 불에서만 켜 보세요.",
+ after:"반복이 칸을 옮겨 다니고, 분기가 칸마다 할 일을 정했습니다. 반복과 분기를 합치면 길이를 모르는 일도 시킬 수 있습니다."},
+{ch:"분기 — 보고 고르기",name:"막히면 돈다",conds:["B","E"],nights:[["0 0 0 0 0",". . . . 0","0 0* . . 0","0 0 0 0 0"],["0 0 0 . .",". . 0 . .",". . 0 . .",". . 0 . .","0* 0 0 . ."]],start:[0,0,1],slots:[12,8,8],sol:{"main":"1","F1":"L B D W 1"},
+ text:"길이 꺾이는 곳이 밤마다 다릅니다. 앞이 막혔을 때만 오른쪽으로 돌면 어떤 길이든 따라갈 수 있습니다.",
+ after:"걸음 수를 세지 않고 벽을 느끼며 걸었습니다. 길을 미리 몰라도 규칙만 있으면 끝까지 갈 수 있습니다."},
+{ch:"분기 — 보고 고르기",name:"성벽 순찰",conds:["G","B","E"],nights:[["0 0* 0+ 0",  "0 . . 0*","0* . . 0+","0+ 0* 0 0"],["0 0+ 0* 0 0*","0* . . . 0+","0 0+ 0* 0 0"]],start:[0,0,1],slots:[12,8,8],sol:{"main":"1","F1":"G L B D W 1"},
+ text:"성벽의 크기와 불의 상태가 밤마다 다릅니다. 불을 확인하는 일과 벽을 확인하는 일을 차례로 시켜 보세요.",
+ after:"조건 두 개를 차례로 확인했습니다. 서로 관계없는 판단은 이렇게 나란히 적을 수 있습니다."},
+{ch:"분기 — 보고 고르기",name:"세 밤의 갈림길",conds:["R","G","B","E"],nights:[
+  [". . . . . . .",". . 0 . . . 0",". . 0* . . . 0",". . 0+ . . . 0",". . 2*r 2 4b 2 2b",". . 0 . 4 . 0",". . 0 . 4 . 0"],
+  [". . . . . . .",". . 0 . . . 0",". . 0 . . . 0",". . 0 . . . 0",". . 2+b 2 4r 2 2*r",". . 0 . 4 . 0+",". . 0 . 4 . 0*"],
+  [". . . . . . .",". . 0 . . . 0",". . 0 . . . 0",". . 0 . . . 0",". . 2*b 2 4b 2 2r",". . 0 . 4 . 0+",". . 0* . 4 . 0"]],start:[4,6,0],slots:[12,8,8],sol:{"main":"1","F1":"G L B 2 W 1","F2":"R D E A J"},
+ text:"끝까지 가면 칸 색을 보고 돌아서 뛰어내립니다. 그 판단을 F2에 묶고, 앞이 막혔을 때만 F2를 불러 보세요. 갈림길은 두 번 나옵니다.",
+ after:"분기의 본문으로 함수를 불렀습니다. 판단 하나를 이름 붙여 묶으면 복잡한 결정도 한 줄로 읽힙니다."},
+];
+const CMD={
+ W:{label:'앞으로',code:'앞으로()',color:'--c-walk',key:'w',icon:'<path d="M14 25V9M7 15l7-8 7 8" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'},
+ D:{label:'오른쪽',code:'오른쪽()',color:'--c-turn',key:'d',icon:'<path d="M7 24V15a7 7 0 0 1 7-7h9M17 2l6 6-6 6" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'},
+ A:{label:'왼쪽',code:'왼쪽()',color:'--c-turn',key:'a',icon:'<path d="M21 24V15a7 7 0 0 0-7-7H5M11 2 5 8l6 6" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>'},
+ J:{label:'점프',code:'점프()',color:'--c-jump',key:'j',icon:'<path d="M4 25h20M6 19C7 8 16 4 22 12M23 5v8h-8" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>'},
+ L:{label:'불켜기',code:'불켜기()',color:'--c-light',key:'l',icon:'<path d="M10 20c0-3-4-5-4-10a8 8 0 0 1 16 0c0 5-4 7-4 10zM11 25h6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'},
+ 1:{label:'F1',code:'F1()',color:'--c-f1',key:'1',fn:true,panel:'F1'},
+ 2:{label:'F2',code:'F2()',color:'--c-f2',key:'2',fn:true,panel:'F2'},
+ R:{label:'빨강 칸?',ask:'빨강 칸인가',code:'빨강_칸()',color:'--c-if',key:'r',cond:true,icon:'<path d="M8 25V4M8 5h13l-4 5 4 5H8" fill="#ff6b5e" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>'},
+ G:{label:'꺼진 불?',ask:'꺼진 불인가',code:'꺼진_불()',color:'--c-if',key:'g',cond:true,icon:'<path d="M10 20c0-3-4-5-4-10a8 8 0 0 1 16 0c0 5-4 7-4 10zM11 25h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 3"/>'},
+ B:{label:'막혔나?',ask:'앞이 막혔나',code:'앞이_막힘()',color:'--c-if',key:'b',cond:true,icon:'<path d="M4 24h20M18 4v20M23 4v20M5 14h8M9 10l4 4-4 4" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>'},
+ E:{label:'아니면',code:'else',color:'--c-else',key:'e',branch:true,icon:'<path d="M14 4v8M14 12 6 22M14 12l8 10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'},
+};
+const PALETTE=['W','D','A','J','L','1','2','R','G','B','E'];
+const isBranch=c=>CMD[c].cond||CMD[c].branch;
+const PANELS=['main','F1','F2'];
+const PANEL_NAME={main:'프로그램',F1:'F1',F2:'F2'};
+const DIRS=[[0,-1],[1,0],[0,1],[-1,0]];   // 0북(화면 안쪽) 1동 2남 3서
+const MAX_ACTIONS=400,MAX_DEPTH=64;
+function parseLevel(L){
+  const tiles=new Map(),goals=[];
+  L.rows.forEach((row,z)=>row.split(/\s+/).forEach((tok,x)=>{if(tok==='.')return;const goal=/[*+]/.test(tok);const h=parseInt(tok,10);const t={x,z,h,goal,pre:tok.includes('+'),sign:tok.includes('r')?'r':tok.includes('b')?'b':'',gi:-1};if(goal){t.gi=goals.length;goals.push(t);}tiles.set(`${x},${z}`,t);}));
+  return{...L,tiles,goals,w:Math.max(...L.rows.map(r=>r.split(/\s+/).length)),d:L.rows.length,maxH:Math.max(...[...tiles.values()].map(t=>t.h)),par:0};
+}
+const parseProg=s=>Object.fromEntries(PANELS.map(p=>[p,(s[p]||'').split(/\s+/).filter(Boolean)]));
+const countBlocks=prog=>PANELS.reduce((n,p)=>n+prog[p].length,0);
+// 문제 하나에 지도(밤)가 여러 장일 수 있다. 원본 문제는 한 장이다
+const levels=LEVELS.map(def=>{const maps=(def.nights||[def.rows]).map(rows=>parseLevel({...def,rows}));for(const m of maps){m.solution=parseProg(m.sol);m.par=countBlocks(m.solution);m.maps=maps;}return maps[0];});
+
+// ───────────────── 인터프리터 — 화면의 모든 것은 이 실행 기록(trace)에서 나온다 ─────────────────
+// 문장 하나가 끝나는 위치. [만약] 문장은 본문 한 문장과, 이어지면 [아니면] + 본문 한 문장까지다
+function stmtEnd(list,i){
+  if(i>=list.length)return i;const c=list[i];
+  if(CMD[c].cond){let j=stmtEnd(list,i+1);if(list[j]==='E')j=stmtEnd(list,j+1);return j;}
+  if(c==='E')return stmtEnd(list,i+1);
+  return i+1;
+}
+function trace(L,prog){
+  const frames=[],lit=L.goals.map(g=>g.pre);
+  let [x,z,d]=L.start,calls=0,bumps=0,reason='end',maxDepth=1,checks=0;
+  const stack=[{p:'main',i:0}];
+  const allLit=()=>lit.length>0&&lit.every(Boolean);
+  while(stack.length){
+    const top=stack[stack.length-1];
+    if(top.i>=prog[top.p].length){stack.pop();continue;}
+    const list=prog[top.p],cmd=list[top.i];top.i++;
+    if(cmd==='E'){top.i=stmtEnd(list,top.i);continue;}   // 참 쪽 본문을 마치고 왔으므로 거짓 쪽을 건너뛴다
+    if(CMD[cmd].cond){
+      if(frames.length>=MAX_ACTIONS){reason='steps';break;}
+      const cur=L.tiles.get(`${x},${z}`),px=x+DIRS[d][0],pz=z+DIRS[d][1],ahead=L.tiles.get(`${px},${pz}`);
+      const result=cmd==='R'?cur.sign==='r':cmd==='G'?(cur.goal&&!lit[cur.gi]):!(ahead&&ahead.h===cur.h);
+      checks++;
+      frames.push({cmd,cond:true,result,probe:cmd==='B'?{x:px,z:pz}:{x,z},from:{x,z,d},to:{x,z,d},ok:true,toggled:-1,lit:lit.slice(),stack:stack.map(s=>({p:s.p,i:s.i-1}))});
+      if(!result){const j=stmtEnd(list,top.i);top.i=list[j]==='E'?j+1:j;}
+      continue;
+    }
+    if(CMD[cmd].fn){
+      calls++;
+      if(stack.length>=MAX_DEPTH){reason='stack';break;}
+      stack.push({p:CMD[cmd].panel,i:0});maxDepth=Math.max(maxDepth,stack.length);continue;
+    }
+    if(frames.length>=MAX_ACTIONS){reason='steps';break;}
+    const from={x,z,d};let ok=true,toggled=-1;
+    const cur=L.tiles.get(`${x},${z}`);
+    if(cmd==='D')d=(d+1)%4;
+    else if(cmd==='A')d=(d+3)%4;
+    else if(cmd==='W'||cmd==='J'){
+      const nx=x+DIRS[d][0],nz=z+DIRS[d][1],next=L.tiles.get(`${nx},${nz}`);
+      const dh=next?next.h-cur.h:null;
+      ok=!!next&&(cmd==='W'?dh===0:(dh===1||dh<0));
+      if(ok){x=nx;z=nz;}else bumps++;
+    }else if(cmd==='L'){
+      if(cur.goal){lit[cur.gi]=!lit[cur.gi];toggled=cur.gi;}else{ok=false;bumps++;}
+    }
+    frames.push({cmd,from,to:{x,z,d},ok,toggled,lit:lit.slice(),stack:stack.map(s=>({p:s.p,i:s.i-1}))});
+    if(allLit()){reason='win';break;}
+  }
+  return{frames,reason,calls,bumps,maxDepth,checks,actions:frames.length-checks,win:reason==='win'};
+}
+
+// ───────────────── 상태 — t 하나(실행 진행도)가 주인이다 ─────────────────
+const params=new URLSearchParams(location.search);
+const STORE='jeomdeungbot:v3';   // v3: 1~15번을 원본 순서로 바꿨다. 진행 기록이 문제 번호로 저장되므로 키를 바꿨다
+const save=(()=>{try{return JSON.parse(localStorage.getItem(STORE))||{};}catch(e){return {};}})();
+save.programs=save.programs||{};save.stars=save.stars||{};
+function persist(){try{localStorage.setItem(STORE,JSON.stringify(save));}catch(e){}}
+const state={level:clamp(Number(params.get('level')||1)-1,0,levels.length-1)|0,t:0,playing:false,ran:false,speed:.42,active:'main',camera:'HERO',program:null,night:0,passed:[]};
+const EMBED=params.get('embed')==='1';if(EMBED)document.body.classList.add('embed');
+let run=null;                 // 현재 프로그램의 trace
+let finished=false;
+const L=()=>levels[state.level].maps[state.night];
+const mapsOf=()=>levels[state.level].maps;
+let nightWait=0,pendingNight=-1;   // 밤을 통과한 뒤 다음 밤으로 넘어가기까지 남은 시간
+const stepsOf=()=>run.frames.length;
+const S=()=>state.t*stepsOf();  // 실수 단위의 현재 행동 번호
+
+// ───────────────── 렌더러·밤하늘·조명 ─────────────────
+const stage=$('stage');let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:true});}
+catch(e){$('loading-msg').innerHTML='<b>WebGL을 사용할 수 없습니다.</b><br>브라우저의 하드웨어 가속을 켜고 다시 열어 주세요.';console.error(e);throw e;}
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setClearColor(0x0b1230,0);
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.domElement.tabIndex=0;stage.append(renderer.domElement);
+const canvas=renderer.domElement,scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(32,16/9,.1,300);
+const target=V(0,.5,0),targetGoal=target.clone(),spherical=new THREE.Spherical(),sphericalGoal=new THREE.Spherical();
+{const studio=new THREE.Scene();studio.background=new THREE.Color(0x1a2554);
+  for(const [x,y,z,w,h,k] of [[-6,7,4,5,9,1.8],[6,6,-2,4,8,1.1],[0,10,-5,9,4,1.4]]){const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(0xbfd0ff).multiplyScalar(k),side:THREE.DoubleSide}));p.position.set(x,y,z);p.lookAt(0,.5,0);studio.add(p);}
+  const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(studio,.03,.1,60).texture;scene.environmentIntensity=.7;pm.dispose();
+  studio.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
+}
+scene.add(new THREE.HemisphereLight(0x8ea4ff,0x12183a,1.25));
+const moon=new THREE.DirectionalLight(0xdfe7ff,2.5);moon.position.set(-6,14,8);moon.castShadow=true;moon.shadow.mapSize.set(2048,2048);moon.shadow.bias=-.0004;moon.shadow.normalBias=.02;
+scene.add(moon,moon.target);
+{ // 별 — 시드 난수로 고정한 배경 장식
+  const r=mulberry32(20261102),n=500,p=new Float32Array(n*3);
+  for(let i=0;i<n;i++){const a=r()*TAU,e=r()*1.1+.05,R=120;p[i*3]=Math.cos(a)*Math.cos(e)*R;p[i*3+1]=Math.sin(e)*R-14;p[i*3+2]=Math.sin(a)*Math.cos(e)*R;}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(p,3));
+  scene.add(new THREE.Points(g,new THREE.PointsMaterial({color:0xdfe6ff,size:.5,transparent:true,opacity:.75,sizeAttenuation:true})));
+}
+// 빛 번짐 스프라이트 텍스처
+const glowTex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),gr=g.createRadialGradient(64,64,2,64,64,64);gr.addColorStop(0,'rgba(255,214,130,1)');gr.addColorStop(.35,'rgba(255,170,60,.42)');gr.addColorStop(1,'rgba(255,150,40,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;})();
+const glowMat=()=>new THREE.SpriteMaterial({map:glowTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:0});
+
+// ───────────────── 카메라 ─────────────────
+const preset={HERO:{phi:58,theta:45},TOP:{phi:3,theta:0},SIDE:{phi:74,theta:90}};
+const CAM_LABEL={HERO:'입체로',TOP:'위에서',SIDE:'옆에서'};
+function fitRadius(){const l=L();return Math.max(13,Math.max(l.w,l.d)*2.6+2,l.maxH*.42*3.6);}
+function setCamera(name,immediate=false){state.camera=name;const l=L(),p=preset[name],H=l.maxH*TILE_H+BASE_H;targetGoal.set((l.w-1)/2,name==='TOP'?H:H*.45,(l.d-1)/2);sphericalGoal.set(fitRadius(),p.phi*DEG,p.theta*DEG);if(immediate){target.copy(targetGoal);spherical.copy(sphericalGoal);moveCamera(0,true);}for(const b of $('cam').children)b.setAttribute('aria-pressed',b.dataset.value===name);}
+function moveCamera(dt=0,immediate=false){const k=immediate?1:1-Math.exp(-dt*6);target.lerp(targetGoal,k);spherical.radius+=(sphericalGoal.radius-spherical.radius)*k;spherical.phi+=(sphericalGoal.phi-spherical.phi)*k;const delta=((sphericalGoal.theta-spherical.theta+PI)%TAU+TAU)%TAU-PI;spherical.theta+=delta*k;camera.position.setFromSpherical(spherical).add(target);camera.lookAt(target);camera.updateMatrixWorld();}
+let pointer=null;
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;canvas.setPointerCapture(e.pointerId);pointer={x:e.clientX,y:e.clientY};sphericalGoal.copy(spherical);targetGoal.copy(target);});
+canvas.addEventListener('pointermove',e=>{if(!pointer)return;const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;sphericalGoal.theta-=dx*.006;sphericalGoal.phi=clamp(sphericalGoal.phi-dy*.006,.05,PI/2-.02);pointer={x:e.clientX,y:e.clientY};});
+for(const n of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(n,()=>pointer=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();sphericalGoal.radius=clamp(sphericalGoal.radius*Math.exp(e.deltaY*.001),5,70);},{passive:false});
+let artScale=1,viewport={width:1,height:1};
+function resize(){const r=stage.getBoundingClientRect();viewport.width=r.width;viewport.height=r.height;renderer.setSize(r.width,r.height);camera.aspect=r.width/r.height;artScale=Math.min(innerWidth/1672,innerHeight/941);camera.fov=2*Math.atan(Math.tan(16*DEG)*r.height/(941*artScale))/DEG;
+  // 무대 중심을 카드 사이 빈 구역(x 약 748, y 약 400)으로 옮긴다
+  camera.setViewOffset(r.width,r.height,(836-748)*artScale,(470-400)*artScale,r.width,r.height);camera.updateProjectionMatrix();document.documentElement.style.setProperty('--scale',artScale);}
+addEventListener('resize',resize);
+
+// ───────────────── 무대 — 밤바다 위의 돌기둥 섬 ─────────────────
+const TILE_H=.42;
+const BASE_H=.12;
+const topY=(x,z)=>{const t=L().tiles.get(`${x},${z}`);return t?t.h*TILE_H+BASE_H:0;};
+const stageGroup=new THREE.Group();scene.add(stageGroup);
+let goalParts=[];
+const plateShape=(()=>{const s=new THREE.Shape(),a=.45,r=.09;s.moveTo(-a+r,-a);s.lineTo(a-r,-a);s.quadraticCurveTo(a,-a,a,-a+r);s.lineTo(a,a-r);s.quadraticCurveTo(a,a,a-r,a);s.lineTo(-a+r,a);s.quadraticCurveTo(-a,a,-a,a-r);s.lineTo(-a,-a+r);s.quadraticCurveTo(-a,-a,-a+r,-a);return s;})();
+const plateGeo=new THREE.ExtrudeGeometry(plateShape,{depth:.05,bevelEnabled:false});plateGeo.rotateX(-PI/2);
+const bulbGeo=new THREE.SphereGeometry(.13,18,14);
+const COL_UNLIT=new THREE.Color(0x1d6d72),COL_LIT=new THREE.Color(0xffc45e),EM_UNLIT=new THREE.Color(0x22c9bd),EM_LIT=new THREE.Color(0xffa22e);
+function disposeGroup(g){g.traverse(o=>{if(o.isMesh&&o.geometry!==plateGeo&&o.geometry!==bulbGeo)o.geometry.dispose();if(o.material&&o.material.dispose)o.material.dispose();});g.clear();}
+function buildStage(){
+  disposeGroup(stageGroup);goalParts=[];const l=L();
+  const sea=new THREE.Mesh(new THREE.PlaneGeometry(90,90),new THREE.ShadowMaterial({opacity:.34,color:0x050920}));
+  sea.rotation.x=-PI/2;sea.position.set((l.w-1)/2,-.01,(l.d-1)/2);sea.receiveShadow=true;stageGroup.add(sea);
+  for(const t of l.tiles.values()){
+    const H=t.h*TILE_H+BASE_H;
+    const shade=new THREE.Color().setHSL(.64,.22,.26+.018*t.h);
+    const col=new THREE.Mesh(new THREE.BoxGeometry(.97,H,.97),new THREE.MeshStandardMaterial({color:shade,roughness:.82}));
+    col.position.set(t.x,H/2,t.z);col.castShadow=col.receiveShadow=true;stageGroup.add(col);
+    const plate=new THREE.Mesh(plateGeo,new THREE.MeshStandardMaterial({color:t.goal?COL_UNLIT:new THREE.Color().setHSL(.63,.2,.47),roughness:.55,emissive:t.goal?EM_UNLIT:0,emissiveIntensity:.5}));
+    plate.position.set(t.x,H+.002,t.z);plate.receiveShadow=true;stageGroup.add(plate);
+    if(t.sign){ // 색만으로 구별하지 않도록 빨강은 원뿔, 파랑은 공 모양 표지를 세운다
+      const c=t.sign==='r'?0xe8483e:0x3f8cf0,m=()=>new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.55,roughness:.5});
+      if(!t.goal){plate.material.color.set(c);plate.material.emissive.set(c);plate.material.emissiveIntensity=.3;}
+      const pole=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,.5,8),new THREE.MeshStandardMaterial({color:0xdfe4f5,roughness:.5}));pole.position.set(t.x+.33,H+.25,t.z-.33);pole.castShadow=true;
+      const head=new THREE.Mesh(t.sign==='r'?new THREE.ConeGeometry(.13,.24,16):new THREE.SphereGeometry(.12,16,12),m());head.position.set(t.x+.33,H+.58,t.z-.33);head.castShadow=true;
+      stageGroup.add(pole,head);
+    }
+    if(t.goal){
+      const bulb=new THREE.Mesh(bulbGeo,new THREE.MeshStandardMaterial({color:0xfff0c9,emissive:0xffb040,emissiveIntensity:0,transparent:true,opacity:0}));
+      const glow=new THREE.Sprite(glowMat());const halo=new THREE.Sprite(glowMat());
+      stageGroup.add(bulb,glow,halo);
+      goalParts[t.gi]={t,plate,bulb,glow,halo,H};
+    }
+  }
+  moon.target.position.set((l.w-1)/2,0,(l.d-1)/2);moon.position.set(moon.target.position.x-6,14+l.maxH*.4,moon.target.position.z+8);
+  const R=Math.max(l.w,l.d)+3;Object.assign(moon.shadow.camera,{left:-R,right:R,top:R,bottom:-R,near:.5,far:60});moon.shadow.camera.updateProjectionMatrix();
+}
+// 점등봇 — 머리 위 등불을 지고 다니는 작은 일꾼. 기본형을 앞(+z)을 보게 조립한다
+const bot=new THREE.Group(),botBody=new THREE.Group(),armR=new THREE.Group(),armL=new THREE.Group();
+let botLamp,botEyes=[];
+{const shell=new THREE.MeshStandardMaterial({color:0xf2e8d5,roughness:.38,metalness:.08});
+  const dark=new THREE.MeshStandardMaterial({color:0x27305c,roughness:.5});
+  const trim=new THREE.MeshStandardMaterial({color:0xe2653f,roughness:.5});
+  const add=(geo,mat,x,y,z,parent=botBody)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;};
+  add(new THREE.CylinderGeometry(.2,.25,.09,24),dark,0,.05,0,bot);                 // 받침
+  add(new THREE.CapsuleGeometry(.2,.13,6,20),shell,0,.33,0);                       // 몸통
+  add(new THREE.TorusGeometry(.2,.028,10,28).rotateX(PI/2),trim,0,.28,0);          // 허리띠
+  add(new THREE.SphereGeometry(.235,28,20),shell,0,.71,0);                         // 머리
+  add(new THREE.SphereGeometry(.24,28,18,PI/2-.95,1.9,PI*.33,PI*.27),dark,0,.71,0);                   // 얼굴 창
+  for(const s of [-1,1]){const eye=add(new THREE.SphereGeometry(.042,12,10),new THREE.MeshStandardMaterial({color:0xfff2b8,emissive:0xffd060,emissiveIntensity:2}),s*.082,.73,.218);botEyes.push(eye);}
+  add(new THREE.CylinderGeometry(.012,.012,.14,8),dark,0,.98,0);                   // 안테나
+  botLamp=add(new THREE.SphereGeometry(.058,14,12),new THREE.MeshStandardMaterial({color:0xfff0c9,emissive:0xffb040,emissiveIntensity:2.6}),0,1.07,0);
+  for(const [g,s] of [[armR,-1],[armL,1]]){g.position.set(s*.22,.44,0);add(new THREE.CapsuleGeometry(.04,.16,4,10),shell,0,-.11,0,g);botBody.add(g);}
+  bot.add(botBody);scene.add(bot);
+  const botGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.55}));botGlow.scale.setScalar(.75);botGlow.position.y=1.07;bot.add(botGlow);
+}
+// isekai3d 캐릭터 — 옷을 입은 통짜 VRM만 쓴다(assets/vrm/isekai3d, manifest 참고). 못 불러오면 로봇으로 돌아간다
+const CHARS={robot:{label:'로봇'}};
+const robotParts=[...bot.children],charHolder=new THREE.Group();bot.add(charHolder);
+const CHAR_HEIGHT=1.3;
+const vrmLoader=new GLTFLoader();vrmLoader.register(p=>new VRMLoaderPlugin(p));
+const vrmCache={};let activeVrm=null,charKey='robot',charWanted='robot',charError='';
+function loadVrm(key){
+  return vrmCache[key]||(vrmCache[key]=vrmLoader.loadAsync('../../../../assets/vrm/isekai3d/'+CHARS[key].file).then(g=>{
+    const vrm=g.userData.vrm;VRMUtils.rotateVRM0(vrm);
+    vrm.scene.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;}});
+    vrm.scene.updateMatrixWorld(true);
+    const box=new THREE.Box3().setFromObject(vrm.scene),k=CHAR_HEIGHT/(box.max.y-box.min.y);
+    vrm.scene.scale.setScalar(k);vrm.scene.position.y=-box.min.y*k;
+    const hand=vrm.humanoid.getRawBoneNode('rightHand');   // 손에 든 등불
+    if(hand){const r=.055/k,lamp=new THREE.Mesh(new THREE.SphereGeometry(r,14,12),new THREE.MeshStandardMaterial({color:0xfff0c9,emissive:0xffb040,emissiveIntensity:2.6}));
+      const dir=hand.children[0]?hand.children[0].position.clone().normalize():V(-1,0,0);lamp.position.copy(dir.multiplyScalar(r*2.6));hand.add(lamp);
+      const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.6}));halo.scale.setScalar(.6/k);lamp.add(halo);}
+    return vrm;}));
+}
+function renderChars(){const box=$('chars');box.innerHTML='';for(const k of Object.keys(CHARS)){const b=document.createElement('button');b.textContent=CHARS[k].label;b.setAttribute('aria-pressed',charKey===k);b.onclick=()=>setCharacter(k);box.append(b);}
+  if(charWanted!==charKey||charError){const m=document.createElement('small');m.textContent=charError||'캐릭터를 불러오는 중…';box.append(m);}}
+function showCharacter(key,vrm){charHolder.clear();activeVrm=vrm;charKey=key;if(vrm)charHolder.add(vrm.scene);for(const o of robotParts)o.visible=!vrm;renderChars();}
+async function setCharacter(key){
+  if(!CHARS[key])return;charWanted=key;charError='';save.character=key;persist();
+  if(!CHARS[key].file){showCharacter('robot',null);return;}
+  renderChars();
+  try{const vrm=await loadVrm(key);if(charWanted===key)showCharacter(key,vrm);}
+  catch(e){console.warn('캐릭터를 불러오지 못했습니다',e);delete vrmCache[key];if(charWanted===key){charWanted='robot';charError='캐릭터를 불러오지 못해 로봇으로 진행합니다.';showCharacter('robot',null);}}
+}
+function animateVrm(p,dt,cheer){
+  const h=activeVrm.humanoid,b=n=>h.getNormalizedBoneNode(n),rot=(n,x,y,z)=>{const o=b(n);if(o)o.rotation.set(x,y,z);};
+  const s=p.stride,c=p.crouch,swing=s*.38;
+  rot('leftUpperLeg',-s*.55-c*.75,0,0);rot('rightUpperLeg',s*.55-c*.75,0,0);
+  rot('leftLowerLeg',Math.max(0,-s)*.2+Math.max(0,s)*.75+c*1.25,0,0);rot('rightLowerLeg',Math.max(0,s)*.2+Math.max(0,-s)*.75+c*1.25,0,0);
+  rot('leftUpperArm',swing,0,-1.2+cheer*2.35);rot('rightUpperArm',-swing,0,1.2-Math.max(p.lift,cheer)*2.35);
+  rot('leftLowerArm',0,.25,0);rot('rightLowerArm',0,-.25,0);
+  rot('spine',p.lean+c*.22+Math.sin(ambient*1.8)*.012,0,0);
+  const em=activeVrm.expressionManager;if(em){em.setValue('happy',cheer>0?1:0);em.setValue('sad',finished&&!run.win?.7:0);em.setValue('blink',ambient%4.3<.12?1:0);}
+  activeVrm.update(dt);
+}
+// 조건을 확인하는 칸을 잠깐 표시한다. 앞이 낭떠러지면 허공에 뜬다
+const probe=new THREE.Mesh(new THREE.RingGeometry(.34,.47,4,1).rotateX(-PI/2).rotateY(PI/4),new THREE.MeshBasicMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide}));probe.visible=false;scene.add(probe);
+const dirAngle=d=>Math.atan2(DIRS[d][0],DIRS[d][1]);
+function shortAngle(a,b){return a+(((b-a+PI)%TAU+TAU)%TAU-PI);}
+let ambient=0,celebrate=0;
+function pose(){            // 로봇의 자세는 실행 기록과 t의 순수 함수다
+  const l=L(),n=stepsOf(),s=S();
+  if(n===0||s<=0){const [x,z,d]=l.start;return{x,z,y:topY(x,z),ang:dirAngle(d),lift:0,lean:0,stride:0,crouch:0};}
+  if(s>=n){const{x,z,d}=run.frames[n-1].to;return{x,z,y:topY(x,z),ang:dirAngle(d),lift:0,lean:0,stride:0,crouch:0};}
+  const i=Math.floor(s),u=s-i,f=run.frames[i],a=f.from,b=f.to,e=smooth(u),y0=topY(a.x,a.z),y1=topY(b.x,b.z);
+  const out={x:lerp(a.x,b.x,e),z:lerp(a.z,b.z,e),y:lerp(y0,y1,e),ang:lerp(dirAngle(a.d),shortAngle(dirAngle(a.d),dirAngle(b.d)),e),lift:0,lean:0,stride:0,crouch:0};
+  if(f.cmd==='W'){out.stride=Math.sin(u*TAU)*(f.ok?1:.45);if(f.ok)out.y+=Math.abs(Math.sin(u*TAU))*.04;else{const k=Math.sin(u*PI)*.13;out.x+=DIRS[a.d][0]*k;out.z+=DIRS[a.d][1]*k;out.lean=Math.sin(u*PI)*.25;}}
+  if(f.cmd==='J'){out.crouch=Math.sin(u*PI)*.75;if(f.ok){out.x=lerp(a.x,b.x,u);out.z=lerp(a.z,b.z,u);out.y=lerp(y0,y1,u)+Math.sin(u*PI)*(.42+Math.max(0,y1-y0));}else out.y+=Math.sin(u*PI)*.22;}
+  if(f.cmd==='L')out.lift=Math.sin(u*PI);
+  return out;
+}
+function litAmount(gi){      // 칸의 밝기도 같은 기록에서 유도한다
+  const n=stepsOf(),s=S();if(n===0||s<=0)return L().goals[gi].pre?1:0;
+  if(s>=n)return run.frames[n-1].lit[gi]?1:0;
+  const i=Math.floor(s),u=s-i,f=run.frames[i],after=f.lit[gi]?1:0,before=after;
+  if(f.toggled===gi){const k=smooth(clamp((u-.3)/.4,0,1));return after?k:1-k;}
+  return before;
+}
+const litCount=()=>{const l=L();return l.goals.reduce((n,_,g)=>n+(litAmount(g)>=.5?1:0),0);};
+function updateStage(dt){
+  ambient+=dt;
+  celebrate=(finished&&run.win)?celebrate+dt:0;
+  const p=pose();
+  bot.position.set(p.x,p.y+.05,p.z);bot.rotation.y=p.ang;
+  botBody.rotation.x=p.lean;
+  botBody.position.y=Math.sin(ambient*2.2)*.012;
+  armR.rotation.x=-p.lift*2.7;armL.rotation.x=p.lift*.5;
+  if(celebrate>0){const k=Math.abs(Math.sin(celebrate*3.4));bot.position.y+=k*.2;armR.rotation.x=armL.rotation.x=-2.6+k*.3;bot.rotation.y=p.ang+Math.sin(celebrate*1.6)*.3;}
+  if(activeVrm)animateVrm(p,dt,celebrate>0?Math.abs(Math.sin(celebrate*3.4))*.5+.5:0);
+  { // 조건 확인 단계의 표시도 t에서 유도한다
+    const sn=S(),i=Math.floor(sn),fr=state.ran&&sn<stepsOf()?run.frames[i]:null,vd=$('verdict');
+    if(fr&&fr.cond){
+      const u=sn-i,y=Math.max(topY(fr.probe.x,fr.probe.z),fr.cmd==='B'?topY(fr.from.x,fr.from.z):0);
+      probe.visible=true;probe.position.set(fr.probe.x,y+.09,fr.probe.z);probe.material.color.set(fr.result?0x7bd88f:0xff6b5e);probe.material.opacity=Math.sin(u*PI)*.95;
+      const q=V(p.x,p.y+1.72,p.z).project(camera);
+      vd.style.display='block';vd.className=fr.result?'':'no';vd.textContent=`${CMD[fr.cmd].ask}? ${fr.result?'참':'거짓'}`;
+      vd.style.left=((q.x*.5*viewport.width)/artScale+836)+'px';vd.style.top=((-q.y*.5*viewport.height)/artScale+470.5)+'px';
+    }else{probe.visible=false;vd.style.display='none';}
+  }
+  for(const g of goalParts){
+    const a=litAmount(g.t.gi);
+    g.plate.material.color.lerpColors(COL_UNLIT,COL_LIT,a);
+    g.plate.material.emissive.lerpColors(EM_UNLIT,EM_LIT,a);
+    g.plate.material.emissiveIntensity=lerp(.42+.12*Math.sin(ambient*2.4+g.t.gi),1.15,a);
+    const bob=Math.sin(ambient*1.5+g.t.gi*1.7)*.04;
+    const wave=celebrate>0?Math.max(0,Math.sin(celebrate*3-g.t.gi*.5))*.25:0;
+    const by=g.H+lerp(.25,1.42,smooth(a))+bob+wave;
+    g.bulb.position.set(g.t.x,by,g.t.z);g.bulb.material.opacity=a;g.bulb.material.emissiveIntensity=a*3.2;g.bulb.visible=a>.01;
+    g.glow.position.set(g.t.x,g.H+.12,g.t.z);g.glow.scale.setScalar(1.3);g.glow.material.opacity=a*.28;
+    g.halo.position.copy(g.bulb.position);g.halo.scale.setScalar(.95);g.halo.material.opacity=a*.75;
+  }
+  stageGroup.updateMatrixWorld(true);
+}
+
+// ───────────────── 프로그램 편집 ─────────────────
+const usable=c=>CMD[c].fn?slotsOf(CMD[c].panel)>0:(!isBranch(c)||(L().conds||[]).includes(c));
+const iconSvg=c=>CMD[c].fn?`<span>${CMD[c].label}</span>`:`<svg viewBox="0 0 28 28">${CMD[c].icon}</svg><span>${CMD[c].label}</span>`;
+function blockEl(c){const b=document.createElement('button');b.type='button';b.className='blk'+(CMD[c].fn?' fn':'')+(isBranch(c)?' cond':'');b.style.setProperty('--c',`var(${CMD[c].color})`);b.innerHTML=iconSvg(c);b.title=`${CMD[c].label} (${CMD[c].key.toUpperCase()})`;return b;}
+const slotsOf=p=>L().slots[PANELS.indexOf(p)];
+function emptyProgram(){return{main:[],F1:[],F2:[]};}
+function loadProgram(){const raw=save.programs[state.level];const prog=emptyProgram();if(raw)for(const p of PANELS)prog[p]=(raw[p]||[]).filter(c=>CMD[c]&&usable(c)).slice(0,slotsOf(p));return prog;}
+function recompute(){run=trace(L(),state.program);}
+function resetRun(){state.t=0;state.playing=false;state.ran=false;finished=false;recompute();hideBanner();buildDepth();}
+function mutate(fn){fn();save.programs[state.level]=state.program;persist();state.passed=[];resetRun();renderNights();renderProgram();renderStatus(true);syncTransport();}
+function appendTo(p,c){if(state.program[p].length>=slotsOf(p)){const n=$('panel-'+p);n.classList.remove('shake');void n.offsetWidth;n.classList.add('shake');return;}mutate(()=>state.program[p].push(c));}
+function renderPalette(){const box=$('palette');box.innerHTML='';let broke=false;for(const c of PALETTE){if(!usable(c))continue;if(isBranch(c)&&!broke){broke=true;const d=document.createElement('div');d.className='brk';box.append(d);}const b=blockEl(c);b.dataset.palette=c;box.append(b);}}
+// 칸마다 분기에서 맡은 역할(참·거짓 본문)을 구한다. 짝이 없는 [아니면]은 따로 표시한다
+function rolesOf(list){const role={},paired=new Set();list.forEach((c,i)=>{if(!CMD[c].cond)return;if(i+1<list.length&&list[i+1]!=='E')role[i+1]='참';const j=stmtEnd(list,i+1);if(list[j]==='E'){paired.add(j);if(j+1<list.length)role[j+1]='거짓';}});return{role,paired};}
+function renderProgram(){
+  const box=$('panels');box.innerHTML='';
+  for(const p of PANELS){
+    const size=slotsOf(p);if(!size)continue;
+    const card=document.createElement('section');card.className='card panel'+(state.active===p?' active':'');card.id='panel-'+p;card.dataset.panel=p;
+    card.innerHTML=`<div class="card-title"><span class="panel-tag">${PANEL_NAME[p]}</span><span>${state.program[p].length} / ${size}칸${state.active===p?' · 여기에 넣는 중':''}</span></div>`;
+    const grid=document.createElement('div');grid.className='slots';const{role,paired}=rolesOf(state.program[p]);
+    for(let i=0;i<size;i++){const cell=document.createElement('div');cell.className='cell';cell.dataset.panel=p;cell.dataset.i=i;if(role[i])cell.dataset.role=role[i];
+      const c=state.program[p][i];if(c){const b=blockEl(c);if(c==='E'&&!paired.has(i)){b.classList.add('orphan');b.title='앞에 [만약] 문장이 없어 아무 일도 하지 않습니다';}b.dataset.slotPanel=p;b.dataset.slotI=i;b.id=`b-${p}-${i}`;if(!b.classList.contains('orphan'))b.title+=' · 누르면 지워집니다';cell.append(b);}
+      grid.append(cell);}
+    card.append(grid);card.addEventListener('click',e=>{if(e.target.closest('.blk'))return;state.active=p;renderProgram();});
+    box.append(card);
+  }
+  renderCode();
+}
+let codeLines=new Map();
+function renderCode(){
+  const box=$('code');box.innerHTML='';codeLines=new Map();
+  const line=(text,cls,key)=>{const d=document.createElement('span');d.className='ln'+(cls?' '+cls:'');d.textContent=text||' ';box.append(d);if(key)codeLines.set(key,d);};
+  // 블록 목록을 들여쓰기가 있는 코드로 옮긴다. 인터프리터의 stmtEnd와 같은 문법이다
+  const emit=(p,list,i,ind)=>{const c=list[i],key=`${p}:${i}`;
+    if(CMD[c].cond){line(`${ind}if ${CMD[c].code}:`,'',key);if(i+1>=list.length){line(ind+'    pass');return list.length;}
+      const j=emit(p,list,i+1,ind+'    ');if(list[j]!=='E')return j;
+      line(ind+'else:','',`${p}:${j}`);if(j+1>=list.length){line(ind+'    pass');return list.length;}return emit(p,list,j+1,ind+'    ');}
+    if(c==='E'){line(ind+'# 짝이 없는 아니면과 다음 블록은 건너뜁니다','',key);return stmtEnd(list,i);}
+    line(ind+CMD[c].code,'',key);return i+1;};
+  const body=(p,ind)=>{const list=state.program[p];let i=0;while(i<list.length)i=emit(p,list,i,ind);};
+  for(const p of ['F1','F2']){if(!slotsOf(p))continue;line(`def ${p}():`,'head');if(!state.program[p].length)line('    pass');body(p,'    ');line('');}
+  line('# 프로그램','head');if(!state.program.main.length)line('# 아직 비어 있습니다');body('main','');
+}
+// 누르기와 끌기 — 터치에서도 되도록 포인터 이벤트로 직접 처리한다
+let drag=null;
+const ghost=$('ghost');
+addEventListener('pointerdown',e=>{const b=e.target.closest('.blk');if(!b||e.button!==0)return;
+  drag=b.dataset.palette?{cmd:b.dataset.palette,from:null}:{cmd:state.program[b.dataset.slotPanel][+b.dataset.slotI],from:{p:b.dataset.slotPanel,i:+b.dataset.slotI}};
+  drag.x=e.clientX;drag.y=e.clientY;drag.started=false;});
+function cellAt(x,y){const el=document.elementFromPoint(x,y);return el?el.closest('.cell'):null;}
+let lastDrop=null;
+addEventListener('pointermove',e=>{if(!drag)return;
+  if(!drag.started&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>6){drag.started=true;ghost.innerHTML='';ghost.append(blockEl(drag.cmd));ghost.style.display='block';}
+  if(!drag.started)return;ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';
+  const c=cellAt(e.clientX,e.clientY);if(lastDrop&&lastDrop!==c)lastDrop.classList.remove('drop');if(c)c.classList.add('drop');lastDrop=c;});
+addEventListener('pointerup',e=>{if(!drag)return;const d=drag;drag=null;ghost.style.display='none';if(lastDrop){lastDrop.classList.remove('drop');lastDrop=null;}
+  if(!d.started){if(d.from)mutate(()=>state.program[d.from.p].splice(d.from.i,1));else appendTo(state.active,d.cmd);return;}
+  const c=cellAt(e.clientX,e.clientY);
+  if(!c){if(d.from)mutate(()=>state.program[d.from.p].splice(d.from.i,1));return;}
+  const p=c.dataset.panel;
+  if(!d.from&&state.program[p].length>=slotsOf(p)){appendTo(p,d.cmd);return;}
+  if(d.from&&d.from.p!==p&&state.program[p].length>=slotsOf(p)){appendTo(p,d.cmd);return;}
+  mutate(()=>{if(d.from)state.program[d.from.p].splice(d.from.i,1);const i=Math.min(+c.dataset.i,state.program[p].length);state.program[p].splice(i,0,d.cmd);state.active=p;});});
+addEventListener('pointercancel',()=>{drag=null;ghost.style.display='none';});
+
+// ───────────────── 호출 깊이 그래프 — trace를 그대로 그린다 ─────────────────
+const NS='http://www.w3.org/2000/svg';
+function buildDepth(){
+  const svg=$('depth');svg.innerHTML='';const n=stepsOf();if(!n)return;
+  const W=834,H=46,top=Math.max(4,run.maxDepth),bw=W/n;
+  const clip=document.createElementNS(NS,'clipPath');clip.id='reveal';const cr=document.createElementNS(NS,'rect');cr.setAttribute('x',0);cr.setAttribute('y',0);cr.setAttribute('width',0);cr.setAttribute('height',H);clip.append(cr);svg.append(clip);
+  const g=document.createElementNS(NS,'g');g.setAttribute('clip-path','url(#reveal)');svg.append(g);
+  run.frames.forEach((f,i)=>{const h=(f.stack.length/top)*(H-3);const r=document.createElementNS(NS,'rect');r.setAttribute('x',i*bw+.5);r.setAttribute('width',Math.max(.8,bw-1));r.setAttribute('y',H-h);r.setAttribute('height',h);r.setAttribute('fill',`var(${CMD[f.cmd].color})`);r.setAttribute('opacity',f.ok?1:.35);g.append(r);});
+  svg._reveal=cr;
+}
+
+// ───────────────── 상태 표시 ─────────────────
+let lastKey='';
+function renderStatus(force=false){
+  const n=stepsOf(),s=S(),done=state.ran?Math.min(n,Math.floor(s+1e-6)):0;
+  const idx=state.ran&&s<n?Math.floor(s):-1;
+  const key=[state.level,idx,done,litCount(),state.ran].join('|');
+  if(!force&&key===lastKey)return;lastKey=key;
+  const blocks=countBlocks(state.program);
+  $('s-blocks').textContent=blocks;
+  $('s-actions').textContent=state.ran?run.frames.slice(0,done).filter(f=>!f.cond).length:'–';
+  $('s-ratio').textContent=state.ran&&finished&&blocks&&run.actions?(run.actions/blocks).toFixed(1):'–';
+  $('s-lit').textContent=`${litCount()}/${L().goals.length}`;
+  $('step-label').textContent=state.ran?`${done} / ${n}번째 단계`:'실행하면 기록됩니다';
+  document.querySelectorAll('.blk.current,.blk.caller,.blk.yes,.blk.no').forEach(b=>b.classList.remove('current','caller','yes','no'));
+  document.querySelectorAll('#code .current,#code .caller').forEach(b=>b.classList.remove('current','caller'));
+  const box=$('stack');box.innerHTML='';
+  if(idx>=0){
+    const st=run.frames[idx].stack;
+    st.forEach((fr,k)=>{const b=$(`b-${fr.p}-${fr.i}`),ln=codeLines.get(`${fr.p}:${fr.i}`),cls=k===st.length-1?'current':'caller';if(b)b.classList.add(cls);if(ln){ln.classList.add(cls);if(cls==='current'){const cb=$('code'),top=ln.offsetTop-cb.offsetTop;if(top<cb.scrollTop||top+ln.offsetHeight>cb.scrollTop+cb.clientHeight)cb.scrollTop=top-cb.clientHeight/2;}}if(cls==='current'&&b&&run.frames[idx].cond)b.classList.add(run.frames[idx].result?'yes':'no');});
+    const show=st.length>7?[...st.slice(0,2),null,...st.slice(-3)]:st;
+    show.forEach((fr,k)=>{const c=document.createElement('span');c.className='chip'+(k===show.length-1?' top':'');c.textContent=fr?PANEL_NAME[fr.p]:`… ${st.length-5}개 …`;box.append(c);if(k<show.length-1)box.append('›');});
+  }else{const c=document.createElement('span');c.style.color='var(--muted)';c.textContent=state.ran?(run.reason==='steps'||run.reason==='stack'?'프로그램이 멈췄습니다':'프로그램이 끝났습니다'):'실행하면 여기에 쌓입니다';box.append(c);}
+}
+function syncTransport(){
+  const n=stepsOf();
+  $('run').textContent=state.playing?'Ⅱ 잠깐 멈춤':(state.ran&&state.t<1?'▶ 이어서':(state.ran?'↺ 다시 실행':'▶ 실행'));
+  $('run').disabled=countBlocks(state.program)===0;
+  $('step').disabled=!n;$('stepback').disabled=!state.ran||state.t<=0;$('rewind').disabled=!state.ran;$('t-range').disabled=!state.ran;
+  if(!scrubbing)$('t-range').value=String(Math.round(state.t*1000));
+  $('speed').value=String(state.speed);
+}
+function updateDepth(){const r=$('depth')._reveal;if(r)r.setAttribute('width',state.ran?state.t*834:0);}
+
+// ───────────────── 레벨 전환·결과 ─────────────────
+function renderLevels(){
+  const box=$('levels');box.innerHTML='';let ch='',row;
+  levels.forEach((l,i)=>{if(l.ch!==ch){ch=l.ch;const h=document.createElement('div');h.className='chapter';h.textContent=ch;box.append(h);row=document.createElement('div');row.className='levels';box.append(row);}
+    const b=document.createElement('button');b.className=i===state.level?'cur':'';b.title=l.name;b.textContent=i+1;const st=save.stars[i]||0;if(st){const s=document.createElement('span');s.className='st';s.textContent='★'.repeat(st);b.append(s);}b.onclick=()=>goLevel(i);row.append(b);});
+}
+function goLevel(i){
+  state.level=i;state.night=0;state.passed=[];state.program=loadProgram();state.active='main';
+  const l=L();
+  $('mission-no').textContent=`${i+1} / ${levels.length}번 문제`;$('mission-par').innerHTML=`기준 <b>${l.par}</b>블록`;$('mission-title').textContent=l.name;$('mission-text').textContent=l.text;
+  buildStage();resetRun();renderLevels();renderNights();renderPalette();renderProgram();setCamera('HERO',true);renderStatus(true);syncTransport();
+}
+function renderNights(){const box=$('nights');box.innerHTML='';const maps=mapsOf();if(maps.length<2)return;
+  maps.forEach((_,k)=>{const b=document.createElement('button');b.textContent=`밤 ${k+1}${state.passed[k]?' ✓':''}`;b.className=state.passed[k]?'ok':'';b.setAttribute('aria-pressed',state.night===k);b.onclick=()=>setNight(k);box.append(b);});}
+function setNight(k){state.night=k;buildStage();resetRun();renderNights();setCamera(state.camera,true);renderStatus(true);syncTransport();}
+function starsFor(blocks){const p=L().par;return blocks<=p?3:blocks<=p+2?2:1;}
+function hideBanner(){nightWait=0;const b=$('banner');b.className='';b.innerHTML='';}
+function showBanner(cls,html){const b=$('banner');b.className='show '+cls;b.innerHTML=html;}
+const programText=()=>Object.entries({프로그램:state.program.main,F1:state.program.F1,F2:state.program.F2}).filter(([,v])=>v.length).map(([k,v])=>k+': '+v.map(c=>CMD[c]?CMD[c].label:c).join(' → ')).join('\n');
+function finish(){
+  if(finished)return;finished=true;const l=L(),blocks=countBlocks(state.program);
+  const maps=mapsOf();
+  if(run.win&&maps.length>1){
+    state.passed[state.night]=true;renderNights();
+    const nx=maps.findIndex((_,k)=>!state.passed[k]);
+    if(nx>=0){showBanner('win',`<h2>밤 ${state.night+1} 통과</h2><p>같은 프로그램으로 다음 밤을 실행합니다.</p>`);pendingNight=nx;nightWait=1.4;renderStatus(true);syncTransport();return;}
+  }
+  if(run.win){
+    const st=starsFor(blocks);save.stars[state.level]=Math.max(save.stars[state.level]||0,st);persist();renderLevels();
+    window.GameRecord.report({stage:state.level+1,stageName:l.name,stars:st,blocks,result:`행동 ${run.actions}번${run.checks?`, 판단 ${run.checks}번`:''}`,program:programText()});
+    const next=state.level<levels.length-1;
+    showBanner('win',`<h2>밤을 밝혔습니다<span class="stars">${'★'.repeat(st)}${'☆'.repeat(3-st)}</span></h2><p>블록 <b>${blocks}</b>개로 행동 <b>${run.actions}</b>번${run.checks?`과 판단 <b>${run.checks}</b>번`:''}을 시켰습니다${maps.length>1?` (마지막 밤 기준)`:''}. ${l.after}</p><div class="row"><button id="b-close">더 줄여 보기</button>${next?'<button class="primary" id="b-next">다음 문제 ▶</button>':''}</div>`);
+    $('b-close').onclick=hideBanner;if(next)$('b-next').onclick=()=>goLevel(state.level+1);
+  }else{
+    const left=l.goals.length-litCount();
+    const why={end:`프로그램이 끝났는데 불이 ${left}개 남았습니다.`,steps:`실행이 ${MAX_ACTIONS}단계를 넘어 멈췄습니다. 프로그램이 끝나지 않고 계속 돌았습니다.`,stack:`호출이 ${MAX_DEPTH}단계까지 쌓여 멈췄습니다. 함수가 자신을 끝없이 부른 것입니다.`}[run.reason];
+    const bump=run.bumps?` 명령 ${run.bumps}개가 헛돌았습니다(흐린 막대).`:'';
+    showBanner('',`<h2>${maps.length>1?`밤 ${state.night+1}: `:''}아직 어둡습니다</h2><p>${why}${bump}${stepsOf()?' 아래 막대를 되감아 어디서 어긋났는지 찾아 보세요.':''}</p><div class="row"><button id="b-close">확인</button></div>`);
+    $('b-close').onclick=hideBanner;
+  }
+  renderStatus(true);syncTransport();
+}
+
+// ───────────────── 조작 ─────────────────
+const range=$('t-range');let scrubbing=false;
+function toggleRun(){
+  if(!countBlocks(state.program))return;
+  if(state.playing){state.playing=false;syncTransport();return;}
+  if(state.t>=1||!state.ran){state.t=0;finished=false;hideBanner();}
+  state.ran=true;state.playing=true;
+  if(!stepsOf()){state.t=1;state.playing=false;finish();}
+  syncTransport();renderStatus(true);
+}
+function stepBy(k){
+  const n=stepsOf();if(!n)return;state.ran=true;state.playing=false;
+  const s=k>0?Math.floor(S()+1e-6)+1:Math.ceil(S()-1e-6)-1;
+  state.t=clamp(s/n,0,1);
+  if(state.t<1){finished=false;hideBanner();}else finish();
+  syncTransport();renderStatus(true);
+}
+$('run').onclick=toggleRun;$('step').onclick=()=>stepBy(1);$('stepback').onclick=()=>stepBy(-1);
+$('rewind').onclick=()=>{state.t=0;state.playing=false;finished=false;hideBanner();syncTransport();renderStatus(true);};
+$('speed').onchange=e=>{state.speed=Number(e.target.value);};
+$('clear').onclick=()=>mutate(()=>{state.program=emptyProgram();});
+range.addEventListener('pointerdown',()=>{scrubbing=true;state.playing=false;syncTransport();});
+range.addEventListener('input',()=>{state.t=Number(range.value)/1000;if(state.t<1){finished=false;hideBanner();}else finish();renderStatus(true);});
+for(const n of ['pointerup','pointercancel','blur'])range.addEventListener(n,()=>{scrubbing=false;syncTransport();});
+for(const k of Object.keys(preset)){const b=document.createElement('button');b.textContent=CAM_LABEL[k];b.dataset.value=k;b.onclick=()=>setCamera(k);$('cam').append(b);}
+addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)&&e.code!=='Space')return;const key=e.key.toLowerCase();
+  if(e.code==='Space'){e.preventDefault();if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();toggleRun();return;}
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();stepBy(e.key==='ArrowRight'?1:-1);return;}
+  if(e.key==='Backspace'){e.preventDefault();if(state.program[state.active].length)mutate(()=>state.program[state.active].pop());return;}
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  for(const c of Object.keys(CMD))if(CMD[c].key===key){if(!usable(c))return;appendTo(state.active,c);return;}
+});
+
+// ───────────────── 프레임 루프 ─────────────────
+const frameDurations=[];let previous=performance.now(),uiElapsed=0,renderCount=0;
+function renderFrame(now){const raw=(now-previous)/1000,dt=Math.min(raw,.1);previous=now;if(document.hidden){requestAnimationFrame(renderFrame);return;}
+  if(state.playing){const n=stepsOf();state.t=clamp(state.t+dt/(n*state.speed),0,1);if(state.t>=1){state.playing=false;finish();syncTransport();}}
+  if(nightWait>0){nightWait-=dt;if(nightWait<=0){setNight(pendingNight);state.ran=true;state.playing=true;syncTransport();renderStatus(true);}}
+  updateStage(dt);moveCamera(dt);
+  uiElapsed+=dt;if(uiElapsed>.04){renderStatus();updateDepth();if(!scrubbing)range.value=String(Math.round(state.t*1000));uiElapsed=0;}
+  renderer.render(scene,camera);if(raw>0&&raw<1){frameDurations.push(raw*1000);if(frameDurations.length>180)frameDurations.shift();}renderCount++;requestAnimationFrame(renderFrame);}
+
+// ───────────────── 자가 점검 API ─────────────────
+function bounds(){const b=new THREE.Box3().setFromObject(stageGroup),pts=[];for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z]){const p=V(x,y,z).project(camera);pts.push([(p.x+1)*viewport.width/2,(-p.y+1)*viewport.height/2]);}return{minX:Math.min(...pts.map(p=>p[0])),maxX:Math.max(...pts.map(p=>p[0])),minY:Math.min(...pts.map(p=>p[1])),maxY:Math.max(...pts.map(p=>p[1]))};}
+function charFacing(){if(!activeVrm)return null;const h=activeVrm.humanoid,a=h.getRawBoneNode('rightFoot'),b=h.getRawBoneNode('rightToes');if(!a||!b)return null;bot.updateMatrixWorld(true);const v=b.getWorldPosition(V()).sub(a.getWorldPosition(V()));return{x:+v.x.toFixed(3),z:+v.z.toFixed(3),ang:+Math.atan2(v.x,v.z).toFixed(3),expected:+pose().ang.toFixed(3)};}
+function snapshot(){const n=stepsOf();return{character:{facing:charFacing(),key:charKey,wanted:charWanted,error:charError,meta:activeVrm?{authors:activeVrm.meta.authors,version:activeVrm.meta.metaVersion}:null},state:JSON.parse(JSON.stringify(state)),level:{no:state.level+1,name:L().name,par:L().par,goals:L().goals.length},night:state.night,passed:state.passed.slice(),run:{steps:n,actions:run.actions,checks:run.checks,reason:run.reason,win:run.win,bumps:run.bumps,calls:run.calls,maxDepth:run.maxDepth,finished},lit:litCount(),blocks:countBlocks(state.program),pose:pose(),renderer:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frames:renderCount,meanFrameMs:frameDurations.length?frameDurations.reduce((a,b)=>a+b)/frameDurations.length:0},bounds:bounds()};}
+function refresh(){updateStage(0);moveCamera(0,true);updateDepth();syncTransport();renderStatus(true);renderer.render(scene,camera);}
+window.lampApp={snapshot,trace,setCharacter,setNight,
+  levelData(){return LEVELS;},
+  setState(p={}){
+    if(p.level!==undefined)goLevel(clamp(Number(p.level)-1,0,levels.length-1));
+    if(p.night!==undefined)setNight(clamp(Number(p.night),0,mapsOf().length-1));
+    if(p.program){const next=emptyProgram();for(const k of PANELS)next[k]=[...(p.program[k]||[])];state.program=next;state.passed=[];resetRun();renderNights();renderProgram();}
+    if(p.solution){state.program=parseProg(L().sol);state.passed=[];resetRun();renderNights();renderProgram();}
+    if(p.camera in preset)setCamera(p.camera,true);
+    if(p.t!==undefined){state.ran=true;state.t=clamp(Number(p.t),0,1);finished=false;hideBanner();if(state.t>=1)finish();}
+    if(p.playing!==undefined){state.playing=Boolean(p.playing);if(state.playing)state.ran=true;}
+    refresh();return snapshot();},
+  advance(seconds){if(state.playing){state.t=clamp(state.t+seconds/(stepsOf()*state.speed),0,1);if(state.t>=1){state.playing=false;finish();}}refresh();return snapshot();},
+  // 모든 문제의 기준 풀이를 실제 인터프리터로 돌려 본다 — 칸 수 안에 들어가는지, 함수 없이 풀 수 없는지까지 본다
+  checkLevels(){return levels.map((l,i)=>{const prog=parseProg(l.sol),rs=l.maps.map(m=>trace(m,prog)),r=rs[0];const fits=PANELS.every((p,k)=>prog[p].length<=l.slots[k]);return{no:i+1,name:l.name,nights:rs.length,win:rs.every(x=>x.win),nightWins:rs.map(x=>x.win).join(),fits,bumps:rs.map(x=>x.bumps).join(),blocks:l.par,actions:rs.map(x=>x.actions).join(),checks:rs.map(x=>x.checks).join(),maxDepth:Math.max(...rs.map(x=>x.maxDepth)),mainOnlyImpossible:l.slots[1]>0?r.actions>l.slots[0]:null};});},
+  capture(){renderer.render(scene,camera);return canvas.toDataURL('image/png');}};
+
+// ───────────────── 시작 ─────────────────
+resize();goLevel(state.level);refresh();
+setCharacter(CHARS[params.get('char')]?params.get('char'):(CHARS[save.character]?save.character:'robot'));
+$('loading').hidden=true;requestAnimationFrame(renderFrame);
+</script>
+</body>
+</html>

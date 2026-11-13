@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 정보화부 학교사업 안내 — 학부모님을 위한 안내 | 샘플고등학교</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bayon&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --pink-light: #F4CED3;
+  --pink-mid: #F0B5BE;
+  --pink-deep: #E8A0AD;
+  --cream: #F3F3E9;
+  --cream-dark: #EDE2E2;
+  --red: #E33529;
+  --red-dark: #C42B21;
+  --brown: #924E26;
+  --brown-dark: #693413;
+  --white: #FFFFFF;
+  --black: #1A1A1A;
+  --yellow: #FFF500;
+  --teal: #2B6786;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'DM Sans', 'Noto Sans KR', -apple-system, sans-serif;
+  overflow: hidden;
+  color: var(--black);
+  font-size: clamp(16px, 1.5vw, 28px);
+  background: var(--pink-light);
+}
+
+/* ═══════════════ BACKGROUND DECORATIONS ═══════════════ */
+.bg-circle {
+  position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+}
+.bg-circle-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, var(--pink-mid) 0%, transparent 70%);
+  top: -10%; right: -5%;
+}
+.bg-circle-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(243,243,233,0.5) 0%, transparent 70%);
+  bottom: -8%; left: -3%;
+}
+.bg-circle-3 {
+  width: 250px; height: 250px;
+  border: 2px solid rgba(227,53,41,0.08);
+  top: 30%; left: 10%;
+}
+
+/* ═══════════════ PRESENTATION ═══════════════ */
+.presentation { width: 100%; height: 100%; position: relative; z-index: 1; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5vh 2.5vw 4.5vh;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* Entry animations */
+.slide.active .anim-up { animation: popUp 0.55s ease-out both; }
+.slide.active .anim-up-d1 { animation: popUp 0.55s 0.08s ease-out both; }
+.slide.active .anim-up-d2 { animation: popUp 0.55s 0.16s ease-out both; }
+.slide.active .anim-up-d3 { animation: popUp 0.55s 0.24s ease-out both; }
+.slide.active .anim-up-d4 { animation: popUp 0.55s 0.32s ease-out both; }
+.slide.active .anim-up-d5 { animation: popUp 0.55s 0.40s ease-out both; }
+.slide.active .anim-scale { animation: scaleUp 0.5s 0.1s ease-out both; }
+.slide.active .anim-tilt { animation: tiltIn 0.6s 0.15s ease-out both; }
+
+@keyframes popUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleUp { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes tiltIn { from { opacity: 0; transform: rotate(-3deg) translateY(20px); } to { opacity: 1; transform: rotate(0deg) translateY(0); } }
+
+/* ═══════════════ CARD FRAME ═══════════════ */
+.card-frame {
+  width: 100%; max-width: 1500px; height: 100%;
+  background: var(--cream);
+  border-radius: 1.8rem;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+/* Topbar with colored dots */
+.frame-topbar {
+  padding: 0.7rem 1.2rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.5);
+}
+.dot-r, .dot-y, .dot-g {
+  width: 0.7rem; height: 0.7rem; border-radius: 50%;
+}
+.dot-r { background: #FF5F57; }
+.dot-y { background: #FFBD2E; }
+.dot-g { background: #28C840; }
+.frame-title-text {
+  flex: 1; text-align: center;
+  font-family: 'Bayon', sans-serif;
+  font-size: 0.72rem; color: var(--red);
+  letter-spacing: 0.15em; text-transform: uppercase;
+}
+
+.frame-body {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 1.6rem 2.2rem;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+
+/* ═══════════════ TYPOGRAPHY ═══════════════ */
+.display-font {
+  font-family: 'Bayon', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+  color: var(--red);
+}
+
+h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.15; }
+h2 { font-size: 1.5rem; font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.2rem; }
+p, .desc { font-size: 1rem; line-height: 1.65; color: var(--brown); }
+.desc-sm { font-size: 0.88rem; line-height: 1.5; color: var(--brown); opacity: 0.7; }
+
+.red-text { color: var(--red); }
+.brown-text { color: var(--brown-dark); }
+.teal-text { color: var(--teal); }
+
+/* Big number */
+.big-num {
+  font-family: 'Bayon', sans-serif;
+  font-size: 3.5rem; line-height: 1;
+  color: var(--red);
+}
+.big-num.sm { font-size: 2.4rem; }
+.big-num-unit { font-size: 0.95rem; font-weight: 600; color: var(--brown); }
+
+/* Section header */
+.sec-header {
+  display: flex; align-items: center; gap: 0.8rem;
+  margin-bottom: 1rem; flex-shrink: 0;
+}
+.sec-num {
+  font-family: 'Bayon', sans-serif;
+  font-size: 2.2rem; color: var(--red); opacity: 0.2;
+  line-height: 1;
+}
+.sec-title h2 { color: var(--brown-dark); }
+.sec-sub { font-size: 0.88rem; color: var(--brown); opacity: 0.6; margin-top: 0.1rem; }
+
+/* Badge */
+.badge {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  padding: 0.25rem 0.75rem; border-radius: 2rem;
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.badge-red { background: var(--red); color: var(--white); }
+.badge-pink { background: var(--pink-mid); color: var(--red-dark); }
+.badge-cream { background: var(--cream-dark); color: var(--brown-dark); }
+.badge-teal { background: rgba(43,103,134,0.12); color: var(--teal); }
+
+/* Pill button */
+.pill-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 1.4rem; border-radius: 3rem;
+  background: var(--red); color: var(--white);
+  font-family: 'Bayon', sans-serif;
+  font-size: 0.85rem; letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: none; cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(227,53,41,0.25);
+}
+.pill-btn:hover { background: var(--red-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(227,53,41,0.3); }
+.pill-btn::after { content: '•'; font-size: 1.1em; }
+
+/* ═══════════════ CARDS ═══════════════ */
+.card {
+  background: var(--white);
+  border-radius: 1.2rem;
+  padding: 1.5rem 1.6rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+
+.card-pink {
+  background: var(--pink-light);
+  box-shadow: none;
+}
+.card-pink:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+
+.card-cream {
+  background: var(--cream-dark);
+  box-shadow: none;
+}
+
+.card-red {
+  background: var(--red);
+  color: var(--white);
+  box-shadow: 0 4px 16px rgba(227,53,41,0.2);
+}
+.card-red p, .card-red .desc, .card-red h3 { color: rgba(255,255,255,0.9); }
+
+/* Tilted card effect */
+.card-tilt { transform: rotate(-2deg); }
+.card-tilt:hover { transform: rotate(0deg) translateY(-3px); }
+.card-tilt-r { transform: rotate(1.5deg); }
+.card-tilt-r:hover { transform: rotate(0deg) translateY(-3px); }
+
+/* ═══════════════ LAYOUT HELPERS ═══════════════ */
+.flex-col { display: flex; flex-direction: column; }
+.flex-row { display: flex; }
+.gap-xs { gap: 0.4rem; }
+.gap-sm { gap: 0.6rem; }
+.gap-md { gap: 0.9rem; }
+.gap-lg { gap: 1.2rem; }
+.flex-1 { flex: 1; min-width: 0; min-height: 0; }
+.flex-2 { flex: 2; min-width: 0; }
+.flex-shrink-0 { flex-shrink: 0; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.text-center { text-align: center; }
+
+.emoji-xl { font-size: 2.8rem; line-height: 1; }
+.emoji-lg { font-size: 2rem; line-height: 1; }
+.emoji-md { font-size: 1.5rem; line-height: 1; }
+
+/* Bullet list */
+.bullet-list { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
+.bullet-list li {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  font-size: 0.95rem; line-height: 1.5; color: var(--brown);
+}
+.bullet-dot {
+  flex-shrink: 0; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--red); margin-top: 0.38rem;
+}
+
+/* Step number */
+.step-num {
+  font-family: 'Bayon', sans-serif;
+  font-size: 1.8rem; color: var(--red); opacity: 0.15;
+  position: absolute; top: 0.6rem; right: 1rem;
+  line-height: 1;
+}
+
+/* Decorative circle in card */
+.deco-circle {
+  position: absolute; border-radius: 50%; pointer-events: none;
+}
+
+/* ═══════════════ COVER ═══════════════ */
+.cover-outer {
+  width: 100%; max-width: 1500px; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+
+/* Large decorative circles */
+.cover-deco-1 {
+  position: absolute; width: 55%; aspect-ratio: 1; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  right: -5%; top: 5%;
+  z-index: 0;
+}
+.cover-deco-2 {
+  position: absolute; width: 30%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--pink-mid);
+  right: 15%; top: 35%;
+  z-index: 0;
+}
+.cover-deco-3 {
+  position: absolute; width: 12%; aspect-ratio: 1; border-radius: 50%;
+  border: 2px solid rgba(227,53,41,0.15);
+  left: 5%; bottom: 15%;
+  z-index: 0;
+}
+
+.cover-content {
+  position: relative; z-index: 1;
+  width: 100%; padding: 0 5%;
+}
+
+.cover-top-label {
+  font-family: 'Bayon', sans-serif;
+  font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 1.5rem;
+}
+
+.cover-main-text {
+  font-family: 'Bayon', sans-serif;
+  font-size: clamp(3rem, 6.5vw, 7rem);
+  text-transform: uppercase;
+  line-height: 0.92;
+  color: var(--red);
+  margin-bottom: 1rem;
+}
+.cover-main-text .line-cream {
+  color: var(--cream);
+  -webkit-text-stroke: 2px var(--red);
+}
+
+.cover-sub {
+  font-size: 1rem; color: var(--brown); font-weight: 400;
+  margin-bottom: 0.3rem; max-width: 500px;
+}
+.cover-school {
+  font-size: 0.82rem; color: var(--brown); opacity: 0.5;
+  margin-bottom: 2rem;
+}
+
+.cover-pills {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+}
+.cover-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1.2rem; border-radius: 3rem;
+  background: var(--white);
+  font-size: 0.82rem; font-weight: 600;
+  color: var(--brown-dark);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: all 0.3s;
+}
+.cover-pill:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+.cover-pill .pill-emoji { font-size: 1.1rem; }
+
+/* ═══════════════ CLUB CARDS ═══════════════ */
+.club-grid { display: flex; gap: 0.5rem; }
+.club-item {
+  flex: 1; text-align: center; padding: 1.2rem 0.5rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: 1.2rem;
+  background: var(--white);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.club-item:hover { transform: translateY(-3px) rotate(0deg); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.club-item:nth-child(odd) { transform: rotate(-1deg); }
+.club-item:nth-child(even) { transform: rotate(1deg); }
+.club-item .club-emoji { font-size: 2rem; margin-bottom: 0.4rem; }
+.club-item .club-name { font-size: 0.95rem; font-weight: 800; color: var(--brown-dark); margin-bottom: 0.15rem; }
+.club-item .club-desc { font-size: 0.82rem; color: var(--brown); opacity: 0.6; line-height: 1.3; }
+.club-item .club-num {
+  font-family: 'Bayon', sans-serif;
+  position: absolute; top: 0.4rem; right: 0.6rem;
+  font-size: 1.4rem; color: var(--red); opacity: 0.08;
+}
+
+/* ═══════════════ TIMELINE ═══════════════ */
+.timeline { display: flex; gap: 0.4rem; position: relative; }
+.timeline::before {
+  content: '';
+  position: absolute; top: 2.2rem; left: 5%; right: 5%;
+  height: 3px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--red), var(--pink-mid), var(--red));
+  opacity: 0.2; z-index: 0;
+}
+.tl-node {
+  flex: 1; z-index: 1; text-align: center;
+  padding: 0.6rem 0.3rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.15rem;
+}
+.tl-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--white); border: 3px solid var(--red);
+  margin-bottom: 0.3rem;
+  box-shadow: 0 0 0 3px rgba(227,53,41,0.1);
+}
+.tl-node:nth-child(3) .tl-dot { background: var(--red); }
+.tl-node:nth-child(5) .tl-dot { background: var(--yellow); border-color: var(--brown); }
+.tl-period { font-family: 'Bayon', sans-serif; font-size: 0.82rem; color: var(--red); letter-spacing: 0.05em; }
+.tl-emoji { font-size: 1.2rem; }
+.tl-label { font-size: 0.88rem; font-weight: 800; color: var(--brown-dark); }
+.tl-desc { font-size: 0.8rem; color: var(--brown); opacity: 0.6; line-height: 1.3; }
+
+/* ═══════════════ END SLIDE ═══════════════ */
+.end-outer {
+  width: 100%; max-width: 1500px; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.end-deco-1 {
+  position: absolute; width: 45%; aspect-ratio: 1; border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  left: -8%; top: 10%; z-index: 0;
+}
+.end-deco-2 {
+  position: absolute; width: 25%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--pink-mid);
+  right: 5%; bottom: 15%; z-index: 0;
+}
+
+/* ═══════════════ PROGRESS & NAV ═══════════════ */
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px; z-index: 100; border-radius: 0 2px 2px 0;
+  background: var(--red);
+  transition: width 0.4s ease;
+}
+
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.35rem 1.5rem;
+  background: rgba(243,243,233,0.92);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  font-size: 14px;
+}
+.nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 1.8rem; height: 1.8rem; border-radius: 50%;
+  border: 1.5px solid var(--red);
+  background: var(--white);
+  color: var(--red); font-size: 0;
+  cursor: pointer; transition: all 0.25s;
+  font-weight: 700; padding: 0; line-height: 1;
+}
+.nav-btn svg { width: 0.55rem; height: 0.55rem; fill: var(--red); display: block; }
+.nav-btn:hover:not(:disabled) {
+  background: var(--red);
+  box-shadow: 0 4px 12px rgba(227,53,41,0.25);
+}
+.nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+.nav-btn:disabled { opacity: 0.2; cursor: not-allowed; border-color: var(--brown); color: var(--brown); }
+.nav-counter { font-size: 13px; font-weight: 700; color: var(--brown); display: flex; align-items: center; gap: 0.15rem; min-width: 3rem; justify-content: center; line-height: 1; }
+.slide-input {
+  width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+  background: transparent; font-size: 13px; font-weight: 700; color: var(--brown); line-height: 1;
+  font-family: inherit; outline: none; cursor: pointer; transition: all 0.2s;
+}
+.slide-input:hover { border-bottom-color: var(--red); }
+.slide-input:focus { border-bottom-color: var(--red); color: var(--red); }
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
+@media (max-width: 1024px) {
+  html, body { font-size: clamp(15px, 2vw, 22px); }
+  .frame-body { padding: 1.3rem 1.6rem; }
+  .card { padding: 1.2rem 1.3rem; }
+  .club-grid { flex-wrap: wrap; }
+  .club-item { flex: 1 1 28%; min-width: 100px; }
+  .cover-main-text { font-size: clamp(2.5rem, 5.5vw, 5rem); }
+}
+
+@media (max-width: 768px) {
+  html, body { font-size: clamp(14px, 3vw, 20px); }
+  .slide { padding: 1.5vh 2vw 5vh; }
+  .frame-body { padding: 1rem 1.2rem; }
+  .flex-row { flex-direction: column; }
+  .card { padding: 1rem 1.1rem; border-radius: 1rem; }
+  .card-frame { border-radius: 1.2rem; }
+  h1 { font-size: 2rem; }
+  .cover-main-text { font-size: clamp(2rem, 8vw, 3.5rem); }
+  .cover-pills { justify-content: center; }
+  .club-grid { flex-wrap: wrap; }
+  .club-item { flex: 1 1 45%; transform: rotate(0deg) !important; }
+  .timeline { flex-wrap: wrap; }
+  .timeline::before { display: none; }
+  .tl-node { flex: 1 1 30%; min-width: 80px; }
+  .bg-circle { display: none; }
+  .cover-deco-1, .cover-deco-2, .cover-deco-3 { display: none; }
+}
+
+@media (max-width: 480px) {
+  html, body { font-size: clamp(14px, 3.5vw, 18px); }
+  .card { padding: 0.9rem; }
+  .nav-btn { width: 1.6rem; height: 1.6rem; }
+  .club-item { flex: 1 1 45%; }
+  .cover-pill { flex: 1 1 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Background decorations -->
+<div class="bg-circle bg-circle-1"></div>
+<div class="bg-circle bg-circle-2"></div>
+<div class="bg-circle bg-circle-3"></div>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- ═══════════ SLIDE 1: COVER ═══════════ -->
+  <div class="slide active" data-slide="0">
+    <div class="cover-outer">
+      <div class="cover-deco-1 anim-scale"></div>
+      <div class="cover-deco-2 anim-scale"></div>
+      <div class="cover-deco-3"></div>
+      <div class="cover-content">
+        <div class="cover-top-label anim-up">샘플고등학교 · 2026</div>
+        <div class="cover-main-text anim-up-d1">
+          정보화부<br>
+          <span class="line-cream">학교사업</span><br>
+          안내
+        </div>
+        <div class="cover-sub anim-up-d2">학부모님을 위한 안내 프레젠테이션</div>
+        <div class="cover-school anim-up-d2">우리 학생들의 AI·디지털 교육 여정을 소개합니다</div>
+        <div class="cover-pills anim-up-d3">
+          <div class="cover-pill"><span class="pill-emoji">🤖</span> AI 중점학교</div>
+          <div class="cover-pill"><span class="pill-emoji">💻</span> 디지털 선도학교</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SLIDE 2: OVERVIEW ═══════════ -->
+  <div class="slide" data-slide="1">
+    <div class="card-frame anim-scale">
+      <div class="frame-topbar">
+        <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+        <div class="frame-title-text">Overview</div>
+      </div>
+      <div class="frame-body flex-col gap-md">
+        <div class="sec-header anim-up">
+          <div class="sec-num">01</div>
+          <div class="sec-title">
+            <h2>정보화부가 하는 일</h2>
+            <div class="sec-sub">우리 학교의 디지털·AI 교육을 이끄는 정보화부를 소개합니다</div>
+          </div>
+        </div>
+        <div class="flex-row gap-md flex-1">
+          <div class="flex-col gap-md flex-2">
+            <div class="card card-red flex-1 flex-col justify-center anim-up-d1" style="padding:2rem 2.2rem;">
+              <div class="badge badge-pink" style="margin-bottom:0.8rem; align-self:flex-start;">MISSION</div>
+              <h1 style="font-size:1.85rem; margin-bottom:0.5rem; color:var(--white);">AI 시대를 준비하는<br><span style="color:var(--yellow);">미래 인재 양성</span></h1>
+              <p style="color:rgba(255,255,255,0.85);">정보화부는 학생들이 AI와 디지털 기술을 직접 경험하고, 미래 사회에 필요한 역량을 키울 수 있도록 다양한 프로그램을 운영합니다.</p>
+            </div>
+          </div>
+          <div class="flex-col gap-md flex-1">
+            <div class="card card-tilt flex-1 flex-col justify-center anim-up-d2" style="padding:1.5rem;">
+              <div class="big-num">2</div>
+              <h3 style="margin-top:0.3rem;">핵심 사업 운영</h3>
+              <div class="desc-sm">AI 중점학교 · AI·디지털 선도학교</div>
+            </div>
+            <div class="card card-pink card-tilt-r flex-1 flex-col justify-center anim-up-d3" style="padding:1.5rem;">
+              <div class="big-num sm">9,500<span class="big-num-unit">만원</span></div>
+              <h3 style="margin-top:0.3rem;">연간 교육 투자</h3>
+              <div class="desc-sm">학생 교육 프로그램에 집중 투자</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SLIDE 3: AI 중점학교 ═══════════ -->
+  <div class="slide" data-slide="2">
+    <div class="card-frame anim-scale">
+      <div class="frame-topbar">
+        <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+        <div class="frame-title-text">AI School</div>
+      </div>
+      <div class="frame-body flex-col gap-md">
+        <div class="sec-header anim-up">
+          <div class="sec-num">02</div>
+          <div class="sec-title">
+            <h2>AI 중점학교</h2>
+            <div class="sec-sub">2023년부터 운영 · 연간 5,000만원 투자</div>
+          </div>
+        </div>
+        <div class="card card-cream flex-shrink-0 anim-up-d1" style="padding:1rem 1.6rem;">
+          <div style="display:flex; align-items:center; gap:0.8rem;">
+            <div class="badge badge-red">핵심 목표</div>
+            <div>
+              <h3 style="font-size:1.1rem; margin-bottom:0.05rem;">세상의 따뜻한 변혁을 주도하는 <span class="red-text">AI 융합 인재 양성</span></h3>
+              <div class="desc-sm">학생들이 AI 기술을 이해하고 활용하여, 자신의 관심 분야와 융합할 수 있는 역량을 기릅니다.</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-row gap-md flex-1">
+          <div class="card card-tilt flex-1 flex-col anim-up-d2" style="position:relative;">
+            <span class="step-num">01.</span>
+            <div class="emoji-lg" style="margin-bottom:0.5rem;">🤖</div>
+            <h3>AI 수업 전원 수강</h3>
+            <p class="desc">전교생 AI 수업 수강, 최신 AI 활용 경험 제공</p>
+            <ul class="bullet-list" style="margin-top:auto; padding-top:0.5rem;">
+              <li><span class="bullet-dot"></span><span>인공지능 원리 및 개념 학습</span></li>
+              <li><span class="bullet-dot"></span><span>최신 AI 활용 및 응용 탐구</span></li>
+            </ul>
+          </div>
+          <div class="card flex-1 flex-col anim-up-d3" style="position:relative;">
+            <span class="step-num">02.</span>
+            <div class="emoji-lg" style="margin-bottom:0.5rem;">🤝</div>
+            <h3>AI 융합 동아리 운영</h3>
+            <p class="desc">희망 동아리에 50만원 이상 지원, AI/SW 융합 활동</p>
+            <ul class="bullet-list" style="margin-top:auto; padding-top:0.5rem;">
+              <li><span class="bullet-dot"></span><span>문·이과 무관 전 동아리 참여 가능</span></li>
+              <li><span class="bullet-dot"></span><span>동아리별 맞춤 AI 프로젝트</span></li>
+            </ul>
+          </div>
+          <div class="card card-tilt-r flex-1 flex-col anim-up-d4" style="position:relative;">
+            <span class="step-num">03.</span>
+            <div class="emoji-lg" style="margin-bottom:0.5rem;">🚀</div>
+            <h3>AI 스타트업 프로젝트</h3>
+            <p class="desc">창업 아이디어를 AI로 실현하는 프로젝트</p>
+            <ul class="bullet-list" style="margin-top:auto; padding-top:0.5rem;">
+              <li><span class="bullet-dot"></span><span>비즈니스 모델 수립</span></li>
+              <li><span class="bullet-dot"></span><span>AI 프로토타입 제작</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SLIDE 4: 방학 프로그램 ═══════════ -->
+  <div class="slide" data-slide="3">
+    <div class="card-frame anim-scale">
+      <div class="frame-topbar">
+        <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+        <div class="frame-title-text">Special Programs</div>
+      </div>
+      <div class="frame-body flex-col gap-md">
+        <div class="sec-header anim-up">
+          <div class="sec-num">03</div>
+          <div class="sec-title">
+            <h2>방학 특별 프로그램</h2>
+            <div class="sec-sub">방학 기간에도 멈추지 않는 AI 교육 기회</div>
+          </div>
+        </div>
+        <div class="flex-row gap-md flex-1">
+          <div class="card card-tilt flex-1 flex-col anim-up-d1" style="padding:1.6rem; position:relative; border: 2px solid var(--pink-mid);">
+            <span class="step-num" style="color:var(--brown);">Summer</span>
+            <div class="badge badge-red" style="align-self:flex-start; margin-bottom:0.6rem;">여름방학</div>
+            <h3 style="font-size:1.2rem;">AI 융합 캠프</h3>
+            <p class="desc" style="margin-bottom:0.6rem;">AI 기술을 직접 활용하는 프로젝트 중심 캠프</p>
+            <ul class="bullet-list" style="margin-top:auto;">
+              <li><span class="bullet-dot"></span><span>AI 기술 활용 프로젝트 체험</span></li>
+              <li><span class="bullet-dot"></span><span>전문 강사 초빙 특강</span></li>
+              <li><span class="bullet-dot"></span><span>팀 프로젝트 & 성과 발표</span></li>
+            </ul>
+          </div>
+          <div class="card card-tilt-r flex-1 flex-col anim-up-d2" style="padding:1.6rem; position:relative; background:var(--pink-light);">
+            <span class="step-num" style="color:var(--brown);">Winter</span>
+            <div class="badge badge-cream" style="align-self:flex-start; margin-bottom:0.6rem;">겨울방학</div>
+            <h3 style="font-size:1.2rem;">IT 기업 탐방</h3>
+            <p class="desc" style="margin-bottom:0.6rem;">실제 IT 기업 현장을 방문하는 진로 탐색 프로그램</p>
+            <ul class="bullet-list" style="margin-top:auto;">
+              <li><span class="bullet-dot"></span><span>실제 IT 기업 현장 방문</span></li>
+              <li><span class="bullet-dot"></span><span>현업 개발자와의 만남</span></li>
+              <li><span class="bullet-dot"></span><span>IT 직업 세계 탐색</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="flex-row gap-md flex-shrink-0">
+          <div class="card card-cream flex-1 anim-up-d3" style="padding:0.8rem 1.2rem;">
+            <div style="display:flex; align-items:center; gap:0.6rem;">
+              <span class="emoji-md">🎯</span>
+              <div>
+                <h3 style="font-size:0.9rem; margin-bottom:0.05rem;">학생이 얻는 것</h3>
+                <div class="desc-sm">프로그램 이수 확인서 · 생활기록부 기재 자료 · 진로 탐색 경험</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SLIDE 5: 디지털 선도학교 ═══════════ -->
+  <div class="slide" data-slide="4">
+    <div class="card-frame anim-scale">
+      <div class="frame-topbar">
+        <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+        <div class="frame-title-text">Digital Pioneer</div>
+      </div>
+      <div class="frame-body flex-col gap-md">
+        <div class="sec-header anim-up">
+          <div class="sec-num">04</div>
+          <div class="sec-title">
+            <h2>AI·디지털 활용 선도학교</h2>
+            <div class="sec-sub">연간 4,500만원 투자 · 에듀테크 프로그램 지원사업 연계</div>
+          </div>
+        </div>
+        <div class="flex-row gap-md flex-1">
+          <div class="card card-tilt flex-1 flex-col anim-up-d1" style="padding:1.5rem; position:relative;">
+            <span class="step-num">01.</span>
+            <div class="badge badge-teal" style="align-self:flex-start; margin-bottom:0.5rem;">정보 · 프로그래밍</div>
+            <div class="emoji-lg" style="margin-bottom:0.4rem;">🖥️</div>
+            <h3 style="font-size:1.25rem;">엘리스</h3>
+            <p class="desc">AI·프로그래밍 실습 플랫폼으로 학생 맞춤형 코딩 교육을 제공합니다.</p>
+          </div>
+          <div class="card flex-1 flex-col anim-up-d2" style="padding:1.5rem; position:relative; background:var(--pink-light);">
+            <span class="step-num">02.</span>
+            <div class="badge badge-pink" style="align-self:flex-start; margin-bottom:0.5rem;">수학</div>
+            <div class="emoji-lg" style="margin-bottom:0.4rem;">📐</div>
+            <h3 style="font-size:1.25rem;">스쿨플랫</h3>
+            <p class="desc">AI가 학생의 수준을 분석하여 개인 맞춤형 수학 문제를 추천합니다.</p>
+          </div>
+          <div class="card card-tilt-r flex-1 flex-col anim-up-d3" style="padding:1.5rem; position:relative;">
+            <span class="step-num">03.</span>
+            <div class="badge badge-red" style="align-self:flex-start; margin-bottom:0.5rem;">수능 과목</div>
+            <div class="emoji-lg" style="margin-bottom:0.4rem;">📝</div>
+            <h3 style="font-size:1.25rem;">기출탭탭</h3>
+            <p class="desc">수능 기출 문제를 AI로 분석하여 취약 유형을 집중 학습합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SLIDE 6: 연간 로드맵 ═══════════ -->
+  <div class="slide" data-slide="5">
+    <div class="card-frame anim-scale">
+      <div class="frame-topbar">
+        <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+        <div class="frame-title-text">Roadmap</div>
+      </div>
+      <div class="frame-body flex-col gap-md">
+        <div class="sec-header anim-up">
+          <div class="sec-num">05</div>
+          <div class="sec-title">
+            <h2>학생 성장 연간 로드맵</h2>
+            <div class="sec-sub">1년간 우리 학생들이 경험하게 될 AI 교육 여정</div>
+          </div>
+        </div>
+        <div class="card flex-shrink-0 anim-up-d1" style="padding:1rem 1.2rem; background:var(--white);">
+          <div class="timeline">
+            <div class="tl-node">
+              <div class="tl-period">3–4월</div>
+              <div class="tl-dot"></div>
+              <div class="tl-emoji">🌱</div>
+              <div class="tl-label">시작</div>
+              <div class="tl-desc">동아리 구성<br>코스웨어 도입</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-period">5–6월</div>
+              <div class="tl-dot"></div>
+              <div class="tl-emoji">📚</div>
+              <div class="tl-label">성장</div>
+              <div class="tl-desc">수업 적용<br>프로젝트 진행</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-period">7–8월</div>
+              <div class="tl-dot"></div>
+              <div class="tl-emoji">☀️</div>
+              <div class="tl-label">도약</div>
+              <div class="tl-desc">AI 캠프<br>특별 활동</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-period">9–10월</div>
+              <div class="tl-dot"></div>
+              <div class="tl-emoji">🎯</div>
+              <div class="tl-label">심화</div>
+              <div class="tl-desc">공개 수업<br>AI 전시회</div>
+            </div>
+            <div class="tl-node">
+              <div class="tl-period">11–12월</div>
+              <div class="tl-dot"></div>
+              <div class="tl-emoji">🏆</div>
+              <div class="tl-label">결실</div>
+              <div class="tl-desc">성과 발표<br>포트폴리오</div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-row gap-md flex-1">
+          <div class="card card-tilt flex-1 flex-col anim-up-d2" style="position:relative;">
+            <span class="step-num">01.</span>
+            <div class="emoji-md" style="margin-bottom:0.3rem;">📝</div>
+            <h3>생활기록부 반영</h3>
+            <p class="desc">동아리 활동, 프로젝트, 캠프 등 다양한 경험이 학생부에 기록됩니다.</p>
+          </div>
+          <div class="card card-pink flex-1 flex-col anim-up-d3" style="position:relative;">
+            <span class="step-num">02.</span>
+            <div class="emoji-md" style="margin-bottom:0.3rem;">🎓</div>
+            <h3>진로·진학 연계</h3>
+            <p class="desc">AI 융합 역량은 이공계뿐 아니라 인문·예술 분야 진학에도 강점이 됩니다.</p>
+          </div>
+          <div class="card card-tilt-r flex-1 flex-col anim-up-d4" style="position:relative;">
+            <span class="step-num">03.</span>
+            <div class="emoji-md" style="margin-bottom:0.3rem;">💪</div>
+            <h3>미래 역량 강화</h3>
+            <p class="desc">문제해결력, 협업 능력, 디지털 리터러시 등 핵심 역량을 키웁니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ SLIDE 7: END ═══════════ -->
+  <div class="slide" data-slide="6">
+    <div class="end-outer">
+      <div class="end-deco-1 anim-scale"></div>
+      <div class="end-deco-2 anim-scale"></div>
+      <div class="cover-content text-center" style="max-width:800px; margin:0 auto;">
+        <div class="emoji-xl anim-up" style="margin-bottom:1rem;">🙇</div>
+        <div class="display-font anim-up-d1" style="font-size:clamp(2.5rem, 5vw, 5rem); margin-bottom:0.5rem;">감사합니다</div>
+        <p class="anim-up-d2" style="font-size:1rem; color:var(--brown); margin-bottom:2rem; line-height:1.7;">학부모님의 관심과 응원이<br>학생들의 미래를 만듭니다.</p>
+        <div class="card card-red anim-up-d3" style="display:inline-block; padding:1rem 2.5rem; margin-bottom:1.8rem; border-radius:1.2rem;">
+          <div style="font-size:0.7rem; color:rgba(255,255,255,0.7); margin-bottom:0.2rem; letter-spacing:0.08em; text-transform:uppercase;">2026 정보화부 핵심 사업</div>
+          <div style="font-size:1rem; font-weight:700; color:var(--white);">AI 중점학교 · AI·디지털 선도학교</div>
+        </div>
+        <div class="anim-up-d5" style="font-size:0.75rem; color:var(--brown); opacity:0.35; margin-top:1.5rem;">샘플고등학교 정보화부</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+  <span class="nav-counter">
+    <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력"> / <span id="totalSlides">7</span>
+  </span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
+  <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면" style="margin-left:0.3rem;">
+    <svg id="fsIcon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+  </button>
+</div>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+const progressBar = document.getElementById('progressBar');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const slideInput = document.getElementById('slideInput');
+document.getElementById('totalSlides').textContent = totalSlides;
+
+function goToSlide(index) {
+  if (index < 0 || index >= totalSlides || index === currentSlide) return;
+  slides[currentSlide].classList.remove('active');
+  currentSlide = index;
+  slides[currentSlide].classList.add('active');
+  updateUI();
+}
+function nextSlide() { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); }
+function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+function updateUI() {
+  progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+  slideInput.value = currentSlide + 1;
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlides - 1;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.target === slideInput) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown' || e.key === 'F5') { e.preventDefault(); nextSlide(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+  else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+  else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+});
+
+let wheelLocked = false;
+document.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  if (wheelLocked) return;
+  wheelLocked = true;
+  if (e.deltaY > 0) nextSlide();
+  else if (e.deltaY < 0) prevSlide();
+  setTimeout(() => { wheelLocked = false; }, 600);
+}, { passive: false });
+
+slideInput.addEventListener('focus', () => slideInput.select());
+slideInput.addEventListener('keydown', (e) => {
+  e.stopPropagation();
+  if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+  else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+});
+slideInput.addEventListener('blur', () => {
+  const n = parseInt(slideInput.value);
+  if (n >= 1 && n <= totalSlides) goToSlide(n - 1);
+  else slideInput.value = currentSlide + 1;
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+document.addEventListener('touchend', (e) => {
+  const diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) { if (diff > 0) nextSlide(); else prevSlide(); }
+}, { passive: true });
+
+updateUI();
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const icon = document.getElementById('fsIcon');
+  if (document.fullscreenElement) {
+    icon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+  } else {
+    icon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+  }
+});
+</script>
+
+  <script type="module" src="../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

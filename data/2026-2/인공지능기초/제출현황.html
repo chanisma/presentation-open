@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>과제 제출 현황 — 인공지능 기초</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+<style>
+  :root {
+    --bg: #eef5fc;
+    --surface: #ffffff;
+    --fg: #0b1c33;
+    --fg-muted: #475972;
+    --fg-faint: #7c8ca3;
+    --hair: rgba(13, 44, 84, 0.16);
+    --primary: #2563eb;
+    --accent: linear-gradient(115deg, #22d3ee 0%, #2563eb 55%, #4f46e5 100%);
+    --c-blue: #2563eb; --c-cyan: #0891b2; --c-violet: #7c3aed;
+    --c-amber: #d97706; --c-green: #059669; --c-rose: #e11d48;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 15% -5%, rgba(37, 99, 235, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(34, 211, 238, 0.10), transparent 55%),
+      var(--bg);
+    color: var(--fg); line-height: 1.65; word-break: keep-all; padding-bottom: 60px;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 28px 18px 0; }
+
+  header.hero {
+    position: relative; overflow: hidden; background: var(--surface);
+    border: 1px solid var(--hair); border-radius: 22px; padding: 30px 28px; margin-bottom: 18px;
+    box-shadow: 0 24px 60px -35px rgba(15, 55, 105, 0.35);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(13, 44, 84, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13, 44, 84, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--primary); }
+  .hero h1 { font-size: clamp(23px, 4.6vw, 32px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad { background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { color: var(--fg-muted); font-size: 14px; margin-top: 8px; max-width: 640px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 18px;
+    padding: 22px 24px; margin-bottom: 16px; box-shadow: 0 16px 44px -32px rgba(15, 55, 105, 0.3);
+  }
+  label.q { display: block; font-weight: 700; font-size: 14px; margin: 12px 0 6px; }
+  input[type="text"], input[type="password"] {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px; padding: 10px 13px;
+    font: inherit; font-size: 14.5px; color: var(--fg); background: #fbfdff;
+  }
+  input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13); }
+  .btn {
+    border: none; border-radius: 999px; padding: 11px 24px; font: inherit; font-weight: 800;
+    font-size: 14.5px; cursor: pointer; transition: transform 0.12s, opacity 0.15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.55; cursor: wait; }
+  .btn-primary { background: linear-gradient(115deg, #22d3ee 0%, #2563eb 55%, #4f46e5 100%); color: #fff; box-shadow: 0 10px 26px -12px rgba(37, 99, 235, 0.6); }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+  .btn-mini { padding: 7px 15px; font-size: 12.5px; border-radius: 999px; }
+
+  .gate-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .gate-row .f { flex: 1 1 150px; }
+  .sid-hint { margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px; font-family: 'JetBrains Mono', monospace; }
+  .sid-hint.ok { color: var(--c-green); }
+  .sid-hint.bad { color: var(--c-rose); }
+  .note { font-size: 12.5px; color: var(--fg-muted); margin-top: 12px; }
+  .err { color: var(--c-rose); font-weight: 700; font-size: 13.5px; margin-top: 12px; min-height: 18px; }
+
+  /* 과제 카드 */
+  .a-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .a-head h2 { font-size: 19px; font-weight: 800; }
+  .a-head .lesson { font-size: 12.5px; color: var(--fg-faint); font-weight: 700; }
+  .count { font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 15px; color: var(--primary); }
+  .bar { height: 10px; border-radius: 999px; background: rgba(13, 44, 84, 0.08); overflow: hidden; margin: 12px 0 4px; }
+  .bar > i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+
+  .bar-note { font-size: 12.5px; color: var(--fg-muted); font-weight: 700; }
+
+  .mine-cta {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 16px;
+    padding: 14px 18px; border-radius: 14px;
+    border: 1.5px solid color-mix(in srgb, var(--c-green) 45%, transparent);
+    background: rgba(5, 150, 105, 0.07);
+  }
+  .mine-cta.todo {
+    border-color: color-mix(in srgb, var(--c-amber) 55%, transparent);
+    background: rgba(217, 119, 6, 0.06);
+  }
+  .mine-cta .t { font-weight: 800; font-size: 14.5px; }
+
+  /* 모달 */
+  .backdrop {
+    position: fixed; inset: 0; background: rgba(9, 26, 51, 0.45); backdrop-filter: blur(3px);
+    display: grid; place-items: center; padding: 18px; z-index: 70;
+  }
+  .backdrop[hidden] { display: none; }
+  .modal {
+    width: min(460px, 100%); max-height: 88vh; overflow-y: auto; background: var(--surface);
+    border: 1px solid var(--hair); border-radius: 20px; padding: 24px;
+    box-shadow: 0 30px 80px -30px rgba(9, 30, 60, 0.5);
+  }
+  .modal h3 { font-size: 18.5px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 12px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .lk-ok { border: 1.5px solid var(--c-green); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 14px 16px; margin-top: 14px; }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-green); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { overflow-wrap: anywhere; }
+  .lk-bad { border: 1.5px solid var(--c-rose); background: rgba(225, 29, 72, 0.06); border-radius: 14px; padding: 13px 16px; margin-top: 14px; font-size: 13.5px; font-weight: 600; color: var(--c-rose); }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; margin-top: 14px; }
+
+  .foot { text-align: center; font-size: 12px; color: var(--fg-faint); margin-top: 18px; }
+  [hidden] { display: none !important; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    .card { padding: 18px 16px; }
+    .gate-row .f { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">인공지능 기초 · 2026-2</div>
+    <h1>과제 <span class="grad">제출 현황</span></h1>
+    <p class="sub">학번과 이름을 넣으면 <strong>몇 명이 냈는지</strong>와 <strong>내가 냈는지</strong>를 확인할 수 있습니다.
+      내가 쓴 내용은 제출할 때 정한 <strong>암호</strong>를 넣어야 열립니다.</p>
+  </header>
+
+  <!-- 입장 -->
+  <section class="card" id="gateCard">
+    <div class="gate-row">
+      <div class="f">
+        <label class="q" for="gSid">학번</label>
+        <input type="text" id="gSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+        <div class="sid-hint" id="gSidHint"></div>
+      </div>
+      <div class="f">
+        <label class="q" for="gName">이름</label>
+        <input type="text" id="gName" placeholder="이름" autocomplete="off">
+      </div>
+      <div class="f" style="flex:0 0 auto;">
+        <button class="btn btn-primary" id="gGo" type="button">현황 보기</button>
+      </div>
+    </div>
+    <div class="err" id="gErr"></div>
+    <p class="note">🔒 현황판에는 <strong>제출한 인원 수</strong>와 <strong>내 상태</strong>만 나옵니다.
+      다른 사람이 누구인지, 무엇을 썼는지는 표시되지 않고, 내가 쓴 내용도 본인 암호로만 열립니다.</p>
+  </section>
+
+  <!-- 현황 -->
+  <div id="boardWrap" hidden></div>
+
+  <p class="foot" id="footNote" hidden></p>
+</div>
+
+<!-- 암호 모달 -->
+<div class="backdrop" id="pwBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+    <h3 id="pwTitle">내 자료 열기</h3>
+    <p class="m-desc">제출할 때 정한 <strong>암호</strong>를 넣으면 내가 쓴 내용이 열립니다.</p>
+    <label class="q" for="pwInput">제출 암호</label>
+    <input type="password" id="pwInput" placeholder="제출할 때 정한 암호" autocomplete="off">
+    <div id="pwResult"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-mini" id="pwClose" type="button">닫기</button>
+      <button class="btn btn-ghost btn-mini" id="pwOpenSheet" type="button" hidden>활동지에서 이어 쓰기</button>
+      <button class="btn btn-primary btn-mini" id="pwGo" type="button">열기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var GAS_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+  var URL_KEY = 'gas_url_ai_basics_2026_2';   // 활동지와 같은 키 (교사가 바꾸면 함께 적용)
+  var ME_KEY  = 'board_me_ai_basics_2026_2';
+  var SID_RE  = /^\d{5}$/;
+
+  var me = { studentId: '', studentName: '' };
+  var currentAssignment = null;
+  var lastLookup = null;
+  var lastPw = '';
+
+  function el(id) { return document.getElementById(id); }
+  function endpoint() { return localStorage.getItem(URL_KEY) || GAS_URL; }
+
+  /* ── 학번 풀이 ── */
+  function sidLabel(sid) {
+    if (!SID_RE.test(sid)) return sid;
+    return parseInt(sid.slice(0, 1), 10) + '학년 ' + parseInt(sid.slice(1, 3), 10) + '반 ' + parseInt(sid.slice(3, 5), 10) + '번';
+  }
+  function renderSidHint() {
+    var v = el('gSid').value.trim();
+    var h = el('gSidHint');
+    if (!v) { h.textContent = ''; h.className = 'sid-hint'; return; }
+    if (!SID_RE.test(v)) { h.textContent = '↳ 숫자 5자리 (예: 20317)'; h.className = 'sid-hint bad'; return; }
+    h.textContent = '↳ ' + sidLabel(v);
+    h.className = 'sid-hint ok';
+  }
+  el('gSid').addEventListener('input', function () {
+    var c = el('gSid').value.replace(/\D/g, '').slice(0, 5);
+    if (c !== el('gSid').value) el('gSid').value = c;
+    renderSidHint();
+  });
+
+  /* ── 통신 (fetch → 막히면 JSONP) ── */
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'bcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버 응답이 없습니다.')); }, 20000);
+      function cleanup() {
+        clearTimeout(timer);
+        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      window[cb] = function (d) { cleanup(); resolve(d); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결할 수 없습니다.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function ask(params) {
+    var qs = Object.keys(params).map(function (k) {
+      return k + '=' + encodeURIComponent(params[k]);
+    }).join('&');
+    var url = endpoint() + '?' + qs;
+    return fetch(url)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return jsonp(url); });
+  }
+
+  /* ── 입장 ── */
+  el('gGo').addEventListener('click', enter);
+  ['gSid', 'gName'].forEach(function (id) {
+    el(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); enter(); } });
+  });
+
+  function enter() {
+    var sid = el('gSid').value.trim();
+    var name = el('gName').value.trim();
+    var err = el('gErr');
+    err.textContent = '';
+    if (!SID_RE.test(sid)) { err.textContent = '학번은 숫자 5자리예요 (학년1 + 반2 + 번호2).'; return; }
+    if (!name) { err.textContent = '이름을 입력해 주세요.'; return; }
+
+    var btn = el('gGo');
+    btn.disabled = true;
+    btn.textContent = '불러오는 중…';
+
+    ask({ action: 'board', studentId: sid, studentName: name })
+      .then(function (res) {
+        if (!res || res.status !== 'ok') {
+          err.textContent = (res && res.status === 'denied')
+            ? '수강생 명단에서 학번·이름을 찾지 못했습니다. 띄어쓰기 없이 정확히 입력했는지 확인해 주세요.'
+            : '불러오지 못했습니다: ' + ((res && res.message) || '알 수 없는 오류');
+          return;
+        }
+        me = { studentId: sid, studentName: name };
+        try { localStorage.setItem(ME_KEY, JSON.stringify(me)); } catch (e) {}
+        renderBoard(res);
+      })
+      .catch(function (e2) { err.textContent = '오류: ' + e2.message; })
+      .finally(function () { btn.disabled = false; btn.textContent = '현황 보기'; });
+  }
+
+  /* ── 현황 그리기 ── */
+  function renderBoard(res) {
+    var wrap = el('boardWrap');
+    wrap.textContent = '';
+    wrap.hidden = false;
+
+    res.assignments.forEach(function (a) {
+      wrap.appendChild(assignmentCard(a, res.rosterKnown));
+    });
+
+    var foot = el('footNote');
+    foot.textContent = res.rosterKnown
+      ? '수강생 명단 기준 현황입니다.'
+      : '아직 수강생 명단이 등록되지 않아 전체 인원 없이 제출 인원만 표시됩니다.';
+    foot.hidden = false;
+
+    el('gGo').textContent = '새로고침';
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function assignmentCard(a, rosterKnown) {
+    var card = document.createElement('section');
+    card.className = 'card';
+
+    var head = document.createElement('div');
+    head.className = 'a-head';
+    var left = document.createElement('div');
+    var h2 = document.createElement('h2');
+    h2.textContent = a.title;
+    var lesson = document.createElement('div');
+    lesson.className = 'lesson';
+    lesson.textContent = a.lesson;
+    if (a.deadline) {
+      var dp = a.deadline.split('-');
+      lesson.textContent += ' · ' + (a.closed ? '마감됨 (' : '마감 ') + Number(dp[1]) + '/' + Number(dp[2]) + (a.closed ? ')' : ' 23:59');
+    }
+    left.appendChild(h2);
+    left.appendChild(lesson);
+    var cnt = document.createElement('div');
+    cnt.className = 'count';
+    cnt.textContent = a.expected ? ('제출 ' + a.submittedCount + ' / ' + a.expected + '명')
+                                 : ('제출 ' + a.submittedCount + '명');
+    head.appendChild(left);
+    head.appendChild(cnt);
+    card.appendChild(head);
+
+    if (a.expected) {
+      var bar = document.createElement('div');
+      bar.className = 'bar';
+      var fill = document.createElement('i');
+      fill.style.width = Math.round((a.submittedCount / a.expected) * 100) + '%';
+      bar.appendChild(fill);
+      card.appendChild(bar);
+      var left2 = document.createElement('div');
+      left2.className = 'bar-note';
+      var rest = a.expected - a.submittedCount;
+      left2.textContent = rest > 0 ? ('아직 ' + rest + '명이 남았어요') : '전원 제출 완료 🎉';
+      card.appendChild(left2);
+    }
+
+    /* 내 상태 + 내 자료 열기 */
+    var cta = document.createElement('div');
+    cta.className = 'mine-cta' + (a.mine ? '' : ' todo');
+    var t = document.createElement('span');
+    t.className = 't';
+    if (a.mine) {
+      t.textContent = '✅ 냈어요 · ' + a.mine.at;
+      var openBtn = document.createElement('button');
+      openBtn.className = 'btn btn-primary btn-mini';
+      openBtn.type = 'button';
+      openBtn.textContent = '내 자료 열기';
+      openBtn.addEventListener('click', function () { openMine(a); });
+      cta.appendChild(t);
+      cta.appendChild(openBtn);
+    } else {
+      t.textContent = a.closed ? '내지 않았어요 · 제출 마감' : '아직 내지 않았어요.';
+      var goBtn = document.createElement('a');
+      goBtn.className = 'btn btn-primary btn-mini';
+      goBtn.style.textDecoration = 'none';
+      goBtn.href = '/' + a.path + '?sid=' + encodeURIComponent(me.studentId);
+      goBtn.textContent = '활동지 열러 가기';
+      cta.appendChild(t);
+      cta.appendChild(goBtn);
+    }
+    card.appendChild(cta);
+
+    return card;
+  }
+
+  /* ── 내 자료 열기 (암호) ── */
+  function openMine(a) {
+    currentAssignment = a;
+    lastLookup = null;
+    lastPw = '';
+    el('pwInput').value = '';
+    el('pwResult').textContent = '';
+    el('pwOpenSheet').hidden = true;
+    el('pwBackdrop').hidden = false;
+    el('pwInput').focus();
+  }
+  function closePw() { el('pwBackdrop').hidden = true; }
+
+  el('pwClose').addEventListener('click', closePw);
+  el('pwBackdrop').addEventListener('click', function (e) { if (e.target === el('pwBackdrop')) closePw(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !el('pwBackdrop').hidden) closePw(); });
+  el('pwInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); el('pwGo').click(); } });
+
+  el('pwGo').addEventListener('click', function () {
+    var pw = el('pwInput').value.trim();
+    var box = el('pwResult');
+    box.textContent = '';
+    if (!pw) { showBad('암호를 입력해 주세요.'); return; }
+
+    var btn = this;
+    btn.disabled = true;
+    var wait = document.createElement('div');
+    wait.className = 'lk-wait';
+    wait.textContent = '확인하는 중…';
+    box.appendChild(wait);
+
+    ask({
+      action: 'lookup',
+      source: currentAssignment ? currentAssignment.id : '',
+      studentId: me.studentId, studentName: me.studentName, password: pw
+    })
+      .then(function (res) {
+        box.textContent = '';
+        if (res && res.status === 'ok') {
+          lastLookup = res;
+          lastPw = pw;
+          el('pwOpenSheet').hidden = false;
+          showOk(res);
+        } else if (res && res.status === 'denied') {
+          showBad('암호가 일치하지 않습니다. 제출할 때 정한 암호를 다시 확인해 주세요.');
+        } else if (res && res.status === 'notfound') {
+          showBad('제출 기록을 찾지 못했습니다.');
+        } else {
+          showBad('오류: ' + ((res && res.message) || '알 수 없는 오류'));
+        }
+      })
+      .catch(function (e2) { box.textContent = ''; showBad('오류: ' + e2.message); })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  function showBad(msg) {
+    var d = document.createElement('div');
+    d.className = 'lk-bad';
+    d.textContent = msg;
+    el('pwResult').appendChild(d);
+  }
+  function showOk(res) {
+    var d = res.data;
+    var box = document.createElement('div');
+    box.className = 'lk-ok';
+    var stamp = document.createElement('div');
+    stamp.className = 'stamp';
+    stamp.textContent = '내가 낸 내용';
+    var when = document.createElement('div');
+    when.className = 'when';
+    when.textContent = res.submittedAt;
+    box.appendChild(stamp);
+    box.appendChild(when);
+    var dl = document.createElement('dl');
+    /* 활동지마다 미리보기에 띄울 항목이 다르다 — 등록되지 않은 과제는 받은 값을 그대로 보여 준다 */
+    var PREVIEW = {
+      ai_world_explore: [['A 현장', 'aScene'], ['A 이유', 'aReason'], ['B 기술', 'bTech'], ['B 칩', 'bChips'],
+        ['C 아이디어', 'cTitle'], ['C 무엇이 달라지나', 'cChange'], ['D 피치', 'dPitch'], ['D 입장', 'dStance']],
+      prompt_lab: [['A 과제', 'aTask'], ['B 1차 점수', 'b1Score'], ['B 1차 진단', 'b1Diag'],
+        ['C 3차 점수', 'c3Score'], ['C 3차에서 고친 점', 'c3Fix'], ['D 안 적힌 조건', 'dMissing'],
+        ['E 한 문장 정리', 'eSummary']],
+      design_recover: [['A 주제', 'aTopic'], ['B1 무엇을 말하는가', 'bMeaning'], ['B2 문단 구성', 'bParas'],
+        ['B4 내가 만든 질문', 'bMyQ'], ['C 1차 점수', 'c1Score'], ['D 고칠 부분', 'd2Fix'],
+        ['D 2차 점수', 'd2Score'], ['E 한 문장 정리', 'eSummary']]
+    };
+    var spec = PREVIEW[currentAssignment ? currentAssignment.id : ''];
+    if (!spec) {
+      spec = Object.keys(d)
+        .filter(function (k) { return ['studentName', 'studentId', 'today'].indexOf(k) < 0; })
+        .slice(0, 8)
+        .map(function (k) { return [k, k]; });
+    }
+    spec.map(function (s) { return [s[0], d[s[1]]]; }).forEach(function (p) {
+      if (!p[1]) return;
+      var dt = document.createElement('dt');
+      dt.textContent = p[0];
+      var dd = document.createElement('dd');
+      dd.textContent = p[1];
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    });
+    box.appendChild(dl);
+    el('pwResult').appendChild(box);
+  }
+
+  /* 활동지로 넘겨서 이어 쓰기 — 같은 탭 세션에만 잠깐 담는다 */
+  el('pwOpenSheet').addEventListener('click', function () {
+    if (!lastLookup || !currentAssignment) return;
+    try {
+      sessionStorage.setItem('handoff_' + currentAssignment.id, JSON.stringify({
+        data: lastLookup.data, password: lastPw, at: lastLookup.submittedAt
+      }));
+    } catch (e) { /* 저장 실패해도 학번은 넘어간다 */ }
+    location.href = '/' + currentAssignment.path + '?sid=' + encodeURIComponent(me.studentId) + '&restore=1';
+  });
+
+  /* ── 마지막에 입장했던 학번·이름 복원 (암호는 저장하지 않음) ── */
+  (function restoreMe() {
+    try {
+      var raw = localStorage.getItem(ME_KEY);
+      if (!raw) return;
+      var m = JSON.parse(raw);
+      if (m && m.studentId) el('gSid').value = m.studentId;
+      if (m && m.studentName) el('gName').value = m.studentName;
+      renderSidHint();
+    } catch (e) { /* 무시 */ }
+  })();
+})();
+</script>
+</body>
+</html>

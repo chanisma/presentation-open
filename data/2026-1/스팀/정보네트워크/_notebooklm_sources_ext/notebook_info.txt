@@ -1,0 +1,4 @@
+notebook_id: 065d4f64-fc91-44ef-9131-af93f6d8f446
+artifact_id: e27fcc2c-15fa-4608-b7d1-b3e70eca6d4e
+title: Scaling Data Science Principles (에필로그 2장)
+created: 2026-07-13

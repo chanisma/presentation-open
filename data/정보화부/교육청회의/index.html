@@ -1,0 +1,1883 @@
+<!--
+  페이지 목적: 전북도 교육청 출장 회의용 실시간 시연 자료.
+  주제: 급격하게 발전하는 기술을 어떻게 교육에 적용할 것인가?
+  회의 중 참석자와 함께 스크롤하며 네 개의 실제 개발 사례(새 창)를
+  시연하고, 교육청에 드리는 세 가지 제안을 구조적으로 공유한다.
+  단일 HTML 파일, 외부 의존성 없음.
+-->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>급격하게 발전하는 기술을 어떻게 교육에 적용할 것인가?</title>
+  <meta name="description" content="교육청과 교사가 함께 그리는 전북 교육의 다음 단계" />
+  <style>
+    /* ===== 기본 리셋 & 전역 ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --card: #161616;
+      --card-hover: #1c1c1c;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text: #e5e5e5;
+      --text-muted: #a0a0a0;
+      --text-dim: #6b6b6b;
+      --accent: #5eead4;
+      --accent-soft: rgba(94, 234, 212, 0.12);
+      --accent-border: rgba(94, 234, 212, 0.35);
+      --radius: 14px;
+      --transition: all 200ms ease;
+      --container: 960px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Pretendard", "Noto Sans KR", system-ui, -apple-system,
+        "Segoe UI", sans-serif;
+      font-weight: 400;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+
+    /* ===== 공통 컨테이너 & 섹션 ===== */
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 96px 0;
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      section { padding: 64px 0; }
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 6px 12px;
+      border: 1px solid var(--accent-border);
+      border-radius: 999px;
+      background: var(--accent-soft);
+      margin-bottom: 20px;
+    }
+
+    h2.section-title {
+      font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    p.section-lead {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 70ch;
+      margin-bottom: 48px;
+    }
+
+    /* ===== Hero ===== */
+    /* 섹션: Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 20%, rgba(94, 234, 212, 0.08), transparent 60%),
+        radial-gradient(ellipse 60% 40% at 50% 80%, rgba(94, 234, 212, 0.04), transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.9rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #ffffff 0%, #bdbdbd 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero .subtitle {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 36px;
+      letter-spacing: 0.01em;
+    }
+
+    .hero .lead {
+      font-size: clamp(0.98rem, 1.5vw, 1.08rem);
+      color: var(--text-muted);
+      max-width: 62ch;
+      margin: 0 auto;
+      line-height: 1.8;
+    }
+
+    /* Hero 핵심 키워드 */
+    .hero-keywords {
+      margin: 40px auto 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      max-width: 780px;
+    }
+
+    .kw {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .kw:hover {
+      border-color: var(--accent-border);
+      color: var(--accent);
+      transform: translateY(-1px);
+      background: rgba(94, 234, 212, 0.06);
+    }
+
+    .kw-primary {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      font-weight: 600;
+      font-size: 0.94rem;
+      padding: 10px 18px;
+    }
+
+    .kw-primary:hover {
+      background: rgba(94, 234, 212, 0.22);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    @media (max-width: 640px) {
+      .hero-keywords { gap: 8px; margin-top: 32px; }
+      .kw { font-size: 0.82rem; padding: 7px 13px; }
+      .kw-primary { font-size: 0.86rem; padding: 8px 14px; }
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      animation: bounce 2.4s ease-in-out infinite;
+    }
+
+    .scroll-indicator .arrow {
+      font-size: 1.3rem;
+      color: var(--accent);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translate(-50%, 0); opacity: 0.6; }
+      50% { transform: translate(-50%, 6px); opacity: 1; }
+    }
+
+    /* ===== 링크 카드 그리드 ===== */
+    /* 섹션: 이미 일어나고 있는 변화 */
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .link-grid.single-col {
+      grid-template-columns: 1fr;
+    }
+
+    @media (max-width: 720px) {
+      .link-grid { grid-template-columns: 1fr; }
+    }
+
+    /* 갈래(그룹) 컨테이너 */
+    .case-group {
+      margin-bottom: 44px;
+    }
+    .case-group:last-of-type { margin-bottom: 20px; }
+
+    .case-group-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .case-group-num {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    .case-group-title {
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 6px;
+      color: #fff;
+      letter-spacing: -0.005em;
+    }
+
+    .case-group-desc {
+      font-size: 0.94rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .link-card {
+      position: relative;
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 26px;
+      transition: var(--transition);
+      overflow: hidden;
+    }
+
+    .link-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--accent-soft), transparent 60%);
+      opacity: 0;
+      transition: var(--transition);
+      pointer-events: none;
+    }
+
+    .link-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-border);
+      background: var(--card-hover);
+    }
+
+    .link-card:hover::before { opacity: 1; }
+
+    .link-card .label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .link-card .url {
+      font-size: clamp(1.02rem, 1.8vw, 1.18rem);
+      font-weight: 600;
+      color: var(--text);
+      word-break: break-all;
+      line-height: 1.4;
+      position: relative;
+      z-index: 1;
+      letter-spacing: -0.005em;
+    }
+
+    .link-card:hover .url { color: var(--accent); }
+
+    .link-card .ext-icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+      z-index: 1;
+      background: var(--bg);
+    }
+
+    .link-card:hover .ext-icon {
+      color: var(--accent);
+      border-color: var(--accent-border);
+      transform: translate(2px, -2px);
+    }
+
+    .cards-note {
+      text-align: center;
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 1rem;
+      margin-top: 12px;
+      padding: 20px 24px;
+      border-top: 1px dashed var(--border);
+    }
+
+    /* ===== 제안 카드 ===== */
+    /* 섹션: 교육청에 드리는 세 가지 제안 */
+    .proposal-intro {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 48px;
+      padding-left: 16px;
+      border-left: 3px solid var(--accent);
+    }
+
+    .proposal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px 40px 36px;
+      margin-bottom: 28px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .proposal:hover {
+      border-color: var(--border-strong);
+    }
+
+    @media (max-width: 640px) {
+      .proposal { padding: 28px 22px; }
+    }
+
+    .proposal-number {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .proposal-number .num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .proposal h3 {
+      font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .quote {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      font-weight: 500;
+      line-height: 1.55;
+      color: var(--text);
+      padding: 20px 24px;
+      margin: 0 0 28px;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-soft);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+    }
+
+    .block { margin-bottom: 24px; }
+    .block:last-child { margin-bottom: 0; }
+
+    .block-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .block-title::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
+    }
+
+    .block p { color: var(--text); margin-bottom: 10px; }
+    .block p:last-child { margin-bottom: 0; }
+
+    .block ul {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0 0;
+    }
+
+    .block ul li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .block ul li::before {
+      content: "—";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .block ul li:last-child { margin-bottom: 0; }
+
+    .block strong { color: #ffffff; font-weight: 600; }
+
+    /* ===== 마무리 ===== */
+    /* 섹션: 마무리 */
+    .closing {
+      text-align: center;
+      padding: 100px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .closing .eyebrow { margin-bottom: 28px; }
+
+    .closing-quote {
+      font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+      font-weight: 500;
+      line-height: 1.6;
+      color: var(--text);
+      max-width: 60ch;
+      margin: 0 auto 32px;
+      font-style: italic;
+    }
+
+    .closing-body {
+      color: var(--text-muted);
+      max-width: 58ch;
+      margin: 0 auto 20px;
+      font-size: 1.02rem;
+    }
+
+    .closing-final {
+      color: var(--accent);
+      font-weight: 500;
+      margin-top: 28px;
+      font-size: 1.05rem;
+    }
+
+    .author-slot {
+      margin-top: 80px;
+      padding-top: 32px;
+      border-top: 1px dashed var(--border);
+      color: var(--text-dim);
+      font-size: 0.88rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .author-slot .label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+    }
+
+    .author-slot .line {
+      width: 200px;
+      height: 1px;
+      background: var(--border-strong);
+      margin-top: 8px;
+    }
+
+    /* ===== 스크롤 진입 애니메이션 ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 600ms ease, transform 600ms ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .scroll-indicator { animation: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* ===== 기술 스택 플로우 (어떻게 만드는가) ===== */
+    /* 섹션: 어떻게 만드는가 */
+    .stack-flow {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .stack-node {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 28px 24px;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 24px;
+      align-items: center;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stack-node::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      opacity: 0.5;
+      transition: var(--transition);
+    }
+
+    .stack-node:hover {
+      border-color: var(--accent-border);
+      background: var(--card-hover);
+      transform: translateX(2px);
+    }
+
+    .stack-node:hover::before { opacity: 1; width: 4px; }
+
+    .stack-node-final::before {
+      background: linear-gradient(180deg, var(--accent), rgba(94, 234, 212, 0.3));
+      opacity: 1;
+      width: 4px;
+    }
+
+    .stack-step {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-right: 1px solid var(--border);
+      padding-right: 24px;
+    }
+
+    .stack-num {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      line-height: 1;
+    }
+
+    .stack-role {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .stack-body {
+      padding-left: 4px;
+    }
+
+    .stack-brand {
+      font-size: clamp(1.15rem, 2.2vw, 1.4rem);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .stack-desc {
+      font-size: 0.97rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    .stack-desc strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* 확장 능력 예시 목록 (노드 02 내부) */
+    .ext-examples {
+      margin-top: 18px;
+      padding: 18px 20px 16px;
+      background: rgba(94, 234, 212, 0.04);
+      border: 1px solid var(--accent-border);
+      border-radius: 12px;
+    }
+
+    .ext-examples-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .ext-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ext-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 0;
+      margin: 0;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .ext-list li::before { display: none; }
+
+    .ext-chip {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 130px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      text-align: center;
+    }
+
+    .ext-chip-custom {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(94, 234, 212, 0.22), rgba(94, 234, 212, 0.08));
+      border-color: var(--accent);
+      font-family: inherit;
+    }
+
+    .ext-desc {
+      flex: 1;
+      font-size: 0.92rem;
+      color: var(--text);
+      padding-top: 5px;
+    }
+
+    .ext-note {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--accent-border);
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .ext-note strong { color: var(--accent); font-weight: 600; }
+
+    @media (max-width: 640px) {
+      .ext-list li { flex-direction: column; gap: 4px; }
+      .ext-chip { min-width: 0; align-self: flex-start; }
+      .ext-desc { padding-top: 0; }
+    }
+
+    /* 연결 화살표 */
+    .stack-arrow {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 0;
+      gap: 6px;
+    }
+
+    .stack-arrow .arrow-line {
+      width: 1px;
+      height: 20px;
+      background: linear-gradient(180deg, var(--accent-border), transparent);
+    }
+
+    .stack-arrow .arrow-line:last-child {
+      background: linear-gradient(180deg, var(--accent-border), var(--accent));
+      height: 24px;
+      position: relative;
+    }
+
+    .stack-arrow .arrow-line:last-child::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .stack-arrow .arrow-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 4px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+
+    /* 모바일 대응 */
+    @media (max-width: 640px) {
+      .stack-node {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 22px 22px 20px;
+      }
+      .stack-step {
+        flex-direction: row;
+        align-items: center;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding-right: 0;
+        padding-bottom: 12px;
+        gap: 14px;
+      }
+      .stack-num { font-size: 1.6rem; }
+      .stack-arrow { padding: 10px 0; }
+    }
+
+    /* ===== 교차 매트릭스 (교육청 S/W × 학교 S/W) ===== */
+    /* 섹션: 교차 매트릭스 */
+    .matrix-wrapper {
+      margin-bottom: 28px;
+    }
+
+    .matrix-axis-top {
+      display: grid;
+      grid-template-columns: 48px 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .axis-spacer { visibility: hidden; }
+
+    .axis-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .axis-label-strength {
+      color: var(--accent);
+      border-color: var(--accent-border);
+      background: var(--accent-soft);
+    }
+
+    .axis-label-weakness {
+      color: var(--text-muted);
+    }
+
+    .matrix-body {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+    }
+
+    .matrix-axis-left {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .axis-vertical {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 4px;
+      min-height: 100%;
+      line-height: 1.3;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+    }
+
+    .axis-vertical span {
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      white-space: nowrap;
+      letter-spacing: 0.15em;
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .matrix-cell {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 24px 22px;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .matrix-cell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: var(--transition);
+      pointer-events: none;
+    }
+
+    .matrix-cell:hover {
+      transform: translateY(-2px);
+      background: var(--card-hover);
+    }
+
+    /* S×S : 가장 강조 (증폭 영역) */
+    .cell-ss {
+      border-color: var(--accent-border);
+    }
+    .cell-ss::before {
+      background: linear-gradient(135deg, var(--accent-soft), transparent 70%);
+      opacity: 1;
+    }
+    .cell-ss:hover { border-color: var(--accent); }
+
+    /* S×W, W×S : 중간 (보완·위임) */
+    .cell-sw, .cell-ws {
+      border-color: var(--border-strong);
+    }
+    .cell-sw:hover, .cell-ws:hover {
+      border-color: var(--accent-border);
+    }
+
+    /* W×W : 약한 톤 (재설계) */
+    .cell-ww {
+      background: rgba(255, 255, 255, 0.015);
+      border-style: dashed;
+    }
+
+    .cell-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cell-combo {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    .cell-ww .cell-combo {
+      color: var(--text-dim);
+    }
+
+    .cell-strategy {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .cell-title {
+      font-size: 1.02rem;
+      font-weight: 700;
+      line-height: 1.45;
+      margin-bottom: 14px;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cell-body {
+      font-size: 0.94rem;
+      line-height: 1.7;
+      color: var(--text);
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cell-insight {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+      padding-top: 14px;
+      border-top: 1px dashed var(--border);
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cell-insight strong { color: var(--accent); font-weight: 600; }
+    .cell-ww .cell-insight strong { color: var(--text); }
+
+    /* 모바일: 축 레이블 숨기고 카드만 세로 1열 */
+    @media (max-width: 720px) {
+      .matrix-axis-top { display: none; }
+      .matrix-body { grid-template-columns: 1fr; }
+      .matrix-axis-left { display: none; }
+      .matrix-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .cell-title { font-size: 1rem; }
+    }
+
+    /* ===== 역할 카드 그리드 (교육청만이 할 수 있는 일) ===== */
+    /* 섹션: 교육청의 고유 영역 */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 720px) {
+      .role-grid { grid-template-columns: 1fr; }
+    }
+
+    .role-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px 28px 26px;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .role-card:hover {
+      border-color: var(--accent-border);
+      transform: translateY(-2px);
+      background: var(--card-hover);
+    }
+
+    .role-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .role-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .role-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 5px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+
+    .role-title {
+      font-size: clamp(1.1rem, 2vw, 1.25rem);
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      letter-spacing: -0.005em;
+      color: #fff;
+    }
+
+    .role-why {
+      color: var(--text);
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .role-why strong { color: var(--accent); font-weight: 600; }
+
+    .role-limit {
+      margin-top: auto;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+    }
+
+    .role-limit .limit-label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .role-limit p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ===== 포커스 접근성 ===== */
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 섹션: Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">전북도 교육청 출장 회의</span>
+      <h1>급격하게 발전하는 기술을<br />어떻게 교육에 적용할 것인가?</h1>
+      <p class="subtitle">교육청과 교사가 함께 그리는 전북 교육의 다음 단계</p>
+      <p class="lead">
+        기술 변화의 속도는 이미 '중앙에서 개발 → 현장에 배포'라는 기존 방식의
+        호흡을 앞질렀습니다. 교사 한 명이 수업 현장에 필요한 도구를 직접 설계·개발·운영하는 일이
+        이미 시작되었고, 이 전환은 방향성의 문제이지 가능성의 문제가 아닙니다.
+        오늘의 논의는 이 변화를 현장과 교육청이 어떻게 함께 수용할 것인가에 대한 제안입니다.
+      </p>
+
+      <div class="hero-keywords" aria-label="오늘 회의의 핵심 키워드">
+        <span class="kw kw-primary">교사 개발자</span>
+        <span class="kw kw-primary">역할 재분배</span>
+        <span class="kw kw-primary">Claude Code</span>
+        <span class="kw">현장 주도</span>
+        <span class="kw">보조자로서의 교육청</span>
+        <span class="kw">수요 기반 개발</span>
+        <span class="kw">지속 가능성</span>
+        <span class="kw">대립이 아닌 협업</span>
+      </div>
+    </div>
+    <div class="scroll-indicator" aria-hidden="true">
+      <span>scroll</span>
+      <span class="arrow">↓</span>
+    </div>
+  </header>
+
+  <!-- 섹션: 이미 일어나고 있는 변화 -->
+  <section id="cases">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">01 &nbsp;&middot;&nbsp; 현장의 실제</span>
+        <h2 class="section-title">이미 일어나고 있는 변화 — 교사 개발 사례</h2>
+        <p class="section-lead">
+          아래 사례들은 모두 한 명의 교사가 직접 기획·개발·운영 중인 도구입니다.
+          목적에 따라 세 가지 갈래로 나누어 정리했습니다.
+          각 카드를 클릭하면 새 창으로 열립니다.
+        </p>
+      </div>
+
+      <!-- 갈래 1: 범용 도구 -->
+      <div class="case-group reveal">
+        <div class="case-group-head">
+          <span class="case-group-num">A</span>
+          <div>
+            <h3 class="case-group-title">범용 도구</h3>
+            <p class="case-group-desc">특정 학교 업무에 국한되지 않는, 교사·학생 누구나 쓸 수 있는 열린 도구.</p>
+          </div>
+        </div>
+        <div class="link-grid single-col">
+          <a class="link-card"
+             href="https://spacekijun.lovable.app"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="spacekijun.lovable.app 새 창으로 열기">
+            <span class="ext-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17L17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </span>
+            <div class="label">Space Kijun</div>
+            <div class="url">spacekijun.lovable.app</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- 갈래 2: 학교 업무 보조 -->
+      <div class="case-group reveal">
+        <div class="case-group-head">
+          <span class="case-group-num">B</span>
+          <div>
+            <h3 class="case-group-title">학교 업무 보조</h3>
+            <p class="case-group-desc">반복적이고 부담이 큰 학교 행정·기자재 관리 업무를 경감하기 위한 도구.</p>
+          </div>
+        </div>
+        <div class="link-grid">
+          <a class="link-card"
+             href="https://kijunseaton.netlify.app"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="kijunseaton.netlify.app 새 창으로 열기">
+            <span class="ext-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17L17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </span>
+            <div class="label">Kijun Seaton</div>
+            <div class="url">kijunseaton.netlify.app</div>
+          </a>
+
+          <a class="link-card"
+             href="https://kijundevice.netlify.app"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="kijundevice.netlify.app 새 창으로 열기">
+            <span class="ext-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17L17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </span>
+            <div class="label">Kijun Device</div>
+            <div class="url">kijundevice.netlify.app</div>
+          </a>
+
+          <a class="link-card"
+             href="https://kijundevice.netlify.app/admin"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="kijundevice.netlify.app/admin 새 창으로 열기">
+            <span class="ext-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17L17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </span>
+            <div class="label">Kijun Device · Admin</div>
+            <div class="url">kijundevice.netlify.app/admin</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- 갈래 3: 교육 결과 분석 -->
+      <div class="case-group reveal">
+        <div class="case-group-head">
+          <span class="case-group-num">C</span>
+          <div>
+            <h3 class="case-group-title">교육 결과 분석</h3>
+            <p class="case-group-desc">평가 결과와 학생 데이터를 시각화하여 수업 개선과 진로 지도에 활용하는 도구.</p>
+          </div>
+        </div>
+        <div class="link-grid">
+          <a class="link-card"
+             href="demos/kg-00-00239-visual-ryu-jarim.html"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="학생 개별 분석 (권채원) 새 창으로 열기">
+            <span class="ext-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17L17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </span>
+            <div class="label">학생 개별 분석</div>
+            <div class="url">kg-00-00239-visual · 권채원.html</div>
+          </a>
+
+          <a class="link-card"
+             href="demos/2026-3학년-3월-모의고사-분석.html"
+             target="_blank"
+             rel="noopener noreferrer"
+             aria-label="2026년 3학년 3월 모의고사 분석 새 창으로 열기">
+            <span class="ext-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17L17 7" />
+                <path d="M8 7h9v9" />
+              </svg>
+            </span>
+            <div class="label">학년 단위 분석</div>
+            <div class="url">2026년 3학년 3월 모의고사 분석.html</div>
+          </a>
+        </div>
+      </div>
+
+      <p class="cards-note reveal">
+        세 갈래의 공통점 — <strong style="color: var(--accent);">수업 현장의 구체적 필요</strong>에서 출발했고,
+        개발자이자 사용자가 동일 인물이며, 이미 운영되고 있다는 것입니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- 섹션: 어떻게 만드는가 (기술 스택 플로우) -->
+  <section id="howto">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">02 &nbsp;&middot;&nbsp; 어떻게 만드는가</span>
+        <h2 class="section-title">교사 1인이 도구를 만들어 배포하기까지</h2>
+        <p class="section-lead">
+          앞서 보여드린 사례들은 모두 <strong style="color: var(--accent);">비슷한 다섯 단계</strong>를 따라 만들어집니다.
+          각 단계는 별도의 전문 도구가 맡아주며, 교사는 "무엇이 필요한가"를 말하는 역할에 집중합니다.
+        </p>
+      </div>
+
+      <ol class="stack-flow reveal">
+        <!-- ① -->
+        <li class="stack-node">
+          <div class="stack-step">
+            <span class="stack-num">01</span>
+            <span class="stack-role">개발 파트너</span>
+          </div>
+          <div class="stack-body">
+            <h3 class="stack-brand">Claude Code</h3>
+            <p class="stack-desc">
+              기획·코드 작성·데이터 분석까지 <strong>대화형으로 함께 수행</strong>하는 AI 개발 파트너.
+              교사가 수업 맥락을 설명하면, 필요한 도구의 초안을 곧바로 만들어냅니다.
+            </p>
+          </div>
+        </li>
+
+        <!-- 연결 -->
+        <li class="stack-arrow" aria-hidden="true">
+          <span class="arrow-line"></span>
+          <span class="arrow-label">연결 · 호출</span>
+          <span class="arrow-line"></span>
+        </li>
+
+        <!-- ② -->
+        <li class="stack-node">
+          <div class="stack-step">
+            <span class="stack-num">02</span>
+            <span class="stack-role">확장 능력</span>
+          </div>
+          <div class="stack-body">
+            <h3 class="stack-brand">API · MCP · Skill</h3>
+            <p class="stack-desc">
+              Claude Code가 <strong>외부 정보와 전문 기능을 가져올 수 있게 해주는 연결 고리</strong>.
+              최신 자료를 찾고, 문서를 읽고, 특정 업무 패턴을 숙련된 방식으로 수행합니다.
+            </p>
+
+            <div class="ext-examples">
+              <div class="ext-examples-label">실제 활용 예</div>
+              <ul class="ext-list">
+                <li>
+                  <span class="ext-chip">Graphify</span>
+                  <span class="ext-desc">문서·자료를 지식 그래프로 구조화해 관계를 한눈에 파악</span>
+                </li>
+                <li>
+                  <span class="ext-chip">Supabase MCP</span>
+                  <span class="ext-desc">데이터베이스와 직접 대화하며 조회·분석을 즉시 수행</span>
+                </li>
+                <li>
+                  <span class="ext-chip">XLSX</span>
+                  <span class="ext-desc">엑셀 파일의 학생 성적·출결·설문 데이터를 직접 읽고 가공</span>
+                </li>
+                <li>
+                  <span class="ext-chip">PPTX</span>
+                  <span class="ext-desc">수업 자료·발표 슬라이드 제작과 일괄 편집 자동화</span>
+                </li>
+                <li>
+                  <span class="ext-chip ext-chip-custom">자체 제작 Skill</span>
+                  <span class="ext-desc">학교 특유의 반복 업무를 교사가 직접 '내 스킬'로 만들어 재사용</span>
+                </li>
+              </ul>
+              <p class="ext-note">
+                필요에 따라 <strong>도구 자체를 늘릴 수 있다는 점</strong>이 핵심입니다.
+                현장의 업무가 바뀌면, 확장 능력도 함께 바뀝니다.
+              </p>
+            </div>
+          </div>
+        </li>
+
+        <li class="stack-arrow" aria-hidden="true">
+          <span class="arrow-line"></span>
+          <span class="arrow-label">데이터 저장 · 인증</span>
+          <span class="arrow-line"></span>
+        </li>
+
+        <!-- ③ -->
+        <li class="stack-node">
+          <div class="stack-step">
+            <span class="stack-num">03</span>
+            <span class="stack-role">백엔드 기반</span>
+          </div>
+          <div class="stack-body">
+            <h3 class="stack-brand">Supabase</h3>
+            <p class="stack-desc">
+              데이터를 안전하게 <strong>저장·조회·보호</strong>하는 기반 서비스.
+              로그인·권한 관리·보안 기본기를 제공해, 교사가 데이터 설계의 전문 영역을 떠안지 않아도 됩니다.
+            </p>
+          </div>
+        </li>
+
+        <li class="stack-arrow" aria-hidden="true">
+          <span class="arrow-line"></span>
+          <span class="arrow-label">코드 보관 · 이력 관리</span>
+          <span class="arrow-line"></span>
+        </li>
+
+        <!-- ④ -->
+        <li class="stack-node">
+          <div class="stack-step">
+            <span class="stack-num">04</span>
+            <span class="stack-role">버전 관리</span>
+          </div>
+          <div class="stack-body">
+            <h3 class="stack-brand">GitHub</h3>
+            <p class="stack-desc">
+              <strong>언제·무엇을·왜 바꿨는지</strong>의 공식 기록 저장소.
+              지속적인 유지보수의 근거가 되고, 차후 지원 사업의 객관적 지표(커밋 이력)로도 활용됩니다.
+            </p>
+          </div>
+        </li>
+
+        <li class="stack-arrow" aria-hidden="true">
+          <span class="arrow-line"></span>
+          <span class="arrow-label">세상에 공개</span>
+          <span class="arrow-line"></span>
+        </li>
+
+        <!-- ⑤ -->
+        <li class="stack-node stack-node-final">
+          <div class="stack-step">
+            <span class="stack-num">05</span>
+            <span class="stack-role">배포 · 공개</span>
+          </div>
+          <div class="stack-body">
+            <h3 class="stack-brand">Netlify · Lovable</h3>
+            <p class="stack-desc">
+              만든 도구를 <strong>인터넷 주소 하나로 누구나 접속할 수 있게</strong> 해주는 배포 플랫폼.
+              설치 없이 링크만 공유하면 학생·동료 교사가 즉시 사용할 수 있습니다.
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <p class="cards-note reveal">
+        교사는 <strong style="color: var(--accent);">수업의 필요</strong>를 말하고,
+        이 다섯 단계가 나머지를 받아냅니다. 이것이 지금 한 명의 교사가 할 수 있게 된 일입니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- 섹션: 교차 매트릭스 (교육청 S/W × 학교 S/W) -->
+  <section id="matrix">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">03 &nbsp;&middot;&nbsp; 교차 매트릭스</span>
+        <h2 class="section-title">서로의 강점과 약점이 만나는 지점</h2>
+        <p class="section-lead">
+          교육청과 학교(교사)는 서로 다른 것을 잘합니다. 네 가지 조합은 각각 다른 전략을 가리킵니다.
+          <strong style="color: var(--accent);">증폭 · 보완 · 위임 · 재설계</strong> —
+          어떤 일을 누구에게 맡겨야 하는가에 대한 지도입니다.
+        </p>
+      </div>
+
+      <!-- 축 레이블 -->
+      <div class="matrix-wrapper reveal">
+        <div class="matrix-axis-top">
+          <div class="axis-spacer"></div>
+          <div class="axis-label axis-label-strength">학교 강점 (S)</div>
+          <div class="axis-label axis-label-weakness">학교 약점 (W)</div>
+        </div>
+
+        <div class="matrix-body">
+          <div class="matrix-axis-left">
+            <div class="axis-label axis-label-strength axis-vertical">
+              <span>교육청 강점 (S)</span>
+            </div>
+            <div class="axis-label axis-label-weakness axis-vertical">
+              <span>교육청 약점 (W)</span>
+            </div>
+          </div>
+
+          <div class="matrix-grid">
+            <!-- ① S × S : 증폭 -->
+            <article class="matrix-cell cell-ss">
+              <div class="cell-head">
+                <span class="cell-combo">S × S</span>
+                <span class="cell-strategy">증폭 · Leverage</span>
+              </div>
+              <h3 class="cell-title">교육청의 인프라 × 교사의 현장 밀착</h3>
+              <p class="cell-body">
+                교육청의 <strong>데이터·예산·표준 제정 권한</strong>이 교사의
+                <strong>현장 직관·빠른 반복</strong>과 만나면, 현장에서 검증된 도구를
+                전북 전역으로 공식 확산시키는 파이프라인이 열립니다.
+              </p>
+              <p class="cell-insight">
+                💡 교육청이 만든 도구를 학교에 배포하는 것이 아니라,
+                <strong>교사가 만든 도구를 교육청이 키운다.</strong>
+              </p>
+            </article>
+
+            <!-- ② S × W : 보완 -->
+            <article class="matrix-cell cell-sw">
+              <div class="cell-head">
+                <span class="cell-combo">S × W</span>
+                <span class="cell-strategy">보완 · Support</span>
+              </div>
+              <h3 class="cell-title">교육청의 전문성 × 교사의 부족한 역량</h3>
+              <p class="cell-body">
+                교사 개발자가 감당하기 어려운 <strong>법·보안·개인정보·인프라 비용</strong>을
+                교육청이 전담합니다. 교사는 기능과 사용자 경험에 집중하고, 교육청은
+                안전망과 런웨이를 공급합니다.
+              </p>
+              <p class="cell-insight">
+                💡 제안 1의 "<strong>보조자로서의 교육청</strong>"이 실현되는 영역.
+              </p>
+            </article>
+
+            <!-- ③ W × S : 위임 -->
+            <article class="matrix-cell cell-ws">
+              <div class="cell-head">
+                <span class="cell-combo">W × S</span>
+                <span class="cell-strategy">위임 · Delegate</span>
+              </div>
+              <h3 class="cell-title">교육청의 한계 × 교사의 강점</h3>
+              <p class="cell-body">
+                교육청이 구조적으로 약한 <strong>수업 맥락·사용자 직관·빠른 업데이트</strong>는
+                이미 교사가 가장 잘합니다. 이 영역을 교육청이 직접 만들려 하면 비효율이
+                누적됩니다.
+              </p>
+              <p class="cell-insight">
+                💡 제안 2·3의 근거 — <strong>예산·권한·신뢰를 교사에게 위임</strong>하라.
+              </p>
+            </article>
+
+            <!-- ④ W × W : 재설계 -->
+            <article class="matrix-cell cell-ww">
+              <div class="cell-head">
+                <span class="cell-combo">W × W</span>
+                <span class="cell-strategy">재설계 · Rethink</span>
+              </div>
+              <h3 class="cell-title">양쪽 모두 약한 영역</h3>
+              <p class="cell-body">
+                대규모 ML 학습 인프라, 고급 UX 리서치, 장기 플랫폼 운영 등은
+                교육청도 학교도 내부적으로 감당하기 어려운 영역입니다. 무리하게
+                떠안으면 양쪽 모두의 시간과 예산이 낭비됩니다.
+              </p>
+              <p class="cell-insight">
+                💡 <strong>민간·대학·타 시도와의 협력</strong>, 범용 상용 서비스 채택이 합리적.
+              </p>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <p class="cards-note reveal">
+        이 매트릭스는 곧바로 다음 세 가지 제안으로 이어집니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- 섹션: 교육청에 드리는 세 가지 제안 -->
+  <section id="proposals">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">04 &nbsp;&middot;&nbsp; 제안</span>
+        <h2 class="section-title">교육청에 드리는 세 가지 제안</h2>
+        <p class="proposal-intro">
+          다음은 비판이 아니라, 현장이 바라보는 역할 재분배에 대한 제안입니다.
+        </p>
+      </div>
+
+      <!-- 제안 1 -->
+      <article class="proposal reveal">
+        <div class="proposal-number">
+          <span class="num">1</span>
+          <span>Proposal One</span>
+        </div>
+        <h3>교육청의 역할 재정의: 개발자가 아닌 보조자</h3>
+
+        <blockquote class="quote">
+          "프로그램을 만들어서 배포하는 시대에서,<br />
+          직접 만들어서 활용하는 시대로."
+        </blockquote>
+
+        <div class="block">
+          <div class="block-title">현상</div>
+          <p>
+            교사가 자신의 수업 맥락에 맞는 도구를 직접 만들 수 있는 시대가 이미 도래했습니다.
+            교육청이 만들어 일괄 배포하는 방식은 구조적으로 <strong>현장 수요와 괴리</strong>를 만듭니다.
+            이는 방향성의 문제이며, 즉각적인 성과로 나타나지 않더라도
+            <strong>피할 수 없는 전환</strong>입니다.
+          </p>
+        </div>
+
+        <div class="block">
+          <div class="block-title">제안</div>
+          <p>
+            교육청은 SaaS 개발의 주체가 아니라, 교사 개발을
+            <strong>보조·보완하는 전문 기관</strong>이 되어야 합니다.
+          </p>
+          <ul>
+            <li>보안성 점검 및 취약점 진단 지원</li>
+            <li>시스템 무결성 검증</li>
+            <li>데이터베이스 구조·최적화 자문</li>
+            <li>개인정보·학생 정보 처리 적법성 검토 (NEIS 연계 여부 포함)</li>
+          </ul>
+          <p style="margin-top: 14px;">
+            교사 개인이 감당하기 어려운 <strong>전문 영역의 안전망</strong>을 제공하는 방향입니다.
+          </p>
+        </div>
+      </article>
+
+      <!-- 제안 2 -->
+      <article class="proposal reveal">
+        <div class="proposal-number">
+          <span class="num">2</span>
+          <span>Proposal Two</span>
+        </div>
+        <h3>교사가 직접 개발할 수 있는 환경 조성</h3>
+
+        <blockquote class="quote">
+          "AI·디지털 '활용' 예산과 '개발' 예산의 분리가 필요합니다."
+        </blockquote>
+
+        <div class="block">
+          <div class="block-title">현상</div>
+          <p>
+            현재의 예산 구조는 대부분 <strong>'AI/디지털 활용'</strong>이라는 큰 범주 안에서 운영됩니다.
+            이 때문에 순수한 개발 활동에 필요한 비용
+            — LLM API 크레딧, 데이터베이스·웹서버 임대, 도메인, 배포 플랫폼 구독 등 —
+            을 집행하기 어렵습니다. 개발에는 실질적인 인프라 비용이 듭니다.
+          </p>
+        </div>
+
+        <div class="block">
+          <div class="block-title">제안</div>
+          <ul>
+            <li><strong>개발 전용 사업 신설</strong> — 예산을 온전히 개발에 사용할 수 있는 별도 트랙</li>
+            <li>지원 품목(예): AI API 크레딧, DB·웹서버 호스팅, 도메인, 배포 플랫폼</li>
+            <li>
+              <strong>지속성 기반의 차등 지원</strong> — GitHub 푸시 이력, 커밋 히스토리,
+              실사용자 기록 등 <strong>객관적 지표</strong>로 근거 마련
+            </li>
+            <li>단발성 결과물이 아닌, 유지보수되는 도구에 우선 배정</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 제안 3 -->
+      <article class="proposal reveal">
+        <div class="proposal-number">
+          <span class="num">3</span>
+          <span>Proposal Three</span>
+        </div>
+        <h3>SaaS 배포의 원칙 재검토: 수요가 먼저</h3>
+
+        <blockquote class="quote">
+          "SaaS 배포에는 기업 마인드가 필요합니다.<br />
+          수요 없는 공급은 실패합니다."
+        </blockquote>
+
+        <div class="block">
+          <div class="block-title">현상</div>
+          <ul>
+            <li>수요가 불분명한 상태에서 공급된 시스템이 현장에서 방치되는 사례가 다수 관찰됩니다.</li>
+            <li>
+              <strong>사용을 학교의 의무로 부과</strong>하는 방식은 소프트웨어 정착의
+              자연스러운 경로가 아닙니다.
+            </li>
+            <li>
+              프로그램의 필요성은 개발자의 의도만으로 전달되지 않습니다.
+              사용자가 스스로 필요성을 체감해야 합니다.
+            </li>
+            <li>
+              교육청이 만든 앱의 근본 한계: <strong>유지보수 당사자</strong>와
+              <strong>필요성을 체감하는 당사자</strong>가 일치하지 않습니다.
+            </li>
+          </ul>
+        </div>
+
+        <div class="block">
+          <div class="block-title">제안</div>
+          <p>다음 둘 중 하나의 방향을 명확히 해야 합니다.</p>
+          <ul>
+            <li>
+              ① 교육청이 제품 조직처럼 <strong>지속적으로 업데이트하는 개발 주체</strong>가 되거나,
+            </li>
+            <li>
+              ② 필요성을 체감하는 <strong>당사자(교사·학교)가 직접 개발</strong>하도록 지원하거나.
+            </li>
+          </ul>
+          <p style="margin-top: 14px;">
+            중간 어디쯤에 애매하게 머무르는 것이 가장 비효율적입니다.
+          </p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- 섹션: 교육청만이 할 수 있는 일 (역할 재분배의 구체화) -->
+  <section id="only-office">
+    <div class="container">
+      <div class="reveal">
+        <span class="eyebrow">05 &nbsp;&middot;&nbsp; 교육청의 고유 영역</span>
+        <h2 class="section-title">교육청만이 할 수 있는 일</h2>
+        <p class="section-lead">
+          "교사 개발을 보조·보완한다"는 말은 교육청의 역할 축소가 아닙니다.
+          오히려 교육청이 아니면 누구도 감당할 수 없는 고유 영역에 집중하자는 제안입니다.
+          다음 네 가지는 학교·교사 단위에서는 구조적으로 수행이 어려운 일들입니다.
+        </p>
+      </div>
+
+      <div class="role-grid">
+        <!-- 카드 1: 데이터 -->
+        <article class="role-card reveal">
+          <div class="role-head">
+            <span class="role-num">01</span>
+            <span class="role-tag">Data</span>
+          </div>
+          <h3 class="role-title">전북 전체를 망라한 데이터 분석</h3>
+          <p class="role-why">
+            <strong>왜 교육청만 가능한가</strong><br />
+            전북 모든 학교의 학업·출결·진로·만족도 데이터를 합법적으로 수집·연결할 수 있는
+            유일한 주체. 개별 학교에서는 보이지 않는 <strong>지역 간 격차, 종단 추세,
+            정책 효과</strong>가 교육청 차원의 데이터에서만 드러납니다.
+          </p>
+          <div class="role-limit">
+            <span class="limit-label">학교 단위의 한계</span>
+            <p>단일 학교 표본은 통계적 유의성 부족, 타 학교 데이터 접근 권한 없음, 익명화·연계 인프라 부재.</p>
+          </div>
+        </article>
+
+        <!-- 카드 2: 법·제도 -->
+        <article class="role-card reveal">
+          <div class="role-head">
+            <span class="role-num">02</span>
+            <span class="role-tag">Legal</span>
+          </div>
+          <h3 class="role-title">법·제도 해석과 안전망</h3>
+          <p class="role-why">
+            <strong>왜 교육청만 가능한가</strong><br />
+            개인정보보호법, 학생정보 처리, NEIS 연계 적법성, 교육 관련 법령 해석,
+            감사 대응 등은 <strong>전담 법무·감사 조직</strong>을 갖춘 교육청이 중심이
+            되어야 합니다. 교사 개발자가 가장 두려워하는 것이 바로 이 영역입니다.
+          </p>
+          <div class="role-limit">
+            <span class="limit-label">학교 단위의 한계</span>
+            <p>교사 1인이 개인정보영향평가·약관·이용동의 설계까지 감당 불가. 법률 자문 접근성도 제한적.</p>
+          </div>
+        </article>
+
+        <!-- 카드 3: 보안·인프라 -->
+        <article class="role-card reveal">
+          <div class="role-head">
+            <span class="role-num">03</span>
+            <span class="role-tag">Security</span>
+          </div>
+          <h3 class="role-title">보안·인프라 전문성 제공</h3>
+          <p class="role-why">
+            <strong>왜 교육청만 가능한가</strong><br />
+            취약점 진단, 침해사고 대응, 공동 인증(SSO), 백업·재해복구, 대규모 트래픽 대응 등은
+            <strong>전문 보안 엔지니어와 공용 인프라</strong>가 필요한 일입니다. 교사 개개인이
+            각자 재발명하는 것은 비효율적이며 위험합니다.
+          </p>
+          <div class="role-limit">
+            <span class="limit-label">학교 단위의 한계</span>
+            <p>보안 전문 인력 부재, 침해 대응 경험 전무, 공용 인증·공용 DB 구축 권한 없음.</p>
+          </div>
+        </article>
+
+        <!-- 카드 4: 표준·네트워킹 -->
+        <article class="role-card reveal">
+          <div class="role-head">
+            <span class="role-num">04</span>
+            <span class="role-tag">Hub</span>
+          </div>
+          <h3 class="role-title">표준·허브·확산의 중심</h3>
+          <p class="role-why">
+            <strong>왜 교육청만 가능한가</strong><br />
+            시·도 간 연계, 우수 사례의 발굴과 공식 확산, <strong>교사 개발자 네트워킹</strong>,
+            공통 API·데이터 스키마 제정, 예산·인프라의 공동 구매 협상 등은 교육청의 조정 권한이
+            없으면 불가능합니다.
+          </p>
+          <div class="role-limit">
+            <span class="limit-label">학교 단위의 한계</span>
+            <p>타 학교 사례 발굴 창구 없음, 표준 제정 권한 없음, 공동 구매·계약 주체 자격 없음.</p>
+          </div>
+        </article>
+      </div>
+
+      <p class="cards-note reveal">
+        요약하자면, 교육청은 <strong style="color: var(--accent);">개별 제품을 만드는 곳</strong>이 아니라
+        <strong style="color: var(--accent);">현장의 1,000개 시도를 안전하게 성장시키는 플랫폼</strong>이 될 때 가장 강력해집니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- 섹션: 마무리 -->
+  <section class="closing" id="closing">
+    <div class="container reveal">
+      <span class="eyebrow">06 &nbsp;&middot;&nbsp; 마무리</span>
+      <p class="closing-quote">
+        "교육청과 교육 현장의 교사가 함께 전북도 교육을 전방위적으로
+        개선할 수 있는 방안을 논의하는 자리가 되길 바랍니다."
+      </p>
+      <p class="closing-body">
+        오늘 말씀드린 내용은 어느 한쪽의 권한을 축소하거나 책임을 넘기려는 것이 아닙니다.
+        기술이 교사 개인에게까지 도달한 지금, 교육청과 현장이 각자 가장 잘할 수 있는
+        역할을 다시 정의하자는 제안입니다.
+      </p>
+      <p class="closing-body">
+        대립이 아닌 <strong style="color: var(--text);">역할 재분배</strong>의 관점에서
+        보아 주시면 감사하겠습니다.
+      </p>
+      <p class="closing-final">오늘의 회의가 그 출발점이 되길 바랍니다.</p>
+
+      <div class="author-slot">
+        <span class="label">작성자</span>
+        <span class="line" aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // 섹션: 스크롤 기반 페이드 인 (IntersectionObserver)
+    (function () {
+      const items = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window)) {
+        items.forEach(function (el) { el.classList.add('visible'); });
+        return;
+      }
+      const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+      items.forEach(function (el) { io.observe(el); });
+    })();
+  </script>
+</body>
+</html>

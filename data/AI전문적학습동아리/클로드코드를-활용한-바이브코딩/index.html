@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+<title>클로드코드를 활용한 바이브코딩 — 교사를 위한 입문</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F5F6;
+    --ink:#222428;
+    --ink-soft:#5D6168;
+    --rule:#2A2D33;
+    --wash:rgba(34,36,40,0.06);
+    --marker-blue:#1E5BD0;
+    --marker-red:#D6263A;
+    --marker-green:#1B9E4B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;overflow:hidden;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'EB Garamond','Noto Sans KR',Georgia,serif;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  .progress{
+    position:fixed;top:0;left:0;height:2px;width:0%;
+    background:var(--marker-blue);transition:width .35s ease;z-index:20;
+  }
+
+  .stage{
+    position:fixed;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    padding:32px 56px 64px;
+  }
+
+  .slide-frame{
+    position:relative;
+    width:min(100%, calc((100vh - 96px) * 16 / 9));
+    aspect-ratio:16/9;
+    background:var(--paper);
+    border:1px solid var(--rule);
+    box-shadow:
+      0 0 0 6px var(--paper),
+      0 0 0 7px rgba(34,36,40,0.18);
+  }
+
+  .slide{
+    position:absolute;inset:0;
+    opacity:0;transition:opacity .45s ease;
+    display:flex;align-items:center;justify-content:center;
+    pointer-events:none;
+  }
+  .slide.active{opacity:1;pointer-events:auto;}
+  .slide img{
+    width:100%;height:100%;
+    object-fit:contain;
+    display:block;
+    user-select:none;-webkit-user-drag:none;
+  }
+
+  .ribbon{
+    position:fixed;left:0;right:0;bottom:0;
+    height:48px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;
+    background:var(--paper);
+    border-top:1px solid var(--rule);
+    z-index:15;
+    font-family:'EB Garamond',Georgia,serif;
+  }
+  .ribbon .meta{font-style:italic;color:var(--ink-soft);font-size:13px;letter-spacing:0.02em;}
+  .ribbon .counter{font-variant-numeric:tabular-nums;letter-spacing:0.18em;font-size:13px;color:var(--ink);}
+  .ribbon .center{
+    position:absolute;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:18px;
+    font-size:12px;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:0.28em;
+    font-family:'EB Garamond',Georgia,serif;
+  }
+  .ribbon .em-rule{display:inline-block;width:24px;height:1px;background:var(--ink-soft);vertical-align:middle;}
+
+  .ribbon .marker-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--marker-blue);vertical-align:middle;margin:0 2px;}
+  .ribbon .marker-dot.red{background:var(--marker-red);}
+  .ribbon .marker-dot.green{background:var(--marker-green);}
+
+  .nav-btn{
+    position:fixed;top:50%;transform:translateY(-50%);
+    width:44px;height:44px;
+    background:transparent;border:1px solid var(--rule);
+    color:var(--ink);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s ease, transform .15s ease;
+    z-index:18;
+  }
+  .nav-btn:hover{background:var(--wash);}
+  .nav-btn:active{transform:translateY(-50%) scale(0.96);}
+  .nav-btn.prev{left:14px;}
+  .nav-btn.next{right:14px;}
+  .nav-btn svg{width:18px;height:18px;}
+  .nav-btn:disabled{opacity:0.25;cursor:default;}
+
+  .index-toggle{
+    position:fixed;top:14px;right:14px;
+    background:transparent;border:1px solid var(--rule);color:var(--ink);
+    padding:6px 12px;font:italic 12px/1 'EB Garamond',Georgia,serif;
+    letter-spacing:0.06em;cursor:pointer;z-index:18;
+  }
+  .index-toggle:hover{background:var(--wash);}
+  .index-panel{
+    position:fixed;inset:0;
+    background:rgba(244,245,246,0.96);
+    display:none;flex-direction:column;align-items:center;justify-content:center;
+    z-index:25;padding:48px;
+  }
+  .index-panel.open{display:flex;}
+  .index-panel h2{font:italic 26px 'EB Garamond',serif;margin-bottom:8px;color:var(--ink);letter-spacing:0.02em;}
+  .index-panel .sub{font:13px 'EB Garamond',serif;letter-spacing:0.32em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:24px;}
+  .index-grid{
+    display:grid;grid-template-columns:repeat(auto-fill, minmax(160px, 1fr));gap:14px;
+    width:min(1100px,90%);max-height:70vh;overflow-y:auto;padding:8px 4px;
+  }
+  .thumb{position:relative;border:1px solid var(--rule);aspect-ratio:16/9;background:var(--paper);cursor:pointer;overflow:hidden;transition:transform .15s ease;}
+  .thumb:hover{transform:translateY(-2px);}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .thumb .num{position:absolute;bottom:4px;right:6px;font:11px 'EB Garamond',serif;font-variant-numeric:tabular-nums;color:var(--ink-soft);background:var(--paper);padding:1px 5px;border:1px solid var(--ink-soft);}
+  .index-close{position:absolute;top:24px;right:24px;background:transparent;border:none;cursor:pointer;font:italic 14px 'EB Garamond',serif;color:var(--ink);letter-spacing:0.06em;}
+
+  .corner-note{position:fixed;top:16px;left:24px;font:italic 12px 'EB Garamond',serif;color:var(--ink-soft);letter-spacing:0.04em;z-index:18;}
+  .corner-note .roman{letter-spacing:0.16em;}
+
+  /* 예시 사이트 직접 접속 링크 바 — 슬라이드 5·6·7에서만 표시 */
+  .example-links{
+    position:fixed;left:50%;bottom:56px;transform:translateX(-50%) translateY(8px);
+    display:none;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+    max-width:min(96%, 920px);
+    padding:9px 14px;
+    background:var(--paper);
+    border:1px solid var(--rule);
+    box-shadow:0 2px 10px rgba(34,36,40,0.10);
+    z-index:17;
+    opacity:0;transition:opacity .3s ease, transform .3s ease;
+  }
+  .example-links.show{display:flex;opacity:1;transform:translateX(-50%) translateY(0);}
+  .example-links .el-label{
+    font:italic 12px 'EB Garamond',serif;color:var(--ink-soft);
+    letter-spacing:0.04em;white-space:nowrap;margin-right:2px;
+  }
+  .example-links a{
+    display:inline-flex;align-items:center;gap:6px;
+    font-family:'Noto Sans KR',sans-serif;font-size:12.5px;font-weight:500;
+    color:var(--marker-blue);text-decoration:none;
+    padding:5px 11px;border:1px solid var(--marker-blue);border-radius:999px;
+    background:transparent;transition:background .15s ease, color .15s ease;
+    white-space:nowrap;
+  }
+  .example-links a:hover{background:var(--marker-blue);color:#fff;}
+  .example-links a .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;}
+  .example-links a.local{color:var(--marker-green);border-color:var(--marker-green);}
+  .example-links a.local:hover{background:var(--marker-green);color:#fff;}
+
+  /* superpowers 설치 안내 카드 — 슬라이드 18에서만 표시 */
+  .install-guide{
+    position:fixed;left:50%;bottom:56px;transform:translateX(-50%) translateY(8px);
+    display:none;flex-direction:column;gap:7px;
+    width:min(96%, 680px);
+    padding:12px 16px;
+    background:var(--paper);
+    border:1px solid var(--rule);
+    box-shadow:0 2px 14px rgba(34,36,40,0.14);
+    z-index:17;
+    opacity:0;transition:opacity .3s ease, transform .3s ease;
+  }
+  .install-guide.show{display:flex;opacity:1;transform:translateX(-50%) translateY(0);}
+  .install-guide .ig-title{
+    font-family:'Noto Sans KR',sans-serif;font-size:13px;font-weight:500;color:var(--ink);
+    display:flex;align-items:center;gap:7px;
+  }
+  .install-guide .ig-title b{color:var(--marker-red);font-weight:700;}
+  .install-guide .ig-step{display:flex;align-items:center;gap:9px;}
+  .install-guide .ig-num{
+    flex:none;width:18px;height:18px;border-radius:50%;
+    background:var(--marker-blue);color:#fff;
+    font:600 11px/18px 'Noto Sans KR',sans-serif;text-align:center;
+  }
+  .install-guide .cmd{
+    flex:1 1 auto;min-width:0;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    font-family:'Consolas','Courier New',monospace;font-size:12.5px;color:var(--ink);
+    background:var(--wash);border:1px dashed var(--rule);border-radius:6px;
+    padding:6px 10px;cursor:pointer;transition:background .15s ease;
+  }
+  .install-guide .cmd:hover{background:rgba(30,91,208,0.10);}
+  .install-guide .cmd code{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .install-guide .cmd .copy{
+    flex:none;font-family:'Noto Sans KR',sans-serif;font-size:11px;font-weight:500;
+    color:var(--marker-blue);border:1px solid var(--marker-blue);border-radius:999px;
+    padding:2px 8px;white-space:nowrap;
+  }
+  .install-guide .cmd.copied .copy{color:#fff;background:var(--marker-green);border-color:var(--marker-green);}
+  .install-guide .ig-note{
+    font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--ink-soft);
+    display:flex;align-items:center;gap:9px;
+  }
+  .install-guide .ig-note .ig-num{background:var(--marker-green);}
+
+  @media print{
+    body{background:white;}
+    .ribbon,.nav-btn,.index-toggle,.corner-note,.progress{display:none;}
+    .stage{padding:0;}
+    .slide-frame{border:none;box-shadow:none;width:100%;height:100vh;}
+  }
+
+  @media (max-width: 720px){
+    .stage{padding:14px 14px 56px;}
+    .nav-btn{width:36px;height:36px;}
+    .ribbon{height:42px;padding:0 14px;font-size:12px;}
+    .ribbon .center{display:none;}
+    .corner-note{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<aside class="corner-note">
+  <span class="roman">— xix —</span> &nbsp; 바이브코딩 · 교사를 위한 입문
+</aside>
+
+<button class="index-toggle" id="indexToggle">— index —</button>
+
+<div class="stage">
+  <div class="slide-frame" id="frame" aria-roledescription="presentation"></div>
+</div>
+
+<button class="nav-btn prev" id="prev" aria-label="이전 슬라이드">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+</button>
+<button class="nav-btn next" id="next" aria-label="다음 슬라이드">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+
+<footer class="ribbon">
+  <div class="meta"><em>Vibe Coding with Claude Code</em> — a whiteboard primer for teachers</div>
+  <div class="center">
+    <span class="em-rule"></span>
+    <span>Whiteboard · Session</span>
+    <span class="marker-dot"></span><span class="marker-dot red"></span><span class="marker-dot green"></span>
+    <span class="em-rule"></span>
+  </div>
+  <div class="counter" id="counter">01 / 19</div>
+</footer>
+
+<div class="example-links" id="exampleLinks" aria-label="예시 사이트 바로가기"></div>
+
+<div class="install-guide" id="installGuide" aria-label="superpowers 설치 방법">
+  <div class="ig-title">⚡ <b>superpowers 설치</b> — 클로드코드 입력창에 차례로 입력 (클릭하면 복사)</div>
+  <div class="ig-step">
+    <span class="ig-num">1</span>
+    <div class="cmd" data-cmd="/plugin marketplace add obra/superpowers-marketplace">
+      <code>/plugin marketplace add obra/superpowers-marketplace</code>
+      <span class="copy">복사</span>
+    </div>
+  </div>
+  <div class="ig-step">
+    <span class="ig-num">2</span>
+    <div class="cmd" data-cmd="/plugin install superpowers@superpowers-marketplace">
+      <code>/plugin install superpowers@superpowers-marketplace</code>
+      <span class="copy">복사</span>
+    </div>
+  </div>
+  <div class="ig-note">
+    <span class="ig-num">3</span>
+    <span>클로드코드를 재시작한 뒤, 입력창에 <code>/</code> 를 눌러 새 기능이 생겼는지 확인하세요. (<code>/plugin</code> 명령이 없다면 클로드코드를 최신 버전으로 업데이트)</span>
+  </div>
+</div>
+
+<div class="index-panel" id="indexPanel" role="dialog" aria-modal="true" aria-label="슬라이드 목차">
+  <button class="index-close" id="indexClose">— close —</button>
+  <h2>Whiteboard Plates</h2>
+  <div class="sub">바이브코딩 · 19 slides</div>
+  <div class="index-grid" id="indexGrid"></div>
+</div>
+
+<script>
+  const TOTAL = 19;
+  const frame = document.getElementById('frame');
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const indexToggle = document.getElementById('indexToggle');
+  const indexPanel = document.getElementById('indexPanel');
+  const indexClose = document.getElementById('indexClose');
+  const indexGrid = document.getElementById('indexGrid');
+
+  let current = 0;
+  function pad(n){return String(n).padStart(2,'0');}
+
+  // 예시 사이트 슬라이드(1-based 5·6·7 → 0-based 4·5·6)별 접속 링크
+  const EXAMPLE_LINKS = {
+    4: [
+      { label: '① 계절 시뮬레이션', url: 'https://season-rho.vercel.app/' },
+      { label: '② 리듬 카드게임', url: 'examples/리듬-카드게임.html', local: true }
+    ],
+    5: [
+      { label: '③ 3D펜 도안 생성기', url: 'examples/3D펜-도안생성기.html', local: true },
+      { label: '④ 영어 받아쓰기', url: 'https://gandyost.github.io/e-dictation/' }
+    ],
+    6: [
+      { label: '⑤ 추천 도우미', url: 'https://youthunder.github.io/recom/' },
+      { label: '⑥ 보고서 페이지', url: 'https://gjsxjehlwk.github.io/report260423/' },
+      { label: '⑦ 어울림', url: 'https://eoullim.vercel.app' },
+      { label: '⑧ 삼각함수 탐구도구', url: 'https://west4062.github.io/Ming-PPT/%EC%88%98%ED%95%99%EA%B3%BC%ED%95%99/%EC%82%BC%EA%B0%81%ED%95%A8%EC%88%98/%EC%82%BC%EA%B0%81%ED%95%A8%EC%88%98-%ED%83%90%EA%B5%AC%EB%8F%84%EA%B5%AC.html' }
+    ]
+  };
+  const exampleLinks = document.getElementById('exampleLinks');
+
+  function renderExampleLinks(idx){
+    const items = EXAMPLE_LINKS[idx];
+    if (!items){ exampleLinks.classList.remove('show'); exampleLinks.innerHTML = ''; return; }
+    let html = '<span class="el-label">🔗 직접 접속:</span>';
+    for (const it of items){
+      html += '<a class="' + (it.local ? 'local' : '') + '" href="' + it.url +
+        '" target="_blank" rel="noopener"><span class="dot"></span>' + it.label + '</a>';
+    }
+    exampleLinks.innerHTML = html;
+    exampleLinks.classList.add('show');
+  }
+
+  // superpowers 설치 안내 카드 (슬라이드 18 → 0-based 17)
+  const installGuide = document.getElementById('installGuide');
+  function toggleInstallGuide(idx){
+    installGuide.classList.toggle('show', idx === 17);
+  }
+  installGuide.addEventListener('click', (e) => {
+    const cmd = e.target.closest('.cmd');
+    if (!cmd) return;
+    const text = cmd.dataset.cmd;
+    const badge = cmd.querySelector('.copy');
+    const done = () => {
+      cmd.classList.add('copied'); badge.textContent = '복사됨!';
+      setTimeout(() => { cmd.classList.remove('copied'); badge.textContent = '복사'; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+    } else { fallbackCopy(text, done); }
+  });
+  function fallbackCopy(text, done){
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch(_) {}
+    document.body.removeChild(ta);
+  }
+
+  for (let i = 1; i <= TOTAL; i++) {
+    const num = pad(i);
+    const div = document.createElement('div');
+    div.className = 'slide' + (i === 1 ? ' active' : '');
+    div.dataset.idx = i - 1;
+    const img = document.createElement('img');
+    img.src = 'images/slide-' + num + '.png';
+    img.alt = '슬라이드 ' + i;
+    img.loading = i <= 2 ? 'eager' : 'lazy';
+    div.appendChild(img);
+    frame.appendChild(div);
+  }
+
+  for (let i = 1; i <= TOTAL; i++) {
+    const num = pad(i);
+    const t = document.createElement('div');
+    t.className = 'thumb';
+    t.dataset.idx = i - 1;
+    const tImg = document.createElement('img');
+    tImg.src = 'images/slide-' + num + '.png';
+    tImg.alt = '슬라이드 ' + i;
+    tImg.loading = 'lazy';
+    const n = document.createElement('span');
+    n.className = 'num';
+    n.textContent = num;
+    t.appendChild(tImg);
+    t.appendChild(n);
+    indexGrid.appendChild(t);
+  }
+
+  const slides = Array.from(frame.querySelectorAll('.slide'));
+
+  function show(idx){
+    if (idx < 0) idx = 0;
+    if (idx > TOTAL - 1) idx = TOTAL - 1;
+    slides[current].classList.remove('active');
+    slides[idx].classList.add('active');
+    current = idx;
+    counter.textContent = pad(current+1) + ' / ' + pad(TOTAL);
+    progress.style.width = ((current+1)/TOTAL*100) + '%';
+    prevBtn.disabled = (current === 0);
+    nextBtn.disabled = (current === TOTAL - 1);
+    renderExampleLinks(current);
+    toggleInstallGuide(current);
+  }
+
+  function next(){ show(current + 1); }
+  function prev(){ show(current - 1); }
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  document.addEventListener('keydown', (e) => {
+    if (indexPanel.classList.contains('open')) {
+      if (e.key === 'Escape') closeIndex();
+      return;
+    }
+    if (['ArrowRight','PageDown',' '].includes(e.key)) { e.preventDefault(); next(); }
+    else if (['ArrowLeft','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(TOTAL - 1);
+    else if (e.key === 'Escape') closeIndex();
+    else if (e.key === 'g' || e.key === 'G') openIndex();
+  });
+
+  let wheelLock = false;
+  window.addEventListener('wheel', (e) => {
+    if (wheelLock) return;
+    if (Math.abs(e.deltaY) < 8) return;
+    wheelLock = true;
+    setTimeout(() => wheelLock = false, 420);
+    if (e.deltaY > 0) next(); else prev();
+  }, { passive: true });
+
+  let tx = null, ty = null;
+  window.addEventListener('touchstart', e => { const t = e.changedTouches[0]; tx = t.clientX; ty = t.clientY; }, { passive: true });
+  window.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - tx, dy = t.clientY - ty;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { if (dx < 0) next(); else prev(); }
+    tx = ty = null;
+  }, { passive: true });
+
+  frame.addEventListener('click', (e) => {
+    const rect = frame.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width / 3) prev(); else next();
+  });
+
+  function openIndex(){ indexPanel.classList.add('open'); }
+  function closeIndex(){ indexPanel.classList.remove('open'); }
+  indexToggle.addEventListener('click', openIndex);
+  indexClose.addEventListener('click', closeIndex);
+  indexGrid.addEventListener('click', (e) => {
+    const t = e.target.closest('.thumb');
+    if (!t) return;
+    show(parseInt(t.dataset.idx, 10));
+    closeIndex();
+  });
+
+  show(0);
+</script>
+  <script type="module" src="../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

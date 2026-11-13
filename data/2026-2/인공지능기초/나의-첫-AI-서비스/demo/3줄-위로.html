@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3줄 위로</title>
+<style>
+  :root {
+    --bg: #0f1d19; --card: #16281f; --line: #24483a;
+    --fg: #e7f4ec; --faint: #9db8a9;
+    --accent: #fb923c; --mint: #5eead4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    line-height: 1.6; min-height: 100vh; padding: 24px 16px 48px;
+  }
+  main { max-width: 640px; margin: 0 auto; display: grid; gap: 16px; }
+  header h1 { font-size: 1.7rem; letter-spacing: -0.02em; }
+  .tag { color: var(--mint); font-size: 0.85rem; margin-top: 2px; }
+  .desc { color: var(--faint); margin-top: 8px; font-size: 0.95rem; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  label { display: block; font-weight: 700; font-size: 0.95rem; }
+  textarea, input[type=text] {
+    width: 100%; margin-top: 6px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--line); background: #0c1714; color: var(--fg);
+    font: inherit; resize: vertical;
+  }
+  textarea { min-height: 84px; }
+  button.run {
+    margin-top: 12px; width: 100%; padding: 12px; border: 0; border-radius: 10px;
+    background: var(--accent); color: #241203; font-weight: 800; font-size: 1rem; cursor: pointer;
+  }
+  button.run:disabled { background: #57493c; color: #a99e93; cursor: not-allowed; }
+  #status { margin-top: 8px; font-size: 0.85rem; color: var(--faint); min-height: 1.2em; }
+  #status.err { color: #fda4af; }
+  #result h2 { font-size: 1rem; color: var(--mint); margin-bottom: 8px; }
+  #out { white-space: pre-wrap; font-size: 1.02rem; }
+  .inside > button {
+    width: 100%; text-align: left; background: none; border: 0; color: var(--accent);
+    font: inherit; font-weight: 700; cursor: pointer;
+  }
+  #inside { margin-top: 12px; display: grid; gap: 12px; }
+  #inside h3 { font-size: 0.85rem; color: var(--mint); }
+  #inside pre {
+    white-space: pre-wrap; word-break: break-all; background: #0c1714;
+    border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px;
+    font-size: 0.82rem; color: var(--faint); font-family: inherit;
+  }
+  footer { text-align: center; color: var(--faint); font-size: 0.78rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🍀 3줄 위로</h1>
+    <p class="tag">감성 · 수업 예시 서비스</p>
+    <p class="desc">오늘 있었던 일을 한 줄 들려주면 위로가 돌아옵니다 —
+    프롬프트에는 "정확히 3줄(공감·다른 각도·내일의 한 걸음)"을 지시해 두었어요.
+    정말 매번 3줄로 올까요? (위로와 상관없는 입력에는 안내 한 문장을 드려요.)</p>
+  </header>
+
+  <section>
+    <label for="f1">오늘 있었던 일
+      <textarea id="f1" placeholder="예: 발표에서 실수해서 하루 종일 신경 쓰였어"></textarea>
+    </label>
+    <button class="run" id="run" type="button">위로 받기</button>
+    <div id="status"></div>
+  </section>
+
+  <section id="result" hidden>
+    <h2>오늘의 3줄</h2>
+    <div id="out"></div>
+  </section>
+
+  <section class="inside">
+    <button id="toggleInside" type="button">🔍 내부 보기 — 이 서비스는 어떻게 답을 만들까?</button>
+    <div id="inside" hidden>
+      <h3>① 미리 써 둔 시스템 프롬프트 (개발자가 쓴 것)</h3>
+      <pre id="sysView"></pre>
+      <h3>② 방금 조립된 사용자 메시지 (여러분 입력이 끼워진 자리)</h3>
+      <pre id="userView">아직 실행 전입니다 — 위에서 한 번 실행해 보세요.</pre>
+      <h3>③ 보낸 API 요청 요약</h3>
+      <pre id="reqView"></pre>
+    </div>
+  </section>
+
+  <footer>Solar Pro 3 · 수업용 임시 키 · 이 서비스는 수업 예시입니다</footer>
+</main>
+
+<script>
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+   이 파일의 주인이 나중에 고치는 곳은 아래 네 상수뿐입니다.
+   따옴표(`)와 기호는 그대로 두고, 그 안의 문장만 고칩니다.
+   ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+
+const SYSTEM_PROMPT = `너는 오늘 하루를 들려주는 고등학생에게 짧은 위로를 건네는 상담 도우미다.
+
+모든 문장을 "-요"나 "-습니다"로 끝나는 존댓말로 쓰고, 판단하거나 훈계하지 않는다.
+의학적 진단이나 치료에 해당하는 조언은 하지 않는다.
+
+답은 정확히 3줄로만 쓴다. 한 줄에 문장 하나씩만 쓰고,
+줄과 줄 사이는 반드시 줄바꿈으로 나눠 세 줄로 보이게 한다.
+첫째 줄 — 들은 일에 공감하는 말
+둘째 줄 — 같은 일을 다른 각도에서 바라보게 하는 말
+셋째 줄 — 내일 해 볼 수 있는 아주 작은 한 걸음
+별표, 머리기호, 굵은 글씨를 쓰지 않고, 이모지는 전체에서 1개 이하로 쓴다.
+
+고민이나 하루 이야기가 아닌, 장난이거나 위로와 상관없는 입력이 오면 3줄 형식 대신
+"오늘 있었던 일을 한 줄로 들려주시면 위로를 준비할게요."라고만 부드럽게 답한다.
+자신이나 다른 사람을 해칠 위험, 학대나 폭력 피해처럼 심각한 위기가 보이면
+3줄 형식을 멈추고, 혼자 견디지 말고 믿을 수 있는 어른이나
+청소년 상담전화 1388에 연락하도록 짧고 분명하게 안내한다.
+
+출력 직전에 줄 수를 스스로 확인한다 — 정확히 3줄이 아니면 3줄로 고쳐서만 출력한다.`;
+
+const PROMPT_TEMPLATE = `오늘 있었던 일: {오늘 있었던 일}`;
+
+const API_KEY = 'YOUR_UPSTAGE_API_KEY';   // 수업용 임시 키 — 수업 후 잠김
+const TEMPERATURE = 1.1;                               // 변화 많게 — 위로는 매번 달라도 좋다
+
+/* ── 여기부터는 서비스의 몸통 — 고칠 일이 없는 부분 ─────────────── */
+
+const API_URL = 'https://api.upstage.ai/v1/chat/completions';
+const FIELDS = [{ key: '오늘 있었던 일', id: 'f1' }];
+
+const $ = (id) => document.getElementById(id);
+$('sysView').textContent = SYSTEM_PROMPT;
+$('reqView').textContent = 'model: solar-pro3\ntemperature: ' + TEMPERATURE + '\nmessages: [system 1개, user 1개]';
+
+$('toggleInside').addEventListener('click', () => {
+  $('inside').hidden = !$('inside').hidden;
+});
+
+function buildUserMessage() {
+  let msg = PROMPT_TEMPLATE;
+  for (const f of FIELDS) msg = msg.split('{' + f.key + '}').join($(f.id).value.trim());
+  return msg;
+}
+
+let coolTimer = null;
+function coolDown() {
+  const sec = 15 + Math.floor(Math.random() * 26); // 15~40초 — 함께 다시 누르는 몰림 방지
+  let left = sec;
+  $('run').disabled = true;
+  $('status').className = 'err';
+  clearInterval(coolTimer);
+  coolTimer = setInterval(() => {
+    left -= 1;
+    if (left <= 0) {
+      clearInterval(coolTimer);
+      $('run').disabled = false;
+      $('status').className = '';
+      $('status').textContent = '이제 다시 눌러도 됩니다.';
+    } else {
+      $('status').textContent = '지금 서버가 붐빕니다 — ' + left + '초 뒤 다시 눌러 주세요.';
+    }
+  }, 1000);
+  $('status').textContent = '지금 서버가 붐빕니다 — ' + sec + '초 뒤 다시 눌러 주세요.';
+}
+
+$('run').addEventListener('click', async () => {
+  const empty = FIELDS.find((f) => !$(f.id).value.trim());
+  if (empty) { $('status').className = 'err'; $('status').textContent = '「' + empty.key + '」 칸을 채워 주세요.'; return; }
+
+  const userMsg = buildUserMessage();
+  $('userView').textContent = userMsg;
+
+  $('run').disabled = true;
+  $('status').className = '';
+  $('status').textContent = 'Solar Pro 3가 답을 만드는 중…';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'solar-pro3',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMsg },
+        ],
+        temperature: TEMPERATURE,
+        max_tokens: 2000,
+        reasoning_effort: 'low',
+        stream: false,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const text = data && data.choices && data.choices[0] && data.choices[0].message
+      ? String(data.choices[0].message.content || '').trim() : '';
+    if (!text) throw new Error('빈 응답');
+    $('out').textContent = text;
+    $('result').hidden = false;
+    $('run').disabled = false;
+    $('status').textContent = '';
+  } catch (e) {
+    coolDown();
+  }
+});
+</script>
+</body>
+</html>

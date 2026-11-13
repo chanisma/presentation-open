@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>피지컬 AI - Teachable Machine × 아두이노</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══ Reset & CSS Variables ═══ */
+    :root {
+      --style-bg: #0F0F2D;
+      --style-primary: #A78BFA;
+      --style-accent: #67E8F9;
+      --style-text: #FFFFFF;
+      --style-text-secondary: #C8C8E0;
+      --glass-fill: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.15);
+      --glass-fill-strong: rgba(255,255,255,0.12);
+      --color-warn: #FBBF24;
+      --color-success: #34D399;
+      --color-pink: #F472B6;
+      font-size: clamp(16px, 1.5vw, 28px);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ═══ Typography ═══ */
+    body {
+      background: var(--style-bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(167,139,250,0.15), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(103,232,249,0.10), transparent);
+      color: var(--style-text);
+      font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden; line-height: 1.6;
+    }
+    h1, h2, h3 {
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+      font-weight: 700; color: var(--style-text);
+      margin-top: 0; word-break: keep-all;
+    }
+    h1 { font-size: 2.4rem; margin-bottom: 0.5rem; line-height: 1.2; }
+    h2 { font-size: 1.5rem; margin-bottom: 0.6rem; }
+    h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    p { font-size: 1rem; line-height: 1.7; margin-top: 0; margin-bottom: 0.4rem; word-break: keep-all; }
+
+    /* ═══ Accessibility ═══ */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--style-primary); color: var(--style-bg);
+      padding: 8px 16px; z-index: 9999; font-size: 14px;
+      border-radius: 0 0 4px 0; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ═══ Slide Container ═══ */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      z-index: 1000; width: 0%; transition: width 0.3s linear;
+    }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.active .browser-card { animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ Glassmorphism Card ═══ */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--glass-fill);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .browser-card--frameless {
+      background: transparent;
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      border: none; box-shadow: none;
+    }
+    .browser-topbar {
+      height: 2.2rem;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex; align-items: center;
+      padding: 0 1rem; gap: 0.5rem; flex-shrink: 0;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: rgba(255,95,86,0.7); }
+    .dot.yellow { background: rgba(255,189,46,0.7); margin-left: 6px; }
+    .dot.green { background: rgba(39,201,63,0.7); margin-left: 6px; }
+    .topbar-title {
+      margin: 0 auto;
+      font-size: 0.7rem; font-weight: 500;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.05em;
+    }
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1.2rem 2rem 1rem;
+      display: flex; flex-direction: column;
+      justify-content: center;
+    }
+
+    /* ═══ Components ═══ */
+
+    /* Section Header */
+    .section-header { margin-bottom: 0.6rem; }
+    .section-header h2 { display: flex; align-items: center; gap: 0.3em; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle {
+      font-size: 0.88rem; color: var(--style-text-secondary);
+      margin-top: 0.15rem;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block; padding: 0.2em 0.7em;
+      border-radius: 2em; font-size: 0.82rem; font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .badge-primary { background: rgba(167,139,250,0.2); color: var(--style-primary); border: 1px solid rgba(167,139,250,0.3); }
+    .badge-accent { background: rgba(103,232,249,0.15); color: var(--style-accent); border: 1px solid rgba(103,232,249,0.3); }
+
+    /* Highlight Box */
+    .highlight-box {
+      background: var(--glass-fill-strong);
+      border: 1px solid var(--glass-border);
+      border-left: 3px solid var(--style-primary);
+      border-radius: 0.6rem;
+      padding: 0.7rem 1rem;
+      margin: 0.5rem 0;
+    }
+    .highlight-box p { margin: 0; font-size: 0.95rem; }
+    .highlight-box--accent { border-left-color: var(--style-accent); }
+    .highlight-box--warn { border-left-color: var(--color-warn); }
+
+    /* Card Grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .card {
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem 1rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover { transform: translateY(-2px); border-color: rgba(167,139,250,0.4); }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.2rem; color: var(--style-text); }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); margin: 0; line-height: 1.5; }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Task List */
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .task-item {
+      display: flex; gap: 0.8rem; align-items: flex-start;
+      padding: 0.6rem 0.8rem;
+      border-left: 3px solid var(--style-primary);
+      background: var(--glass-fill);
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+    .task-item:nth-child(2) { border-left-color: var(--style-accent); }
+    .task-item:nth-child(3) { border-left-color: var(--color-pink); }
+    .task-item:nth-child(4) { border-left-color: var(--color-warn); }
+    .task-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem; font-weight: 700;
+      color: var(--style-primary);
+      min-width: 1.6rem;
+    }
+    .task-body { flex: 1; }
+    .task-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.1rem; }
+    .task-desc { font-size: 0.85rem; color: var(--style-text-secondary); margin: 0; }
+
+    /* Two Column */
+    .two-col { display: flex; gap: 1rem; align-items: stretch; }
+    .col-left, .col-right { flex: 1; }
+    .col-divider { width: 1px; background: var(--glass-border); flex-shrink: 0; }
+    .col-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--style-primary); }
+    .col-title--accent { color: var(--style-accent); }
+    .col-list { list-style: none; display: flex; flex-direction: column; gap: 0.35rem; }
+    .col-list li {
+      font-size: 0.9rem; color: var(--style-text-secondary);
+      padding-left: 1em; position: relative;
+    }
+    .col-list li::before { content: '▸'; position: absolute; left: 0; color: var(--style-primary); }
+    .col-right .col-list li::before { color: var(--style-accent); }
+
+    /* Flow Diagram */
+    .flow-diagram {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.3rem; flex-wrap: wrap; margin: 0.5rem 0;
+    }
+    .flow-step {
+      background: var(--glass-fill-strong);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      text-align: center; min-width: 5.5rem;
+    }
+    .flow-step-title { font-size: 0.82rem; font-weight: 600; color: var(--style-text); }
+    .flow-step-desc { font-size: 0.75rem; color: var(--style-text-secondary); margin-top: 0.1rem; }
+    .flow-step--primary { border-color: rgba(167,139,250,0.4); background: rgba(167,139,250,0.08); }
+    .flow-step--accent { border-color: rgba(103,232,249,0.4); background: rgba(103,232,249,0.08); }
+    .flow-step--success { border-color: rgba(52,211,153,0.4); background: rgba(52,211,153,0.08); }
+    .flow-arrow {
+      font-size: 1rem; color: var(--style-primary);
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    }
+
+    /* Code Block */
+    .code-block {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.6rem;
+      padding: 0.7rem 1rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.78rem; line-height: 1.6;
+      color: var(--style-text-secondary);
+      overflow-x: auto;
+      margin: 0.4rem 0;
+    }
+    .code-block .keyword { color: var(--style-primary); }
+    .code-block .string { color: var(--color-success); }
+    .code-block .comment { color: rgba(200,200,224,0.5); font-style: italic; }
+    .code-block .func { color: var(--style-accent); }
+    .code-block .num { color: var(--color-warn); }
+
+    /* Tip Box */
+    .tip-box {
+      background: rgba(103,232,249,0.08);
+      border: 1px solid rgba(103,232,249,0.25);
+      border-radius: 0.6rem;
+      padding: 0.6rem 0.8rem;
+      margin-top: 0.4rem;
+    }
+    .tip-box--warn {
+      background: rgba(251,191,36,0.08);
+      border-color: rgba(251,191,36,0.25);
+    }
+    .tip-title {
+      font-size: 0.88rem; font-weight: 600;
+      color: var(--style-accent); margin-bottom: 0.2rem;
+    }
+    .tip-title--warn { color: var(--color-warn); }
+    .tip-list { list-style: none; }
+    .tip-list li {
+      font-size: 0.85rem; color: var(--style-text-secondary);
+      padding: 0.15rem 0; padding-left: 1.2em; position: relative;
+    }
+    .tip-list li::before {
+      content: '✦'; position: absolute; left: 0;
+      color: var(--style-accent); font-size: 0.7rem; top: 0.25rem;
+    }
+    .tip-box--warn .tip-list li::before { color: var(--color-warn); }
+
+    /* Stat Grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .stat-item {
+      text-align: center;
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem 0.5rem;
+    }
+    .stat-number {
+      display: block;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem; font-weight: 700;
+      color: var(--style-accent); line-height: 1.2;
+    }
+    .stat-label { display: block; font-size: 0.82rem; color: var(--style-text-secondary); margin-top: 0.2rem; }
+
+    /* Cover & End */
+    .cover-slide { text-align: center; justify-content: center; align-items: center; }
+    .cover-badge { margin-bottom: 0.6rem; }
+    .cover-title {
+      font-size: 2.4rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; line-height: 1.2; margin-bottom: 0.4rem;
+    }
+    .cover-subtitle { font-size: 1.05rem; color: var(--style-text-secondary); margin-bottom: 0.8rem; }
+    .cover-divider {
+      width: 60px; height: 2px; margin: 0 auto 0.8rem;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      border-radius: 2px;
+    }
+    .cover-meta {
+      font-size: 0.88rem; color: var(--style-text-secondary);
+      display: flex; gap: 0.6rem; justify-content: center; align-items: center;
+    }
+    .end-slide { text-align: center; align-items: center; }
+    .end-title {
+      font-size: 2rem;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.3rem;
+    }
+    .end-subtitle { font-size: 0.95rem; color: var(--style-text-secondary); margin-bottom: 0.8rem; }
+    .end-summary { text-align: left; max-width: 600px; margin: 0 auto; }
+    .summary-title { font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--style-accent); }
+    .summary-list { list-style: none; }
+    .summary-list li { font-size: 0.9rem; padding: 0.2rem 0; color: var(--style-text-secondary); }
+
+    /* Decorative */
+    .deco-blob { position: absolute; border-radius: 50%; pointer-events: none; z-index: -1; filter: blur(60px); }
+    .deco-blob--tr { right: -5%; top: -10%; width: 35%; padding-bottom: 35%; background: rgba(167,139,250,0.08); }
+    .deco-blob--bl { left: -8%; bottom: -5%; width: 30%; padding-bottom: 30%; background: rgba(103,232,249,0.06); }
+
+    /* ═══ Navigation ═══ */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: rgba(15,15,45,0.9);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--glass-border);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--glass-border);
+      border-radius: 50%; background: transparent;
+      cursor: pointer; font-size: 0;
+      color: var(--style-text-secondary);
+      transition: all 0.2s; padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: rgba(167,139,250,0.2); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--style-text); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700; color: var(--style-text-secondary);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700;
+      color: var(--style-text-secondary); font-family: inherit;
+      padding: 0; outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-accent); background: rgba(255,255,255,0.05); border-radius: 4px; }
+
+    /* ═══ Responsive ═══ */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; height: 1px; }
+      .flow-diagram { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+      h1, .cover-title { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .browser-content { padding: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="14" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+    <div class="deco-blob deco-blob--tr"></div>
+    <div class="deco-blob deco-blob--bl"></div>
+
+    <!-- ═══ Slide 1: Cover ═══ -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <div class="cover-badge">
+            <span class="badge badge-primary">인공지능과 피지컬컴퓨팅</span>
+          </div>
+          <h1 class="cover-title">피지컬 AI</h1>
+          <p class="cover-subtitle">Teachable Machine × 아두이노</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>샘플고등학교</span>
+            <span aria-hidden="true">·</span>
+            <span>손동작 인식 스마트 조명 프로젝트</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 2: 지난 시간 복습 ═══ -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 지난 시간 복습">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🔄</span> 지난 시간 복습</h2>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-item">
+              <span class="stat-number" style="font-size:1.3rem; color:var(--style-primary);">전이학습</span>
+              <span class="stat-label">MobileNet의 특징 추출기를 빌려와 분류층만 새로 학습</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" style="font-size:1.3rem;">TM</span>
+              <span class="stat-label">Teachable Machine으로 손동작 인식 모델 완성</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" style="font-size:1.3rem; color:var(--color-success);">모델 저장</span>
+              <span class="stat-label">학습된 모델을 클라우드에 업로드하여 링크 확보</span>
+            </div>
+          </div>
+          <div class="highlight-box highlight-box--accent" style="margin-top:0.6rem;">
+            <p>지난 시간에 우리는 AI의 <strong>"눈"</strong>을 만들었습니다. 오늘은 AI에게 <strong>"손과 발"</strong>을 달아줍니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 3: 피지컬 AI란? ═══ -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 피지컬 AI란?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🤖</span> 피지컬 AI란?</h2>
+            <p class="section-subtitle">AI가 디지털 세계를 넘어 물리적 세계와 만나는 기술</p>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">디지털 AI</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">화면 속에서만 동작</li>
+                <li role="listitem">텍스트, 이미지, 음성 처리</li>
+                <li role="listitem">ChatGPT, 번역기, 필터</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title col-title--accent">피지컬 AI</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">현실 세계에서 행동</li>
+                <li role="listitem">센서로 인식하고 모터/LED로 반응</li>
+                <li role="listitem">자율주행차, 로봇, 스마트홈</li>
+              </ul>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            <p>피지컬 AI의 핵심 구조: <strong>센서 입력 → AI 판단 → 물리적 출력</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 4: 피지컬 AI 사례 ═══ -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 피지컬 AI 사례">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🌍</span> 피지컬 AI, 이미 우리 곁에</h2>
+          </div>
+          <div class="grid-3 card-grid" role="list">
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-primary);">
+              <h3 class="card-title">자율주행차</h3>
+              <p class="card-desc">카메라/라이다 → AI 판단 → 핸들/브레이크 제어</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-accent);">
+              <h3 class="card-title">스마트 팩토리</h3>
+              <p class="card-desc">카메라 → 불량 감지 AI → 로봇팔이 불량품 제거</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid var(--color-pink);">
+              <h3 class="card-title">스마트홈</h3>
+              <p class="card-desc">음성/동작 → AI 인식 → 조명/에어컨/커튼 제어</p>
+            </div>
+          </div>
+          <div class="highlight-box highlight-box--accent" style="margin-top:0.6rem;">
+            <p>모두 같은 패턴입니다: <strong>센서</strong>(카메라, 마이크)로 인식 → <strong>AI</strong>가 판단 → <strong>액추에이터</strong>(모터, LED)가 행동</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 5: 우리의 프로젝트 = 피지컬 AI ═══ -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 우리의 프로젝트">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✋</span> 우리의 프로젝트도 피지컬 AI</h2>
+            <p class="section-subtitle">손동작 인식 스마트 조명 컨트롤러</p>
+          </div>
+          <div class="flow-diagram" role="img" aria-label="프로젝트 구조: 웹캠 → Teachable Machine → 시리얼 통신 → 아두이노 → LED">
+            <div class="flow-step flow-step--primary">
+              <div class="flow-step-title">웹캠</div>
+              <div class="flow-step-desc">센서 입력</div>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="flow-step flow-step--primary">
+              <div class="flow-step-title">TM 모델</div>
+              <div class="flow-step-desc">AI 판단</div>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="flow-step flow-step--accent">
+              <div class="flow-step-title">시리얼</div>
+              <div class="flow-step-desc">통신</div>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="flow-step flow-step--accent">
+              <div class="flow-step-title">아두이노</div>
+              <div class="flow-step-desc">제어기</div>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="flow-step flow-step--success">
+              <div class="flow-step-title">LED</div>
+              <div class="flow-step-desc">물리적 출력</div>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top:0.6rem;" role="list">
+            <div class="card" role="listitem">
+              <h3 class="card-title" style="color:var(--style-primary);">지난 시간에 완성한 것</h3>
+              <p class="card-desc">웹캠 → TM 모델 (AI의 눈과 뇌)</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title" style="color:var(--style-accent);">오늘 만들 것</h3>
+              <p class="card-desc">시리얼 통신 → 아두이노 → LED (AI의 손과 발)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 6: 준비물 ═══ -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 준비물">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🔧</span> 오늘의 준비물</h2>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-primary);">
+              <h3 class="card-title">하드웨어</h3>
+              <p class="card-desc">아두이노 Uno + USB 케이블</p>
+              <p class="card-desc">LED 3개 (빨강, 초록, 파랑)</p>
+              <p class="card-desc">220Ω 저항 3개 + 브레드보드 + 점퍼선</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-accent);">
+              <h3 class="card-title">소프트웨어</h3>
+              <p class="card-desc">Chrome 브라우저 (Web Serial API 지원)</p>
+              <p class="card-desc">Arduino IDE (아두이노 코드 업로드용)</p>
+              <p class="card-desc">지난 시간에 저장한 TM 모델 링크</p>
+            </div>
+          </div>
+          <div class="tip-box--warn tip-box" style="margin-top:0.5rem;">
+            <p class="tip-title tip-title--warn">체크리스트</p>
+            <ul class="tip-list">
+              <li>TM 모델 링크를 가지고 있나요? 없다면 지난 시간 모델을 다시 만들어야 합니다</li>
+              <li>Chrome 브라우저를 사용해야 합니다 (Edge도 가능)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 7: 아두이노 회로 ═══ -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 아두이노 회로 구성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⚡</span> Step 1 — 아두이노 회로 구성</h2>
+            <p class="section-subtitle">LED 3개를 아두이노에 연결합니다</p>
+          </div>
+          <ol class="task-list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <h3 class="task-title">빨간 LED → 디지털 9번 핀</h3>
+                <p class="task-desc">LED 긴 다리(+) → 220Ω 저항 → 9번 핀, 짧은 다리(-) → GND</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <h3 class="task-title">초록 LED → 디지털 10번 핀</h3>
+                <p class="task-desc">같은 방식으로 10번 핀에 연결</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <h3 class="task-title">파란 LED → 디지털 11번 핀</h3>
+                <p class="task-desc">같은 방식으로 11번 핀에 연결</p>
+              </div>
+            </li>
+          </ol>
+          <div class="tip-box">
+            <p class="tip-title">LED 연결 규칙</p>
+            <ul class="tip-list">
+              <li>LED는 극성이 있습니다 — 긴 다리가 (+), 짧은 다리가 (-)</li>
+              <li>저항을 빼먹으면 LED가 타버릴 수 있으니 반드시 연결하세요</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 8: 아두이노 코드 ═══ -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 아두이노 코드">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">💻</span> Step 2 — 아두이노 코드 업로드</h2>
+          </div>
+          <div class="code-block" role="code" aria-label="아두이노 코드">
+<span class="comment">// LED 핀 번호 설정</span>
+<span class="keyword">const int</span> RED = <span class="num">9</span>;
+<span class="keyword">const int</span> GREEN = <span class="num">10</span>;
+<span class="keyword">const int</span> BLUE = <span class="num">11</span>;
+
+<span class="keyword">void</span> <span class="func">setup</span>() {
+  <span class="func">Serial</span>.begin(<span class="num">9600</span>);        <span class="comment">// 시리얼 통신 시작</span>
+
+  <span class="func">pinMode</span>(RED, <span class="keyword">OUTPUT</span>);     <span class="comment">// LED 핀을 출력 모드로</span>
+  <span class="func">pinMode</span>(GREEN, <span class="keyword">OUTPUT</span>);
+  <span class="func">pinMode</span>(BLUE, <span class="keyword">OUTPUT</span>);
+}
+
+<span class="keyword">void</span> <span class="func">loop</span>() {
+
+  <span class="keyword">if</span> (<span class="func">Serial</span>.available()) {  <span class="comment">// 데이터가 들어오면</span>
+    <span class="keyword">char</span> cmd = <span class="func">Serial</span>.read(); <span class="comment">// 문자 1개 읽기</span>
+
+    <span class="comment">// 모든 LED 끄기</span>
+    <span class="func">digitalWrite</span>(RED, <span class="keyword">LOW</span>);
+    <span class="func">digitalWrite</span>(GREEN, <span class="keyword">LOW</span>);
+    <span class="func">digitalWrite</span>(BLUE, <span class="keyword">LOW</span>);
+
+    <span class="comment">// 받은 명령에 따라 LED 켜기</span>
+    <span class="keyword">if</span> (cmd == <span class="string">'R'</span>)  <span class="func">digitalWrite</span>(RED, <span class="keyword">HIGH</span>);    <span class="comment">// 주먹 → 빨강</span>
+    <span class="keyword">if</span> (cmd == <span class="string">'G'</span>)  <span class="func">digitalWrite</span>(GREEN, <span class="keyword">HIGH</span>);  <span class="comment">// 보 → 초록</span>
+    <span class="keyword">if</span> (cmd == <span class="string">'B'</span>)  <span class="func">digitalWrite</span>(BLUE, <span class="keyword">HIGH</span>);   <span class="comment">// 가위 → 파랑</span>
+    <span class="comment">// 'O'이면 전부 꺼진 상태 유지</span>
+  }
+}</div>
+          <div class="highlight-box" style="margin-top:0.3rem;">
+            <p>시리얼로 문자 하나를 받아 LED를 제어합니다. <strong>'R'</strong>=빨강, <strong>'G'</strong>=초록, <strong>'B'</strong>=파랑, <strong>'O'</strong>=전부 끄기</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 9: Web Serial API 설명 ═══ -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: Web Serial API">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🔗</span> 웹과 아두이노를 잇는 다리</h2>
+            <p class="section-subtitle">Web Serial API — 브라우저에서 직접 하드웨어와 통신</p>
+          </div>
+          <div class="flow-diagram" role="img" aria-label="통신 흐름: Chrome 브라우저 → Web Serial API → USB → 아두이노">
+            <div class="flow-step flow-step--primary">
+              <div class="flow-step-title">Chrome</div>
+              <div class="flow-step-desc">TM 모델 실행</div>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="flow-step flow-step--accent">
+              <div class="flow-step-title">Web Serial</div>
+              <div class="flow-step-desc">API 통신</div>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="flow-step">
+              <div class="flow-step-title">USB</div>
+              <div class="flow-step-desc">케이블</div>
+            </div>
+            <span class="flow-arrow" aria-hidden="true">→</span>
+            <div class="flow-step flow-step--success">
+              <div class="flow-step-title">아두이노</div>
+              <div class="flow-step-desc">LED 제어</div>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top:0.5rem;" role="list">
+            <div class="card" role="listitem">
+              <h3 class="card-title" style="color:var(--style-accent);">Web Serial API의 장점</h3>
+              <p class="card-desc">별도 프로그램 설치 없이 Chrome만으로 시리얼 통신 가능</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title" style="color:var(--style-primary);">동작 원리</h3>
+              <p class="card-desc">AI가 손동작을 인식할 때마다 시리얼로 문자 하나를 아두이노에 전송</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 10: 웹 코드 설명 ═══ -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 웹 코드">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📝</span> 웹 페이지 코드 핵심</h2>
+            <p class="section-subtitle">TM 모델 로드 + 시리얼 전송 (코드 파일은 제공됩니다)</p>
+          </div>
+          <div class="code-block" role="code" aria-label="JavaScript 핵심 코드">
+<span class="comment">// 1. TM 모델 로드</span>
+<span class="keyword">const</span> model = <span class="keyword">await</span> <span class="func">tmImage</span>.load(modelURL, metadataURL);
+
+<span class="comment">// 2. 웹캠으로 예측</span>
+<span class="keyword">const</span> prediction = <span class="keyword">await</span> model.<span class="func">predict</span>(webcam.canvas);
+
+<span class="comment">// 3. 가장 높은 확률의 클래스 찾기</span>
+<span class="keyword">let</span> bestClass = prediction.<span class="func">reduce</span>(
+  (a, b) => a.probability > b.probability ? a : b
+);
+
+<span class="comment">// 4. 시리얼로 명령 전송</span>
+<span class="keyword">if</span> (bestClass.className === <span class="string">"주먹"</span>)
+  writer.<span class="func">write</span>(<span class="string">"R"</span>);  <span class="comment">// 빨간 LED</span></div>
+          <div class="highlight-box" style="margin-top:0.3rem;">
+            <p>핵심 흐름: 모델 로드 → 웹캠 예측 → 가장 높은 확률의 클래스 → 해당 문자를 시리얼로 전송</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 11: 실습 순서 ═══ -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 실습 순서">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🎯</span> 실습 순서</h2>
+            <p class="section-subtitle">하나씩 따라해봅시다</p>
+          </div>
+          <ol class="task-list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <h3 class="task-title">아두이노 회로 조립</h3>
+                <p class="task-desc">LED 3개를 9, 10, 11번 핀에 연결 (저항 필수)</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <h3 class="task-title">아두이노 코드 업로드</h3>
+                <p class="task-desc">Arduino IDE에서 코드를 복사 → 업로드 (포트 확인)</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <h3 class="task-title">웹 페이지 열기 + 시리얼 연결</h3>
+                <p class="task-desc">제공된 HTML 파일을 Chrome에서 열고, "연결" 버튼으로 아두이노 선택</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">04</span>
+              <div class="task-body">
+                <h3 class="task-title">손동작으로 LED 제어 테스트</h3>
+                <p class="task-desc">웹캠 앞에서 손동작 → AI 인식 → LED 점등 확인</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 12: Arduino IDE 포트 설정 ═══ -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: 포트 설정">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⚙</span> 아두이노 업로드 가이드</h2>
+          </div>
+          <ol class="task-list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <h3 class="task-title">Arduino IDE 실행</h3>
+                <p class="task-desc">아두이노를 USB로 연결한 후 Arduino IDE를 엽니다</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <h3 class="task-title">보드 & 포트 선택</h3>
+                <p class="task-desc">도구 → 보드: "Arduino Uno" 선택, 포트: "COM○" (숫자가 붙은 것) 선택</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <h3 class="task-title">코드 붙여넣기 → 업로드</h3>
+                <p class="task-desc">기존 코드를 모두 지우고, 제공된 코드를 붙여넣은 후 업로드(→) 버튼 클릭</p>
+              </div>
+            </li>
+          </ol>
+          <div class="tip-box--warn tip-box" style="margin-top:0.4rem;">
+            <p class="tip-title tip-title--warn">주의</p>
+            <ul class="tip-list">
+              <li>업로드 시 "Done uploading" 메시지가 나오면 성공</li>
+              <li>포트가 안 보이면 USB 케이블을 다시 연결하거나 드라이버 설치 필요</li>
+              <li>업로드 후에는 Arduino IDE의 시리얼 모니터를 반드시 닫아주세요</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 13: 트러블슈팅 ═══ -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 13: 트러블슈팅">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">피지컬 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🛠</span> 잘 안 될 때 체크리스트</h2>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem" style="border-left:3px solid var(--color-warn);">
+              <h3 class="card-title">LED가 안 켜져요</h3>
+              <p class="card-desc">LED 극성 확인 (긴 다리=+)</p>
+              <p class="card-desc">저항이 연결되어 있는지 확인</p>
+              <p class="card-desc">핀 번호가 코드와 일치하는지 확인</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid var(--color-pink);">
+              <h3 class="card-title">시리얼 연결이 안 돼요</h3>
+              <p class="card-desc">Arduino IDE 시리얼 모니터 닫기</p>
+              <p class="card-desc">Chrome 브라우저인지 확인</p>
+              <p class="card-desc">USB 케이블 재연결 시도</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-primary);">
+              <h3 class="card-title">인식이 잘 안 돼요</h3>
+              <p class="card-desc">조명이 밝은 환경에서 테스트</p>
+              <p class="card-desc">동작을 더 명확하게 해보기</p>
+              <p class="card-desc">TM에서 모델 재학습 필요할 수도</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-accent);">
+              <h3 class="card-title">모델 링크를 잃어버렸어요</h3>
+              <p class="card-desc">teachablemachine.withgoogle.com 접속</p>
+              <p class="card-desc">새 프로젝트로 모델을 다시 만들어도 됩니다</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 14: 마무리 ═══ -->
+    <div class="slide" data-slide="13" role="region" aria-label="슬라이드 14: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <h2 class="end-title">피지컬 AI 완성!</h2>
+          <p class="end-subtitle">AI가 세상과 상호작용하는 첫 번째 프로젝트를 만들었습니다</p>
+          <div class="highlight-box end-summary">
+            <h3 class="summary-title">오늘의 핵심</h3>
+            <ul class="summary-list" role="list">
+              <li role="listitem">✦ <strong>피지컬 AI</strong>는 센서 입력 → AI 판단 → 물리적 출력 구조입니다</li>
+              <li role="listitem">✦ <strong>Web Serial API</strong>로 브라우저에서 아두이노와 직접 통신합니다</li>
+              <li role="listitem">✦ 우리의 프로젝트도 자율주행, 스마트홈과 <strong>같은 원리</strong>로 동작합니다</li>
+              <li role="listitem">✦ 웹캠(센서) → TM 모델(AI) → LED(출력) 파이프라인을 직접 구현했습니다</li>
+            </ul>
+          </div>
+          <div class="tip-box" style="margin-top:0.6rem; max-width:600px; margin-left:auto; margin-right:auto;">
+            <p class="tip-title">도전 과제</p>
+            <ul class="tip-list">
+              <li>LED 대신 서보모터를 연결하면? → 손동작으로 문 열기</li>
+              <li>부저를 연결하면? → 손동작으로 멜로디 연주</li>
+              <li>동작 클래스를 더 추가하면? → 더 다양한 제어 가능</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">14</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    document.getElementById('totalSlides').textContent = totalSlides;
+
+    function announceSlide(c, t) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (c + 1) + ' / ' + t;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(function() { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      const dy = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', function() { this.select(); });
+    slideInput.addEventListener('keydown', function(e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        const num = parseInt(this.value);
+        if (num >= 1 && num <= totalSlides) goToSlide(num - 1);
+        else this.value = currentSlide + 1;
+        this.blur();
+      } else if (e.key === 'Escape') { this.value = currentSlide + 1; this.blur(); }
+    });
+    slideInput.addEventListener('blur', function() {
+      const num = parseInt(this.value);
+      if (num >= 1 && num <= totalSlides) goToSlide(num - 1);
+      else this.value = currentSlide + 1;
+    });
+
+    updateNav();
+  </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>디지털 리터러시와 미디어 윤리</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #FAFAFA;
+      --style-bg-rgb: 250, 250, 250;
+      --style-primary: #111111;
+      --style-accent: #FF3D00;
+      --style-text: #111111;
+      --style-text-secondary: #666666;
+    }
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Source Sans 3', -apple-system, sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden;
+      height: 100%;
+    }
+    h1, h2, h3 { color: var(--style-primary); }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.05em; text-transform: uppercase; }
+    h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    h3 { font-family: 'Source Sans 3', sans-serif; font-size: 1.1rem; font-weight: 700; }
+    p { font-size: 1rem; line-height: 1.7; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-accent); color: #fff; padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-contrast: high) { :root { --style-primary: #000; --style-text: #000; --style-bg: #fff; --style-accent: #cc0000; } .browser-card { border: 2px solid #000; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+    .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: var(--style-accent); z-index: 1000; transition: width 0.3s ease; }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0.8rem 1.2rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .browser-card { width: 100%; max-width: 1200px; max-height: calc(100vh - 4.8rem); display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 0.4rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 2px solid var(--style-primary); }
+    .browser-topbar { display: flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; border-bottom: 2px solid var(--style-primary); }
+    .topbar-title { font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem; color: var(--style-text-secondary); letter-spacing: 0.15em; text-transform: uppercase; margin: 0 auto; }
+    .browser-content { flex: 1; overflow-y: auto; padding: 1rem 2rem 0.8rem; }
+    .browser-card--frameless { background: var(--style-primary); color: #fff; box-shadow: none; border: none; }
+    .browser-card--frameless .browser-topbar { border-bottom: 2px solid rgba(255,255,255,0.15); }
+    .browser-card--frameless .topbar-title { color: rgba(255,255,255,0.6); }
+    .cover-slide { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 60vh; }
+    .cover-title { color: #fff; margin-bottom: 0.3rem; }
+    .cover-subtitle { font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem; }
+    .cover-rule { width: 80px; height: 4px; background: var(--style-accent); margin: 0.6rem 0; }
+    .cover-meta { font-size: 0.88rem; color: rgba(255,255,255,0.5); display: flex; gap: 0.5rem; }
+    .section-header { margin-bottom: 0.8rem; }
+    .section-header h2 { display: flex; align-items: center; }
+    .section-icon { display: inline; font-size: 1em; margin-right: 0.4em; vertical-align: -0.05em; }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text-secondary); margin-top: 0.2rem; font-family: 'Source Sans 3', sans-serif; text-transform: none; letter-spacing: normal; }
+    .highlight-box { background: rgba(255,61,0,0.05); border-left: 4px solid var(--style-accent); padding: 0.6rem 1rem; border-radius: 0 0.3rem 0.3rem 0; margin: 0.6rem 0; font-size: 0.95rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .card { background: #fff; border-radius: 0.4rem; padding: 0.8rem 1rem; border: 2px solid rgba(0,0,0,0.08); }
+    .card-dark { background: var(--style-primary); color: #fff; border-color: var(--style-primary); }
+    .card-dark h3 { color: #fff; }
+    .card-dark .card-desc { color: rgba(255,255,255,0.75); }
+    .card-title { font-size: 1rem; margin-bottom: 0.2rem; }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
+    .col-title { font-size: 1.05rem; margin-bottom: 0.4rem; }
+    .col-list { list-style: none; padding: 0; }
+    .col-list li { font-size: 0.95rem; padding: 0.3rem 0; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat-item { text-align: center; padding: 0.8rem; border: 2px solid rgba(0,0,0,0.08); border-radius: 0.4rem; }
+    .stat-number { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--style-accent); display: block; letter-spacing: 0.02em; }
+    .stat-label { font-size: 0.82rem; color: var(--style-text-secondary); }
+    .activity-list { list-style: none; padding: 0; }
+    .activity-item { display: flex; gap: 0.8rem; padding: 0.6rem 0; border-bottom: 2px solid rgba(0,0,0,0.04); }
+    .activity-icon { font-size: 1.2rem; flex-shrink: 0; color: var(--style-accent); font-weight: 700; font-family: 'Bebas Neue', sans-serif; }
+    .activity-title { font-weight: 700; font-size: 1rem; }
+    .activity-desc { font-size: 0.88rem; color: var(--style-text-secondary); }
+    .placeholder-block { display: flex; align-items: center; justify-content: center; min-height: 180px; background: repeating-linear-gradient(45deg, rgba(0,0,0,0.02), rgba(0,0,0,0.02) 10px, transparent 10px, transparent 20px); border: 2px dashed rgba(0,0,0,0.12); border-radius: 0.4rem; margin: 0.6rem 0; }
+    .placeholder-label { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--style-text-secondary); letter-spacing: 0.1em; text-transform: uppercase; }
+    .end-slide { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 50vh; }
+    .end-title { font-size: 2.2rem; color: #fff; margin-bottom: 0.5rem; }
+    .end-subtitle { font-size: 1rem; color: rgba(255,255,255,0.6); margin-top: 0.8rem; }
+    @keyframes popUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .stat-item { animation: popUp 0.5s ease-out both; }
+    .slide.active .stat-item:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .stat-item:nth-child(3) { animation-delay: 0.16s; }
+    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 0.8rem; padding: 0.4rem 1rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 2px solid var(--style-primary); z-index: 1000; height: 42px; }
+    .nav-btn { background: none; border: none; cursor: pointer; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.2s; }
+    .nav-btn:hover { background: rgba(0,0,0,0.06); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn svg { width: 1.2rem; height: 1.2rem; fill: var(--style-text); }
+    .nav-counter { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: var(--style-text-secondary); display: flex; align-items: center; gap: 0.2rem; letter-spacing: 0.05em; }
+    .slide-input { width: 2em; text-align: center; border: 2px solid rgba(0,0,0,0.15); border-radius: 4px; font-size: 14px; padding: 2px; background: transparent; font-family: 'Bebas Neue', sans-serif; }
+    @media (max-width: 1024px) { html, body { font-size: clamp(15px, 2vw, 22px); } }
+    @media (max-width: 768px) { html, body { font-size: clamp(14px, 3vw, 20px); } .grid-2, .two-col, .stat-grid { grid-template-columns: 1fr; } h1 { font-size: 2.4rem; } h2 { font-size: 1.5rem; } }
+    @media (max-width: 480px) { html, body { font-size: clamp(14px, 3.5vw, 18px); } .browser-content { padding: 0.8rem; } }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="10" aria-label="프레젠테이션 진행률"></div>
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Digital Ethics</span></div>
+        <div class="browser-content cover-slide" tabindex="-1">
+          <h1 class="cover-title">Digital Literacy<br>&amp; Media Ethics</h1>
+          <div class="cover-rule" aria-hidden="true"></div>
+          <p class="cover-subtitle">디지털 리터러시와 미디어 윤리 — 정보를 비판적으로 읽는 능력</p>
+          <div class="cover-meta">
+            <span>고등학교 1학년 정보</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-03">2026년 3월</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 학습 목표 (stat-highlight) -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 학습 목표">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> Learning Goals</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">01</span>
+              <span class="stat-label">디지털 정보의 신뢰성을 판단할 수 있다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">02</span>
+              <span class="stat-label">미디어 윤리의 핵심 원칙을 설명할 수 있다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">03</span>
+              <span class="stat-label">가짜 뉴스를 식별하는 방법을 실습한다</span>
+            </div>
+          </div>
+          <div class="placeholder-block" aria-hidden="true">
+            <span class="placeholder-label">Infographic Placeholder</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 디지털 리터러시란 (two-col, text only) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 디지털 리터러시란">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> What is Digital Literacy?</h2>
+            <p class="section-subtitle">디지털 환경에서 정보를 찾고, 평가하고, 활용하는 능력</p>
+          </div>
+          <div class="two-col">
+            <div class="col">
+              <h3 class="col-title">핵심 역량</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">정보 검색과 필터링</li>
+                <li role="listitem">출처의 신뢰성 평가</li>
+                <li role="listitem">디지털 콘텐츠 창작</li>
+              </ul>
+            </div>
+            <div class="col">
+              <h3 class="col-title">왜 중요한가</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">가짜 뉴스와 허위 정보 범람</li>
+                <li role="listitem">AI 생성 콘텐츠의 급증</li>
+                <li role="listitem">디지털 시민으로서의 책임</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 현황 (stat-highlight) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 현황">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> Current Status</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">67%</span>
+              <span class="stat-label">가짜 뉴스를 접한 경험이 있는 청소년</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">38%</span>
+              <span class="stat-label">뉴스 출처를 확인하는 학생 비율</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">4.2h</span>
+              <span class="stat-label">청소년 일평균 미디어 이용 시간</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>한국언론진흥재단 조사 결과, 청소년의 미디어 리터러시 역량 강화가 시급한 과제로 나타났습니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 가짜 뉴스 식별법 (card-grid) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 가짜 뉴스 식별법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> Fake News Detection</h2>
+          </div>
+          <div class="grid-2" role="list">
+            <div class="card card-dark" role="listitem">
+              <h3 class="card-title">1. 출처 확인</h3>
+              <p class="card-desc">기사를 발행한 매체의 신뢰도를 먼저 점검</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:4px solid var(--style-accent);">
+              <h3 class="card-title">2. 교차 검증</h3>
+              <p class="card-desc">같은 사안을 2개 이상 다른 매체에서 확인</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:4px solid var(--style-accent);">
+              <h3 class="card-title">3. 날짜 확인</h3>
+              <p class="card-desc">오래된 기사가 새 뉴스처럼 공유되는 경우 주의</p>
+            </div>
+            <div class="card card-dark" role="listitem">
+              <h3 class="card-title">4. 감정적 제목</h3>
+              <p class="card-desc">분노·공포를 유발하는 제목은 의심해야 한다</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 미디어 윤리 (activity-list) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 미디어 윤리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> Media Ethics</h2>
+            <p class="section-subtitle">디지털 세상에서 지켜야 할 윤리 원칙</p>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">01</span>
+              <div class="activity-body">
+                <h3 class="activity-title">저작권 존중</h3>
+                <p class="activity-desc">타인의 콘텐츠를 무단으로 사용하지 않고, 출처를 반드시 표기한다</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">02</span>
+              <div class="activity-body">
+                <h3 class="activity-title">개인정보 보호</h3>
+                <p class="activity-desc">타인의 동의 없이 개인정보를 공유하거나 게시하지 않는다</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">03</span>
+              <div class="activity-body">
+                <h3 class="activity-title">사이버 폭력 금지</h3>
+                <p class="activity-desc">온라인에서도 현실과 동일한 예의와 존중을 유지한다</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: AI와 미디어 (card-grid) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: AI와 미디어">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> AI &amp; Media</h2>
+            <p class="section-subtitle">인공지능 시대의 새로운 미디어 과제</p>
+          </div>
+          <div class="grid-2" role="list">
+            <div class="card" role="listitem" style="border-left:4px solid var(--style-accent);">
+              <h3 class="card-title">딥페이크</h3>
+              <p class="card-desc">AI로 생성된 가짜 영상·음성 기술. 진위 판별 점점 어려워짐</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:4px solid var(--style-primary);">
+              <h3 class="card-title">생성형 AI 콘텐츠</h3>
+              <p class="card-desc">AI가 작성한 글·이미지의 저작권과 진정성 문제</p>
+            </div>
+          </div>
+          <div class="placeholder-block" aria-hidden="true">
+            <span class="placeholder-label">AI-Generated Content Examples — Placeholder</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 실습 활동 -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 실습 활동">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> Practice Activity</h2>
+          </div>
+          <div class="highlight-box" role="note">
+            <p><strong>실습:</strong> 아래 뉴스 기사 3개 중 가짜 뉴스를 찾아보세요. 판별 근거를 모둠별로 발표합니다.</p>
+          </div>
+          <div class="grid-2" role="list" style="margin-top:0.6rem;">
+            <div class="card" role="listitem" style="border-left:4px solid var(--style-accent);">
+              <h3 class="card-title">평가 기준</h3>
+              <p class="card-desc">출처의 신뢰성, 교차 검증 여부, 논리적 근거 제시</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:4px solid var(--style-primary);">
+              <h3 class="card-title">활동 방법</h3>
+              <p class="card-desc">4인 모둠 → 기사 분석 → 판별 근거 작성 → 발표</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: 디지털 시민 선언 (card-grid) -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 디지털 시민 선언">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">디지털 리터러시</span></div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">→</span> Digital Citizen</h2>
+            <p class="section-subtitle">우리의 디지털 시민 선언</p>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">01</span>
+              <div class="activity-body">
+                <h3 class="activity-title">정보를 비판적으로 판단합니다</h3>
+                <p class="activity-desc">모든 정보를 그대로 믿지 않고, 검증하는 습관을 기릅니다</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">02</span>
+              <div class="activity-body">
+                <h3 class="activity-title">타인의 권리를 존중합니다</h3>
+                <p class="activity-desc">저작권, 개인정보, 초상권을 소중히 여깁니다</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">03</span>
+              <div class="activity-body">
+                <h3 class="activity-title">책임감 있게 공유합니다</h3>
+                <p class="activity-desc">확인되지 않은 정보를 무분별하게 퍼뜨리지 않습니다</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: 마무리 -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Digital Ethics</span></div>
+        <div class="browser-content end-slide" tabindex="-1">
+          <h2 class="end-title">Think Before<br>You Share.</h2>
+          <div class="cover-rule" aria-hidden="true"></div>
+          <p class="end-subtitle">비판적 사고가 디지털 세상을 건강하게 만듭니다</p>
+          <div class="highlight-box" role="note" style="margin-top:1rem; text-align:left; background: rgba(255,255,255,0.08); border-color: var(--style-accent);">
+            <p style="color: rgba(255,255,255,0.8);"><strong style="color:#fff;">참고 자료:</strong> 한국언론진흥재단 미디어 리터러시 교육 자료 | 유네스코 MIL 프레임워크</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">10</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    function announceSlide(c,t){const el=document.getElementById('slideAnnounce');if(el)el.textContent=`슬라이드 ${c+1} / ${t}`;}
+    function updateNav(){const p=((currentSlide+1)/totalSlides)*100;progressBar.style.width=p+'%';progressBar.setAttribute('aria-valuenow',currentSlide+1);slideInput.value=currentSlide+1;prevBtn.disabled=currentSlide===0;nextBtn.disabled=currentSlide===totalSlides-1;}
+    function goToSlide(i){if(i<0||i>=totalSlides)return;slides[currentSlide].classList.remove('active');currentSlide=i;slides[currentSlide].classList.add('active');updateNav();announceSlide(currentSlide,totalSlides);const c=slides[currentSlide].querySelector('.browser-content');if(c)c.focus();}
+    function nextSlide(){goToSlide(currentSlide+1);}
+    function prevSlide(){goToSlide(currentSlide-1);}
+    document.addEventListener('keydown',(e)=>{if(e.target===slideInput)return;if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();nextSlide();}else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();prevSlide();}else if(e.key==='Home'){e.preventDefault();goToSlide(0);}else if(e.key==='End'){e.preventDefault();goToSlide(totalSlides-1);}});
+    let wheelLocked=false;document.addEventListener('wheel',(e)=>{e.preventDefault();if(wheelLocked)return;wheelLocked=true;if(e.deltaY>0)nextSlide();else if(e.deltaY<0)prevSlide();setTimeout(()=>{wheelLocked=false;},600);},{passive:false});
+    let touchStartX=0;document.addEventListener('touchstart',(e)=>{touchStartX=e.changedTouches[0].screenX;},{passive:true});document.addEventListener('touchend',(e)=>{const d=e.changedTouches[0].screenX-touchStartX;if(Math.abs(d)>50){d<0?nextSlide():prevSlide();}},{passive:true});
+    prevBtn.addEventListener('click',prevSlide);nextBtn.addEventListener('click',nextSlide);
+    slideInput.addEventListener('focus',()=>{slideInput.select();});slideInput.addEventListener('keydown',(e)=>{e.stopPropagation();if(e.key==='Enter'){const n=parseInt(slideInput.value);if(n>=1&&n<=totalSlides)goToSlide(n-1);slideInput.blur();}else if(e.key==='Escape'){slideInput.value=currentSlide+1;slideInput.blur();}});slideInput.addEventListener('blur',()=>{const n=parseInt(slideInput.value);if(n>=1&&n<=totalSlides)goToSlide(n-1);else slideInput.value=currentSlide+1;});
+    function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen().catch(()=>{});document.getElementById('fsExpand').style.display='none';document.getElementById('fsCompress').style.display='block';}else{document.exitFullscreen();document.getElementById('fsExpand').style.display='block';document.getElementById('fsCompress').style.display='none';}}document.getElementById('fsBtn').addEventListener('click',toggleFullscreen);
+    updateNav();
+  </script>
+</body>
+</html>

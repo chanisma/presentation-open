@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 옆에서 본 나무 손잡이 고무 도장. 같은 요청서 세 장 위를 오가며 누른다
+       (교사중심-AI지원체계 17장 「같은 자료를, 또 한 번」 — 요청서 세 장). 인면(y≈206)이 아래, 가로 중앙 x=80이 찍히는 지점.
+       완성도 높은 손그림 — 선 흔들림 최소, 나뭇결만 짧은 스트로크. 밝은 배경용 잉크 #16201b. 텍스트 없음.
+       팔레트: ink #16201b · knob #c98f5a · neck #b67c48 · block #d9a46f · rubber #94570f
+       앵커: 인면 y≈206, 찍히는 중심 x=80 -->
+
+  <!-- 손잡이 머리 -->
+  <path d="M80 8 C104 8 118 22 118 40 C118 56 104 66 80 66 C56 66 42 56 42 40 C42 22 56 8 80 8 Z"
+        fill="#c98f5a" stroke="#16201b" stroke-width="2.4" />
+  <path d="M60 24 C68 18 80 16 92 18" stroke="#ffffff" stroke-width="3" opacity=".35" />
+  <!-- 목 -->
+  <path d="M68 64 C66 80 64 94 60 108 L100 108 C96 94 94 80 92 64" fill="#b67c48" stroke="#16201b" stroke-width="2.4" />
+  <g stroke="#16201b" stroke-width="1.3" opacity=".35">
+    <path d="M74 72 C73 84 72 94 70 102" /><path d="M86 72 C87 84 88 94 90 102" />
+  </g>
+  <!-- 받침 나무 -->
+  <path d="M28 108 L132 108 C138 108 142 112 142 118 L142 170 C142 176 138 180 132 180 L28 180 C22 180 18 176 18 170 L18 118 C18 112 22 108 28 108 Z"
+        fill="#d9a46f" stroke="#16201b" stroke-width="2.4" />
+  <g stroke="#16201b" stroke-width="1.3" opacity=".3">
+    <path d="M30 126 C60 122 100 124 130 128" /><path d="M30 146 C62 150 98 148 130 144" /><path d="M34 164 C64 160 96 162 126 166" />
+  </g>
+  <path d="M26 116 L60 116" stroke="#ffffff" stroke-width="3" opacity=".3" />
+  <!-- 고무 인면 -->
+  <path d="M22 180 L138 180 L136 204 C136 208 133 210 129 210 L31 210 C27 210 24 208 24 204 Z"
+        fill="#94570f" stroke="#16201b" stroke-width="2.2" />
+  <path d="M30 196 L130 196" stroke="#16201b" stroke-width="1.2" opacity=".35" />
+</svg>

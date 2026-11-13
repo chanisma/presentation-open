@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code & Presentation Builder 환경 설치</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --main: #3aaa5c;
+  --dark: #2d8a49;
+  --light: #e8f5e9;
+  --accent: #43b867;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --blue: #2196f3;
+  --blue-light: #e3f2fd;
+  --orange: #ff9800;
+  --orange-light: #fff3e0;
+  --purple: #9c27b0;
+  --purple-light: #f3e5f5;
+  --red: #e53935;
+  --red-light: #fce4ec;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--main);
+  overflow: hidden;
+  color: var(--gray-900);
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+
+.presentation { width: 100%; height: 100%; position: relative; }
+
+.slide {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2.2vh 3vw;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+.browser-card {
+  background: var(--white);
+  border-radius: 1rem;
+  width: 100%; max-width: 1600px;
+  height: 100%; max-height: calc(100vh - 4.4vh);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.browser-topbar {
+  background: var(--gray-100);
+  padding: 0.6rem 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+.dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
+.dot.red { background: #FF5F57; }
+.dot.yellow { background: #FFBD2E; }
+.dot.green { background: #28C840; }
+.browser-topbar .tab-title {
+  flex: 1; text-align: center;
+  font-size: 0.8rem; color: var(--gray-600); font-weight: 500;
+  margin-right: 2.5rem;
+}
+
+.browser-content {
+  padding: 2.2rem 3rem;
+  overflow-y: auto; flex: 1;
+}
+
+/* ── TYPOGRAPHY ── */
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; margin-bottom: 0.5rem; }
+h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.9rem; color: var(--dark); }
+h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
+h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.3rem; }
+p  { font-size: 1rem; line-height: 1.7; color: var(--gray-800); }
+
+.subtitle { font-size: 1.15rem; color: var(--gray-600); font-weight: 400; margin-bottom: 0.3rem; }
+.school-name { font-size: 1rem; color: var(--dark); font-weight: 600; margin-top: 0.6rem; }
+
+/* ── COVER ── */
+.cover-content { text-align: center; padding: 1.5rem 1rem; }
+.cover-content h1 { font-size: 2.6rem; color: var(--dark); margin-bottom: 0.8rem; }
+.year-badge {
+  display: inline-block;
+  background: var(--dark); color: var(--white);
+  padding: 0.35rem 1.4rem; border-radius: 1.5rem;
+  font-size: 1rem; font-weight: 700; margin-bottom: 1rem;
+}
+
+/* ── SECTION DIVIDER ── */
+.sec-div {
+  display: flex; align-items: center; gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+.sec-icon {
+  width: 2.8rem; height: 2.8rem; border-radius: 0.6rem;
+  background: var(--light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; flex-shrink: 0;
+}
+.sec-title-wrap h2 { margin-bottom: 0; }
+.sec-sub { font-size: 0.88rem; color: var(--gray-600); margin-top: 0.1rem; }
+
+/* ── BADGE ── */
+.badge {
+  display: inline-block;
+  padding: 0.22rem 0.7rem; border-radius: 20px;
+  font-size: 0.82rem; font-weight: 600;
+  margin-right: 0.35rem; margin-bottom: 0.35rem;
+}
+.badge.green  { background: var(--light); color: var(--dark); }
+.badge.blue   { background: var(--blue-light); color: #1565c0; }
+.badge.orange { background: var(--orange-light); color: #e65100; }
+.badge.purple { background: var(--purple-light); color: #7b1fa2; }
+.badge.red    { background: var(--red-light); color: #c62828; }
+
+/* ── INFO BOX ── */
+.info-box {
+  border-left: 4px solid var(--accent);
+  background: var(--light);
+  padding: 0.9rem 1.2rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 0.8rem 0;
+  font-size: 0.95rem; line-height: 1.6;
+}
+.info-box.blue   { background: var(--blue-light); border-left-color: var(--blue); }
+.info-box.orange { background: var(--orange-light); border-left-color: var(--orange); }
+.info-box.red    { background: var(--red-light); border-left-color: var(--red); }
+.info-box.purple { background: var(--purple-light); border-left-color: var(--purple); }
+
+/* ── HIGHLIGHT BOX ── */
+.highlight-box {
+  background: linear-gradient(135deg, var(--light), #c8e6c9);
+  border-radius: 0.8rem; padding: 1.2rem 1.5rem;
+  margin: 0.8rem 0; text-align: center;
+}
+.highlight-box .big-text { font-size: 1.35rem; font-weight: 800; color: var(--dark); margin-bottom: 0.2rem; }
+.highlight-box .small-text { font-size: 0.9rem; color: var(--gray-600); }
+
+/* ── GRIDS ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; margin: 0.8rem 0; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.9rem; margin: 0.8rem 0; }
+
+/* ── CARD ITEM ── */
+.card-item {
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: 0.7rem; padding: 1.1rem 1.2rem;
+}
+.card-item .icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.card-item h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.3rem; }
+.card-item p  { font-size: 0.9rem; color: var(--gray-600); line-height: 1.5; }
+
+/* ── STEP TASK BOX ── */
+.step-box {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 0.7rem; padding: 1rem 1.2rem;
+  margin-bottom: 0.7rem; border-left: 4px solid var(--accent);
+  position: relative;
+}
+.step-box.blue   { border-left-color: var(--blue); }
+.step-box.orange { border-left-color: var(--orange); }
+.step-box.purple { border-left-color: var(--purple); }
+.step-box .step-num {
+  font-size: 0.78rem; font-weight: 700; color: var(--dark);
+  text-transform: uppercase; margin-bottom: 0.15rem;
+}
+.step-box.blue .step-num   { color: #1565c0; }
+.step-box.orange .step-num { color: #e65100; }
+.step-box.purple .step-num { color: #7b1fa2; }
+.step-box h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.25rem; }
+.step-box p  { font-size: 0.92rem; color: var(--gray-600); line-height: 1.55; }
+
+/* ── CODE BLOCK ── */
+.code-block {
+  background: #1e1e1e; color: #d4d4d4;
+  border-radius: 0.5rem; padding: 0.8rem 1.1rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.88rem; line-height: 1.5;
+  margin: 0.5rem 0; overflow-x: auto;
+  white-space: pre;
+}
+.code-inline {
+  background: #f0f0f0; color: #c7254e;
+  padding: 0.1rem 0.4rem; border-radius: 0.3rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+/* ── TOC LIST ── */
+.toc-list { list-style: none; margin: 1rem 0; }
+.toc-list li {
+  display: flex; align-items: center;
+  padding: 1.1rem 1.3rem; margin-bottom: 0.7rem;
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: 0.8rem; font-size: 1.1rem; font-weight: 500;
+  cursor: pointer; transition: all 0.2s;
+}
+.toc-list li:hover { background: var(--light); border-color: var(--accent); transform: translateX(4px); }
+.toc-list li .num {
+  width: 2.3rem; height: 2.3rem;
+  background: var(--dark); color: var(--white);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem; font-weight: 700; margin-right: 1rem; flex-shrink: 0;
+}
+
+/* ── CALLOUT ── */
+.callout {
+  background: var(--orange-light); border: 2px solid var(--orange);
+  border-radius: 0.8rem; padding: 1.2rem 1.5rem;
+  text-align: center; margin: 0.8rem 0;
+}
+.callout .callout-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+.callout .callout-title { font-size: 1.3rem; font-weight: 800; color: #e65100; margin-bottom: 0.3rem; }
+.callout .callout-desc { font-size: 0.95rem; color: var(--gray-800); line-height: 1.6; }
+
+/* ── COVER PILLS ── */
+.cover-pills { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-top: 1.2rem; }
+.cover-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 1.1rem; border-radius: 2rem;
+  background: var(--gray-100); border: 1px solid var(--gray-200);
+  font-size: 0.88rem; font-weight: 600; color: var(--gray-800);
+  transition: all 0.2s;
+}
+.cover-pill:hover { background: var(--light); border-color: var(--accent); }
+
+/* ── TWO COLUMN ── */
+.two-col { display: flex; gap: 1.2rem; }
+.two-col > * { flex: 1; min-width: 0; }
+
+/* ── ACTIVITY LIST ── */
+.act-list { list-style: none; }
+.act-list li {
+  display: flex; align-items: flex-start; gap: 0.7rem;
+  padding: 0.65rem 0; border-bottom: 1px solid var(--gray-200);
+  font-size: 0.95rem;
+}
+.act-list li:last-child { border-bottom: none; }
+.act-list li .emoji { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.05rem; }
+.act-list li .details strong { display: block; font-size: 1rem; margin-bottom: 0.1rem; }
+.act-list li .details span { color: var(--gray-600); font-size: 0.88rem; }
+
+/* ── PROGRAM CARD ── */
+.prog-card {
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: 0.8rem; padding: 1.2rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.prog-icon { font-size: 2.5rem; flex-shrink: 0; }
+.prog-info h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.2rem; }
+.prog-info p  { font-size: 0.88rem; color: var(--gray-600); line-height: 1.4; }
+
+/* ── END SLIDE ── */
+.end-content { text-align: center; padding: 1.5rem 1rem; }
+.end-content h1 { color: var(--dark); margin-bottom: 0.5rem; }
+.end-content p  { font-size: 1.1rem; margin-bottom: 1.5rem; }
+
+/* ── PROGRESS & NAV ── */
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: rgba(255,255,255,0.85);
+  transition: width 0.4s ease; z-index: 100;
+}
+.nav-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1.5rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--gray-200);
+  z-index: 999;
+  font-size: 14px;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem; height: 1.8rem;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 50%;
+  background: var(--white);
+  cursor: pointer;
+  font-size: 0;
+  color: var(--gray-800);
+  transition: all 0.2s;
+  padding: 0; line-height: 1;
+}
+.nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--main);
+  background: var(--main);
+}
+.nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.nav-counter {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-600);
+  min-width: 3rem;
+  text-align: center;
+  display: flex; align-items: center; gap: 0.15rem;
+  line-height: 1;
+}
+.slide-input {
+  width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+  background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+  font-family: inherit; padding: 0; outline: none; cursor: pointer;
+  transition: border-color 0.2s; line-height: 1;
+}
+.slide-input:hover { border-bottom-color: var(--main); }
+.slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  html, body { font-size: clamp(13px, 1.8vw, 18px); }
+  .browser-content { padding: 1.8rem 2rem; }
+}
+@media (max-width: 768px) {
+  html, body { font-size: clamp(13px, 2.8vw, 17px); }
+  .slide { padding: 1vh 2vw; }
+  .browser-content { padding: 1.4rem 1.4rem; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .two-col { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- ═══ SLIDE 1: 표지 ═══ -->
+  <div class="slide active" data-slide="0">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">AI 전문적 학습공동체 · 환경 설치 가이드</div>
+      </div>
+      <div class="browser-content">
+        <div class="cover-content">
+          <img src="assets/cover.png" alt="환경 설치 가이드 일러스트" style="width: 100%; max-width: 320px; border-radius: 16px; margin-bottom: 0.5rem; object-fit: cover; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+          <br>
+          <div class="year-badge">2026</div>
+          <h1>Claude Code &amp;<br>Presentation Builder<br>환경 설치 가이드</h1>
+          <p class="subtitle">AI 전문적 학습공동체 — 선생님을 위한 단계별 설치 안내</p>
+          <p class="school-name">샘플고등학교</p>
+          <div class="cover-pills">
+            <span class="cover-pill">🖥️ Visual Studio Code</span>
+            <span class="cover-pill">🤖 Claude Code</span>
+            <span class="cover-pill">🐙 Git &amp; GitHub</span>
+            <span class="cover-pill">📊 Presentation Builder</span>
+          </div>
+          <div class="info-box" style="margin-top: 1.5rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+            💡 <strong>이 자료는 프로그래밍 경험이 없어도 괜찮습니다!</strong><br>
+            화면을 보며 순서대로 따라하면 누구나 설치할 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 2: 목차 ═══ -->
+  <div class="slide" data-slide="1">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">목차</div>
+      </div>
+      <div class="browser-content">
+        <h2>목차</h2>
+        <ul class="toc-list">
+          <li onclick="goToSlide(2)">
+            <span class="num">1</span>
+            <div>
+              <strong>준비물 한눈에 보기</strong>
+              <div style="font-size:0.82rem; color:var(--gray-600);">설치할 프로그램 전체 목록</div>
+            </div>
+          </li>
+          <li onclick="goToSlide(3)">
+            <span class="num">2</span>
+            <div>
+              <strong>Visual Studio Code 설치</strong>
+              <div style="font-size:0.82rem; color:var(--gray-600);">코드 편집기 + 한국어 팩 + Live Server</div>
+            </div>
+          </li>
+          <li onclick="goToSlide(4)">
+            <span class="num">3</span>
+            <div>
+              <strong>Git &amp; GitHub Desktop 설치</strong>
+              <div style="font-size:0.82rem; color:var(--gray-600);">버전 관리 도구 및 저장소 설정</div>
+            </div>
+          </li>
+          <li onclick="goToSlide(5)">
+            <span class="num">4</span>
+            <div>
+              <strong>Claude Code 설치</strong>
+              <div style="font-size:0.82rem; color:var(--gray-600);">AI 코딩 도우미 설치 및 실행</div>
+            </div>
+          </li>
+          <li onclick="goToSlide(7)">
+            <span class="num">5</span>
+            <div>
+              <strong>Presentation Builder 설치 &amp; 사용</strong>
+              <div style="font-size:0.82rem; color:var(--gray-600);">스킬 파일 설치 및 발표 자료 생성</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 3: 준비물 한눈에 보기 ═══ -->
+  <div class="slide" data-slide="2">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">준비물 한눈에 보기</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">📦</div>
+          <div class="sec-title-wrap">
+            <h2>설치할 프로그램 전체 목록</h2>
+            <div class="sec-sub">순서대로 설치하면 됩니다 — 전부 무료입니다!</div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-bottom: 0.8rem;">
+          <div class="prog-card">
+            <div class="prog-icon">🖥️</div>
+            <div class="prog-info">
+              <h4>Visual Studio Code</h4>
+              <p>코드 편집기. 모든 작업의 기반이 되는 프로그램입니다.</p>
+              <span class="badge green">1순위</span>
+            </div>
+          </div>
+          <div class="prog-card">
+            <div class="prog-icon">🌿</div>
+            <div class="prog-info">
+              <h4>Git</h4>
+              <p>파일 버전 관리 도구. Claude Code가 파일을 저장하는 데 필요합니다.</p>
+              <span class="badge blue">2순위</span>
+            </div>
+          </div>
+          <div class="prog-card">
+            <div class="prog-icon">🤖</div>
+            <div class="prog-info">
+              <h4>Claude Code</h4>
+              <p>AI 코딩 도우미. 발표 자료를 자동으로 만들어 주는 핵심 도구입니다.</p>
+              <span class="badge orange">3순위</span>
+            </div>
+          </div>
+          <div class="prog-card">
+            <div class="prog-icon">🐙</div>
+            <div class="prog-info">
+              <h4>GitHub Desktop</h4>
+              <p>파일을 인터넷에 저장하고 공유하는 도구입니다.</p>
+              <span class="badge orange">3순위</span>
+            </div>
+          </div>
+        </div>
+        <div class="info-box">
+          ✅ <strong>설치 순서가 중요합니다!</strong>
+          VSCode → Git → Claude Code → GitHub Desktop → Presentation Builder 순서로 진행하세요.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 4: VSCode 설치 ═══ -->
+  <div class="slide" data-slide="3">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">1단계 — Visual Studio Code 설치</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">🖥️</div>
+          <div class="sec-title-wrap">
+            <h2>Visual Studio Code 설치</h2>
+            <div class="sec-sub">코드 편집기 + 한국어 팩 + Live Server 확장 설치</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="step-box">
+              <div class="step-num">STEP 1</div>
+              <h4>VSCode 다운로드 및 설치</h4>
+              <p>인터넷에서 <strong>"visual studio code"</strong> 검색 후 공식 사이트에서 다운로드하여 설치합니다.</p>
+            </div>
+            <div class="step-box blue">
+              <div class="step-num">STEP 2</div>
+              <h4>한국어 팩 설치</h4>
+              <p>왼쪽 패널 <strong>확장(Extensions)</strong> 클릭 →<br>
+              <strong>"Korean Language Pack"</strong> 검색 → 설치<br>
+              오른쪽 아래 <strong>RESTART</strong> 버튼이 뜨면 클릭!</p>
+            </div>
+            <div class="step-box orange">
+              <div class="step-num">STEP 3</div>
+              <h4>Live Server 확장 설치</h4>
+              <p>확장 검색창에 <strong>"Live Server"</strong> 입력 후 설치합니다.<br>
+              나중에 만든 HTML 파일을 바로 브라우저로 볼 때 사용합니다.</p>
+            </div>
+          </div>
+          <div>
+            <div class="step-box purple">
+              <div class="step-num">STEP 4</div>
+              <h4>터미널(커맨드 창) 열기</h4>
+              <p>VSCode 우측 상단 <strong>패널 설정/해제 버튼</strong> 클릭<br>
+              → 아래 검정 창이 생기면<br>
+              → 창 위 오른쪽 <strong>▼ 화살표</strong> 클릭<br>
+              → <strong>"Command Prompt"</strong> 선택</p>
+            </div>
+            <div class="info-box" style="margin-top: 0.5rem;">
+              💡 <strong>팁</strong>: 아래쪽에 생긴 검정 화면이 <strong>커맨드 창(터미널)</strong>입니다.<br>
+              앞으로 여기에 명령어를 입력할 거예요.
+            </div>
+            <div class="info-box blue" style="margin-top: 0.5rem;">
+              🔍 <strong>확장 아이콘 위치</strong>: 왼쪽 세로 메뉴에서 네모가 4개인 아이콘을 찾으세요.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 5: Git & GitHub Desktop ═══ -->
+  <div class="slide" data-slide="4">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">2단계 — Git &amp; GitHub Desktop 설치</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">🌿</div>
+          <div class="sec-title-wrap">
+            <h2>Git &amp; GitHub Desktop 설치</h2>
+            <div class="sec-sub">파일을 저장하고 관리하는 도구 — Claude Code가 작업 파일을 저장할 때 필요합니다</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <h3 style="margin-bottom: 0.7rem;">🌿 Git 설치</h3>
+            <div class="step-box">
+              <div class="step-num">STEP 1 — Git 다운로드</div>
+              <h4>아래 주소 접속 후 다운로드</h4>
+              <div class="code-block">https://git-scm.com/install/windows</div>
+              <p><strong>"Click here to download"</strong> 클릭</p>
+            </div>
+            <div class="step-box blue">
+              <div class="step-num">STEP 2 — 설치 진행</div>
+              <h4>설치 중 에디터 선택 화면에서</h4>
+              <p><strong>"Use Visual Studio Code as Git's default editor"</strong> 선택<br>
+              나머지는 모두 <strong>Next(다음)</strong> 클릭</p>
+            </div>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.7rem;">🐙 GitHub Desktop 설치</h3>
+            <div class="step-box orange">
+              <div class="step-num">STEP 3 — GitHub Desktop 다운로드</div>
+              <h4>아래 주소 접속 후 다운로드</h4>
+              <div class="code-block">https://desktop.github.com/download/</div>
+            </div>
+            <div class="step-box purple">
+              <div class="step-num">STEP 4 — 설치 및 로그인</div>
+              <h4>GitHub 계정으로 로그인</h4>
+              <p>GitHub 계정이 없으면 <strong>github.com</strong>에서 먼저 가입합니다.<br>
+              가입 후 GitHub Desktop에서 로그인하면 됩니다.</p>
+            </div>
+            <div class="info-box" style="margin-top: 0.5rem;">
+              💡 GitHub는 작업 파일을 인터넷에 저장하는 공간입니다.<br>
+              구글 드라이브와 비슷한 개념이에요.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 6: Claude Code 설치 ═══ -->
+  <div class="slide" data-slide="5">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">3단계 — Claude Code 설치</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">🤖</div>
+          <div class="sec-title-wrap">
+            <h2>Claude Code 설치 및 실행</h2>
+            <div class="sec-sub">커맨드 창에 한 줄만 붙여넣으면 자동 설치됩니다</div>
+          </div>
+        </div>
+        <div class="step-box" style="margin-bottom: 0.8rem;">
+          <div class="step-num">STEP 1 — 설치 명령어 실행</div>
+          <h4>커맨드 창(터미널)에 아래 내용을 복사하여 붙여넣고 Enter</h4>
+          <div class="code-block">curl -fsSL https://claude.ai/install.cmd -o install.cmd && install.cmd && del install.cmd</div>
+          <p style="margin-top: 0.4rem;">설치가 자동으로 진행됩니다. 완료까지 잠시 기다려 주세요.</p>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="callout" style="margin-bottom: 0.8rem;">
+              <div class="callout-icon">⚠️</div>
+              <div class="callout-title">환경변수 추가 안내</div>
+              <div class="callout-desc">설치 완료 후 <strong>"~~~ is not in your PATH"</strong>라는 문구가 보이면 환경변수를 추가해야 합니다!</div>
+            </div>
+            <div class="step-box orange">
+              <div class="step-num">환경변수 추가 방법 (필요한 경우만)</div>
+              <h4>① 키보드 윈도우 버튼 누르고 <span class="code-inline">path</span> 검색</h4>
+              <p>→ <strong>"시스템 환경 변수 편집"</strong> 클릭</p>
+              <h4 style="margin-top:0.5rem;">② 환경 변수 → Path 더블클릭 → 새로 만들기</h4>
+              <p>→ 위 메시지에서 <code style="background:#fff3e0; padding:0.1rem 0.3rem; border-radius:3px;">~~~</code>에 표시된 경로를 그대로 붙여넣기 → 확인</p>
+            </div>
+          </div>
+          <div>
+            <div class="step-box blue">
+              <div class="step-num">STEP 2 — Claude Code 실행</div>
+              <h4>커맨드 창에 <span class="code-inline">claude</span> 입력 후 Enter</h4>
+              <p>처음 실행 시 설정 화면이 나옵니다.<br>
+              모르는 항목은 <strong>기본값(Enter)</strong>으로 선택하면 됩니다.</p>
+            </div>
+            <div class="info-box blue" style="margin-top: 0.6rem;">
+              💡 <strong>실행이 안 될 때</strong>: VSCode를 완전히 끄고 다시 켜면 해결되는 경우가 많습니다.
+            </div>
+            <div class="info-box" style="margin-top: 0.5rem;">
+              🔑 <strong>로그인</strong>: Claude 계정이 필요합니다. claude.ai에서 먼저 가입해 주세요.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 7: GitHub 리파지토리 설정 ═══ -->
+  <div class="slide" data-slide="6">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">3단계 — GitHub 리파지토리(작업 공간) 설정</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">📁</div>
+          <div class="sec-title-wrap">
+            <h2>GitHub 리파지토리(작업 공간) 설정</h2>
+            <div class="sec-sub">리파지토리 = 작업 파일들이 저장되는 폴더</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="highlight-box" style="margin-bottom: 1rem;">
+              <div class="big-text">처음 만드는 경우</div>
+              <div class="small-text">새 리파지토리 생성</div>
+            </div>
+            <ul class="act-list">
+              <li>
+                <span class="emoji">①</span>
+                <div class="details">
+                  <strong>GitHub Desktop에서 Add 클릭</strong>
+                  <span>상단 메뉴에서 Add 버튼 클릭</span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">②</span>
+                <div class="details">
+                  <strong>Create new repository 선택</strong>
+                  <span></span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">③</span>
+                <div class="details">
+                  <strong>Repository name에 원하는 이름 입력</strong>
+                  <span>예: <span class="code-inline">presentation</span> (영어, 공백 없이)</span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">④</span>
+                <div class="details">
+                  <strong>Create repository 클릭</strong>
+                  <span></span>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <div class="highlight-box" style="margin-bottom: 1rem; background: linear-gradient(135deg, var(--blue-light), #bbdefb);">
+              <div class="big-text" style="color: #1565c0;">기존 것을 가져오는 경우</div>
+              <div class="small-text">리파지토리 복제(Clone)</div>
+            </div>
+            <ul class="act-list">
+              <li>
+                <span class="emoji">①</span>
+                <div class="details">
+                  <strong>Add 클릭 → Clone repository 선택</strong>
+                  <span></span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">②</span>
+                <div class="details">
+                  <strong>목록에서 가져올 리파지토리 선택</strong>
+                  <span></span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">③</span>
+                <div class="details">
+                  <strong>Clone 클릭</strong>
+                  <span></span>
+                </div>
+              </li>
+            </ul>
+            <div class="info-box blue" style="margin-top: 1rem;">
+              🖥️ <strong>VSCode에서 바로 열기</strong>:<br>
+              GitHub Desktop에서 <strong>현재 리파지토리 이름을 오른쪽 클릭</strong><br>
+              → <strong>"Open in Visual Studio Code"</strong> 선택
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 8: Presentation Builder 설치 ═══ -->
+  <div class="slide" data-slide="7">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">4단계 — Presentation Builder 설치</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">📊</div>
+          <div class="sec-title-wrap">
+            <h2>Presentation Builder 스킬 설치</h2>
+            <div class="sec-sub">파일 하나를 지정된 폴더에 복사하면 설치 완료!</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="step-box">
+              <div class="step-num">STEP 1 — 스킬 파일 받기</div>
+              <h4>presentation-builder.md 파일 다운로드</h4>
+              <p>아래 버튼을 클릭하여 스킬 파일을 다운로드합니다.</p>
+              <a href="presentation-builder.md" download="presentation-builder.md"
+                style="display:inline-flex; align-items:center; gap:0.4rem; margin-top:0.5rem;
+                       background:var(--main); color:#fff; border:none; border-radius:0.5rem;
+                       padding:0.45rem 1rem; font-size:0.88rem; font-weight:700;
+                       text-decoration:none; cursor:pointer; transition:background 0.2s;"
+                onmouseover="this.style.background='var(--dark)'"
+                onmouseout="this.style.background='var(--main)'">
+                ⬇ presentation-builder.md 다운로드
+              </a>
+            </div>
+            <div class="step-box blue">
+              <div class="step-num">STEP 2 — 폴더에 파일 복사</div>
+              <h4>아래 위치에 파일을 복사합니다</h4>
+              <div class="code-block">C:\users\{사용자 이름}\.claude\commands</div>
+              <p style="margin-top: 0.4rem;">
+                <strong>{사용자 이름}</strong>은 컴퓨터마다 다릅니다.<br>
+                예: <span class="code-inline">C:\users\teacher01\.claude\commands</span>
+              </p>
+            </div>
+            <div class="info-box orange" style="margin-top: 0.5rem;">
+              ⚠️ <strong>.claude 폴더가 안 보일 때</strong>: 파일 탐색기 상단 메뉴 → 보기 → <strong>"숨긴 항목"</strong> 체크 활성화
+            </div>
+          </div>
+          <div>
+            <div class="step-box orange">
+              <div class="step-num">STEP 3 — Claude Code 재시작</div>
+              <h4>VSCode를 완전히 끄고 다시 켜기</h4>
+              <p>VSCode를 종료 후 다시 실행하고<br>
+              커맨드 창에 <span class="code-inline">claude</span> 입력하여 다시 시작합니다.</p>
+            </div>
+            <div class="step-box purple" style="margin-top: 0.6rem;">
+              <div class="step-num">STEP 4 — 설치 확인</div>
+              <h4>Claude Code에서 아래 명령어 입력</h4>
+              <div class="code-block">/presentation-builder 안녕하세요</div>
+              <p style="margin-top: 0.3rem;">응답이 오면 설치 성공입니다! 🎉</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 9: 사용 방법 ═══ -->
+  <div class="slide" data-slide="8">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">5단계 — Presentation Builder 사용 방법</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">✨</div>
+          <div class="sec-title-wrap">
+            <h2>발표 자료 만들기</h2>
+            <div class="sec-sub">명령어 한 줄로 아름다운 HTML 프레젠테이션 자동 생성!</div>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-bottom: 1rem;">
+          <div class="big-text">기본 사용법</div>
+        </div>
+        <div class="code-block">/presentation-builder 수업 관련 설명을 여기에 적어주세요</div>
+        <div class="grid-2" style="margin-top: 1rem;">
+          <div>
+            <h3 style="margin-bottom: 0.7rem;">📝 활용 예시</h3>
+            <div class="step-box">
+              <div class="step-num">예시 1 — 간단하게</div>
+              <div class="code-block">/presentation-builder 수학 1학년 함수 개념 수업 자료</div>
+            </div>
+            <div class="step-box blue" style="margin-top: 0.6rem;">
+              <div class="step-num">예시 2 — 자세하게</div>
+              <div class="code-block">/presentation-builder 국어 3학년 시 해석 수업.
+학습 목표: 은유법 이해하기
+대상: 고등학교 3학년</div>
+            </div>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.7rem;">🎨 디자인 추가하기</h3>
+            <div class="step-box orange">
+              <div class="step-num">방법 1 — 새로운 디자인 요청</div>
+              <h4>텍스트로 설명하기</h4>
+              <div class="code-block">presentation-builder에 새로운 디자인 추가: (디자인 설명)</div>
+            </div>
+            <div class="step-box purple" style="margin-top: 0.6rem;">
+              <div class="step-num">방법 2 — 기존 자료 참고</div>
+              <h4>PDF 파일 활용하기</h4>
+              <p>기존 발표 자료를 PDF로 저장 후:</p>
+              <div class="code-block">@C:\users\user\desktop\파일명.pdf 참고해서 디자인 추가</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 10: Node.js 설치 ═══ -->
+  <div class="slide" data-slide="9">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">2단계 — Node.js 설치 &amp; Claude Code 설치</div>
+      </div>
+      <div class="browser-content">
+        <div class="sec-div">
+          <div class="sec-icon">🟩</div>
+          <div class="sec-title-wrap">
+            <h2>Node.js 설치하기</h2>
+            <div class="sec-sub">Claude Code를 npm으로 설치하려면 Node.js가 먼저 필요합니다</div>
+          </div>
+        </div>
+        <div class="two-col">
+          <div>
+            <h3 style="margin-bottom: 0.7rem;">📥 Node.js 설치 순서</h3>
+            <ul class="act-list">
+              <li>
+                <span class="emoji">①</span>
+                <div class="details">
+                  <strong>nodejs.org 접속</strong>
+                  <span>브라우저 주소창에 <span class="code-inline">nodejs.org</span> 입력</span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">②</span>
+                <div class="details">
+                  <strong>LTS 버전 (안정 버전) 다운로드</strong>
+                  <span>초록색 <strong>LTS</strong> 버튼 클릭 — 안정적인 권장 버전</span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">③</span>
+                <div class="details">
+                  <strong>설치 파일 실행</strong>
+                  <span>다운로드된 파일 더블클릭 → <strong>Next</strong>를 계속 클릭</span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">④</span>
+                <div class="details">
+                  <strong>설치 완료 후 터미널 새로 열기</strong>
+                  <span>기존 터미널 창은 닫고 새 창을 열어야 적용됨</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.7rem;">⚡ Claude Code 설치</h3>
+            <div class="step-box" style="margin-bottom: 0.7rem;">
+              <div class="step-num">터미널(커맨드창)에서 실행</div>
+              <div class="code-block">npm install -g @anthropic-ai/claude-code</div>
+            </div>
+            <div class="info-box" style="margin-bottom: 0.7rem;">
+              💡 <strong>-g 옵션</strong>: 컴퓨터 전체에 설치 (global)<br>
+              어느 폴더에서든 <span class="code-inline">claude</span> 명령어 사용 가능
+            </div>
+            <div class="step-box blue">
+              <div class="step-num">설치 확인</div>
+              <div class="code-block">claude --version</div>
+              <p style="margin-top: 0.4rem; font-size: 0.82rem; color: var(--gray-600);">버전 번호가 출력되면 설치 성공!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 11: 마무리 ═══ -->
+  <div class="slide" data-slide="10">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+        <div class="tab-title">설치 완료!</div>
+      </div>
+      <div class="browser-content">
+        <div class="end-content">
+          <h1>설치 완료! 🎉</h1>
+          <p>이제 AI가 발표 자료를 대신 만들어 드립니다.</p>
+
+          <div class="highlight-box" style="margin: 1.2rem 0;">
+            <div class="big-text">설치한 도구 총정리</div>
+          </div>
+
+          <div class="grid-3" style="margin-bottom: 1.2rem; text-align: left;">
+            <div class="card-item">
+              <div class="icon">🖥️</div>
+              <h4>VSCode</h4>
+              <p>코드 편집기 + 한국어 팩 + Live Server</p>
+            </div>
+            <div class="card-item">
+              <div class="icon">🤖</div>
+              <h4>Claude Code</h4>
+              <p>AI 코딩 도우미 + Presentation Builder 스킬</p>
+            </div>
+            <div class="card-item">
+              <div class="icon">🐙</div>
+              <h4>Git &amp; GitHub</h4>
+              <p>파일 버전 관리 + 저장 공간</p>
+            </div>
+          </div>
+
+          <div class="info-box" style="text-align: left; max-width: 700px; margin: 0 auto 1rem;">
+            🚀 <strong>다음 수업부터 바로 사용해 보세요!</strong><br>
+            VSCode → 커맨드 창 → <span class="code-inline">claude</span> 입력 →
+            <span class="code-inline">/presentation-builder 수업 내용</span> 입력
+          </div>
+
+          <p style="font-size: 0.88rem; color: var(--gray-600);">
+            샘플고등학교 AI 전문적 학습공동체
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </button>
+  <span class="nav-counter">
+    <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력"> / <span id="totalSlides">11</span>
+  </span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음">
+    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+  </button>
+</div>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlidesCount = slides.length;
+const progressBar = document.getElementById('progressBar');
+const slideInput = document.getElementById('slideInput');
+const totalSlidesEl = document.getElementById('totalSlides');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+totalSlidesEl.textContent = totalSlidesCount;
+
+function goToSlide(index) {
+  if (index < 0 || index >= totalSlidesCount || index === currentSlide) return;
+  slides[currentSlide].classList.remove('active');
+  currentSlide = index;
+  slides[currentSlide].classList.add('active');
+  updateUI();
+}
+function nextSlide() { if (currentSlide < totalSlidesCount - 1) goToSlide(currentSlide + 1); }
+function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+function updateUI() {
+  const progress = ((currentSlide + 1) / totalSlidesCount) * 100;
+  progressBar.style.width = progress + '%';
+  slideInput.value = currentSlide + 1;
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlidesCount - 1;
+}
+
+// 슬라이드 번호 직접 입력
+slideInput.addEventListener('focus', () => slideInput.select());
+slideInput.addEventListener('keydown', (e) => {
+  e.stopPropagation();
+  if (e.key === 'Enter') {
+    const n = parseInt(slideInput.value);
+    if (!isNaN(n) && n >= 1 && n <= totalSlidesCount) goToSlide(n - 1);
+    else slideInput.value = currentSlide + 1;
+    slideInput.blur();
+  } else if (e.key === 'Escape') {
+    slideInput.value = currentSlide + 1;
+    slideInput.blur();
+  }
+});
+slideInput.addEventListener('blur', () => {
+  const n = parseInt(slideInput.value);
+  if (!isNaN(n) && n >= 1 && n <= totalSlidesCount) goToSlide(n - 1);
+  else slideInput.value = currentSlide + 1;
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+  else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+  else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlidesCount - 1); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+document.addEventListener('touchend', (e) => {
+  const diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) { if (diff > 0) nextSlide(); else prevSlide(); }
+}, { passive: true });
+
+updateUI();
+</script>
+  <script type="module" src="../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

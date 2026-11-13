@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교사 콘솔 · 수업 라이브</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --fg:#1e293b; --sub:#64748b; --line:#e2e8f0;
+          --blue:#3b82f6; --green:#10b981; --red:#ef4444; --amber:#f59e0b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family:'Noto Sans KR',sans-serif; background:var(--bg); color:var(--fg); min-height:100vh; }
+  header { padding:14px 22px; background:var(--card); border-bottom:1px solid var(--line);
+           display:flex; justify-content:space-between; align-items:center; }
+  header .brand { font-weight:800; }
+  header .gear { border:0; background:none; cursor:pointer; color:var(--sub); font-size:18px; }
+  main { max-width: 920px; margin: 0 auto; padding: 26px 18px 80px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:24px; margin-bottom:18px; }
+  h1 { font-size:20px; margin-bottom:4px; }
+  h2 { font-size:16px; margin-bottom:12px; }
+  .sub { color:var(--sub); font-size:13.5px; margin-bottom:16px; line-height:1.5; }
+  label { display:block; font-size:13px; font-weight:700; color:var(--sub); margin:14px 0 6px; }
+  input[type=text], input[type=password], select, textarea {
+    width:100%; padding:11px 12px; border:1.5px solid var(--line); border-radius:10px;
+    font-size:15px; font-family:inherit; outline:none; background:#fff; }
+  input:focus, select:focus, textarea:focus { border-color:var(--blue); }
+  .btn { padding:11px 18px; border:0; border-radius:10px; cursor:pointer; background:var(--blue);
+         color:#fff; font-size:14.5px; font-weight:700; font-family:inherit; }
+  .btn--ghost { background:#f1f5f9; color:var(--fg); }
+  .btn--ok { background:var(--green); }
+  .btn--warn { background:var(--red); }
+  .btn--sm { padding:7px 12px; font-size:13px; border-radius:8px; }
+  .btn:disabled { opacity:.5; cursor:default; }
+  .btn:hover { filter:brightness(1.07); }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .error { color:var(--red); font-size:13.5px; margin-top:10px; }
+  .bigcode { font-size:56px; font-weight:800; letter-spacing:.2em; color:var(--blue); text-align:center; }
+  .qrbox { display:flex; justify-content:center; margin:14px 0; }
+  .qrbox svg { width:240px; height:240px; }
+  .joinurl { text-align:center; font-size:13px; color:var(--sub); overflow-wrap:anywhere;
+             background:#f1f5f9; border-radius:8px; padding:8px 10px; }
+  .stat { display:flex; gap:22px; margin:8px 0 4px; }
+  .stat b { font-size:26px; }
+  .stat span { display:block; color:var(--sub); font-size:12.5px; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .chip { background:#f1f5f9; border-radius:999px; padding:4px 12px; font-size:13px; }
+  .act { border:1px solid var(--line); border-radius:14px; padding:16px; margin-top:12px; }
+  .act__head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+  .act__prompt { font-weight:700; font-size:15px; line-height:1.45; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:12px; font-weight:700; }
+  .badge--open { background:#ecfdf5; color:#047857; }
+  .badge--closed { background:#fef3c7; color:#92400e; }
+  .badge--revealed { background:#eff6ff; color:#1d4ed8; }
+  .badge--draft { background:#f1f5f9; color:var(--sub); }
+  .badge--kind { background:#f1f5f9; color:var(--sub); font-weight:500; }
+  .act__chart { margin-top:12px; }
+  .sess-item { display:flex; justify-content:space-between; align-items:center; padding:12px 4px;
+               border-bottom:1px solid var(--line); }
+  .sess-item:last-child { border-bottom:0; }
+  .hidden { display:none !important; }
+  dialog { border:1px solid var(--line); border-radius:16px; padding:24px; width:min(480px,92vw); }
+  dialog::backdrop { background:rgba(15,23,42,.4); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">수업 라이브 · 교사 콘솔</div>
+  <button class="gear" id="gearBtn" title="설정">⚙</button>
+</header>
+<main id="app"></main>
+
+<dialog id="settings">
+  <h2>설정</h2>
+  <label>시트 아카이브 URL (활동지 공용 Apps Script)</label>
+  <input type="text" id="archiveInput" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec">
+  <div class="row" style="margin-top:16px">
+    <button class="btn" id="passSave">저장</button>
+    <button class="btn btn--ghost" id="passClose">닫기</button>
+  </div>
+</dialog>
+
+<script type="module">
+import { joinUrl, saveHostSession, listHostSessions, removeHostSession, getConfig, setConfig } from '../runtime/config.js?v=2';
+import { createDriver } from '../runtime/driver.js?v=1';
+import { renderAggregates } from '../runtime/charts.js?v=1';
+import { archiveToSheet } from '../runtime/archive.js?v=1';
+
+const app = document.getElementById('app');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+let driver = null;
+let session = null;          // {sessionId, code, hostToken, title, deckPath}
+let state = null;
+let pollTimer = null;
+
+const KIND_LABEL = { choice: '객관식', ox: 'OX', short: '주관식', wordcloud: '워드클라우드', exit: '출구티켓', code: '코드' };
+
+// 수업 폴더의 quiz.json 로드 → 정규형 [{id, slide, kind, prompt, config}] (없으면 null)
+async function fetchQuizJson(deckPath) {
+  if (!deckPath) return null;
+  try {
+    // 문항은 덱 유형과 무관하게 '수업 폴더의 quiz.json'. 다만 네이티브 React 덱은
+    // 경로가 URL(?deck=<id>)에 없으므로 pages.json 항목의 quizJson으로 찾는다
+    // (React 쪽은 src/decks/registry.tsx의 quizJson — 두 값은 같아야 한다).
+    let rel;
+    if (/\?deck=[\w-]+/.test(deckPath)) {
+      const pages = await (await fetch('../../pages.json')).json();
+      rel = (pages.subjects || [])
+        .flatMap((s) => s.pages || [])
+        .find((p) => p.path === deckPath)?.quizJson;
+      if (!rel) return null;
+    } else {
+      rel = deckPath.replace(/[^/]*$/, '') + 'quiz.json';
+    }
+    const res = await fetch('../../' + rel);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const acts = (Array.isArray(data.activities) ? data.activities : [])
+      .map((a) => {
+        const { id, slide, kind, prompt, ...config } = a;
+        return { id, slide, kind, prompt, config };
+      })
+      .filter((a) => a.id && a.kind && typeof a.prompt === 'string');
+    return acts.length ? acts : null;
+  } catch (e) { return null; }
+}
+
+// quiz.json 문항 목록 HTML (미리보기·대시보드 공용)
+function quizJsonListHtml(acts, withOpenBtn) {
+  return acts.map((a, i) => {
+    const meta = [
+      KIND_LABEL[a.kind] || a.kind,
+      a.config.peerInstruction ? 'PI 2라운드' : null,
+      (a.config.answer !== undefined && a.config.answer !== null) ? '정답 있음' : null,
+      a.slide === 'last' ? '마지막 쪽' : Number.isInteger(a.slide) ? `${a.slide + 1}쪽` : null,
+    ].filter(Boolean).join(' · ');
+    return `
+    <div class="sess-item">
+      <div style="min-width:0">
+        <div style="font-size:14px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.prompt)}</div>
+        <div style="font-size:12px;color:var(--sub);margin-top:2px">${esc(meta)}</div>
+      </div>
+      ${withOpenBtn ? `<button class="btn btn--sm btn--ok" data-ljopen="${i}">열기</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── 설정 다이얼로그 ──
+const dlg = document.getElementById('settings');
+document.getElementById('gearBtn').addEventListener('click', () => {
+  document.getElementById('archiveInput').value = getConfig().appsScriptUrl || '';
+  dlg.showModal();
+});
+document.getElementById('passSave').addEventListener('click', () => {
+  setConfig({ appsScriptUrl: document.getElementById('archiveInput').value.trim() });
+  dlg.close();
+});
+
+// ── 토스트 (링크 옵션 포함, 사용자 입력은 textContent로만) ──
+function toast(msg, kind, linkUrl) {
+  document.querySelectorAll('.lp-toast').forEach((t) => t.remove());
+  const el = document.createElement('div');
+  el.className = 'lp-toast';
+  el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:1000;'
+    + 'padding:12px 20px;border-radius:12px;font-size:14px;font-weight:700;color:#fff;'
+    + 'box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;gap:14px;align-items:center;'
+    + `background:${kind === 'err' ? '#b91c1c' : '#047857'}`;
+  const span = document.createElement('span');
+  span.textContent = msg;
+  el.appendChild(span);
+  if (linkUrl) {
+    const a = document.createElement('a');
+    a.href = linkUrl; a.target = '_blank'; a.textContent = '시트 열기 ↗';
+    a.style.cssText = 'color:#fff;text-decoration:underline;white-space:nowrap;';
+    el.appendChild(a);
+  }
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), kind === 'err' ? 9000 : 6000);
+}
+
+// ── 세션 결과 → 구글 시트 저장 ──
+async function saveToSheet() {
+  const btn = app.querySelector('#sheetBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
+  try {
+    const dump = await driver.exportSession(session.sessionId, session.hostToken);
+    const r = await archiveToSheet(dump);
+    toast(`시트 저장 완료 — 응답 ${r.rows.responses}건 · 문항 ${r.rows.activities}건`, 'ok', r.sheetUrl);
+    return true;
+  } catch (e) {
+    toast('시트 저장 실패: ' + e.message, 'err');
+    return false;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '시트에 저장'; }
+  }
+}
+document.getElementById('passClose').addEventListener('click', () => dlg.close());
+
+// ── 홈: 새 세션 + 최근 세션 ──
+async function renderHome() {
+  clearInterval(pollTimer);
+  session = null; state = null;
+
+  let deckOptions = '<option value="">(덱 없이 진행 — 즉석 문항만 사용)</option>';
+  try {
+    const pages = await (await fetch('../../pages.json')).json();
+    for (const subj of pages.subjects || []) {
+      const opts = (subj.pages || [])
+        .map((p) => `<option value="${esc(p.path)}">${esc(p.title)}</option>`).join('');
+      if (opts) deckOptions += `<optgroup label="${esc(subj.name)}">${opts}</optgroup>`;
+    }
+  } catch (e) { /* pages.json 없이도 동작 */ }
+
+  const recent = listHostSessions().slice(0, 6);
+  app.innerHTML = `
+    <div class="card">
+      <h1>새 수업 세션</h1>
+      <p class="sub">세션을 만들면 6자리 코드가 발급됩니다. 학생은 <b>live/join</b> 페이지에서 코드로 참여합니다.</p>
+      <label>수업 제목</label>
+      <input type="text" id="titleInput" maxlength="60" placeholder="예: 3차시 — HTTP와 웹의 동작">
+      <label>연결할 슬라이드덱 (선택)</label>
+      <select id="deckSelect">${deckOptions}</select>
+      <div id="quizJsonPreview" style="margin-top:8px"></div>
+      <label>참여 방식</label>
+      <select id="nameModeSelect">
+        <option value="anonymous">익명 — 학번 없이 이름만</option>
+        <option value="named">기명 — 학번 + 이름 입력</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:16px"
+             title="정답이 있는 객관식/OX 문항에 자동으로 속도 점수가 붙고, 결과 공개 화면에 누적 탑5가 표시됩니다">
+        <input type="checkbox" id="gamifyCheck" style="width:auto">
+        ⚡ 스피드 퀴즈 세션 — 빠른 정답에 높은 점수, 공개 시 탑5 표시
+      </label>
+      <div class="row" style="margin-top:20px">
+        <button class="btn" id="createBtn">세션 만들기</button>
+      </div>
+      <p class="error hidden" id="createErr"></p>
+    </div>
+    ${recent.length ? `
+    <div class="card">
+      <h2>최근 세션 이어서 진행</h2>
+      ${recent.map((s) => `
+        <div class="sess-item">
+          <div><b style="letter-spacing:.1em;color:var(--blue)">${esc(s.code)}</b>
+               <span style="color:var(--sub);font-size:13px;margin-left:8px">${esc(s.title || '(제목 없음)')}</span></div>
+          <div class="row">
+            <button class="btn btn--sm btn--ghost" data-resume="${esc(s.code)}">열기</button>
+            <button class="btn btn--sm btn--ghost" data-forget="${esc(s.code)}">삭제</button>
+          </div>
+        </div>`).join('')}
+    </div>` : ''}`;
+
+  app.querySelector('#createBtn').addEventListener('click', createSession);
+  app.querySelectorAll('[data-resume]').forEach((b) =>
+    b.addEventListener('click', () => resume(b.dataset.resume)));
+  app.querySelectorAll('[data-forget]').forEach((b) =>
+    b.addEventListener('click', () => { removeHostSession(b.dataset.forget); renderHome(); }));
+
+  // 덱 선택 시 quiz.json 문항 미리보기
+  const deckSel = app.querySelector('#deckSelect');
+  const previewEl = app.querySelector('#quizJsonPreview');
+  const showPreview = async () => {
+    previewEl.innerHTML = '';
+    const acts = await fetchQuizJson(deckSel.value);
+    if (!acts) return;
+    previewEl.innerHTML = `
+      <div style="border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:#f8fafc">
+        <div style="font-size:12.5px;font-weight:700;color:var(--sub);margin-bottom:4px">
+          이 수업의 라이브 문항 ${acts.length}개 (quiz.json)</div>
+        ${quizJsonListHtml(acts, false)}
+      </div>`;
+  };
+  deckSel.addEventListener('change', showPreview);
+
+  // 뷰어 [발표 시작] 딥링크: ?deck=<path> 프리필
+  const deckParam = new URLSearchParams(location.search).get('deck');
+  if (deckParam && [...deckSel.options].some((o) => o.value === deckParam)) {
+    deckSel.value = deckParam;
+    showPreview();
+    app.querySelector('#titleInput').focus();
+  }
+}
+
+async function createSession() {
+  const err = app.querySelector('#createErr');
+  err.classList.add('hidden');
+  const btn = app.querySelector('#createBtn');
+  btn.disabled = true; btn.textContent = '생성 중…';
+  try {
+    const title = app.querySelector('#titleInput').value.trim();
+    const deckPath = app.querySelector('#deckSelect').value || null;
+    const nameMode = app.querySelector('#nameModeSelect').value || 'anonymous';
+    const gamify = app.querySelector('#gamifyCheck').checked;
+    const s = await driver.createSession({ title, deckPath, nameMode, gamify });
+    session = { ...s, deckPath };
+    saveHostSession({ code: s.code, hostToken: s.hostToken, sessionId: s.sessionId, title, deckPath });
+    renderSession();
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '세션 만들기';
+    err.textContent = '생성 실패: ' + e.message;
+    err.classList.remove('hidden');
+  }
+}
+
+async function resume(code) {
+  const saved = listHostSessions().find((s) => s.code === code);
+  if (!saved) return;
+  try {
+    const s = await driver.resumeSession(code, saved.hostToken);
+    session = { sessionId: s.sessionId, code: s.code, hostToken: saved.hostToken,
+                title: s.title, deckPath: s.deckPath, status: s.status };
+    renderSession();
+  } catch (e) {
+    removeHostSession(code);
+    renderHome();
+  }
+}
+
+// ── 세션 대시보드 ──
+function renderSession() {
+  // 디렉터리 URL 필수: 정적 서버(serve 등)가 .html을 리다이렉트하며 쿼리를 버리는 경우가 있음
+  // 네이티브 React 덱(path에 ?deck=<id> 쿼리 포함)은 쿼리를 유지하고 &로 이어 붙인다
+  let deckHref = null;
+  if (session.deckPath) {
+    const base = session.deckPath.includes('?')
+      ? `../../${session.deckPath}`
+      : `../../${session.deckPath.replace(/index\.html$/, '')}`;
+    deckHref = `${base}${base.includes('?') ? '&' : '?'}live=${session.code}&host=1`;
+  }
+  app.innerHTML = `
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h1>${esc(session.title || '수업 세션')}</h1>
+        <button class="btn btn--sm btn--ghost" id="homeBtn">← 홈</button>
+      </div>
+      <div class="bigcode">${esc(session.code)}</div>
+      <div class="qrbox" id="qrBox"></div>
+      <div class="joinurl">${esc(joinUrl(session.code))}</div>
+      <div class="row" style="margin-top:16px; justify-content:center">
+        <button class="btn btn--ghost" id="copyBtn">참여 링크 복사</button>
+        ${deckHref ? `<a class="btn" style="text-decoration:none" href="${esc(deckHref)}" target="_blank">덱을 호스트 모드로 열기 ↗</a>` : ''}
+        ${session.deckPath ? `<button class="btn btn--ghost" id="interactBtn"
+          title="학생 화면의 클릭 차단을 풀면 학생이 미러된 슬라이드를 직접 눌러볼 수 있습니다">🔒 학생 조작 잠금</button>` : ''}
+        <button class="btn btn--ok" id="sheetBtn">시트에 저장</button>
+        <button class="btn btn--warn" id="endBtn">세션 종료</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stat">
+        <div><b id="pCount">0</b><span>참여 학생</span></div>
+        <div><b id="aCount">0</b><span>진행한 문항</span></div>
+      </div>
+      <div class="chips" id="pChips"></div>
+    </div>
+    <div id="deckActsCard"></div>
+    <div class="card">
+      <h2>즉석 문항 출제</h2>
+      <p class="sub">덱 없이도 바로 문항을 열 수 있습니다. (객관식은 보기를 줄바꿈으로 구분)</p>
+      <div class="row">
+        <select id="adhocKind" style="width:140px">
+          <option value="choice">객관식</option>
+          <option value="ox">OX</option>
+          <option value="short">주관식</option>
+          <option value="wordcloud">워드클라우드</option>
+          <option value="exit">출구티켓</option>
+          <option value="code">코드 작성</option>
+        </select>
+        <input type="text" id="adhocPrompt" placeholder="문항 내용" style="flex:1;min-width:220px">
+      </div>
+      <textarea id="adhocOptions" rows="3" placeholder="보기1&#10;보기2&#10;보기3" style="margin-top:10px"></textarea>
+      <div id="adhocCodeWrap" class="hidden" style="margin-top:10px">
+        <div class="row">
+          <select id="adhocLang" style="width:150px">
+            <option value="python">Python</option>
+            <option value="web">HTML/CSS/JS</option>
+          </select>
+          <span style="font-size:12.5px;color:var(--sub)" id="adhocTestsHint">테스트: 한 줄에 하나, <b>호출 =&gt; 기대값</b> 형식</span>
+        </div>
+        <textarea id="adhocStarter" rows="3" placeholder="# 시작 코드 (학생 에디터에 미리 채워짐)"
+          style="margin-top:8px;font-family:Consolas,monospace;font-size:13.5px"></textarea>
+        <textarea id="adhocTests" rows="2" placeholder="sum_to(5) => 15&#10;sum_to(10) => 55"
+          style="margin-top:8px;font-family:Consolas,monospace;font-size:13.5px"></textarea>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <select id="adhocAnswer" style="width:180px">
+          <option value="">정답 없음(투표)</option>
+        </select>
+        <label id="adhocPiWrap" style="margin:0; display:flex; align-items:center; gap:6px; font-size:13.5px; cursor:pointer">
+          <input type="checkbox" id="adhocPi" style="width:auto"> 2라운드 투표 (Peer Instruction)
+        </label>
+        <button class="btn btn--ok" id="adhocBtn">바로 열기</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2>문항 현황</h2>
+        <button class="btn btn--sm btn--ghost" id="exportBtn">데이터 내보내기(JSON)</button>
+      </div>
+      <div id="actList"><p class="sub">아직 진행한 문항이 없습니다.</p></div>
+    </div>`;
+
+  // 실시간 채널: 콘솔 상태 변경을 학생·덱에 즉시 알림 (수신 시 재조회)
+  try { channel.close(); } catch (e) { /* 무시 */ }
+  driver.connectChannel(session.code, () => refresh()).then((ch) => { channel = ch; });
+
+  app.querySelector('#homeBtn').addEventListener('click', renderHome);
+  app.querySelector('#copyBtn').addEventListener('click', async (e) => {
+    await navigator.clipboard.writeText(joinUrl(session.code));
+    e.target.textContent = '복사됨!';
+    setTimeout(() => { e.target.textContent = '참여 링크 복사'; }, 1500);
+  });
+  const interactBtn = app.querySelector('#interactBtn');
+  if (interactBtn) interactBtn.addEventListener('click', toggleInteract);
+  app.querySelector('#endBtn').addEventListener('click', endSession);
+  app.querySelector('#sheetBtn').addEventListener('click', saveToSheet);
+  app.querySelector('#exportBtn').addEventListener('click', exportData);
+  wireAdhoc();
+  drawQr();
+  fillDeckActs();
+  clearInterval(pollTimer);
+  pollTimer = setInterval(refresh, 3000);
+  refresh();
+}
+
+// 덱의 quiz.json 문항을 콘솔에서 바로 열기 (덱을 띄우지 않아도 수업 진행 가능)
+async function fillDeckActs() {
+  const holder = app.querySelector('#deckActsCard');
+  if (!holder || !session.deckPath) return;
+  const acts = await fetchQuizJson(session.deckPath);
+  if (!acts) return;
+  holder.innerHTML = `
+    <div class="card">
+      <h2>덱 문항 · quiz.json</h2>
+      <p class="sub">덱을 열지 않아도 여기서 바로 문항을 열 수 있습니다. 진행 상태·집계·마감/공개는 아래 '문항 현황'에서.</p>
+      ${quizJsonListHtml(acts, true)}
+    </div>`;
+  holder.querySelectorAll('[data-ljopen]').forEach((btn) => btn.addEventListener('click', async () => {
+    const a = acts[Number(btn.dataset.ljopen)];
+    btn.disabled = true;
+    try {
+      const pub = await driver.openActivity(session.sessionId, session.hostToken, {
+        slideKey: a.id, slideIndex: Number.isInteger(a.slide) ? a.slide : null,
+        kind: a.kind, prompt: a.prompt, config: a.config,
+      });
+      sendEvent({ type: 'activity', activity: pub });
+      await refresh();
+    } finally { btn.disabled = false; }
+  }));
+}
+
+function drawQr() {
+  const holder = app.querySelector('#qrBox');
+  if (!holder) return;
+  const s = document.createElement('script');
+  s.src = new URL('../vendor/qrcode.js?v=1', import.meta.url).href;
+  const draw = () => {
+    const qr = window.qrcode(0, 'M');
+    qr.addData(joinUrl(session.code));
+    qr.make();
+    holder.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+  };
+  if (window.qrcode) draw(); else { s.onload = draw; document.head.appendChild(s); }
+}
+
+function wireAdhoc() {
+  const kindEl = app.querySelector('#adhocKind');
+  const optsEl = app.querySelector('#adhocOptions');
+  const ansEl = app.querySelector('#adhocAnswer');
+  const piWrap = app.querySelector('#adhocPiWrap');
+  const codeWrap = app.querySelector('#adhocCodeWrap');
+  const langEl = app.querySelector('#adhocLang');
+  const sync = () => {
+    const kind = kindEl.value;
+    optsEl.classList.toggle('hidden', kind !== 'choice');
+    ansEl.classList.toggle('hidden', kind !== 'choice' && kind !== 'ox');
+    piWrap.classList.toggle('hidden', kind !== 'choice' && kind !== 'ox');
+    codeWrap.classList.toggle('hidden', kind !== 'code');
+    const isPy = langEl.value === 'python';
+    app.querySelector('#adhocTests').classList.toggle('hidden', !isPy);
+    app.querySelector('#adhocTestsHint').classList.toggle('hidden', !isPy);
+    ansEl.innerHTML = '<option value="">정답 없음(투표)</option>';
+    if (kind === 'choice') {
+      optsEl.value.split('\n').map((s) => s.trim()).filter(Boolean).forEach((opt, i) => {
+        ansEl.innerHTML += `<option value="${i}">정답: ${i + 1}. ${esc(opt.slice(0, 20))}</option>`;
+      });
+    } else if (kind === 'ox') {
+      ansEl.innerHTML += '<option value="true">정답: O</option><option value="false">정답: X</option>';
+    }
+  };
+  langEl.addEventListener('change', sync);
+  kindEl.addEventListener('change', sync);
+  optsEl.addEventListener('input', sync);
+  sync();
+  app.querySelector('#adhocBtn').addEventListener('click', async (e) => {
+    const kind = kindEl.value;
+    const prompt = app.querySelector('#adhocPrompt').value.trim();
+    if (!prompt) return;
+    const config = {};
+    if (kind === 'choice') {
+      config.options = optsEl.value.split('\n').map((s) => s.trim()).filter(Boolean);
+      if (config.options.length < 2) return;
+      if (ansEl.value !== '') config.answer = Number(ansEl.value);
+    } else if (kind === 'ox' && ansEl.value !== '') {
+      config.answer = ansEl.value === 'true';
+    }
+    if ((kind === 'choice' || kind === 'ox') && app.querySelector('#adhocPi').checked) {
+      config.peerInstruction = true;
+    }
+    if (kind === 'code') {
+      config.language = langEl.value;
+      config.starter = app.querySelector('#adhocStarter').value;
+      if (langEl.value === 'python') {
+        config.tests = app.querySelector('#adhocTests').value.split('\n')
+          .map((line) => line.split('=>'))
+          .filter((p) => p.length === 2 && p[0].trim())
+          .map(([call, expected]) => ({ call: call.trim(), expected: expected.trim() }));
+      }
+    }
+    e.target.disabled = true;
+    try {
+      const pub = await driver.openActivity(session.sessionId, session.hostToken, {
+        slideKey: 'adhoc-' + Date.now(), slideIndex: null, kind, prompt, config,
+      });
+      sendEvent({ type: 'activity', activity: pub });
+      app.querySelector('#adhocPrompt').value = '';
+      refresh();
+    } finally { e.target.disabled = false; }
+  });
+}
+
+let channel = { ok: false, send() {}, close() {} };
+// 상태 페이로드 동봉 송신 — 학생이 재조회 없이 즉시 반영
+function sendEvent(payload) { try { channel.send(payload || { type: 'update' }); } catch (e) { /* 무시 */ } }
+
+// 학생 미러 화면의 클릭 차단 해제 (세션 플래그 v11 — 진실은 hostState로 수렴)
+let allowInteract = false;
+function syncInteractBtn() {
+  const btn = app.querySelector('#interactBtn');
+  if (!btn) return;
+  btn.textContent = allowInteract ? '🔓 학생 조작 허용됨' : '🔒 학생 조작 잠금';
+  btn.classList.toggle('btn--ghost', !allowInteract);
+  btn.title = allowInteract
+    ? '학생이 자기 화면에서 슬라이드를 직접 넘기고 있습니다 — 누르면 다시 잠급니다'
+    : '학생 화면의 클릭 차단을 풀면 학생이 미러된 슬라이드를 직접 눌러볼 수 있습니다';
+}
+
+async function toggleInteract(e) {
+  const btn = e.currentTarget;
+  const on = !allowInteract;
+  btn.disabled = true;
+  try {
+    await driver.setInteract(session.sessionId, session.hostToken, on);
+    allowInteract = on;
+    syncInteractBtn();
+    sendEvent({ type: 'interact', on });   // 학생 화면 즉시 반영
+  } catch (err) {
+    alert('학생 조작 설정 실패: ' + err.message
+      + ' (Supabase 마이그레이션 v11 적용 여부를 확인하세요)');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function refresh() {
+  if (!session) return;
+  try {
+    state = await driver.hostState(session.sessionId, session.hostToken);
+  } catch (e) { return; }
+  if (state.session) { allowInteract = !!state.session.allowInteract; syncInteractBtn(); }
+  const pc = app.querySelector('#pCount');
+  if (!pc) return;
+  pc.textContent = state.participantCount;
+  app.querySelector('#aCount').textContent = (state.activities || []).length;
+  app.querySelector('#pChips').innerHTML = (state.participants || [])
+    .map((p) => `<span class="chip">${p.studentNo ? `<b style="color:var(--blue)">${esc(p.studentNo)}</b> ` : ''}${esc(p.nickname || '익명')}</span>`).join('');
+
+  const list = app.querySelector('#actList');
+  if (list.querySelector('.code-panel')) return; // 코드 열람 중 — 목록 갱신 보류 (닫으면 재개)
+  const acts = state.activities || [];
+  if (!acts.length) { list.innerHTML = '<p class="sub">아직 진행한 문항이 없습니다.</p>'; return; }
+  const kindLabel = { choice: '객관식', ox: 'OX', short: '주관식', wordcloud: '워드클라우드', exit: '출구티켓', code: '코드' };
+  const stLabel = { open: '진행 중', closed: '닫힘', revealed: '공개됨', draft: '대기' };
+  list.innerHTML = acts.map((a) => {
+    const isPi = !!(a.config && a.config.peerInstruction);
+    const round = a.currentRound || 1;
+    const rc = a.roundCounts || [a.responseCount, 0];
+    const countLabel = round > 1 ? `1차 ${rc[0]} · 2차 ${rc[1]}` : (isPi ? `1차 ${rc[0]}` : `응답 ${rc[0]}`);
+    // 컨트롤 3동사: 열기(문항 화면 표시) → 결과 공개(결과 화면 표시) → 문항 닫기(양쪽에서 제거). 녹색 = 다음 단계.
+    let buttons;
+    if (a.status === 'open' && isPi && round === 1) {
+      buttons = `<button class="btn btn--sm" data-do="round2">2차 투표 →</button>
+                 <button class="btn btn--sm btn--ghost" data-do="close" title="문항 화면을 교사·학생 화면에서 없앱니다">닫기</button>`;
+    } else if (a.status === 'open') {
+      buttons = `<button class="btn btn--sm btn--ok" data-do="reveal">결과 공개</button>
+                 <button class="btn btn--sm btn--ghost" data-do="close" title="문항 화면을 교사·학생 화면에서 없앱니다">닫기</button>`;
+    } else if (a.status === 'revealed') {
+      buttons = `<button class="btn btn--sm btn--ok" data-do="close" title="결과 화면을 교사·학생 화면에서 없앱니다">닫기</button>`;
+    } else if (a.status === 'closed' && isPi && round === 1) {
+      buttons = `<button class="btn btn--sm" data-do="round2">2차 투표 →</button>
+                 <button class="btn btn--sm btn--ok" data-do="reveal">결과 공개</button>`;
+    } else if (a.status === 'closed') {
+      buttons = `<button class="btn btn--sm btn--ghost" data-do="reopen">다시 열기</button>
+                 ${a.revealedAt
+                   ? `<button class="btn btn--sm btn--ghost" data-do="reveal" title="결과 화면을 다시 띄웁니다">다시 공개</button>`
+                   : `<button class="btn btn--sm btn--ok" data-do="reveal">결과 공개</button>`}`;
+    } else {
+      buttons = `<button class="btn btn--sm btn--ghost" data-do="reopen">다시 열기</button>`;
+    }
+    if (a.kind === 'code') {
+      buttons += `<button class="btn btn--sm btn--ghost" data-do="codes">코드 보기</button>`;
+    }
+    return `
+    <div class="act" data-id="${a.id}">
+      <div class="act__head">
+        <div>
+          <span class="badge badge--kind">${kindLabel[a.kind] || a.kind}${isPi ? ' · PI' : ''}</span>
+          <span class="badge badge--${a.status}">${stLabel[a.status] || a.status}${round > 1 ? ' (2차)' : ''}</span>
+          <span style="color:var(--sub);font-size:12.5px;margin-left:6px">${countLabel}</span>
+          <div class="act__prompt" style="margin-top:6px">${esc(a.prompt)}</div>
+        </div>
+        <div class="row">${buttons}</div>
+      </div>
+      <div class="act__chart"></div>
+    </div>`;
+  }).join('');
+
+  acts.forEach((a) => {
+    const el = list.querySelector(`[data-id="${a.id}"]`);
+    let agg;
+    if ((a.currentRound || 1) > 1) {
+      agg = { kind: a.kind, pi: true, rounds: [a.aggregates || {}, a.aggregates2 || {}],
+              total: (a.aggregates2 || {}).total || 0 };
+    } else {
+      agg = { ...(a.aggregates || {}) };
+    }
+    if (['choice', 'ox'].includes(a.kind) && a.config && 'answer' in a.config) agg.answer = a.config.answer;
+    if (state.session && state.session.gamify && Array.isArray(state.leaderboard) && state.leaderboard.length) {
+      agg.leaderboard = state.leaderboard;
+    }
+    renderAggregates(el.querySelector('.act__chart'), { kind: a.kind, config: a.config }, agg, { theme: 'light' });
+    el.querySelectorAll('[data-do]').forEach((btn) => btn.addEventListener('click', async () => {
+      if (btn.dataset.do === 'codes') { showCodes(el, a); return; }
+      btn.disabled = true;
+      try {
+        if (btn.dataset.do === 'close') {
+          await driver.closeActivity(session.sessionId, session.hostToken, a.id);
+          sendEvent({ type: 'close', activityId: a.id });
+        } else if (btn.dataset.do === 'reveal') {
+          const agg = await driver.revealActivity(session.sessionId, session.hostToken, a.id);
+          sendEvent({ type: 'reveal', activityId: a.id, agg });
+        } else if (btn.dataset.do === 'round2') {
+          const pub = await driver.advanceRound(session.sessionId, session.hostToken, a.id);
+          sendEvent({ type: 'activity', activity: pub });
+        } else if (btn.dataset.do === 'reopen') {
+          const pub = await driver.openActivity(session.sessionId, session.hostToken, {
+            slideKey: a.slideKey, slideIndex: a.slideIndex, kind: a.kind, prompt: a.prompt, config: a.config || {} });
+          sendEvent({ type: 'activity', activity: pub });
+        }
+        await refresh();
+      } finally { btn.disabled = false; }
+    }));
+  });
+}
+
+// 활동 카드 아래 제출 코드 목록 토글 (학생별 통과 뱃지 + 코드 펼치기)
+async function showCodes(actEl, a) {
+  const existing = actEl.querySelector('.code-panel');
+  if (existing) { existing.remove(); return; }
+  const panel = document.createElement('div');
+  panel.className = 'code-panel';
+  panel.style.cssText = 'margin-top:12px;border-top:1px dashed var(--line);padding-top:12px';
+  panel.innerHTML = '<p class="sub">불러오는 중…</p>';
+  actEl.appendChild(panel);
+  try {
+    const subs = await driver.codeSubmissions(session.sessionId, session.hostToken, a.id);
+    if (!subs.length) { panel.innerHTML = '<p class="sub">아직 제출이 없습니다.</p>'; return; }
+    panel.innerHTML = subs.map((s, i) => `
+      <div style="margin-bottom:8px">
+        <button class="btn btn--sm btn--ghost" data-code="${i}" style="display:flex;gap:8px;align-items:center">
+          <span>${esc((s.studentNo ? s.studentNo + ' ' : '') + (s.nickname || '익명'))}</span>
+          ${Number.isInteger(s.total) && s.total > 0
+            ? `<span class="badge ${s.passed === s.total ? 'badge--open' : 'badge--kind'}">${s.passed}/${s.total}</span>` : ''}
+        </button>
+        <pre hidden style="margin-top:6px;background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px 14px;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow-y:auto"></pre>
+      </div>`).join('');
+    panel.querySelectorAll('[data-code]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const pre = btn.parentElement.querySelector('pre');
+        pre.hidden = !pre.hidden;
+        if (!pre.textContent) pre.textContent = subs[Number(btn.dataset.code)].code || '(빈 코드)';
+      });
+    });
+  } catch (e) {
+    panel.innerHTML = `<p class="sub">코드 조회 실패: ${esc(e.message)}</p>`;
+  }
+}
+
+async function endSession() {
+  const btn = app.querySelector('#endBtn');
+  if (btn.dataset.confirm !== '1') {
+    btn.dataset.confirm = '1'; btn.textContent = '정말 종료할까요?';
+    setTimeout(() => { btn.dataset.confirm = ''; btn.textContent = '세션 종료'; }, 3500);
+    return;
+  }
+  await driver.endSession(session.sessionId, session.hostToken);
+  sendEvent({ type: 'end' });
+  clearInterval(pollTimer);
+  // 아카이브 URL이 설정되어 있으면 세션 결과를 시트에 자동 저장
+  if (getConfig().appsScriptUrl) {
+    await saveToSheet();
+  }
+  renderHome();
+}
+
+async function exportData() {
+  const data = await driver.exportSession(session.sessionId, session.hostToken);
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `live-session-${session.code}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── 시작 ──
+(async () => {
+  driver = await createDriver();
+  renderHome();
+})();
+</script>
+</body>
+</html>

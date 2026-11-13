@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>함수 — 코드를 포장하는 기술</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  /* Deck Contract v1 — 크롬·네비·모션 런타임은 deck.js가 제공 */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif; background: #131120; color: #ece9f4;
+    font-size: clamp(13px, 1.1vw, 20px); }
+  .presentation { width: 100%; height: 100%; position: relative; }
+  .slide { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+    transition: opacity .45s ease; overflow: hidden; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .code-font { font-family: Consolas, 'D2Coding', monospace; }
+</style>
+</head>
+<body data-deck-title="함수 — 코드를 포장하는 기술" data-subject="정보">
+<div class="presentation">
+
+<!-- scene: fn-01 | metaphor: 복붙 도장 | intent: 같은 코드가 도장처럼 반복해서 찍히는 지루함을 보여주어 함수의 필요성을 몸으로 느끼게 한다 -->
+<div class="slide active" data-scene="fn-01">
+  <style>
+    [data-scene="fn-01"] { background: radial-gradient(115% 85% at 75% 20%, #221d38 0%, #131120 60%); }
+    [data-scene="fn-01"] .stamped { position: absolute; width: 21vw; min-width: 230px;
+      background: #1d1930; border: 1px solid #37305a; border-radius: .7vw; padding: 1.2vw 1.4vw;
+      font-family: Consolas, monospace; font-size: 1vw; line-height: 1.7; color: #b8b1d6;
+      box-shadow: 0 14px 34px rgba(0,0,0,.5); will-change: transform, opacity; opacity: 0; }
+    [data-scene="fn-01"] .stamped .k { color: #8fa7ff; }
+    [data-scene="fn-01"] .stamped .s { color: #7ed6a8; }
+    [data-scene="fn-01"] .st1 { right: 26vw; top: 8vh; transform: rotate(-4deg); }
+    [data-scene="fn-01"] .st2 { right: 15vw; top: 22vh; transform: rotate(3deg); }
+    [data-scene="fn-01"] .st3 { right: 22vw; top: 38vh; transform: rotate(-2deg); }
+    [data-scene="fn-01"] .again { position: absolute; right: 7vw; top: 50vh; transform: rotate(9deg) scale(0);
+      border: .45vw solid #e0566b; color: #e0566b; border-radius: .8vw; padding: .5vh 1.2vw;
+      font-size: 1.6vw; font-weight: 900; letter-spacing: .12em; will-change: transform, opacity; opacity: 0; }
+    [data-scene="fn-01"] .kicker { position: absolute; left: 7vw; bottom: 42vh;
+      letter-spacing: .34em; color: #8fa7ff; font-weight: 700; font-size: .95em; }
+    [data-scene="fn-01"] h1 { position: absolute; left: 7vw; bottom: 21vh;
+      font-size: 4.3vw; font-weight: 900; line-height: 1.18; letter-spacing: -.02em; }
+    [data-scene="fn-01"] h1 em { font-style: normal; color: #f0b45c; }
+    [data-scene="fn-01"] .sub { position: absolute; left: 7vw; bottom: 14vh;
+      color: #a49dc2; font-size: 1.15em; font-weight: 300; }
+  </style>
+  <div class="stamped st1"><span class="k">print</span>(<span class="s">"환영합니다"</span>)<br><span class="k">print</span>(<span class="s">"="*20</span>)<br><span class="k">print</span>(<span class="s">"메뉴를 고르세요"</span>)</div>
+  <div class="stamped st2"><span class="k">print</span>(<span class="s">"환영합니다"</span>)<br><span class="k">print</span>(<span class="s">"="*20</span>)<br><span class="k">print</span>(<span class="s">"메뉴를 고르세요"</span>)</div>
+  <div class="stamped st3"><span class="k">print</span>(<span class="s">"환영합니다"</span>)<br><span class="k">print</span>(<span class="s">"="*20</span>)<br><span class="k">print</span>(<span class="s">"메뉴를 고르세요"</span>)</div>
+  <div class="again">벌써 3번째 복붙</div>
+  <div class="kicker">정보 · 파이썬</div>
+  <h1>함수,<br>코드를 <em>포장</em>하는 기술</h1>
+  <p class="sub">같은 코드를 세 번 붙여넣는 순간, 더 좋은 방법이 있다는 신호다</p>
+</div>
+
+<!-- scene: fn-02 | metaphor: 자판기 | intent: 함수가 이름·입력·출력을 가진 기계임을 자판기 작동 순서로 직관화한다 -->
+<div class="slide" data-scene="fn-02">
+  <style>
+    [data-scene="fn-02"] { background: linear-gradient(155deg, #17142a 0%, #10101c 70%); }
+    [data-scene="fn-02"] .machine { position: absolute; left: 9vw; top: 13vh; width: 24vw; min-width: 250px;
+      height: 66vh; background: linear-gradient(180deg, #262143 0%, #1b1832 100%);
+      border: 1px solid #3d3566; border-radius: 1.1vw; box-shadow: 0 20px 50px rgba(0,0,0,.55); }
+    [data-scene="fn-02"] .machine .name { position: absolute; top: 3.5vh; left: 0; right: 0; text-align: center;
+      font-family: Consolas, monospace; font-size: 1.5vw; font-weight: 700; color: #f0b45c; }
+    [data-scene="fn-02"] .slot { position: absolute; top: 12vh; left: 50%; transform: translateX(-50%);
+      width: 7vw; height: 1vh; background: #0c0a16; border-radius: .5vh; box-shadow: inset 0 2px 6px #000; }
+    [data-scene="fn-02"] .coin { position: absolute; top: 6vh; left: 50%; width: 3.2vw; min-width: 34px;
+      aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffd98a, #d9a13f);
+      color: #6b4c12; font-weight: 900; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2vw; transform: translateX(-50%); will-change: transform, opacity; }
+    [data-scene="fn-02"] .lamp { position: absolute; top: 26vh; left: 50%; transform: translateX(-50%);
+      width: 9vw; height: 9vh; border-radius: .8vw; background: #14111f; border: 1px solid #3d3566;
+      display: flex; align-items: center; justify-content: center; color: #4d4675;
+      font-size: .85vw; letter-spacing: .2em; font-weight: 700; }
+    [data-scene="fn-02"] .lamp.on-look { color: #7ed6a8; text-shadow: 0 0 14px rgba(126,214,168,.7); }
+    [data-scene="fn-02"] .outlet { position: absolute; bottom: 8vh; left: 50%; transform: translateX(-50%);
+      width: 12vw; height: 7vh; background: #0c0a16; border-radius: .6vw; box-shadow: inset 0 4px 10px #000; }
+    [data-scene="fn-02"] .can { position: absolute; bottom: 9.4vh; left: 50%; width: 4.4vw; min-width: 44px;
+      height: 6.4vh; border-radius: .7vw; background: linear-gradient(180deg, #7ed6a8, #3f9e6f);
+      color: #0a2a1b; font-weight: 900; display: flex; align-items: center; justify-content: center;
+      font-size: .95vw; transform: translateX(-50%) translateY(-3vh); opacity: 0; will-change: transform, opacity; }
+    [data-scene="fn-02"] .head { position: absolute; right: 8vw; top: 15vh; width: 44vw; }
+    [data-scene="fn-02"] .head .no { letter-spacing: .3em; color: #8fa7ff; font-weight: 700; font-size: .9em; }
+    [data-scene="fn-02"] .head h2 { font-size: 3vw; font-weight: 900; line-height: 1.3; margin-top: 1.2vh; }
+    [data-scene="fn-02"] .head h2 b { color: #f0b45c; }
+    [data-scene="fn-02"] .parts { position: absolute; right: 8vw; top: 38vh; width: 40vw; }
+    [data-scene="fn-02"] .part { display: flex; align-items: baseline; gap: 1.2vw; padding: 1.6vh 0;
+      border-bottom: 1px solid rgba(143,167,255,.14); }
+    [data-scene="fn-02"] .part .tag { flex: none; width: 8vw; font-family: Consolas, monospace;
+      color: #8fa7ff; font-size: 1.05vw; font-weight: 700; }
+    [data-scene="fn-02"] .part p { color: #a49dc2; font-weight: 300; line-height: 1.6; }
+    [data-scene="fn-02"] .part p b { color: #ece9f4; font-weight: 700; }
+  </style>
+  <div class="machine">
+    <div class="name">vending()</div>
+    <div class="coin">500</div>
+    <div class="slot"></div>
+    <div class="lamp">WORKING</div>
+    <div class="outlet"></div>
+    <div class="can">콜라</div>
+  </div>
+  <div class="head">
+    <div class="no">SCENE 02 · 함수의 정체</div>
+    <h2>함수는 <b>자판기</b>다 —<br>넣으면, 일하고, 내놓는다</h2>
+  </div>
+  <div class="parts">
+    <div class="part"><span class="tag">이름</span><p><b>vending</b> — 뭘 하는 기계인지 한 단어로. 이름만 봐도 하는 일을 알게 짓는다.</p></div>
+    <div class="part"><span class="tag">입력</span><p>동전 500원 = <b>매개변수</b>. 괄호 안으로 들어가는 재료.</p></div>
+    <div class="part"><span class="tag">출력</span><p>나온 콜라 = <b>return 값</b>. 기계가 되돌려주는 결과물.</p></div>
+  </div>
+</div>
+
+<!-- scene: fn-03 | metaphor: 레시피와 요리 | intent: 정의는 레시피를 적는 것일 뿐, 호출이 있어야 비로소 실행된다는 최대 오개념을 정면으로 깬다 -->
+<div class="slide" data-scene="fn-03">
+  <style>
+    [data-scene="fn-03"] { background: #14121f; }
+    [data-scene="fn-03"] .cap { position: absolute; left: 7vw; top: 12vh; }
+    [data-scene="fn-03"] .cap .no { letter-spacing: .3em; color: #8fa7ff; font-weight: 700; font-size: .9em; }
+    [data-scene="fn-03"] .cap h2 { font-size: 2.9vw; font-weight: 900; margin-top: 1vh; line-height: 1.3; }
+    [data-scene="fn-03"] .cap h2 b { color: #e0566b; }
+    [data-scene="fn-03"] .recipe { position: absolute; left: 8vw; top: 34vh; width: 30vw; min-width: 300px;
+      background: #f4efe2; color: #2a2438; border-radius: .6vw; padding: 2.4vh 1.8vw;
+      transform: rotate(-1.6deg); box-shadow: 0 18px 44px rgba(0,0,0,.5); }
+    [data-scene="fn-03"] .recipe .rl { font-size: .85vw; letter-spacing: .3em; color: #94897a;
+      border-bottom: 2px dashed #cfc5ae; padding-bottom: 1vh; margin-bottom: 1.6vh; font-weight: 700; }
+    [data-scene="fn-03"] .recipe pre { font-family: Consolas, monospace; font-size: 1.15vw; line-height: 1.8; }
+    [data-scene="fn-03"] .recipe .k { color: #7c5cd6; font-weight: 700; }
+    [data-scene="fn-03"] .recipe .s { color: #2e7d4f; }
+    [data-scene="fn-03"] .recipe .note { margin-top: 1.4vh; font-size: .95vw; color: #94897a; }
+    [data-scene="fn-03"] .callside { position: absolute; right: 10vw; top: 36vh; width: 30vw; }
+    [data-scene="fn-03"] .callbtn { display: inline-block; font-family: Consolas, monospace;
+      background: #262143; border: 1px solid #4a4180; color: #ece9f4; font-size: 1.5vw; font-weight: 700;
+      padding: 1.6vh 2.2vw; border-radius: .8vw; box-shadow: 0 8px 0 #171430; will-change: transform; }
+    [data-scene="fn-03"] .bubble { margin-top: 4.5vh; display: inline-block; background: #7ed6a8; color: #0a2a1b;
+      font-size: 1.5vw; font-weight: 900; padding: 1.4vh 1.8vw; border-radius: 1vw 1vw 1vw .2vw;
+      transform: scale(0); transform-origin: 10% 90%; will-change: transform, opacity; opacity: 0; }
+    [data-scene="fn-03"] .verdict { position: absolute; left: 8vw; bottom: 9vh; right: 10vw;
+      display: flex; gap: 2vw; align-items: baseline; }
+    [data-scene="fn-03"] .verdict .half { flex: 1; border-top: .25vw solid #4a4180; padding-top: 1.4vh;
+      color: #a49dc2; font-weight: 300; }
+    [data-scene="fn-03"] .verdict .half b { color: #ece9f4; }
+    [data-scene="fn-03"] .verdict .half:last-child { border-top-color: #7ed6a8; }
+  </style>
+  <div class="cap">
+    <div class="no">SCENE 03 · 최대의 함정</div>
+    <h2>레시피를 적어도<br>요리는 <b>저절로 안 된다</b></h2>
+  </div>
+  <div class="recipe">
+    <div class="rl">RECIPE · 정의 def</div>
+    <pre><span class="k">def</span> greet():
+    print(<span class="s">"안녕!"</span>)</pre>
+    <div class="note">여기까지는 종이에 적힌 레시피일 뿐 — 실행되는 건 아무것도 없다.</div>
+  </div>
+  <div class="callside">
+    <div class="callbtn">greet()</div>
+    <div><span class="bubble">안녕!</span></div>
+  </div>
+  <div class="verdict">
+    <div class="half"><b>정의</b>는 준비 — 파이썬이 "이런 요리법이 있구나" 기억만 한다</div>
+    <div class="half"><b>호출</b>이 실행 — 이름()을 부르는 순간 요리가 시작된다</div>
+  </div>
+</div>
+
+<!-- scene: fn-04 | metaphor: 파이프 기계 | intent: 값이 매개변수로 들어가 return으로 나오는 흐름을 대각선 파이프 낙하로 체험시킨다 -->
+<div class="slide" data-scene="fn-04">
+  <style>
+    [data-scene="fn-04"] { background: linear-gradient(200deg, #191531 0%, #110f1d 65%); }
+    [data-scene="fn-04"] .codecard { position: absolute; right: 8vw; top: 12vh; width: 24vw; min-width: 250px;
+      background: #1d1930; border: 1px solid #37305a; border-radius: .7vw; padding: 1.6vh 1.5vw;
+      font-family: Consolas, monospace; font-size: 1.1vw; line-height: 1.9; color: #b8b1d6; }
+    [data-scene="fn-04"] .codecard .k { color: #8fa7ff; } [data-scene="fn-04"] .codecard .n { color: #f0b45c; }
+    [data-scene="fn-04"] .rig { position: absolute; left: 6vw; top: 14vh; width: 52vw; height: 64vh; }
+    [data-scene="fn-04"] .tube { position: absolute; height: 2.4vh; background: rgba(143,167,255,.16);
+      border: 1px solid rgba(143,167,255,.35); border-radius: 1.2vh; }
+    [data-scene="fn-04"] .tube--in { left: 0; top: 12vh; width: 20vw; transform: rotate(14deg); transform-origin: 0 50%; }
+    [data-scene="fn-04"] .tube--out { right: 6vw; bottom: 6vh; width: 17vw; transform: rotate(14deg); transform-origin: 100% 50%; }
+    [data-scene="fn-04"] .boxm { position: absolute; left: 21vw; top: 22vh; width: 13vw; min-width: 140px; height: 20vh;
+      background: linear-gradient(180deg, #2c2650 0%, #201b3c 100%); border: 1px solid #4a4180;
+      border-radius: 1vw; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1vh; box-shadow: 0 16px 40px rgba(0,0,0,.5); }
+    [data-scene="fn-04"] .boxm .fname { font-family: Consolas, monospace; color: #f0b45c; font-weight: 700; font-size: 1.3vw; }
+    [data-scene="fn-04"] .boxm .gear { width: 3.4vw; height: 3.4vw; border-radius: 50%;
+      border: .5vw dashed #8fa7ff; will-change: transform; }
+    [data-scene="fn-04"] .cap3 { position: absolute; width: 3.4vw; min-width: 36px; aspect-ratio: 1; border-radius: 50%;
+      background: #f0b45c; color: #4a3208; font-weight: 900; display: flex; align-items: center;
+      justify-content: center; font-size: 1.3vw; will-change: transform, opacity; }
+    [data-scene="fn-04"] .cap6 { position: absolute; width: 3.8vw; min-width: 40px; aspect-ratio: 1; border-radius: 50%;
+      background: #7ed6a8; color: #0a2a1b; font-weight: 900; display: flex; align-items: center;
+      justify-content: center; font-size: 1.4vw; opacity: 0; will-change: transform, opacity; }
+    [data-scene="fn-04"] .lbl { position: absolute; color: #a49dc2; font-size: .95vw; letter-spacing: .18em; font-weight: 700; }
+    [data-scene="fn-04"] .lbl--in { left: 1vw; top: 7vh; }
+    [data-scene="fn-04"] .lbl--out { right: 3vw; bottom: 13vh; }
+    [data-scene="fn-04"] .punch { position: absolute; left: 7vw; bottom: 11vh; width: 56vw;
+      color: #a49dc2; font-weight: 300; font-size: 1.1em; }
+    [data-scene="fn-04"] .punch b { color: #f0b45c; }
+  </style>
+  <div class="rig">
+    <span class="lbl lbl--in">IN · 매개변수</span>
+    <div class="tube tube--in"></div>
+    <div class="boxm"><div class="fname">double(x)</div><div class="gear"></div></div>
+    <div class="tube tube--out"></div>
+    <span class="lbl lbl--out">OUT · return</span>
+    <div class="cap3">3</div>
+    <div class="cap6">6</div>
+  </div>
+  <div class="codecard">
+    <span class="k">def</span> double(x):<br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="k">return</span> x * <span class="n">2</span><br><br>double(<span class="n">3</span>) &nbsp;# → <span class="n">6</span>
+  </div>
+  <p class="punch">괄호로 넣은 <b>3</b>이 x가 되어 기계를 통과하고, <b>return이 6을 밖으로 내보낸다</b> — 이 왕복이 함수의 심장이다.</p>
+</div>
+
+<!-- scene: fn-05 | metaphor: 스피커와 상자 | intent: print는 소리처럼 사라지고 return은 상자에 담아 건네져 변수에 저장된다는 차이를 대비시킨다 -->
+<div class="slide" data-scene="fn-05">
+  <style>
+    [data-scene="fn-05"] { background: #121020; }
+    [data-scene="fn-05"] .half { position: absolute; top: 0; bottom: 0; }
+    [data-scene="fn-05"] .half--l { left: 0; width: 55%; background: linear-gradient(160deg, rgba(224,86,107,.08), transparent 60%); }
+    [data-scene="fn-05"] .half--r { right: 0; width: 45%; border-left: 1px solid rgba(143,167,255,.18); }
+    [data-scene="fn-05"] .cap { position: absolute; left: 7vw; top: 11vh; z-index: 2; }
+    [data-scene="fn-05"] .cap .no { letter-spacing: .3em; color: #8fa7ff; font-weight: 700; font-size: .9em; }
+    [data-scene="fn-05"] .cap h2 { font-size: 2.8vw; font-weight: 900; margin-top: 1vh; }
+    [data-scene="fn-05"] .cap h2 b { color: #e0566b; } [data-scene="fn-05"] .cap h2 em { font-style: normal; color: #7ed6a8; }
+    [data-scene="fn-05"] .spk { position: absolute; left: 12vw; top: 40vh; width: 7vw; min-width: 72px; aspect-ratio: 1;
+      border-radius: 1vw; background: #241f3e; border: 1px solid #4a4180;
+      display: flex; align-items: center; justify-content: center; }
+    [data-scene="fn-05"] .spk::after { content: ''; width: 55%; height: 55%; border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #4a4180, #171430); }
+    [data-scene="fn-05"] .wave { position: absolute; left: 15.5vw; top: 43.5vh; width: 2vw; height: 2vw;
+      border: .3vw solid #e0566b; border-radius: 50%; opacity: 0; will-change: transform, opacity; }
+    [data-scene="fn-05"] .said { position: absolute; left: 24vw; top: 41vh; font-family: Consolas, monospace;
+      font-size: 1.5vw; color: #e0566b; font-weight: 700; opacity: 0; will-change: opacity, transform; }
+    [data-scene="fn-05"] .spklbl { position: absolute; left: 12vw; top: 54vh; width: 26vw; color: #a49dc2; font-weight: 300; }
+    [data-scene="fn-05"] .spklbl b { color: #e0566b; }
+    [data-scene="fn-05"] .shelf { position: absolute; right: 8vw; top: 34vh; width: 26vw; height: 1vh;
+      background: #37305a; border-radius: .5vh; }
+    [data-scene="fn-05"] .shelf .tag { position: absolute; left: 0; top: -4.2vh; font-family: Consolas, monospace;
+      color: #8fa7ff; font-size: 1.05vw; }
+    [data-scene="fn-05"] .gift { position: absolute; right: 16vw; top: 58vh; width: 6vw; min-width: 62px; aspect-ratio: 1;
+      background: linear-gradient(180deg, #8fd6ae, #4f9e75); border-radius: .6vw;
+      display: flex; align-items: center; justify-content: center; color: #0a2a1b;
+      font-weight: 900; font-size: 1.5vw; will-change: transform; }
+    [data-scene="fn-05"] .gift::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+      width: .7vw; transform: translateX(-50%); background: rgba(10,42,27,.28); }
+    [data-scene="fn-05"] .boxlbl { position: absolute; right: 8vw; top: 54vh; width: 24vw; text-align: right;
+      color: #a49dc2; font-weight: 300; }
+    [data-scene="fn-05"] .boxlbl b { color: #7ed6a8; }
+    [data-scene="fn-05"] .bottom { position: absolute; left: 7vw; right: 7vw; bottom: 8vh;
+      border-top: 1px solid rgba(143,167,255,.18); padding-top: 1.6vh; color: #a49dc2;
+      font-weight: 300; font-size: 1.05em; text-align: center; }
+    [data-scene="fn-05"] .bottom b { color: #ece9f4; }
+  </style>
+  <div class="half half--l"></div>
+  <div class="half half--r"></div>
+  <div class="cap">
+    <div class="no">SCENE 05 · 헷갈림 주의</div>
+    <h2><b>print는 말하기</b>, <em>return은 건네주기</em></h2>
+  </div>
+  <div class="spk"></div>
+  <div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div>
+  <div class="said">"안녕"</div>
+  <p class="spklbl"><b>print("안녕")</b> — 화면에 말하고 끝. 소리처럼 퍼지고 사라져서 <b>변수에 담을 수 없다</b>.</p>
+  <div class="shelf"><span class="tag">result = double(3)</span></div>
+  <div class="gift">6</div>
+  <p class="boxlbl"><b>return 6</b> — 상자에 담아 건네주기. 받은 값은 <b>변수 선반에 올려두고 계속 쓴다</b>.</p>
+  <p class="bottom">둘 다 화면에 6이 보일 수 있다 — 하지만 <b>다시 꺼내 쓸 수 있는 쪽은 return뿐</b>이다.</p>
+</div>
+
+<!-- scene: fn-06 | metaphor: 서랍 정리 | intent: 이름 붙이기·다시 쓰기·한 곳만 고치기라는 함수의 세 가지 이득을 서랍이 닫히는 정돈의 감각으로 요약한다 -->
+<div class="slide" data-scene="fn-06">
+  <style>
+    [data-scene="fn-06"] { background: radial-gradient(100% 100% at 18% 88%, #1e1a34 0%, #131120 55%); }
+    [data-scene="fn-06"] .cab { position: absolute; left: 9vw; top: 16vh; width: 34vw; min-width: 330px; }
+    [data-scene="fn-06"] .drawer { position: relative; height: 12vh; margin-bottom: 2vh; overflow: hidden;
+      border-radius: .8vw; background: #1b1730; border: 1px solid #37305a; }
+    [data-scene="fn-06"] .drawer .front { position: absolute; inset: 0; display: flex; align-items: center;
+      gap: 1.4vw; padding: 0 1.8vw; background: linear-gradient(180deg, #2c2650, #221d40);
+      will-change: transform; transform: translateX(102%); }
+    [data-scene="fn-06"] .drawer .front .knob { flex: none; width: 1.2vw; height: 1.2vw; border-radius: 50%;
+      background: #f0b45c; box-shadow: 0 0 0 .35vw rgba(240,180,92,.18); }
+    [data-scene="fn-06"] .drawer .front .t { font-weight: 900; font-size: 1.5vw; }
+    [data-scene="fn-06"] .drawer .front .d { color: #a49dc2; font-weight: 300; font-size: 1vw; }
+    [data-scene="fn-06"] .head { position: absolute; right: 8vw; top: 18vh; width: 38vw; text-align: right; }
+    [data-scene="fn-06"] .head .no { letter-spacing: .3em; color: #8fa7ff; font-weight: 700; font-size: .9em; }
+    [data-scene="fn-06"] .head h2 { font-size: 3vw; font-weight: 900; line-height: 1.3; margin-top: 1.2vh; }
+    [data-scene="fn-06"] .head h2 b { color: #f0b45c; }
+    [data-scene="fn-06"] .next { position: absolute; right: 8vw; bottom: 10vh; text-align: right; color: #a49dc2; }
+    [data-scene="fn-06"] .next b { color: #8fa7ff; }
+  </style>
+  <div class="head">
+    <div class="no">SCENE 06 · 정리</div>
+    <h2>포장을 마치면<br>코드가 <b>서랍처럼 정돈</b>된다</h2>
+  </div>
+  <div class="cab">
+    <div class="drawer"><div class="front f1"><span class="knob"></span><span class="t">이름 붙이기</span><span class="d">greet만 봐도 하는 일이 보인다</span></div></div>
+    <div class="drawer"><div class="front f2"><span class="knob"></span><span class="t">다시 쓰기</span><span class="d">복붙 대신 greet() 한 줄</span></div></div>
+    <div class="drawer"><div class="front f3"><span class="knob"></span><span class="t">한 곳만 고치기</span><span class="d">인사말이 바뀌면 함수 안만 수정</span></div></div>
+  </div>
+  <div class="next">다음 차시 — 함수가 함수를 부르면? <b>재귀의 세계</b></div>
+</div>
+
+</div>
+
+<!-- Deck Contract v1: 네비·크롬·모션 런타임·라이브 연동은 공통 컨트롤러가 제공 -->
+<script type="module" src="../../../../live/runtime/deck.js?v=1"></script>
+<script type="module">
+/* 씬 타임라인 — deck.js 전역(SceneMotion·interpolate·easeOut·easeInOut·springy) 사용 */
+
+/* fn-01 복붙 도장: 코드 카드가 도장처럼 순차로 쾅쾅 + 붉은 스탬프 */
+SceneMotion.register('fn-01', (t, el) => {
+  ['.st1', '.st2', '.st3'].forEach((sel, i) => {
+    const card = el.querySelector(sel);
+    const s = springy(t, 0.25 + i * 0.35, 0.5);
+    card.style.opacity = Math.min(1, s * 1.6);
+    const rot = [-4, 3, -2][i];
+    card.style.transform = `rotate(${rot}deg) scale(${0.7 + 0.3 * s})`;
+  });
+  const st = el.querySelector('.again');
+  const s = springy(t, 1.45, 0.5);
+  st.style.opacity = Math.min(1, s * 1.8);
+  st.style.transform = `rotate(9deg) scale(${s})`;
+});
+
+/* fn-02 자판기: 동전 투입 → 램프 점등 → 캔 배출 */
+SceneMotion.register('fn-02', (t, el) => {
+  const coin = el.querySelector('.coin');
+  const drop = interpolate(t, [0.3, 0.9], [0, 7], easeInOut);   // vh
+  coin.style.transform = `translateX(-50%) translateY(${drop}vh)`;
+  coin.style.opacity = t < 0.95 ? 1 : Math.max(0, 1 - (t - 0.95) * 6);
+  el.querySelector('.lamp').classList.toggle('on-look', t >= 1.0 && t < 1.6);
+  const can = el.querySelector('.can');
+  const out = springy(t, 1.5, 0.6);
+  can.style.opacity = Math.min(1, out * 1.6);
+  can.style.transform = `translateX(-50%) translateY(${(1 - out) * -3}vh)`;
+});
+
+/* fn-03 레시피: 호출 버튼이 눌리고 말풍선 팝 */
+SceneMotion.register('fn-03', (t, el) => {
+  const btn = el.querySelector('.callbtn');
+  const press = t >= 0.9 && t < 1.1 ? 1 : 0;
+  btn.style.transform = `translateY(${press * 0.55}vh)`;
+  btn.style.boxShadow = press ? '0 3px 0 #171430' : '0 8px 0 #171430';
+  const bub = el.querySelector('.bubble');
+  const s = springy(t, 1.1, 0.55);
+  bub.style.opacity = Math.min(1, s * 1.6);
+  bub.style.transform = `scale(${s})`;
+});
+
+/* fn-04 파이프: 3이 굴러 들어가고 기어가 돌고 6이 나온다 (히어로 t=1.6에 6이 배출 완료) */
+SceneMotion.register('fn-04', (t, el) => {
+  const rig = el.querySelector('.rig');
+  const W = rig.clientWidth, H = rig.clientHeight;
+  const c3 = el.querySelector('.cap3');
+  const x3 = interpolate(t, [0.15, 0.7], [0, 0.33 * W], easeInOut);
+  const y3 = interpolate(t, [0.15, 0.7], [0.14 * H, 0.32 * H], easeInOut);
+  c3.style.transform = `translate(${x3}px, ${y3}px)`;
+  c3.style.opacity = t < 0.75 ? 1 : Math.max(0, 1 - (t - 0.75) * 5);
+  el.querySelector('.gear').style.transform = `rotate(${interpolate(t, [0.6, 1.2], [0, 240], easeInOut)}deg)`;
+  const c6 = el.querySelector('.cap6');
+  const k = interpolate(t, [1.0, 1.5], [0, 1], easeInOut);
+  c6.style.opacity = Math.min(1, k * 2);
+  c6.style.transform = `translate(${0.34 * W + k * 0.26 * W}px, ${0.44 * H + k * 0.26 * H}px)`;
+});
+
+/* fn-05 스피커와 상자: 파동은 퍼져 사라지고, 상자는 선반으로 올라간다 */
+SceneMotion.register('fn-05', (t, el) => {
+  ['.w1', '.w2', '.w3'].forEach((sel, i) => {
+    const w = el.querySelector(sel);
+    const k = interpolate(t, [0.3 + i * 0.3, 1.3 + i * 0.3], [0, 1]);
+    w.style.opacity = k > 0 && k < 1 ? 0.75 * (1 - k) : 0;
+    w.style.transform = `scale(${1 + k * 3.2})`;
+  });
+  const said = el.querySelector('.said');
+  const sk = interpolate(t, [0.4, 1.9], [0, 1]);
+  said.style.opacity = sk < 0.35 ? sk * 2.4 : Math.max(0, 1 - (sk - 0.35) * 1.6);
+  said.style.transform = `translateX(${sk * 4.5}vw)`;
+  const gift = el.querySelector('.gift');
+  const up = interpolate(t, [0.7, 1.5], [0, 20], easeInOut);   // vh
+  gift.style.transform = `translateY(${-up}vh)`;
+});
+
+/* fn-06 서랍: 세 칸이 차례로 닫히며 정돈 */
+SceneMotion.register('fn-06', (t, el) => {
+  ['.f1', '.f2', '.f3'].forEach((sel, i) => {
+    const front = el.querySelector(sel);
+    const k = interpolate(t, [0.25 + i * 0.35, 0.85 + i * 0.35], [102, 0], easeOut);
+    front.style.transform = `translateX(${k}%)`;
+  });
+});
+</script>
+</body>
+</html>

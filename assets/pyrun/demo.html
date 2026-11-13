@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>파이썬 실행기 견본</title>
+<script type="module" src="./py-runner.js"></script>
+<style>
+  body { margin: 0; padding: 32px 24px 80px; background: #f2ead9; color: #1f1a14; font-family: 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; display: grid; gap: 36px; }
+  h1 { margin: 0 0 4px; font-size: 30px; }
+  h2 { margin: 0 0 10px; font-size: 19px; }
+  p { margin: 0 0 12px; color: #6b6357; line-height: 1.6; }
+  code { font-family: 'JetBrains Mono', Consolas, monospace; background: #fff8; padding: 0 4px; border-radius: 4px; }
+  py-runner { height: 360px; }
+  py-runner[layout="stack"] { height: auto; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>파이썬 실행기 견본 <small style="font-size:16px;color:#6b6357">assets/pyrun</small></h1>
+    <p>덱과 활동지가 같이 쓰는 부품입니다. 사용법은 <code>assets/pyrun/README.md</code>에 있습니다.</p>
+  </header>
+
+  <section>
+    <h2>1. 실행 + 변수 상자</h2>
+    <py-runner id="r1" vars>
+      <script type="text/x-python">
+        name = "민지"
+        age = 17
+        print(name)
+        print(age)
+      </script>
+    </py-runner>
+  </section>
+
+  <section>
+    <h2>2. 한 줄씩 보기 + 함수 칸</h2>
+    <py-runner id="r2" vars mode="step" dots>
+      <script type="text/x-python">
+        def greet(name):
+            print(f"안녕, {name}! 반가워.")
+
+        greet("민지")
+        greet("서연")
+      </script>
+    </py-runner>
+  </section>
+
+  <section>
+    <h2>3. 예측 먼저 + 자동 점검 (세로 배치)</h2>
+    <py-runner id="r3" vars step predict layout="stack" rows="6">
+      <script type="text/x-python">
+        coin = 1000
+        coin = coin - 300
+        snack = "과자"
+        coin = coin + 500
+        print(snack, coin)
+      </script>
+    </py-runner>
+  </section>
+
+  <section>
+    <h2>4. 가린 줄</h2>
+    <py-runner id="r4" vars mask="2-3">
+      <script type="text/x-python">
+        name = "민지"
+        print(name)
+        print("name")
+      </script>
+    </py-runner>
+  </section>
+</main>
+<script type="module">
+  const r3 = document.getElementById('r3');
+  r3.checks = [
+    { label: '오류 없이 실행', test: (r) => !r.error },
+    { label: 'print 1번 이상', test: (r) => r.info.prints >= 1 },
+  ];
+</script>
+</body>
+</html>

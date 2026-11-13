@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "entries": {
+    "vox-person-phone": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        232,
+        87,
+        195,
+        540
+      ],
+      "w": 195,
+      "h": 540,
+      "cropped_at": "2026-08-18"
+    },
+    "vox-person-fold": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        800,
+        78,
+        212,
+        549
+      ],
+      "w": 212,
+      "h": 549,
+      "cropped_at": "2026-08-18"
+    },
+    "vox-servers": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        132,
+        627,
+        351,
+        493
+      ],
+      "w": 351,
+      "h": 493,
+      "cropped_at": "2026-08-18"
+    },
+    "vox-cart": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        677,
+        627,
+        442,
+        517
+      ],
+      "w": 442,
+      "h": 517,
+      "cropped_at": "2026-08-18"
+    },
+    "vox-shield": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        178,
+        104,
+        363,
+        453
+      ],
+      "w": 363,
+      "h": 453,
+      "cropped_at": "2026-08-18"
+    },
+    "vox-pin": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        777,
+        131,
+        280,
+        426
+      ],
+      "w": 280,
+      "h": 426,
+      "cropped_at": "2026-08-18"
+    },
+    "vox-eye": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        147,
+        770,
+        416,
+        302
+      ],
+      "w": 416,
+      "h": 302,
+      "cropped_at": "2026-08-18"
+    },
+    "vox-coins": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        726,
+        725,
+        366,
+        378
+      ],
+      "w": 366,
+      "h": 378,
+      "cropped_at": "2026-08-18"
+    }
+  }
+}

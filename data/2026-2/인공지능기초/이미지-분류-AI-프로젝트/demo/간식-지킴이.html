@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>간식 지킴이</title>
+<style>
+  :root {
+    --paper: #f3eee3;
+    --card: #fffdf8;
+    --ink: #2b3a55;
+    --ink-soft: #5c6780;
+    --berry: #9c3d6e;
+    --berry-soft: #f3dfe8;
+    --line: #ddd3c2;
+    --amber: #d98e04;
+    --amber-soft: #fbf0d6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  main {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 28px 16px 48px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--berry);
+  }
+  header p {
+    margin: 6px 0 22px;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 0 rgba(43, 58, 85, 0.06);
+  }
+  .status {
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+  }
+  .status.ready { color: #3f8a4f; }
+  #dropZone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 220px;
+    border: 2.5px dashed var(--berry);
+    border-radius: 14px;
+    background: var(--berry-soft);
+    text-align: center;
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+  }
+  #dropZone.dragging { background: #ead0dc; }
+  #dropZone.locked { opacity: 0.45; cursor: not-allowed; }
+  #dropZone img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    display: none;
+  }
+  #dropZone.has-image img { display: block; }
+  #dropZone.has-image .hint { display: none; }
+  .hint strong { display: block; font-size: 18px; color: var(--berry); }
+  .hint span { font-size: 14px; color: var(--ink-soft); }
+  .pick-btn {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--berry);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .pick-btn:disabled { background: #b9a9b1; cursor: not-allowed; }
+  #fileInput { display: none; }
+
+  #answer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 2px solid var(--line);
+    background: var(--paper);
+    font-size: 21px;
+    font-weight: 800;
+    min-height: 72px;
+  }
+  #answer .emoji { font-size: 34px; line-height: 1; }
+  #answer.empty { color: var(--ink-soft); font-size: 16px; font-weight: 500; }
+  #answer.unknown { border-color: var(--amber); background: var(--amber-soft); }
+
+  .bars { margin-top: 16px; display: grid; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 72px 1fr 48px; align-items: center; gap: 10px; }
+  .bar-name { font-weight: 700; font-size: 15px; overflow-wrap: anywhere; }
+  .bar-track { position: relative; height: 18px; background: #ece5d8; border-radius: 9px; overflow: hidden; }
+  .bar-fill { height: 100%; width: 0; border-radius: 9px; background: var(--ink); transition: width 0.4s ease; }
+  .bar-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--amber); }
+  .bar-pct { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .threshold-note { margin: 10px 0 0; font-size: 13px; color: var(--ink-soft); }
+  .threshold-note b { color: var(--amber); }
+
+  #errorBox {
+    display: none;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #fde8e4;
+    border: 1.5px solid #e2a597;
+    color: #8a2a17;
+    font-size: 15px;
+    white-space: pre-line;
+  }
+  #errorBox.show { display: block; }
+  footer { margin-top: 24px; font-size: 12px; color: var(--ink-soft); text-align: center; }
+
+  @media (max-width: 420px) {
+    header h1 { font-size: 26px; }
+    #answer { font-size: 18px; }
+    .bar-row { grid-template-columns: 60px 1fr 44px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🍪 간식 지킴이</h1>
+    <p>사진을 올리면 먹어도 되는지 알려 줘요.</p>
+  </header>
+
+  <section class="card" aria-label="사진 입력">
+    <p class="status" id="status">모델을 불러오는 중…</p>
+    <div id="dropZone" class="locked" role="button" tabindex="0" aria-label="사진을 끌어다 놓거나 눌러서 고르기">
+      <div class="hint">
+        <strong>사진을 여기에 끌어다 놓으세요</strong>
+        <span>또는 아래 버튼을 눌러 사진을 고르세요.</span>
+      </div>
+      <img id="preview" alt="올린 사진 미리보기">
+    </div>
+    <button class="pick-btn" id="pickBtn" type="button" disabled>📷 사진 올리기</button>
+    <input type="file" id="fileInput" accept="image/*">
+  </section>
+
+  <section class="card" aria-label="결과" aria-live="polite">
+    <div id="answer" class="empty"><span class="emoji" id="answerEmoji"></span><span id="answerText">사진을 올리면 여기에 결과가 나와요.</span></div>
+    <div class="bars" id="bars"></div>
+    <p class="threshold-note" id="thresholdNote"></p>
+  </section>
+
+  <div id="errorBox" role="alert"></div>
+
+  <footer>Teachable Machine으로 학습한 모델이 이 브라우저 안에서 계산합니다.</footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.3/dist/teachablemachine-image.min.js"></script>
+<script>
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+ * ★★★★★ 이 파일의 주인이 나중에 이 값들만 고칩니다 ★★★★★
+ * MODEL_URL       : Teachable Machine 「모델 업로드」로 받은 공유 링크
+ * CLASS_RESPONSES : 클래스 이름마다 보여 줄 문장 · 이모지 · 색
+ *                   (클래스 이름은 Teachable Machine과 글자 하나까지 같아야 합니다)
+ * THRESHOLD       : 기준값(0~1). 가장 높은 신뢰도가 이보다 낮으면 답하지 않습니다
+ * UNKNOWN_MESSAGE : 기준값보다 낮을 때 보여 줄 문장
+ * ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+const MODEL_URL = "https://teachablemachine.withgoogle.com/models/Ypk_oN1sUj/";   // 끝에 /가 없으면 코드에서 붙여 쓴다
+
+const CLASS_RESPONSES = {
+  "머핀":   { message: "머핀이에요. 먹어도 돼요!",   emoji: "🧁", color: "#2e9e5b" },
+  "치와와": { message: "먹으면 안 돼요! 강아지예요.", emoji: "🐶", color: "#d64545" }
+};
+
+const THRESHOLD = 0.7;   // 0~1 사이 값
+
+const UNKNOWN_MESSAGE = "🤔 잘 모르겠어요. 다른 사진을 올려 주세요.";
+
+  let model = null;
+  let labels = [];
+
+  const statusEl = document.getElementById("status");
+  const dropZone = document.getElementById("dropZone");
+  const pickBtn = document.getElementById("pickBtn");
+  const fileInput = document.getElementById("fileInput");
+  const preview = document.getElementById("preview");
+  const answerEl = document.getElementById("answer");
+  const answerEmoji = document.getElementById("answerEmoji");
+  const answerText = document.getElementById("answerText");
+  const barsEl = document.getElementById("bars");
+  const thresholdNote = document.getElementById("thresholdNote");
+  const errorBox = document.getElementById("errorBox");
+
+  function showError(message) {
+    errorBox.textContent = message;
+    errorBox.classList.add("show");
+  }
+
+  function setLocked(locked) {
+    pickBtn.disabled = locked;
+    dropZone.classList.toggle("locked", locked);
+  }
+
+  function normalizedModelUrl() {
+    const url = MODEL_URL.trim();
+    return url.endsWith("/") ? url : url + "/";
+  }
+
+  function buildBars() {
+    barsEl.textContent = "";
+    labels.forEach(function (name) {
+      const row = document.createElement("div");
+      row.className = "bar-row";
+
+      const nameEl = document.createElement("span");
+      nameEl.className = "bar-name";
+      nameEl.textContent = name;
+
+      const track = document.createElement("div");
+      track.className = "bar-track";
+      const fill = document.createElement("div");
+      fill.className = "bar-fill";
+      const response = CLASS_RESPONSES[name];
+      if (response && response.color) fill.style.background = response.color;
+      const mark = document.createElement("div");
+      mark.className = "bar-mark";
+      mark.style.left = Math.round(THRESHOLD * 100) + "%";
+      track.appendChild(fill);
+      track.appendChild(mark);
+
+      const pct = document.createElement("span");
+      pct.className = "bar-pct";
+      pct.textContent = "0%";
+
+      row.appendChild(nameEl);
+      row.appendChild(track);
+      row.appendChild(pct);
+      row.dataset.name = name;
+      barsEl.appendChild(row);
+    });
+    thresholdNote.textContent = "";
+    const b = document.createElement("b");
+    b.textContent = "주황색 선";
+    thresholdNote.appendChild(b);
+    thresholdNote.appendChild(document.createTextNode(
+      "은 기준값 " + Math.round(THRESHOLD * 100) + "%예요. 가장 높은 막대가 이 선을 넘어야 답을 알려 줘요."
+    ));
+  }
+
+  function checkLabels() {
+    const missing = labels.filter(function (name) { return !(name in CLASS_RESPONSES); });
+    const extra = Object.keys(CLASS_RESPONSES).filter(function (name) { return labels.indexOf(name) === -1; });
+    if (missing.length === 0 && extra.length === 0) return;
+    const parts = [];
+    if (missing.length) parts.push("응답이 없는 클래스 " + missing.join(", "));
+    if (extra.length) parts.push("모델에 없는 이름 " + extra.join(", "));
+    let message = "⚠️ 클래스 이름이 Teachable Machine과 달라요: " + parts.join(" / ") + "\n";
+    message += "모델의 클래스는 " + labels.join(", ") + "입니다. CLASS_RESPONSES의 이름을 똑같이 맞춰 주세요.";
+    showError(message);
+  }
+
+  async function loadModel() {
+    setLocked(true);
+    statusEl.textContent = "모델을 불러오는 중…";
+    try {
+      if (typeof tmImage === "undefined") throw new Error("Teachable Machine 라이브러리를 불러오지 못했습니다.");
+      const base = normalizedModelUrl();
+      model = await tmImage.load(base + "model.json", base + "metadata.json");
+      labels = model.getClassLabels();
+      buildBars();
+      checkLabels();
+      statusEl.textContent = "준비됐어요. 사진을 올려 보세요.";
+      statusEl.classList.add("ready");
+      setLocked(false);
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = "모델을 쓸 수 없어요.";
+      showError("모델을 불러오지 못했어요. 공유 링크와 인터넷 연결을 확인하세요.");
+    }
+  }
+
+  function handleFile(file) {
+    if (!model) return;
+    if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+      showError("사진 파일만 올릴 수 있어요. jpg나 png 파일을 골라 주세요.");
+      return;
+    }
+    errorBox.classList.remove("show");
+    checkLabels();
+    const url = URL.createObjectURL(file);
+    preview.onload = async function () {
+      dropZone.classList.add("has-image");
+      try {
+        const predictions = await model.predict(preview);
+        showResult(predictions);
+      } catch (err) {
+        console.error(err);
+        showError("사진을 판정하지 못했어요. 다른 사진으로 다시 해 보세요.");
+      }
+      URL.revokeObjectURL(url);
+    };
+    preview.onerror = function () {
+      showError("사진을 열 수 없어요. 다른 사진 파일을 골라 주세요.");
+    };
+    preview.src = url;
+  }
+
+  function showResult(predictions) {
+    let best = predictions[0];
+    predictions.forEach(function (p) {
+      if (p.probability > best.probability) best = p;
+      const row = barsEl.querySelector('[data-name="' + CSS.escape(p.className) + '"]');
+      if (!row) return;
+      const percent = Math.round(p.probability * 100);
+      row.querySelector(".bar-fill").style.width = percent + "%";
+      row.querySelector(".bar-pct").textContent = percent + "%";
+    });
+
+    answerEl.classList.remove("empty", "unknown");
+    answerEl.style.borderColor = "";
+    answerEl.style.color = "";
+    const response = CLASS_RESPONSES[best.className];
+
+    if (best.probability >= THRESHOLD && response) {
+      answerEmoji.textContent = response.emoji || "";
+      answerText.textContent = response.message;
+      answerEl.style.borderColor = response.color;
+      answerEl.style.color = response.color;
+    } else if (best.probability >= THRESHOLD) {
+      // 응답이 없는 클래스(이름 불일치)는 클래스 이름만 보여 준다
+      answerEmoji.textContent = "";
+      answerText.textContent = best.className;
+    } else {
+      answerEl.classList.add("unknown");
+      answerEmoji.textContent = "";
+      answerText.textContent = UNKNOWN_MESSAGE;
+    }
+  }
+
+  pickBtn.addEventListener("click", function () { fileInput.click(); });
+  dropZone.addEventListener("click", function () { if (model) fileInput.click(); });
+  dropZone.addEventListener("keydown", function (e) {
+    if ((e.key === "Enter" || e.key === " ") && model) { e.preventDefault(); fileInput.click(); }
+  });
+  fileInput.addEventListener("change", function () {
+    handleFile(fileInput.files[0]);
+    fileInput.value = "";
+  });
+  ["dragenter", "dragover"].forEach(function (type) {
+    dropZone.addEventListener(type, function (e) {
+      e.preventDefault();
+      if (model) dropZone.classList.add("dragging");
+    });
+  });
+  ["dragleave", "drop"].forEach(function (type) {
+    dropZone.addEventListener(type, function (e) {
+      e.preventDefault();
+      dropZone.classList.remove("dragging");
+    });
+  });
+  dropZone.addEventListener("drop", function (e) {
+    if (e.dataTransfer && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+
+  loadModel();
+</script>
+</body>
+</html>

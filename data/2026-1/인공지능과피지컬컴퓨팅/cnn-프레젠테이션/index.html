@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNN - 이미지를 이해하는 인공지능</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --main: #2196f3;
+  --dark: #1565c0;
+  --light: #e3f2fd;
+  --accent: #42a5f5;
+  --bg: #f0f4f8;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #e8eaed;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-600: #6b7280;
+  --gray-700: #4b5563;
+  --gray-800: #374151;
+  --gray-900: #1f2937;
+  --orange: #ff9800; --orange-bg: #fff3e0;
+  --purple: #9c27b0; --purple-bg: #f3e5f5;
+  --red: #e53935; --red-bg: #fce4ec;
+  --green: #43a047; --green-bg: #e8f5e9;
+  --teal: #00897b; --teal-bg: #e0f2f1;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  overflow: hidden;
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+
+/* Progress Bar */
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 4px;
+  background: linear-gradient(90deg, var(--main), var(--purple));
+  z-index: 1000; transition: width 0.4s ease; border-radius: 0 2px 2px 0;
+}
+
+/* Presentation */
+.presentation { width: 100%; height: 100vh; position: relative; }
+.slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0.8rem 1.5rem 2rem; opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+/* Browser Card */
+.browser-card {
+  width: 100%; max-width: 1600px; max-height: calc(100vh - 8rem);
+  background: var(--white); border-radius: 1rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.browser-topbar {
+  display: flex; align-items: center; padding: 0.7rem 1rem;
+  background: var(--gray-50); border-bottom: 1px solid var(--gray-200); flex-shrink: 0;
+}
+.browser-dots { display: flex; gap: 0.4rem; margin-right: 1rem; }
+.browser-dots span { width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+.browser-dots span:nth-child(1) { background: #ff5f57; }
+.browser-dots span:nth-child(2) { background: #ffbd2e; }
+.browser-dots span:nth-child(3) { background: #28c840; }
+.browser-title {
+  flex: 1; text-align: center; font-size: 0.8rem; font-weight: 600; color: var(--gray-600);
+}
+.browser-content { padding: 2.5rem 3rem; overflow-y: auto; flex: 1; }
+
+/* Typography */
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; }
+h2 { font-size: 1.7rem; font-weight: 700; line-height: 1.4; margin-bottom: 1.2rem; }
+h3 { font-size: 1.3rem; font-weight: 600; line-height: 1.4; }
+p  { font-size: 1.05rem; line-height: 1.7; color: var(--gray-700); }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.3rem 0.85rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 600;
+}
+.badge-blue { background: var(--light); color: var(--dark); }
+.badge-orange { background: var(--orange-bg); color: #e65100; }
+.badge-purple { background: var(--purple-bg); color: #6200ea; }
+.badge-green { background: var(--green-bg); color: #2d8a49; }
+.badge-red { background: var(--red-bg); color: #c62828; }
+.badge-teal { background: var(--teal-bg); color: #00695c; }
+
+.year-badge {
+  display: inline-block; padding: 0.4rem 1.2rem; border-radius: 2rem;
+  background: var(--light); color: var(--dark); font-weight: 700; font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+}
+
+/* Cover */
+.cover-content { text-align: center; padding: 2rem 0; }
+.cover-subtitle { font-size: 1.2rem; color: var(--gray-600); margin: 0.8rem 0 1.5rem; }
+.cover-tags { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+
+/* Section Divider */
+.section-divider { text-align: center; margin-bottom: 2rem; }
+.section-divider .icon { font-size: 2.8rem; margin-bottom: 0.8rem; }
+.section-divider h2 { margin-bottom: 0.4rem; }
+.section-divider .subtitle { font-size: 1.05rem; color: var(--gray-600); }
+
+/* TOC */
+.toc-list { display: flex; flex-direction: column; gap: 0.6rem; max-width: 800px; margin: 0 auto; }
+.toc-item {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.8rem 1.2rem; border-radius: 0.7rem;
+  background: var(--gray-50); cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit;
+}
+.toc-item:hover { background: var(--light); transform: translateX(4px); }
+.toc-num {
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--main); color: white; font-weight: 700; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.toc-text h3 { font-size: 1rem; margin-bottom: 0.15rem; }
+.toc-text p { font-size: 0.82rem; color: var(--gray-600); line-height: 1.4; }
+
+/* Highlight Box */
+.highlight-box {
+  background: linear-gradient(135deg, var(--light), #bbdefb33);
+  border: 1px solid #bbdefb; border-radius: 0.8rem;
+  padding: 1.2rem 1.5rem; margin: 1.2rem 0;
+  font-size: 1.05rem; color: var(--dark); font-weight: 500; text-align: center;
+}
+
+/* Info Box */
+.info-box {
+  background: var(--gray-50); border-radius: 0.8rem;
+  padding: 1rem 1.3rem; margin: 0.8rem 0;
+  border-left: 4px solid var(--main);
+}
+.info-box.orange { border-left-color: var(--orange); background: #fff8f0; }
+.info-box.purple { border-left-color: var(--purple); background: #faf5ff; }
+.info-box.green { border-left-color: var(--green); background: #f0faf2; }
+.info-box.red { border-left-color: var(--red); background: #fff5f5; }
+.info-box.teal { border-left-color: var(--teal); background: #f0fafa; }
+.info-box h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+.info-box p { font-size: 0.92rem; line-height: 1.6; }
+
+/* Card Grid */
+.card-grid { display: grid; gap: 1rem; }
+.card-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.card-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.card-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Feature Card */
+.feature-card {
+  background: var(--white); border: 1px solid var(--gray-200); border-radius: 0.8rem;
+  padding: 1.2rem; transition: transform 0.2s, box-shadow 0.2s;
+}
+.feature-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.feature-card .card-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+.feature-card h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+.feature-card p { font-size: 0.85rem; line-height: 1.5; color: var(--gray-600); }
+
+/* Pipeline */
+.pipeline {
+  display: flex; align-items: center; gap: 0.3rem; padding: 1rem 0;
+  overflow-x: auto; justify-content: center; flex-wrap: wrap;
+}
+.pipe-stage {
+  padding: 0.6rem 0.9rem; border-radius: 0.6rem; font-size: 0.78rem; font-weight: 700;
+  text-align: center; color: white; min-width: 80px; position: relative;
+}
+.pipe-arrow { font-size: 1.2rem; color: var(--gray-400); flex-shrink: 0; }
+
+/* Comparison */
+.compare-row {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.5rem;
+  align-items: center; margin: 1rem 0;
+}
+.compare-vs {
+  width: 2.5rem; height: 2.5rem; border-radius: 50%;
+  background: var(--gray-200); display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.85rem; color: var(--gray-600);
+}
+
+/* Visual Demo Boxes */
+.demo-box {
+  background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 0.8rem;
+  padding: 1.2rem; margin: 1rem 0;
+}
+.demo-box h4 { font-size: 0.9rem; font-weight: 700; color: var(--dark); margin-bottom: 0.8rem; }
+
+/* Pixel Grid */
+.pixel-grid {
+  display: inline-grid; gap: 1px; background: var(--gray-300); padding: 1px;
+  border-radius: 0.3rem; font-size: 0.6rem; font-weight: 700;
+}
+.pixel-grid .cell {
+  width: 2.2rem; height: 2.2rem; display: flex; align-items: center; justify-content: center;
+}
+
+/* Kernel */
+.kernel-demo {
+  display: flex; align-items: center; gap: 1rem; justify-content: center; flex-wrap: wrap;
+}
+.kernel-grid {
+  display: inline-grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+  background: var(--gray-200); padding: 2px; border-radius: 0.3rem;
+}
+.kernel-grid .cell {
+  width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; border-radius: 0.2rem;
+}
+
+/* Layer Diagram */
+.layer-diagram {
+  display: flex; align-items: center; gap: 0.5rem; justify-content: center;
+  margin: 1rem 0; flex-wrap: wrap;
+}
+.layer-block {
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+}
+.layer-visual {
+  border-radius: 0.4rem; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: white; font-size: 0.7rem;
+}
+.layer-label { font-size: 0.7rem; color: var(--gray-600); font-weight: 600; text-align: center; }
+
+/* Analogy Box */
+.analogy {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 1px solid #ffcc80; border-radius: 0.8rem;
+  padding: 1rem 1.3rem; margin: 1rem 0;
+}
+.analogy .label {
+  font-size: 0.75rem; font-weight: 700; color: #e65100;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;
+}
+.analogy p { color: var(--gray-800); font-size: 0.95rem; }
+
+/* CTA Button */
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.9rem 2rem; border-radius: 0.7rem; border: none;
+  background: linear-gradient(135deg, var(--main), var(--dark)); color: white;
+  font-size: 1rem; font-weight: 700; font-family: inherit;
+  cursor: pointer; text-decoration: none;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.3); transition: all 0.2s;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(33,150,243,0.4); }
+.cta-btn.purple {
+  background: linear-gradient(135deg, #7c4dff, #6200ea);
+  box-shadow: 0 4px 16px rgba(124,77,255,0.3);
+}
+.cta-btn.purple:hover { box-shadow: 0 6px 24px rgba(124,77,255,0.4); }
+.cta-btn.sm {
+  padding: 0.5rem 1.2rem; font-size: 0.82rem; border-radius: 0.5rem;
+  box-shadow: 0 2px 8px rgba(33,150,243,0.2);
+}
+.cta-btn.teal {
+  background: linear-gradient(135deg, #00897b, #00695c);
+  box-shadow: 0 4px 16px rgba(0,137,123,0.3);
+}
+.cta-btn.teal:hover { box-shadow: 0 6px 24px rgba(0,137,123,0.4); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal-box {
+  width: 90vw; max-width: 900px; max-height: 85vh;
+  background: var(--white); border-radius: 1rem;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.7rem 1.2rem; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); flex-shrink:0;
+}
+.modal-header h3 { font-size: 0.9rem; font-weight: 700; color: var(--dark); }
+.modal-close {
+  width: 2rem; height: 2rem; border-radius: 50%; border: none;
+  background: var(--gray-200); cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; color: var(--gray-700);
+}
+.modal-close:hover { background: var(--red); color: white; }
+.modal-body { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; }
+.modal-content { display: none; }
+.modal-content.active { display: block; }
+.modal-canvas-row {
+  display: flex; align-items: flex-start; gap: 1rem; justify-content: center;
+  flex-wrap: wrap; margin: 1rem 0;
+}
+.modal-canvas-row canvas {
+  border: 1px solid var(--gray-200); border-radius: 0.5rem;
+  image-rendering: pixelated;
+}
+.modal-canvas-label {
+  text-align: center; font-size: 0.78rem; font-weight: 600;
+  color: var(--gray-600); margin-top: 0.3rem;
+}
+.modal-arrow { font-size: 1.8rem; color: var(--gray-400); align-self: center; }
+.modal-grid-demo {
+  display: inline-grid; gap: 1px; background: var(--gray-300); padding: 1px;
+  border-radius: 0.3rem;
+}
+.modal-grid-demo .gc {
+  width: 2.8rem; height: 2.8rem; display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 700; border-radius: 0.15rem;
+}
+.modal-note {
+  background: var(--light); border-radius: 0.5rem; padding: 0.8rem 1rem;
+  font-size: 0.85rem; color: var(--dark); margin-top: 1rem; line-height: 1.6;
+}
+
+/* Step List */
+.step-list { display: flex; flex-direction: column; gap: 0.7rem; }
+.step-item {
+  display: flex; gap: 0.8rem; align-items: flex-start;
+  padding: 0.7rem 1rem; background: var(--gray-50); border-radius: 0.6rem;
+}
+.step-num {
+  width: 1.6rem; height: 1.6rem; border-radius: 50%; flex-shrink: 0;
+  background: var(--main); color: white; font-size: 0.75rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; margin-top: 0.1rem;
+}
+.step-item h4 { font-size: 0.9rem; font-weight: 700; }
+.step-item p { font-size: 0.82rem; color: var(--gray-600); margin-top: 0.1rem; }
+
+/* Summary Grid */
+.summary-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem; margin: 1rem 0;
+}
+.summary-card {
+  text-align: center; padding: 1rem; border-radius: 0.7rem;
+  border: 1px solid var(--gray-200);
+}
+.summary-card .icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.summary-card h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 0.2rem; }
+.summary-card p { font-size: 0.75rem; color: var(--gray-600); }
+
+/* Formula */
+.formula {
+  background: var(--gray-900); color: #e0e0e0; padding: 1rem 1.5rem;
+  border-radius: 0.6rem; font-family: 'Courier New', monospace;
+  font-size: 0.9rem; margin: 0.8rem 0; text-align: center; letter-spacing: 0.03em;
+}
+.formula .hl { color: #64b5f6; font-weight: 700; }
+.formula .hl-orange { color: #ffb74d; font-weight: 700; }
+.formula .hl-green { color: #81c784; font-weight: 700; }
+.formula .hl-red { color: #ef9a9a; font-weight: 700; }
+
+/* Two Column */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+
+/* Nav Bar */
+.nav-bar {
+  position: fixed; bottom: 1.2rem; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 0.8rem; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+  padding: 0.5rem 1rem; border-radius: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.nav-btn {
+  width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 1px solid var(--gray-200);
+  background: white; cursor: pointer; font-size: 0.9rem; color: var(--gray-700);
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.nav-btn:hover:not(:disabled) { background: var(--light); border-color: var(--main); color: var(--main); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+.nav-counter { font-size: 0.82rem; font-weight: 600; color: var(--gray-600); min-width: 4rem; text-align: center; }
+
+@media (max-width: 768px) {
+  .browser-content { padding: 1.5rem; }
+  .two-col, .card-grid.cols-2, .card-grid.cols-3, .card-grid.cols-4 { grid-template-columns: 1fr; }
+  .compare-row { grid-template-columns: 1fr; }
+  .compare-vs { margin: 0 auto; }
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.4rem; }
+}
+
+@media print {
+  .slide { page-break-after: always; opacity: 1 !important; pointer-events: auto !important; position: relative; }
+  .nav-bar, .progress-bar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- Slide 1: Cover -->
+  <div class="slide active" data-slide="0">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">인공지능과 피지컬컴퓨팅 · CNN</div>
+      </div>
+      <div class="browser-content">
+        <div class="cover-content">
+          <div class="year-badge">인공지능과 피지컬컴퓨팅</div>
+          <h1>CNN - 이미지를 이해하는<br>인공지능의 원리</h1>
+          <p class="cover-subtitle">컴퓨터는 사진을 어떻게 '보고' 분류할까?</p>
+          <div class="cover-tags">
+            <span class="badge badge-blue">🧠 CNN</span>
+            <span class="badge badge-purple">👁️ 이미지 분류</span>
+            <span class="badge badge-orange">🔍 특징 추출</span>
+            <span class="badge badge-green">📊 딥러닝</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2: TOC -->
+  <div class="slide" data-slide="1">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">목차</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">📋</div>
+          <h2>오늘 배울 내용</h2>
+        </div>
+        <div class="toc-list">
+          <a class="toc-item" onclick="goToSlide(2)">
+            <div class="toc-num">1</div>
+            <div class="toc-text">
+              <h3>이미지 분류란?</h3>
+              <p>사람과 컴퓨터가 이미지를 인식하는 방식의 차이</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(3)">
+            <div class="toc-num">2</div>
+            <div class="toc-text">
+              <h3>CNN이란 무엇인가?</h3>
+              <p>합성곱 신경망의 개념과 전체 구조</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(5)">
+            <div class="toc-num">3</div>
+            <div class="toc-text">
+              <h3>CNN의 각 단계 이해하기</h3>
+              <p>입력 → 컨볼루션 → ReLU → 풀링 → 완전연결 → 출력</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(12)">
+            <div class="toc-num">4</div>
+            <div class="toc-text">
+              <h3>CNN은 어떻게 학습할까?</h3>
+              <p>역전파와 학습 과정 이해</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(13)">
+            <div class="toc-num">5</div>
+            <div class="toc-text">
+              <h3>직접 체험하기</h3>
+              <p>CNN 시각화 도구로 직접 확인해보기</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: 이미지 분류란? -->
+  <div class="slide" data-slide="2">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">이미지 분류란?</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">👁️</div>
+          <h2>이미지 분류(Image Classification)란?</h2>
+          <p class="subtitle">이미지를 보고 "이것은 무엇이다"라고 판단하는 것</p>
+        </div>
+
+        <div class="compare-row">
+          <div class="feature-card" style="text-align:center;">
+            <div class="card-icon">🧑</div>
+            <h4>사람의 눈</h4>
+            <p>눈 → 뇌가 순식간에 패턴을 인식<br>"이건 고양이다!" 라고 즉시 판단<br><br>경험과 학습으로 자연스럽게 분류</p>
+          </div>
+          <div class="compare-vs">VS</div>
+          <div class="feature-card" style="text-align:center;">
+            <div class="card-icon">🤖</div>
+            <h4>컴퓨터의 눈</h4>
+            <p>이미지 = <strong>숫자(픽셀)의 배열</strong><br>각 픽셀은 0~255 사이의 숫자<br><br>숫자만 보고는 무엇인지 알 수 없음!</p>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          💡 <strong>컴퓨터가 이미지를 "이해"하려면 특별한 방법이 필요합니다</strong><br>
+          그 방법이 바로 <strong>CNN(합성곱 신경망)</strong>입니다!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: CNN이란? -->
+  <div class="slide" data-slide="3">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">CNN이란?</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🧠</div>
+          <h2>CNN (Convolutional Neural Network)</h2>
+          <p class="subtitle">합성곱 신경망 - 이미지 인식에 특화된 인공지능</p>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <div class="info-box">
+              <h4>🔤 이름 풀어보기</h4>
+              <p><strong>Convolutional</strong> = 합성곱 (필터로 특징 추출)<br>
+              <strong>Neural Network</strong> = 신경망 (뇌의 뉴런을 모방)</p>
+            </div>
+
+            <div class="analogy">
+              <div class="label">💡 비유로 이해하기</div>
+              <p>CNN은 마치 <strong>탐정</strong>과 같습니다!<br>
+              ① 사진에서 <strong>단서(특징)</strong>를 찾고<br>
+              ② 단서들을 <strong>조합</strong>하여<br>
+              ③ 최종 <strong>결론(분류)</strong>을 내립니다</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-box purple">
+              <h4>📐 핵심 아이디어</h4>
+              <p>이미지의 특징을 <strong>단계적으로</strong> 추출합니다</p>
+            </div>
+            <div class="step-list" style="margin-top:0.8rem;">
+              <div class="step-item">
+                <div class="step-num">1</div>
+                <div><h4>저수준 특징</h4><p>가장자리(엣지), 색상 변화</p></div>
+              </div>
+              <div class="step-item">
+                <div class="step-num" style="background:var(--purple);">2</div>
+                <div><h4>중수준 특징</h4><p>질감, 도형, 패턴 조합</p></div>
+              </div>
+              <div class="step-item">
+                <div class="step-num" style="background:var(--orange);">3</div>
+                <div><h4>고수준 특징</h4><p>눈, 코, 바퀴 같은 물체의 부분</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: CNN 전체 구조 -->
+  <div class="slide" data-slide="4">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">CNN 전체 구조</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🏗️</div>
+          <h2>CNN 파이프라인 전체 구조</h2>
+          <p class="subtitle">이미지가 분류 결과가 되기까지의 여정</p>
+        </div>
+
+        <div class="pipeline">
+          <div class="pipe-stage" style="background:var(--dark);">🖼️<br>입력</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#1565c0;">🔍<br>Conv</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#e65100;">⚡<br>ReLU</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#2e7d32;">📉<br>Pool</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#1565c0;">🔍<br>Conv</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#e65100;">⚡<br>ReLU</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#2e7d32;">📉<br>Pool</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#6200ea;">📏<br>Flatten</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#c62828;">🧮<br>Dense</div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-stage" style="background:#00695c;">📊<br>Softmax</div>
+        </div>
+
+        <div class="two-col" style="margin-top:1rem;">
+          <div class="info-box" style="background:#e3f2fd;">
+            <h4>🔵 특징 추출 단계 (Feature Extraction)</h4>
+            <p>Conv → ReLU → Pool 반복<br>이미지에서 점점 더 복잡한 특징을 추출합니다.<br>
+            <span style="font-size:0.82rem;color:var(--gray-600);">마치 퍼즐 조각을 찾는 과정</span></p>
+          </div>
+          <div class="info-box purple">
+            <h4>🟣 분류 단계 (Classification)</h4>
+            <p>Flatten → Dense → Softmax<br>추출한 특징을 조합하여 최종 분류 결과를 도출합니다.<br>
+            <span style="font-size:0.82rem;color:var(--gray-600);">찾은 퍼즐 조각으로 답을 맞추는 과정</span></p>
+          </div>
+        </div>
+
+        <div class="analogy">
+          <div class="label">💡 <a href="https://poloclub.github.io/cnn-explainer/" target="_blank" style="color:#e65100;text-decoration:underline;">CNN Explainer</a>의 Tiny VGG 모델</div>
+          <p><a href="https://poloclub.github.io/cnn-explainer/" target="_blank" style="color:inherit;text-decoration:underline;">CNN Explainer</a>에서 사용하는 <strong>Tiny VGG</strong>는 2개의 Conv-ReLU-Pool 블록과 1개의 완전연결층으로 구성된 <strong>간단한 CNN 모델</strong>입니다. 이 구조만으로도 에스프레소, 식료품점 등 10가지 클래스를 분류할 수 있습니다!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: 입력 (Input) -->
+  <div class="slide" data-slide="5">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">Step 1: 입력 (Input)</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-blue" style="margin-bottom:0.8rem;">Step 1</span>
+        <h2>입력 이미지 → 숫자 배열</h2>
+
+        <div class="two-col">
+          <div>
+            <p>컴퓨터에게 이미지는 <strong>숫자의 2차원 배열(행렬)</strong>입니다.</p>
+
+            <div class="info-box" style="margin-top:1rem;">
+              <h4>🎨 컬러 이미지의 구조</h4>
+              <p>하나의 컬러 이미지는 <strong>3개의 채널</strong>로 구성됩니다<br>
+              🔴 Red + 🟢 Green + 🔵 Blue = 컬러 이미지<br><br>
+              각 채널은 0(어두움) ~ 255(밝음) 사이의 숫자</p>
+            </div>
+
+            <div class="info-box orange" style="margin-top:0.8rem;">
+              <h4>📐 이미지 크기</h4>
+              <p>64 × 64 픽셀 이미지의 경우<br>
+              → 64 × 64 × 3 = <strong>12,288개의 숫자</strong>가 됩니다!<br>
+              CNN은 이 숫자들에서 의미있는 패턴을 찾아냅니다.</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="demo-box">
+              <h4>🔢 흑백 이미지 예시 (5×5 픽셀)</h4>
+              <div style="display:flex; align-items: center; gap: 1.5rem; justify-content:center; margin-top:0.5rem;">
+                <div>
+                  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:1px; width:fit-content;">
+                    <div style="width:2rem;height:2rem;background:#000;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#000;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#aaa;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#aaa;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#aaa;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#aaa;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#000;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#fff;border:1px solid #ddd;"></div>
+                    <div style="width:2rem;height:2rem;background:#444;"></div>
+                    <div style="width:2rem;height:2rem;background:#000;"></div>
+                  </div>
+                  <div style="text-align:center;font-size:0.7rem;color:var(--gray-600);margin-top:0.3rem;">이미지 (눈에 보이는 것)</div>
+                </div>
+                <div style="font-size:1.5rem;color:var(--gray-400);">→</div>
+                <div>
+                  <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:#e0e0e0; padding:1px; border-radius:0.3rem;">
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">0</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">0</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">170</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">170</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">170</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">170</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">0</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">255</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">68</div>
+                    <div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;background:#fff;">0</div>
+                  </div>
+                  <div style="text-align:center;font-size:0.7rem;color:var(--gray-600);margin-top:0.3rem;">숫자 배열 (컴퓨터가 보는 것)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: Convolution -->
+  <div class="slide" data-slide="6">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">Step 2: 컨볼루션 (Convolution)</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-blue" style="margin-bottom:0.8rem;">Step 2 · 핵심 연산</span>
+        <h2>컨볼루션 - 특징을 추출하는 필터</h2>
+
+        <div class="two-col">
+          <div>
+            <div class="analogy">
+              <div class="label">💡 비유</div>
+              <p>돋보기로 사진의 작은 영역을 하나씩 살펴보며<br>
+              <strong>"여기에 가장자리가 있네!"</strong><br>
+              <strong>"여기에 무늬가 있네!"</strong><br>
+              라고 특징을 기록하는 것과 같습니다.</p>
+            </div>
+
+            <div class="info-box">
+              <h4>🔍 작동 원리</h4>
+              <p>작은 <strong>필터(커널)</strong>가 이미지 위를 슬라이딩하며<br>
+              각 위치에서 <strong>요소별 곱셈 → 합산</strong>을 수행합니다.<br>
+              이 결과가 <strong>특징 맵(Feature Map)</strong>이 됩니다.</p>
+            </div>
+
+            <div class="info-box orange" style="margin-top:0.6rem;">
+              <h4>🎯 필터의 종류</h4>
+              <p>• <strong>수평 엣지 필터</strong>: 가로 방향 경계선 감지<br>
+              • <strong>수직 엣지 필터</strong>: 세로 방향 경계선 감지<br>
+              • <strong>샤프닝 필터</strong>: 윤곽을 선명하게<br>
+              <span style="font-size:0.8rem;">※ CNN은 학습을 통해 최적의 필터를 스스로 찾아냅니다!</span></p>
+            </div>
+          </div>
+
+          <div>
+            <div class="demo-box">
+              <h4>🧮 컨볼루션 계산 과정</h4>
+              <div class="kernel-demo" style="margin-top:0.8rem;">
+                <div style="text-align:center;">
+                  <div style="font-size:0.72rem;color:var(--gray-600);margin-bottom:0.3rem;">입력 패치 (3×3)</div>
+                  <div class="kernel-grid">
+                    <div class="cell" style="background:#e3f2fd;">1</div>
+                    <div class="cell" style="background:#e3f2fd;">2</div>
+                    <div class="cell" style="background:#e3f2fd;">0</div>
+                    <div class="cell" style="background:#e3f2fd;">3</div>
+                    <div class="cell" style="background:#e3f2fd;">1</div>
+                    <div class="cell" style="background:#e3f2fd;">2</div>
+                    <div class="cell" style="background:#e3f2fd;">0</div>
+                    <div class="cell" style="background:#e3f2fd;">1</div>
+                    <div class="cell" style="background:#e3f2fd;">3</div>
+                  </div>
+                </div>
+                <div style="font-size:1.5rem;color:var(--gray-400);">×</div>
+                <div style="text-align:center;">
+                  <div style="font-size:0.72rem;color:var(--gray-600);margin-bottom:0.3rem;">필터 (커널)</div>
+                  <div class="kernel-grid">
+                    <div class="cell" style="background:#bbdefb;color:#1565c0;">1</div>
+                    <div class="cell" style="background:#bbdefb;color:#1565c0;">0</div>
+                    <div class="cell" style="background:#ffcdd2;color:#c62828;">-1</div>
+                    <div class="cell" style="background:#bbdefb;color:#1565c0;">1</div>
+                    <div class="cell" style="background:#bbdefb;color:#1565c0;">0</div>
+                    <div class="cell" style="background:#ffcdd2;color:#c62828;">-1</div>
+                    <div class="cell" style="background:#bbdefb;color:#1565c0;">1</div>
+                    <div class="cell" style="background:#bbdefb;color:#1565c0;">0</div>
+                    <div class="cell" style="background:#ffcdd2;color:#c62828;">-1</div>
+                  </div>
+                </div>
+              </div>
+              <div class="formula" style="margin-top:0.8rem;">
+                <span class="hl">(1×1)</span> + <span class="hl">(2×0)</span> + <span class="hl-red">(0×-1)</span> + <span class="hl">(3×1)</span> + <span class="hl">(1×0)</span> + <span class="hl-red">(2×-1)</span> + <span class="hl">(0×1)</span> + <span class="hl">(1×0)</span> + <span class="hl-red">(3×-1)</span><br>
+                = 1 + 0 + 0 + 3 + 0 - 2 + 0 + 0 - 3 = <span class="hl-green">-1</span>
+              </div>
+              <div style="text-align:center;margin-top:0.8rem;">
+                <button class="cta-btn sm teal" onclick="openModal('conv','컨볼루션 실제 처리 결과')">🔬 실제 컨볼루션 결과 보기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Feature Maps -->
+  <div class="slide" data-slide="7">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">특징 맵 (Feature Maps)</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-purple" style="margin-bottom:0.8rem;">핵심 개념</span>
+        <h2>필터가 만들어내는 특징 맵</h2>
+
+        <p style="margin-bottom:1rem;">하나의 컨볼루션 층에는 <strong>여러 개의 필터</strong>가 있습니다. 각 필터는 서로 다른 특징을 감지하여 <strong>각각의 특징 맵</strong>을 만듭니다.</p>
+
+        <div class="card-grid cols-3">
+          <div class="feature-card" style="border-top:3px solid #1565c0;">
+            <div class="card-icon">↔️</div>
+            <h4>필터 1: 수평 엣지</h4>
+            <p>가로 방향의 경계선을 감지합니다.<br>예: 지평선, 선반 가장자리</p>
+            <div style="margin-top:0.5rem;height:3rem;background:linear-gradient(0deg, #333 48%, #fff 48%, #fff 52%, #333 52%);border-radius:0.3rem;"></div>
+          </div>
+          <div class="feature-card" style="border-top:3px solid #e65100;">
+            <div class="card-icon">↕️</div>
+            <h4>필터 2: 수직 엣지</h4>
+            <p>세로 방향의 경계선을 감지합니다.<br>예: 기둥, 문 가장자리</p>
+            <div style="margin-top:0.5rem;height:3rem;background:linear-gradient(90deg, #333 48%, #fff 48%, #fff 52%, #333 52%);border-radius:0.3rem;"></div>
+          </div>
+          <div class="feature-card" style="border-top:3px solid #2e7d32;">
+            <div class="card-icon">↗️</div>
+            <h4>필터 3: 대각선 엣지</h4>
+            <p>대각선 방향의 특징을 감지합니다.<br>예: 지붕 경사, 대각선 패턴</p>
+            <div style="margin-top:0.5rem;height:3rem;background:linear-gradient(135deg, #333 45%, #fff 45%, #fff 55%, #333 55%);border-radius:0.3rem;"></div>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top:1.2rem;">
+          🔑 <strong><a href="https://poloclub.github.io/cnn-explainer/" target="_blank" style="color:var(--dark);text-decoration:underline;">CNN Explainer</a></strong>에서 Tiny VGG의 첫 번째 층에는 <strong>10개의 필터</strong>가 있어<br>
+          10개의 서로 다른 특징 맵을 생성합니다. 각 특징 맵은 이미지의 다른 측면을 포착합니다!
+        </div>
+
+        <div class="analogy" style="margin-top:1rem;">
+          <div class="label">💡 비유</div>
+          <p>10명의 탐정이 같은 사진을 보지만, 각자 <strong>다른 관점</strong>에서 단서를 찾는 것과 같습니다.<br>
+          한 명은 윤곽선을, 다른 한 명은 색상 변화를, 또 다른 한 명은 질감을 집중해서 봅니다.</p>
+        </div>
+
+        <div style="text-align:center;margin-top:0.8rem;">
+          <button class="cta-btn sm teal" onclick="openModal('fmap','여러 필터의 특징 맵')">🔬 실제 특징 맵 보기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: ReLU -->
+  <div class="slide" data-slide="8">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">Step 3: ReLU 활성화 함수</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-orange" style="margin-bottom:0.8rem;">Step 3</span>
+        <h2>ReLU - 음수를 없애는 활성화 함수</h2>
+
+        <div class="two-col">
+          <div>
+            <div class="info-box">
+              <h4>📌 ReLU란? (Rectified Linear Unit)</h4>
+              <p>놀라울 정도로 단순한 함수입니다:<br><br>
+              <strong>양수 → 그대로 유지</strong><br>
+              <strong>음수 → 0으로 변환</strong></p>
+            </div>
+
+            <div class="formula">
+              <span class="hl">ReLU(x)</span> = <span class="hl-green">max(0, x)</span>
+            </div>
+
+            <div class="demo-box" style="margin-top:0.6rem;">
+              <h4>📈 ReLU 함수 그래프</h4>
+              <svg viewBox="0 0 280 180" style="width:100%;max-width:320px;display:block;margin:0.5rem auto;" xmlns="http://www.w3.org/2000/svg">
+                <!-- Grid -->
+                <line x1="40" y1="10" x2="40" y2="160" stroke="#e0e0e0" stroke-width="1"/>
+                <line x1="40" y1="90" x2="270" y2="90" stroke="#e0e0e0" stroke-width="1"/>
+                <!-- Axis -->
+                <line x1="20" y1="90" x2="270" y2="90" stroke="#424242" stroke-width="1.5" marker-end="url(#arr)"/>
+                <line x1="140" y1="165" x2="140" y2="10" stroke="#424242" stroke-width="1.5" marker-end="url(#arr)"/>
+                <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#424242"/></marker></defs>
+                <!-- Axis labels -->
+                <text x="265" y="105" font-size="11" fill="#424242" font-weight="600">x</text>
+                <text x="148" y="18" font-size="11" fill="#424242" font-weight="600">y</text>
+                <text x="130" y="105" font-size="9" fill="#9e9e9e">0</text>
+                <!-- Negative part: y=0 (flat line) -->
+                <line x1="30" y1="90" x2="140" y2="90" stroke="#c62828" stroke-width="3" stroke-linecap="round"/>
+                <!-- Positive part: y=x (diagonal) -->
+                <line x1="140" y1="90" x2="250" y2="10" stroke="#1565c0" stroke-width="3" stroke-linecap="round"/>
+                <!-- Labels -->
+                <text x="55" y="82" font-size="10" fill="#c62828" font-weight="700">x &lt; 0 → 0</text>
+                <text x="185" y="40" font-size="10" fill="#1565c0" font-weight="700">x ≥ 0 → x</text>
+                <!-- Dot at origin -->
+                <circle cx="140" cy="90" r="4" fill="#1565c0" stroke="white" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <div class="analogy">
+              <div class="label">💡 비유</div>
+              <p>탐정이 찾은 단서 중에서<br>
+              <strong>"확실한 단서만 남기고</strong> (양수 = 특징 있음)<br>
+              <strong>애매한 건 무시하는 것"</strong> (음수 = 특징 없음)<br>과 같습니다.</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="demo-box">
+              <h4>🧮 ReLU 계산 예시</h4>
+              <div style="overflow-x:auto;">
+                <table style="border-collapse:collapse;margin:0.5rem auto;width:100%;">
+                  <tr>
+                    <td style="padding:0.5rem;background:var(--gray-100);font-weight:700;font-size:0.82rem;border:1px solid var(--gray-200);">입력 (x)</td>
+                    <td style="padding:0.5rem;background:#e8f5e9;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#2e7d32;font-weight:600;">3.2</td>
+                    <td style="padding:0.5rem;background:#ffebee;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#c62828;font-weight:600;">-1.5</td>
+                    <td style="padding:0.5rem;background:#e8f5e9;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#2e7d32;font-weight:600;">0.7</td>
+                    <td style="padding:0.5rem;background:#ffebee;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#c62828;font-weight:600;">-4.1</td>
+                    <td style="padding:0.5rem;background:#e8f5e9;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#2e7d32;font-weight:600;">2.0</td>
+                    <td style="padding:0.5rem;background:#ffebee;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#c62828;font-weight:600;">-0.3</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem;background:var(--gray-100);font-weight:700;font-size:0.82rem;border:1px solid var(--gray-200);">max(0, x)</td>
+                    <td style="padding:0.5rem;background:#e8f5e9;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#2e7d32;font-weight:700;">3.2</td>
+                    <td style="padding:0.5rem;background:#fff3e0;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#e65100;font-weight:700;">0</td>
+                    <td style="padding:0.5rem;background:#e8f5e9;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#2e7d32;font-weight:700;">0.7</td>
+                    <td style="padding:0.5rem;background:#fff3e0;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#e65100;font-weight:700;">0</td>
+                    <td style="padding:0.5rem;background:#e8f5e9;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#2e7d32;font-weight:700;">2.0</td>
+                    <td style="padding:0.5rem;background:#fff3e0;font-size:0.82rem;border:1px solid var(--gray-200);text-align:center;color:#e65100;font-weight:700;">0</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <div class="info-box green" style="margin-top:0.8rem;">
+              <h4>❓ 왜 ReLU가 필요할까?</h4>
+              <p><strong>비선형성(Nonlinearity)</strong>을 추가하기 위해서입니다!<br><br>
+              ReLU 없이 컨볼루션만 반복하면, 아무리 층을 쌓아도 <strong>단순한 직선적 변환</strong>에 불과합니다. ReLU가 있어야 복잡한 패턴을 학습할 수 있습니다.</p>
+            </div>
+            <div style="text-align:center;margin-top:0.6rem;">
+              <button class="cta-btn sm teal" onclick="openModal('relu','ReLU 적용 전후 비교')">🔬 실제 ReLU 결과 보기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: Max Pooling -->
+  <div class="slide" data-slide="9">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">Step 4: 맥스 풀링 (Max Pooling)</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-green" style="margin-bottom:0.8rem;">Step 4</span>
+        <h2>맥스 풀링 - 중요한 특징만 남기기</h2>
+
+        <div class="two-col">
+          <div>
+            <div class="info-box">
+              <h4>📉 맥스 풀링이란?</h4>
+              <p>특징 맵을 <strong>작은 영역(2×2)</strong>으로 나누고,<br>
+              각 영역에서 <strong>가장 큰 값(최댓값)</strong>만 선택합니다.<br><br>
+              결과: 크기가 <strong>절반</strong>으로 줄어듭니다!</p>
+            </div>
+
+            <div class="analogy">
+              <div class="label">💡 비유</div>
+              <p>시험 성적표에서 각 과목군의 <strong>최고 점수만</strong> 뽑아 요약하는 것과 같습니다. 세부 사항은 사라지지만, <strong>가장 중요한 정보</strong>는 남습니다.</p>
+            </div>
+
+            <div class="info-box teal" style="margin-top:0.8rem;">
+              <h4>✅ 맥스 풀링의 장점</h4>
+              <p>① <strong>계산량 감소</strong>: 데이터 크기가 1/4로<br>
+              ② <strong>과적합 방지</strong>: 불필요한 세부 사항 제거<br>
+              ③ <strong>위치 불변성</strong>: 특징의 정확한 위치보다<br>&nbsp;&nbsp;&nbsp;"특징이 있는지"가 더 중요</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="demo-box">
+              <h4>🧮 2×2 맥스 풀링 계산 과정</h4>
+              <div style="display:flex;align-items:center;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:0.8rem;">
+                <div style="text-align:center;">
+                  <div style="font-size:0.72rem;color:var(--gray-600);margin-bottom:0.3rem;">입력 (4×4)</div>
+                  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;">
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#e3f2fd;border-radius:0.2rem;color:#1565c0;">1</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#1565c0;color:#fff;border-radius:0.2rem;">5</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#fff3e0;border-radius:0.2rem;color:#e65100;">2</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#e65100;color:#fff;border-radius:0.2rem;">8</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#e3f2fd;border-radius:0.2rem;color:#1565c0;">3</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#e3f2fd;border-radius:0.2rem;color:#1565c0;">2</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#fff3e0;border-radius:0.2rem;color:#e65100;">4</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#fff3e0;border-radius:0.2rem;color:#e65100;">1</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#e8f5e9;border-radius:0.2rem;color:#2e7d32;">7</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#e8f5e9;border-radius:0.2rem;color:#2e7d32;">1</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#fce4ec;border-radius:0.2rem;color:#c62828;">3</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#c62828;color:#fff;border-radius:0.2rem;">9</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#e8f5e9;border-radius:0.2rem;color:#2e7d32;">4</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#2e7d32;color:#fff;border-radius:0.2rem;">8</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#fce4ec;border-radius:0.2rem;color:#c62828;">2</div>
+                    <div style="width:2.3rem;height:2.3rem;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;background:#fce4ec;border-radius:0.2rem;color:#c62828;">6</div>
+                  </div>
+                </div>
+                <div style="font-size:1.5rem;color:var(--gray-400);">→<br><span style="font-size:0.7rem;">max</span></div>
+                <div style="text-align:center;">
+                  <div style="font-size:0.72rem;color:var(--gray-600);margin-bottom:0.3rem;">출력 (2×2)</div>
+                  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:3px;">
+                    <div style="width:3rem;height:3rem;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;background:#1565c0;color:#fff;border-radius:0.3rem;">5</div>
+                    <div style="width:3rem;height:3rem;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;background:#e65100;color:#fff;border-radius:0.3rem;">8</div>
+                    <div style="width:3rem;height:3rem;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;background:#2e7d32;color:#fff;border-radius:0.3rem;">8</div>
+                    <div style="width:3rem;height:3rem;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:800;background:#c62828;color:#fff;border-radius:0.3rem;">9</div>
+                  </div>
+                </div>
+              </div>
+              <div class="formula" style="margin-top:0.8rem;">
+                <span class="hl">max(1,5,3,2)</span>=<span class="hl-green">5</span> &nbsp;
+                <span class="hl-orange">max(2,8,4,1)</span>=<span class="hl-green">8</span> &nbsp;
+                <span class="hl-green">max(7,1,4,8)</span>=<span class="hl-green">8</span> &nbsp;
+                <span class="hl-red">max(3,9,2,6)</span>=<span class="hl-green">9</span>
+              </div>
+              <div style="text-align:center;margin-top:0.8rem;">
+                <button class="cta-btn sm teal" onclick="openModal('pool','맥스 풀링 처리 결과')">🔬 실제 풀링 결과 보기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: 두 번째 블록 -->
+  <div class="slide" data-slide="10">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">반복: 더 깊은 특징 추출</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-purple" style="margin-bottom:0.8rem;">심화</span>
+        <h2>Conv → ReLU → Pool 반복의 의미</h2>
+
+        <p style="margin-bottom:1.2rem;">CNN에서 <strong>같은 블록을 반복</strong>하면, 층이 깊어질수록 <strong>더 복잡하고 추상적인 특징</strong>을 학습합니다.</p>
+
+        <div class="card-grid cols-3">
+          <div class="feature-card" style="border-top:3px solid #1565c0;">
+            <div style="text-align:center;">
+              <div class="card-icon">🔵</div>
+              <h4>1번째 블록</h4>
+              <span class="badge badge-blue" style="font-size:0.7rem;">저수준 특징</span>
+            </div>
+            <p style="margin-top:0.5rem;">
+              <strong>단순한 패턴</strong>을 감지합니다:<br>
+              • 가장자리 (엣지)<br>
+              • 색상의 변화<br>
+              • 밝기 차이<br>
+              • 간단한 질감
+            </p>
+          </div>
+          <div class="feature-card" style="border-top:3px solid var(--purple);">
+            <div style="text-align:center;">
+              <div class="card-icon">🟣</div>
+              <h4>2번째 블록</h4>
+              <span class="badge badge-purple" style="font-size:0.7rem;">중수준 특징</span>
+            </div>
+            <p style="margin-top:0.5rem;">
+              <strong>패턴의 조합</strong>을 감지합니다:<br>
+              • 모서리, 꼭짓점<br>
+              • 곡선, 원형<br>
+              • 반복되는 질감<br>
+              • 간단한 도형
+            </p>
+          </div>
+          <div class="feature-card" style="border-top:3px solid var(--orange);">
+            <div style="text-align:center;">
+              <div class="card-icon">🟠</div>
+              <h4>더 깊은 층 (심화 CNN)</h4>
+              <span class="badge badge-orange" style="font-size:0.7rem;">고수준 특징</span>
+            </div>
+            <p style="margin-top:0.5rem;">
+              <strong>의미 있는 부분</strong>을 감지합니다:<br>
+              • 눈, 코, 입<br>
+              • 바퀴, 창문<br>
+              • 꽃잎 모양<br>
+              • 글자 형태
+            </p>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top:1.2rem;">
+          🔑 <strong>핵심 포인트</strong>: CNN은 층이 깊어질수록 <strong>"선 → 모양 → 물체 부분 → 전체 물체"</strong>를 순서대로 인식합니다.<br>
+          이것이 CNN이 이미지를 "이해"하는 방식입니다!
+        </div>
+
+        <div class="analogy" style="margin-top:0.8rem;">
+          <div class="label">💡 <a href="https://poloclub.github.io/cnn-explainer/" target="_blank" style="color:#e65100;text-decoration:underline;">CNN Explainer</a>에서 확인!</div>
+          <p><a href="https://poloclub.github.io/cnn-explainer/" target="_blank" style="color:inherit;text-decoration:underline;">CNN Explainer</a>에서 첫 번째 Conv 층의 특징 맵은 <strong>단순한 패턴</strong>(엣지, 색상)을 보여주고,<br>
+          두 번째 Conv 층의 특징 맵은 더 <strong>복잡한 패턴</strong>(질감, 모양 조합)을 보여줍니다.</p>
+        </div>
+
+        <div style="text-align:center;margin-top:0.8rem;">
+          <button class="cta-btn sm teal" onclick="openModal('deep','층별 처리 결과 비교')">🔬 실제 처리 과정 보기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 12: Flatten + Dense -->
+  <div class="slide" data-slide="11">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">Step 5~6: Flatten + 완전연결층</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-purple" style="margin-bottom:0.8rem;">Step 5~6</span>
+        <h2>Flatten → 완전연결층 (Dense Layer)</h2>
+
+        <div class="two-col">
+          <div>
+            <div class="info-box">
+              <h4>📏 Flatten (펼치기)</h4>
+              <p>2차원 특징 맵을 <strong>1차원 벡터</strong>로 변환합니다.<br><br>
+              예: 10개의 8×8 특징 맵<br>
+              → 10 × 8 × 8 = <strong>640개의 숫자</strong> 나열</p>
+            </div>
+
+            <div class="layer-diagram" style="margin:1rem 0;">
+              <div class="layer-block">
+                <div class="layer-visual" style="width:4rem;height:4rem;background:var(--main);">8×8<br>×10</div>
+                <div class="layer-label">특징 맵</div>
+              </div>
+              <div style="font-size:1.5rem;color:var(--gray-400);">→</div>
+              <div class="layer-block">
+                <div class="layer-visual" style="width:1.5rem;height:8rem;background:var(--purple);">640</div>
+                <div class="layer-label">Flatten</div>
+              </div>
+              <div style="font-size:1.5rem;color:var(--gray-400);">→</div>
+              <div class="layer-block">
+                <div class="layer-visual" style="width:1.5rem;height:5rem;background:var(--orange);">128</div>
+                <div class="layer-label">Dense</div>
+              </div>
+              <div style="font-size:1.5rem;color:var(--gray-400);">→</div>
+              <div class="layer-block">
+                <div class="layer-visual" style="width:1.5rem;height:3rem;background:var(--red);">10</div>
+                <div class="layer-label">출력</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-box purple">
+              <h4>🧮 완전연결층 (Dense Layer)</h4>
+              <p>모든 입력 뉴런이 모든 출력 뉴런에 연결됩니다.<br><br>
+              추출된 특징들을 <strong>종합적으로 분석</strong>하여<br>
+              "이 특징 조합은 고양이일 가능성이 높다"는<br>
+              <strong>최종 판단</strong>을 내립니다.</p>
+            </div>
+
+            <div class="analogy" style="margin-top:0.8rem;">
+              <div class="label">💡 비유</div>
+              <p>탐정들이 모은 <strong>모든 단서를 종합</strong>하는 회의:<br><br>
+              "뾰족한 귀 + 수염 + 작은 코 + 긴 꼬리<br>
+              = 이건 <strong>고양이</strong>일 확률이 높다!"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 13: Softmax -->
+  <div class="slide" data-slide="12">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">Step 7: Softmax 출력</div>
+      </div>
+      <div class="browser-content">
+        <span class="badge badge-teal" style="margin-bottom:0.8rem;">Step 7 · 최종 출력</span>
+        <h2>Softmax - 확률로 변환하여 분류</h2>
+
+        <div class="two-col">
+          <div>
+            <div class="info-box">
+              <h4>📊 Softmax란?</h4>
+              <p>완전연결층의 출력값(점수)을<br>
+              <strong>0~1 사이의 확률</strong>로 변환합니다.<br><br>
+              모든 클래스의 확률을 합하면 <strong>항상 1 (100%)</strong></p>
+            </div>
+
+            <div class="demo-box" style="margin-top:1rem;">
+              <h4>🧮 변환 과정</h4>
+              <div style="display:flex;align-items:center;gap:0.8rem;justify-content:center;flex-wrap:wrap;margin-top:0.5rem;">
+                <div style="text-align:center;">
+                  <div style="font-size:0.72rem;color:var(--gray-600);margin-bottom:0.3rem;">Dense 출력 (점수)</div>
+                  <div style="display:flex;flex-direction:column;gap:3px;">
+                    <div style="padding:0.3rem 0.8rem;background:var(--gray-100);border-radius:0.3rem;font-size:0.8rem;font-weight:600;">5.2</div>
+                    <div style="padding:0.3rem 0.8rem;background:var(--gray-100);border-radius:0.3rem;font-size:0.8rem;font-weight:600;">2.1</div>
+                    <div style="padding:0.3rem 0.8rem;background:var(--gray-100);border-radius:0.3rem;font-size:0.8rem;font-weight:600;">-0.3</div>
+                    <div style="padding:0.3rem 0.8rem;background:var(--gray-100);border-radius:0.3rem;font-size:0.8rem;font-weight:600;">1.0</div>
+                  </div>
+                </div>
+                <div style="font-size:1.2rem;color:var(--gray-400);">→<br><span style="font-size:0.65rem;">softmax</span></div>
+                <div style="text-align:center;">
+                  <div style="font-size:0.72rem;color:var(--gray-600);margin-bottom:0.3rem;">확률 출력</div>
+                  <div style="display:flex;flex-direction:column;gap:3px;">
+                    <div style="padding:0.3rem 0.8rem;background:#1565c0;color:#fff;border-radius:0.3rem;font-size:0.8rem;font-weight:700;">89.5% 고양이 🐱</div>
+                    <div style="padding:0.3rem 0.8rem;background:#e3f2fd;border-radius:0.3rem;font-size:0.8rem;font-weight:600;color:#1565c0;">7.2% 강아지</div>
+                    <div style="padding:0.3rem 0.8rem;background:#f5f5f5;border-radius:0.3rem;font-size:0.8rem;font-weight:600;color:var(--gray-600);">1.5% 토끼</div>
+                    <div style="padding:0.3rem 0.8rem;background:#f5f5f5;border-radius:0.3rem;font-size:0.8rem;font-weight:600;color:var(--gray-600);">1.8% 햄스터</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="info-box green">
+              <h4>✅ 분류 결과 해석</h4>
+              <p>가장 높은 확률의 클래스가 <strong>최종 예측 결과</strong>입니다.<br><br>
+              위 예시에서 "고양이"가 89.5%로 가장 높으므로<br>
+              CNN은 이 이미지를 <strong>"고양이"로 분류</strong>합니다.</p>
+            </div>
+
+            <div class="analogy" style="margin-top:0.8rem;">
+              <div class="label">💡 <a href="https://poloclub.github.io/cnn-explainer/" target="_blank" style="color:#e65100;text-decoration:underline;">CNN Explainer</a>에서의 분류</div>
+              <p>Tiny VGG 모델은 <strong>10가지 클래스</strong>를 분류합니다:<br>
+              에스프레소, 식료품점, 도서관, 체육관, 교회,<br>
+              식당, 회의실, 강당, 주방, 침실 등<br><br>
+              Softmax 출력의 <strong>초록색 막대</strong>가 가장 높은 클래스가<br>
+              모델의 최종 예측입니다!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 14: 역전파 -->
+  <div class="slide" data-slide="13">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">CNN의 학습: 역전파</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🔄</div>
+          <h2>CNN은 어떻게 학습할까?</h2>
+          <p class="subtitle">역전파(Backpropagation) - 실수에서 배우는 과정</p>
+        </div>
+
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div>
+              <h4>순전파 (Forward Pass)</h4>
+              <p>이미지를 입력 → CNN 파이프라인을 거쳐 → 예측 결과 출력<br>
+              <span style="color:#1565c0;font-weight:600;">예: "이 이미지는 강아지(70%)"라고 예측</span></p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:var(--red);">2</div>
+            <div>
+              <h4>손실 계산 (Loss)</h4>
+              <p>예측이 <strong>정답과 얼마나 틀렸는지</strong> 계산합니다<br>
+              <span style="color:#c62828;font-weight:600;">정답은 "고양이"인데 "강아지"라고 했으므로 → 큰 손실!</span></p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:var(--purple);">3</div>
+            <div>
+              <h4>역전파 (Backward Pass)</h4>
+              <p>출력 → 입력 방향으로 <strong>오차의 원인을 추적</strong>합니다<br>
+              <span style="color:#6200ea;font-weight:600;">"어떤 필터의 어떤 가중치가 잘못된 결과를 만들었는가?"</span></p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:var(--green);">4</div>
+            <div>
+              <h4>가중치 업데이트</h4>
+              <p>오차를 줄이는 방향으로 <strong>필터의 숫자(가중치)를 조정</strong>합니다<br>
+              <span style="color:#2e7d32;font-weight:600;">다음에는 고양이를 더 잘 맞출 수 있도록 필터 수정!</span></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top:1rem;">
+          🔁 이 과정을 <strong>수천~수만 번</strong> 반복하면, CNN의 필터들은 점점 더 정확한 특징을 잡아내도록 발전합니다.<br>
+          사람이 필터를 설계하는 것이 아니라, <strong>CNN이 스스로 최적의 필터를 학습</strong>합니다!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 15: CNN 시각화 체험 -->
+  <div class="slide" data-slide="14">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">직접 체험하기</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🎮</div>
+          <h2>CNN을 직접 눈으로 확인해보세요!</h2>
+          <p class="subtitle">인터랙티브 시각화 도구로 CNN의 각 단계를 체험합니다</p>
+        </div>
+
+        <div class="card-grid cols-2" style="margin:1.5rem 0;">
+          <div class="feature-card" style="border:2px solid var(--main);text-align:center;padding:1.5rem;">
+            <div class="card-icon">🧠</div>
+            <h4 style="font-size:1.1rem;">CNN 시각화 도구</h4>
+            <p style="margin:0.8rem 0;">우리가 만든 인터랙티브 시각화!<br>샘플 이미지나 직접 업로드한 이미지로<br>CNN의 전체 과정을 확인해보세요.</p>
+            <a href="../cnn-시각화/index.html" target="_blank" class="cta-btn" style="margin-top:0.5rem;">
+              🚀 CNN 시각화 체험하기
+            </a>
+          </div>
+          <div class="feature-card" style="border:2px solid var(--purple);text-align:center;padding:1.5rem;">
+            <div class="card-icon">🌐</div>
+            <h4 style="font-size:1.1rem;">CNN Explainer</h4>
+            <p style="margin:0.8rem 0;">Georgia Tech 연구팀이 만든<br>Tiny VGG 모델 시각화 도구.<br>각 뉴런과 연결을 탐색할 수 있습니다.</p>
+            <a href="https://poloclub.github.io/cnn-explainer/" target="_blank" class="cta-btn purple" style="margin-top:0.5rem;">
+              🔗 CNN Explainer 방문
+            </a>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h4>📝 체험 가이드</h4>
+          <p>
+            <strong>① CNN 시각화 도구에서:</strong> 샘플 이미지를 선택하고 "CNN 분석 시작" 버튼을 누르세요. 각 단계를 클릭하면 상세 설명과 계산 과정을 볼 수 있습니다.<br>
+            <strong>② <a href="https://poloclub.github.io/cnn-explainer/" target="_blank" style="color:inherit;text-decoration:underline;">CNN Explainer</a>에서:</strong> 이미지 위의 각 사각형(뉴런)을 클릭해보세요. 해당 필터가 어떤 특징을 감지하는지 확인할 수 있습니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 16: 요약 -->
+  <div class="slide" data-slide="15">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">정리</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">📋</div>
+          <h2>오늘 배운 내용 정리</h2>
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card" style="background:#e3f2fd;">
+            <div class="icon">🖼️</div>
+            <h4>입력</h4>
+            <p>이미지 → 숫자 배열<br>(R, G, B 채널)</p>
+          </div>
+          <div class="summary-card" style="background:#e3f2fd;">
+            <div class="icon">🔍</div>
+            <h4>컨볼루션</h4>
+            <p>필터로 슬라이딩하며<br>특징 추출</p>
+          </div>
+          <div class="summary-card" style="background:#fff3e0;">
+            <div class="icon">⚡</div>
+            <h4>ReLU</h4>
+            <p>음수 → 0 변환<br>비선형성 추가</p>
+          </div>
+          <div class="summary-card" style="background:#e8f5e9;">
+            <div class="icon">📉</div>
+            <h4>맥스 풀링</h4>
+            <p>최댓값만 선택<br>크기 축소</p>
+          </div>
+          <div class="summary-card" style="background:#f3e5f5;">
+            <div class="icon">📏</div>
+            <h4>Flatten</h4>
+            <p>2D → 1D 변환<br>벡터로 펼치기</p>
+          </div>
+          <div class="summary-card" style="background:#fce4ec;">
+            <div class="icon">🧮</div>
+            <h4>완전연결층</h4>
+            <p>특징 종합 분석<br>최종 판단</p>
+          </div>
+          <div class="summary-card" style="background:#e0f2f1;">
+            <div class="icon">📊</div>
+            <h4>Softmax</h4>
+            <p>확률로 변환<br>분류 결과 출력</p>
+          </div>
+          <div class="summary-card" style="background:#fff8e1;">
+            <div class="icon">🔄</div>
+            <h4>역전파</h4>
+            <p>오차에서 학습<br>필터 자동 개선</p>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top:1.2rem;">
+          🧠 <strong>CNN의 핵심</strong>: "이미지에서 <strong>단순한 특징 → 복잡한 특징</strong>을 단계적으로 추출하여,<br>
+          추출된 특징의 조합으로 <strong>이미지를 분류</strong>하는 인공지능"
+        </div>
+
+        <div style="text-align:center;margin-top:1.2rem;">
+          <a href="../cnn-시각화/index.html" target="_blank" class="cta-btn">
+            🚀 CNN 시각화로 직접 확인하기
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="vizModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modalTitle">실제 처리 결과</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Conv -->
+      <div class="modal-content" id="mc-conv">
+        <h3 style="margin-bottom:0.8rem;">🔍 컨볼루션 실제 처리 결과</h3>
+        <p style="font-size:0.88rem;color:var(--gray-600);margin-bottom:1rem;">샘플 이미지에 3×3 엣지 감지 필터를 적용한 결과입니다. 필터가 이미지의 가장자리(엣지)를 찾아냅니다.</p>
+        <div class="modal-canvas-row">
+          <div style="text-align:center;"><canvas id="cvConvIn" width="128" height="128" style="width:160px;height:160px;"></canvas><div class="modal-canvas-label">입력 이미지</div></div>
+          <div class="modal-arrow">→</div>
+          <div style="text-align:center;"><canvas id="cvConvK1" width="128" height="128" style="width:160px;height:160px;"></canvas><div class="modal-canvas-label">수평 엣지 필터 결과</div></div>
+          <div style="text-align:center;"><canvas id="cvConvK2" width="128" height="128" style="width:160px;height:160px;"></canvas><div class="modal-canvas-label">수직 엣지 필터 결과</div></div>
+        </div>
+        <div id="convCalcDetail"></div>
+        <div class="modal-note">💡 밝은 부분은 필터가 강하게 반응한 곳(특징 발견), 어두운 부분은 반응이 없는 곳입니다. 서로 다른 필터가 서로 다른 방향의 가장자리를 감지하는 것을 확인하세요!</div>
+      </div>
+      <!-- Feature Maps -->
+      <div class="modal-content" id="mc-fmap">
+        <h3 style="margin-bottom:0.8rem;">🗺️ 여러 필터의 특징 맵</h3>
+        <p style="font-size:0.88rem;color:var(--gray-600);margin-bottom:1rem;">같은 이미지에 6개의 서로 다른 필터를 적용하면, 각각 다른 특징을 감지하는 6개의 특징 맵이 만들어집니다.</p>
+        <div class="modal-canvas-row" id="fmapRow"></div>
+        <div class="modal-note">💡 각 특징 맵은 이미지의 서로 다른 측면을 포착합니다. CNN은 이 여러 관점의 정보를 종합하여 이미지를 이해합니다.</div>
+      </div>
+      <!-- ReLU -->
+      <div class="modal-content" id="mc-relu">
+        <h3 style="margin-bottom:0.8rem;">⚡ ReLU 적용 전후 비교</h3>
+        <p style="font-size:0.88rem;color:var(--gray-600);margin-bottom:1rem;">컨볼루션 결과에 ReLU를 적용하면 음수 값이 모두 0(검정)으로 변합니다.</p>
+        <div class="modal-canvas-row">
+          <div style="text-align:center;"><canvas id="cvReluBefore" width="128" height="128" style="width:180px;height:180px;"></canvas><div class="modal-canvas-label">컨볼루션 결과 (ReLU 전)<br><span style="color:#c62828;">음수 = 빨간 계열</span></div></div>
+          <div class="modal-arrow">→<br><span style="font-size:0.7rem;">ReLU</span></div>
+          <div style="text-align:center;"><canvas id="cvReluAfter" width="128" height="128" style="width:180px;height:180px;"></canvas><div class="modal-canvas-label">ReLU 적용 후<br><span style="color:#2e7d32;">양수만 남음, 음수→0(검정)</span></div></div>
+        </div>
+        <div id="reluValDemo"></div>
+        <div class="modal-note">💡 빨간 영역(음수)이 모두 검정(0)으로 바뀐 것을 확인하세요. 이렇게 "확실한 특징"만 남기는 것이 ReLU의 역할입니다.</div>
+      </div>
+      <!-- Pool -->
+      <div class="modal-content" id="mc-pool">
+        <h3 style="margin-bottom:0.8rem;">📉 맥스 풀링 실제 처리 결과</h3>
+        <p style="font-size:0.88rem;color:var(--gray-600);margin-bottom:1rem;">2×2 맥스 풀링을 적용하면 이미지 크기가 절반으로 줄어들지만, 중요한 특징은 보존됩니다.</p>
+        <div class="modal-canvas-row">
+          <div style="text-align:center;"><canvas id="cvPoolBefore" width="128" height="128" style="width:200px;height:200px;"></canvas><div class="modal-canvas-label">풀링 전 (128×128)</div></div>
+          <div class="modal-arrow">→<br><span style="font-size:0.7rem;">2×2 max</span></div>
+          <div style="text-align:center;"><canvas id="cvPoolAfter" width="64" height="64" style="width:200px;height:200px;"></canvas><div class="modal-canvas-label">풀링 후 (64×64)</div></div>
+        </div>
+        <div class="modal-note">💡 크기가 절반으로 줄었지만, 가장자리와 주요 특징은 그대로 남아있습니다! 이렇게 계산량을 줄이면서도 핵심 정보를 유지하는 것이 풀링의 장점입니다.</div>
+      </div>
+      <!-- Deep layers -->
+      <div class="modal-content" id="mc-deep">
+        <h3 style="margin-bottom:0.8rem;">🔬 층별 처리 결과 비교</h3>
+        <p style="font-size:0.88rem;color:var(--gray-600);margin-bottom:1rem;">같은 이미지가 CNN의 각 단계를 거치며 어떻게 변화하는지 확인합니다.</p>
+        <div class="modal-canvas-row" id="deepRow"></div>
+        <div class="modal-note">💡 층이 깊어질수록 이미지는 작아지지만, 추출된 특징은 점점 더 추상적이고 의미있어집니다. 처음에는 단순한 엣지 → 질감 → 복잡한 패턴 순으로 발전합니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation Bar -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>◀</button>
+  <span class="nav-counter" id="navCounter">1 / 16</span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()">▶</button>
+</div>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+const progressBar = document.getElementById('progressBar');
+const navCounter = document.getElementById('navCounter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function updateSlide() {
+  slides.forEach((s, i) => {
+    s.classList.toggle('active', i === currentSlide);
+  });
+  progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+  navCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlides - 1;
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) { currentSlide--; updateSlide(); }
+}
+
+function goToSlide(index) {
+  if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+  if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+});
+
+// Touch swipe
+let touchStartX = 0;
+let touchEndX = 0;
+document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+document.addEventListener('touchend', function(e) {
+  touchEndX = e.changedTouches[0].screenX;
+  const diff = touchStartX - touchEndX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) nextSlide();
+    else prevSlide();
+  }
+}, { passive: true });
+
+// ═══════════════════════════════════
+// Modal & CNN Computation Demos
+// ═══════════════════════════════════
+const SZ = 128;
+let sampleGray = null; // grayscale float array
+
+function genSampleImage() {
+  // Generate a simple geometric pattern (circle + cross)
+  const d = new Float32Array(SZ * SZ);
+  const cx = SZ/2, cy = SZ/2, r = SZ*0.3;
+  for (let y = 0; y < SZ; y++) for (let x = 0; x < SZ; x++) {
+    const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
+    let v = 0.15; // background
+    if (dist < r) v = 0.85; // circle
+    if (dist > r-3 && dist < r+3) v = 1.0; // circle edge
+    if (Math.abs(x - SZ/2) < 3 && y > SZ*0.25 && y < SZ*0.75) v = 0.95; // vertical bar
+    if (Math.abs(y - SZ/2) < 3 && x > SZ*0.25 && x < SZ*0.75) v = 0.95; // horizontal bar
+    // Add slight gradient
+    v += (x / SZ) * 0.08;
+    d[y * SZ + x] = Math.min(1, Math.max(0, v));
+  }
+  sampleGray = d;
+}
+
+function drawGrayToCanvas(cv, data, w, h) {
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(w, h);
+  for (let i = 0; i < w * h; i++) {
+    const v = Math.max(0, Math.min(255, Math.round(data[i] * 255)));
+    img.data[i*4] = v; img.data[i*4+1] = v; img.data[i*4+2] = v; img.data[i*4+3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function drawSignedToCanvas(cv, data, w, h) {
+  // Signed data: negative=red, positive=blue, zero=black
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(w, h);
+  let mx = 0;
+  for (let i = 0; i < data.length; i++) mx = Math.max(mx, Math.abs(data[i]));
+  if (mx === 0) mx = 1;
+  for (let i = 0; i < w * h; i++) {
+    const v = data[i] / mx;
+    if (v >= 0) {
+      const b = Math.round(v * 255);
+      img.data[i*4] = 30; img.data[i*4+1] = 60+Math.round(v*100); img.data[i*4+2] = b;
+    } else {
+      const r = Math.round(-v * 255);
+      img.data[i*4] = r; img.data[i*4+1] = 20; img.data[i*4+2] = 20;
+    }
+    img.data[i*4+3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+function convolve(input, w, h, kernel) {
+  const kSize = 3, half = 1;
+  const out = new Float32Array(w * h);
+  for (let y = half; y < h - half; y++) {
+    for (let x = half; x < w - half; x++) {
+      let sum = 0;
+      for (let ky = 0; ky < kSize; ky++)
+        for (let kx = 0; kx < kSize; kx++)
+          sum += input[(y+ky-half)*w+(x+kx-half)] * kernel[ky*kSize+kx];
+      out[y*w+x] = sum;
+    }
+  }
+  return out;
+}
+
+function applyReLU(data) {
+  const out = new Float32Array(data.length);
+  for (let i = 0; i < data.length; i++) out[i] = Math.max(0, data[i]);
+  return out;
+}
+
+function maxPool2x2(data, w, h) {
+  const ow = Math.floor(w/2), oh = Math.floor(h/2);
+  const out = new Float32Array(ow * oh);
+  for (let y = 0; y < oh; y++)
+    for (let x = 0; x < ow; x++)
+      out[y*ow+x] = Math.max(
+        data[(y*2)*w+(x*2)], data[(y*2)*w+(x*2+1)],
+        data[(y*2+1)*w+(x*2)], data[(y*2+1)*w+(x*2+1)]
+      );
+  return { d: out, w: ow, h: oh };
+}
+
+const KERNELS = {
+  hEdge: [-1,-1,-1, 0,0,0, 1,1,1],
+  vEdge: [-1,0,1, -1,0,1, -1,0,1],
+  diag:  [0,-1,-1, 1,0,-1, 1,1,0],
+  sharp: [0,-1,0, -1,5,-1, 0,-1,0],
+  blur:  [1/9,1/9,1/9, 1/9,1/9,1/9, 1/9,1/9,1/9],
+  emboss: [-2,-1,0, -1,1,1, 0,1,2],
+};
+const KERNEL_NAMES = ['수평 엣지','수직 엣지','대각선','샤프닝','블러','엠보스'];
+
+function openModal(mode, title) {
+  if (!sampleGray) genSampleImage();
+  document.getElementById('modalTitle').textContent = title || '실제 처리 결과';
+  // Hide all, show target
+  document.querySelectorAll('.modal-content').forEach(el => el.classList.remove('active'));
+  const target = document.getElementById('mc-' + mode);
+  if (target) target.classList.add('active');
+  document.getElementById('vizModal').classList.add('open');
+  // Run computation
+  setTimeout(() => runDemo(mode), 50);
+}
+
+function closeModal() {
+  document.getElementById('vizModal').classList.remove('open');
+}
+
+function runDemo(mode) {
+  if (mode === 'conv') runConvDemo();
+  else if (mode === 'fmap') runFmapDemo();
+  else if (mode === 'relu') runReluDemo();
+  else if (mode === 'pool') runPoolDemo();
+  else if (mode === 'deep') runDeepDemo();
+}
+
+function runConvDemo() {
+  const inp = sampleGray;
+  drawGrayToCanvas(document.getElementById('cvConvIn'), inp, SZ, SZ);
+  const hResult = convolve(inp, SZ, SZ, KERNELS.hEdge);
+  const vResult = convolve(inp, SZ, SZ, KERNELS.vEdge);
+  drawSignedToCanvas(document.getElementById('cvConvK1'), hResult, SZ, SZ);
+  drawSignedToCanvas(document.getElementById('cvConvK2'), vResult, SZ, SZ);
+
+  // Show sample calculation
+  const cx = 30, cy = 30;
+  const k = KERNELS.hEdge;
+  let html = '<div style="margin-top:1rem;padding:1rem;background:#f8f9fa;border-radius:0.5rem;">';
+  html += '<h4 style="font-size:0.85rem;font-weight:700;color:var(--dark);margin-bottom:0.5rem;">🧮 위치 ('+cx+','+cy+')에서의 계산 과정</h4>';
+  html += '<div style="display:flex;gap:0.8rem;align-items:center;justify-content:center;flex-wrap:wrap;">';
+  // input patch
+  html += '<div style="text-align:center;"><div style="font-size:0.68rem;color:var(--gray-600);">입력 패치</div><div style="display:inline-grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ddd;padding:1px;border-radius:3px;">';
+  const patch = [];
+  for (let ky=0;ky<3;ky++) { for (let kx=0;kx<3;kx++) { const v=inp[(cy+ky-1)*SZ+(cx+kx-1)]; patch.push(v); const bg=`rgb(${Math.round(v*255)},${Math.round(v*255)},${Math.round(v*255)})`; html+=`<div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:600;background:${bg};color:${v>0.5?'#fff':'#333'};">${v.toFixed(2)}</div>`; } }
+  html += '</div></div>';
+  html += '<div style="font-size:1.2rem;color:#999;">×</div>';
+  // kernel
+  html += '<div style="text-align:center;"><div style="font-size:0.68rem;color:var(--gray-600);">수평 엣지 필터</div><div style="display:inline-grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ddd;padding:1px;border-radius:3px;">';
+  for (let i=0;i<9;i++) { const v=k[i]; const bg=v>0?'#bbdefb':v<0?'#ffcdd2':'#f5f5f5'; html+=`<div style="width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;background:${bg};">${v}</div>`; }
+  html += '</div></div>';
+  html += '<div style="font-size:1.2rem;color:#999;">=</div>';
+  // result
+  let sum = 0; for(let i=0;i<9;i++) sum += patch[i]*k[i];
+  html += `<div style="text-align:center;font-size:1.2rem;font-weight:800;color:var(--dark);">${sum.toFixed(3)}</div>`;
+  html += '</div></div>';
+  document.getElementById('convCalcDetail').innerHTML = html;
+}
+
+function addCanvasWithLabel(parent, cv, labelHtml) {
+  parent.appendChild(cv);
+  const lbl = document.createElement('div');
+  lbl.className = 'modal-canvas-label';
+  lbl.innerHTML = labelHtml;
+  parent.appendChild(lbl);
+}
+
+function runFmapDemo() {
+  const row = document.getElementById('fmapRow');
+  row.innerHTML = '';
+  const kNames = Object.keys(KERNELS);
+  // Input first
+  const inDiv = document.createElement('div'); inDiv.style.textAlign='center';
+  const inCv = document.createElement('canvas'); inCv.width=SZ; inCv.height=SZ; inCv.style.cssText='width:100px;height:100px;border:1px solid #ddd;border-radius:4px;image-rendering:pixelated;';
+  drawGrayToCanvas(inCv, sampleGray, SZ, SZ);
+  addCanvasWithLabel(inDiv, inCv, '입력 이미지');
+  row.appendChild(inDiv);
+  const arrow = document.createElement('div'); arrow.className='modal-arrow'; arrow.textContent='→'; row.appendChild(arrow);
+  // Feature maps
+  kNames.forEach((kn, i) => {
+    const result = convolve(sampleGray, SZ, SZ, KERNELS[kn]);
+    const div = document.createElement('div'); div.style.textAlign='center';
+    const cv = document.createElement('canvas'); cv.width=SZ; cv.height=SZ; cv.style.cssText='width:100px;height:100px;border:1px solid #ddd;border-radius:4px;image-rendering:pixelated;';
+    drawSignedToCanvas(cv, result, SZ, SZ);
+    addCanvasWithLabel(div, cv, KERNEL_NAMES[i]);
+    row.appendChild(div);
+  });
+}
+
+function runReluDemo() {
+  const convResult = convolve(sampleGray, SZ, SZ, KERNELS.hEdge);
+  const reluResult = applyReLU(convResult);
+  drawSignedToCanvas(document.getElementById('cvReluBefore'), convResult, SZ, SZ);
+  // After ReLU: only positive, show as grayscale
+  let mx = 0; for (let i=0;i<reluResult.length;i++) mx=Math.max(mx,reluResult[i]); if(mx===0) mx=1;
+  const norm = new Float32Array(reluResult.length);
+  for (let i=0;i<reluResult.length;i++) norm[i]=reluResult[i]/mx;
+  drawGrayToCanvas(document.getElementById('cvReluAfter'), norm, SZ, SZ);
+
+  // Show value comparison
+  const samples = []; let negCount=0;
+  for (let i=0; i<convResult.length; i+=Math.floor(convResult.length/20)) {
+    samples.push({before:convResult[i],after:reluResult[i]});
+    if(convResult[i]<0) negCount++;
+    if(samples.length>=10) break;
+  }
+  let html='<div style="margin-top:1rem;overflow-x:auto;"><table style="border-collapse:collapse;margin:0 auto;"><tr><td style="padding:0.4rem 0.6rem;background:#f5f5f5;font-weight:700;font-size:0.78rem;border:1px solid #e0e0e0;">입력 (x)</td>';
+  samples.forEach(s=>{const c=s.before<0?'#ffebee':'#e8f5e9';html+=`<td style="padding:0.4rem;background:${c};font-size:0.72rem;border:1px solid #e0e0e0;text-align:center;font-weight:600;">${s.before.toFixed(2)}</td>`;});
+  html+='</tr><tr><td style="padding:0.4rem 0.6rem;background:#f5f5f5;font-weight:700;font-size:0.78rem;border:1px solid #e0e0e0;">max(0,x)</td>';
+  samples.forEach(s=>{const c=s.after===0?'#fff3e0':'#e8f5e9';html+=`<td style="padding:0.4rem;background:${c};font-size:0.72rem;border:1px solid #e0e0e0;text-align:center;font-weight:700;">${s.after.toFixed(2)}</td>`;});
+  html+='</tr></table></div>';
+  document.getElementById('reluValDemo').innerHTML=html;
+}
+
+function runPoolDemo() {
+  const convResult = convolve(sampleGray, SZ, SZ, KERNELS.hEdge);
+  const reluResult = applyReLU(convResult);
+  let mx=0; for(let i=0;i<reluResult.length;i++) mx=Math.max(mx,reluResult[i]); if(!mx)mx=1;
+  const norm = new Float32Array(reluResult.length);
+  for(let i=0;i<reluResult.length;i++) norm[i]=reluResult[i]/mx;
+  drawGrayToCanvas(document.getElementById('cvPoolBefore'), norm, SZ, SZ);
+  const pooled = maxPool2x2(norm, SZ, SZ);
+  drawGrayToCanvas(document.getElementById('cvPoolAfter'), pooled.d, pooled.w, pooled.h);
+}
+
+function runDeepDemo() {
+  const row = document.getElementById('deepRow');
+  row.innerHTML = '';
+  const stages = [
+    { label: '입력', data: sampleGray, w: SZ, h: SZ, signed: false },
+  ];
+  // Layer 1: Conv → ReLU → Pool
+  let conv1 = convolve(sampleGray, SZ, SZ, KERNELS.hEdge);
+  stages.push({ label: 'Conv1', data: conv1, w: SZ, h: SZ, signed: true });
+  let relu1 = applyReLU(conv1);
+  let mx=0; for(let i=0;i<relu1.length;i++) mx=Math.max(mx,relu1[i]); if(!mx)mx=1;
+  let normR1 = new Float32Array(relu1.length); for(let i=0;i<relu1.length;i++) normR1[i]=relu1[i]/mx;
+  stages.push({ label: 'ReLU1', data: normR1, w: SZ, h: SZ, signed: false });
+  let pool1 = maxPool2x2(normR1, SZ, SZ);
+  stages.push({ label: 'Pool1\n(64×64)', data: pool1.d, w: pool1.w, h: pool1.h, signed: false });
+  // Layer 2: Conv → ReLU → Pool
+  let conv2 = convolve(pool1.d, pool1.w, pool1.h, KERNELS.vEdge);
+  stages.push({ label: 'Conv2', data: conv2, w: pool1.w, h: pool1.h, signed: true });
+  let relu2 = applyReLU(conv2);
+  mx=0; for(let i=0;i<relu2.length;i++) mx=Math.max(mx,relu2[i]); if(!mx)mx=1;
+  let normR2 = new Float32Array(relu2.length); for(let i=0;i<relu2.length;i++) normR2[i]=relu2[i]/mx;
+  stages.push({ label: 'ReLU2', data: normR2, w: pool1.w, h: pool1.h, signed: false });
+  let pool2 = maxPool2x2(normR2, pool1.w, pool1.h);
+  stages.push({ label: 'Pool2\n(32×32)', data: pool2.d, w: pool2.w, h: pool2.h, signed: false });
+
+  stages.forEach((st, i) => {
+    if (i > 0) { const arr = document.createElement('div'); arr.className='modal-arrow'; arr.textContent='→'; row.appendChild(arr); }
+    const div = document.createElement('div'); div.style.textAlign='center';
+    const cv = document.createElement('canvas'); cv.width=st.w; cv.height=st.h;
+    const dispSz = Math.max(80, 130 - i*8);
+    cv.style.cssText=`width:${dispSz}px;height:${dispSz}px;border:1px solid #ddd;border-radius:4px;image-rendering:pixelated;`;
+    if (st.signed) drawSignedToCanvas(cv, st.data, st.w, st.h);
+    else drawGrayToCanvas(cv, st.data, st.w, st.h);
+    addCanvasWithLabel(div, cv, st.label.replace('\n','<br>'));
+    row.appendChild(div);
+  });
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+genSampleImage();
+
+// Initialize
+updateSlide();
+</script>
+
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

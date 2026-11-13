@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "activities": [
+    {
+      "id": "warmup-if",
+      "slide": 2,
+      "kind": "wordcloud",
+      "prompt": "오늘 하루 겪은 '만약 ~라면'을 한 단어로 적어보세요!"
+    },
+    {
+      "id": "q-colon",
+      "slide": 3,
+      "kind": "ox",
+      "prompt": "if 문에서 조건 뒤의 콜론(:)과 다음 줄 들여쓰기는 생략해도 된다.",
+      "answer": false,
+      "misconceptions": {
+        "true": "콜론과 들여쓰기는 파이썬 문법의 핵심이에요 — 둘 중 하나만 빠져도 SyntaxError/IndentationError가 납니다"
+      }
+    },
+    {
+      "id": "q-elif",
+      "slide": 5,
+      "kind": "choice",
+      "prompt": "점수 = 85일 때 「if 점수 >= 90: print('A')  elif 점수 >= 80: print('B')  else: print('C')」의 출력은?",
+      "options": ["A", "B", "C", "B와 C 둘 다"],
+      "answer": 1,
+      "misconceptions": {
+        "0": "85는 90 이상이 아니에요 — 첫 조건은 거짓",
+        "2": "elif 점수 >= 80이 참이므로 else까지 가지 않아요",
+        "3": "if-elif-else는 위에서부터 딱 하나의 갈래만 실행돼요"
+      }
+    },
+    {
+      "id": "pi-compare",
+      "slide": 6,
+      "kind": "choice",
+      "peerInstruction": true,
+      "prompt": "점수가 60점 '이상'일 때 통과시키려고 합니다. 알맞은 조건은?",
+      "options": ["점수 > 60", "점수 >= 60", "점수 = 60", "점수 == 60"],
+      "answer": 1,
+      "misconceptions": {
+        "0": "딱 60점을 받은 학생이 탈락해요 — '이상'은 60을 포함합니다",
+        "2": "=는 값을 넣는 대입 연산자예요. 비교는 ==",
+        "3": "==는 '정확히 60점일 때'만 참이 돼요"
+      }
+    },
+    {
+      "id": "q-or",
+      "slide": 7,
+      "kind": "ox",
+      "prompt": "or는 두 조건이 모두 참일 때만 True가 된다.",
+      "answer": false,
+      "misconceptions": {
+        "true": "그건 and의 규칙이에요 — or는 둘 중 하나만 참이어도 True입니다"
+      }
+    },
+    {
+      "id": "code-evenodd",
+      "slide": 10,
+      "kind": "code",
+      "language": "python",
+      "prompt": "연습 — 숫자 n이 짝수면 '짝수', 홀수면 '홀수'를 반환하는 함수 판별(n)을 완성하세요.",
+      "starter": "def 판별(n):\n    # 조건문으로 짝수/홀수를 판별해 보세요\n    # 힌트: n % 2 는 n을 2로 나눈 나머지\n    pass\n",
+      "tests": [
+        { "call": "판별(4)", "expected": "짝수" },
+        { "call": "판별(7)", "expected": "홀수" },
+        { "call": "판별(0)", "expected": "짝수" }
+      ],
+      "solution": "def 판별(n):\n    if n % 2 == 0:\n        return '짝수'\n    else:\n        return '홀수'"
+    },
+    {
+      "id": "exit",
+      "slide": "last",
+      "kind": "exit",
+      "prompt": "오늘 조건문 수업을 마무리하며"
+    }
+  ]
+}

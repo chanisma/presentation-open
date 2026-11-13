@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인공지능과 피지컬컴퓨팅 오리엔테이션</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --main: #2196f3;
+  --dark: #1565c0;
+  --light: #e3f2fd;
+  --accent: #42a5f5;
+  --bg: #f0f4f8;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #e8eaed;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-600: #6b7280;
+  --gray-700: #4b5563;
+  --gray-800: #374151;
+  --gray-900: #1f2937;
+  --blue-accent: #2196f3;
+  --orange-accent: #ff9800;
+  --purple-accent: #9c27b0;
+  --red-accent: #e53935;
+  --green-sub: #43b867;
+  --orange-bg: #fff3e0;
+  --purple-bg: #f3e5f5;
+  --red-bg: #fce4ec;
+  --green-bg: #e8f5e9;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  overflow: hidden;
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+
+/* Progress Bar */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--main), var(--accent));
+  z-index: 1000;
+  transition: width 0.4s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Presentation Container */
+.presentation {
+  width: 100%; height: 100vh;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Browser Card */
+.browser-card {
+  width: 100%;
+  max-width: 1600px;
+  max-height: calc(100vh - 8rem);
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.browser-topbar {
+  display: flex;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+.browser-dots {
+  display: flex;
+  gap: 0.4rem;
+  margin-right: 1rem;
+}
+.browser-dots span {
+  width: 0.7rem; height: 0.7rem;
+  border-radius: 50%;
+}
+.browser-dots span:nth-child(1) { background: #ff5f57; }
+.browser-dots span:nth-child(2) { background: #ffbd2e; }
+.browser-dots span:nth-child(3) { background: #28c840; }
+.browser-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gray-600);
+}
+
+.browser-content {
+  padding: 2.5rem 3rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ============================
+   Typography
+   ============================ */
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; }
+h2 { font-size: 1.7rem; font-weight: 700; line-height: 1.4; margin-bottom: 1.2rem; }
+h3 { font-size: 1.3rem; font-weight: 600; line-height: 1.4; }
+p  { font-size: 1.05rem; line-height: 1.7; color: var(--gray-700); }
+
+/* ============================
+   Common Components
+   ============================ */
+
+/* Badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.badge-blue { background: var(--light); color: var(--dark); }
+.badge-orange { background: var(--orange-bg); color: #e65100; }
+.badge-purple { background: var(--purple-bg); color: #6200ea; }
+.badge-green { background: var(--green-bg); color: #2d8a49; }
+
+/* Year badge */
+.year-badge {
+  display: inline-block;
+  padding: 0.4rem 1.2rem;
+  border-radius: 2rem;
+  background: var(--light);
+  color: var(--dark);
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+}
+
+/* Section Divider */
+.section-divider {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.section-divider .icon {
+  font-size: 2.8rem;
+  margin-bottom: 0.8rem;
+}
+.section-divider h2 {
+  margin-bottom: 0.4rem;
+}
+.section-divider .subtitle {
+  font-size: 1.05rem;
+  color: var(--gray-600);
+}
+
+/* Highlight Box */
+.highlight-box {
+  background: linear-gradient(135deg, var(--light), #bbdefb33);
+  border: 1px solid #bbdefb;
+  border-radius: 0.8rem;
+  padding: 1.2rem 1.5rem;
+  margin: 1.2rem 0;
+  font-size: 1.05rem;
+  color: var(--dark);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Info Box */
+.info-box {
+  background: var(--gray-50);
+  border-left: 4px solid var(--main);
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 1rem 1.2rem;
+  margin-top: 1.2rem;
+  font-size: 0.95rem;
+  color: var(--gray-700);
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+/* Card */
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.8rem;
+  padding: 1.5rem;
+  transition: all 0.25s;
+}
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(33,150,243,0.1);
+  transform: translateY(-2px);
+}
+.card .card-icon {
+  font-size: 2rem;
+  margin-bottom: 0.6rem;
+}
+.card h3 { margin-bottom: 0.4rem; }
+.card p { font-size: 0.95rem; }
+
+/* Showcase Grid (5-col) */
+.club-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.club-item {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.8rem;
+  padding: 1.3rem 0.8rem;
+  text-align: center;
+  transition: all 0.25s;
+}
+.club-item:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 16px rgba(33,150,243,0.1);
+}
+.club-item .emoji { font-size: 2.4rem; margin-bottom: 0.5rem; }
+.club-item .name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
+.club-item .desc { font-size: 0.8rem; color: var(--gray-600); }
+
+/* Task Box */
+.task-box {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.2rem 1.5rem;
+  border-radius: 0.8rem;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  margin-bottom: 0.8rem;
+  transition: all 0.2s;
+}
+.task-box:hover {
+  border-color: var(--accent);
+}
+.task-num {
+  width: 2.2rem; height: 2.2rem;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  color: var(--white);
+}
+.task-body h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+.task-body p { font-size: 0.9rem; color: var(--gray-600); }
+
+/* Activity Item */
+.activity-item {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 1.2rem 1.5rem;
+  border-radius: 0.8rem;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  margin-bottom: 0.8rem;
+  transition: all 0.2s;
+}
+.activity-item:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(33,150,243,0.08);
+}
+.activity-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 2.8rem;
+  text-align: center;
+}
+.activity-body h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+.activity-body p { font-size: 0.92rem; color: var(--gray-600); line-height: 1.6; }
+
+/* Timeline */
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+.timeline-item {
+  text-align: center;
+  position: relative;
+  padding: 1rem 0.6rem;
+  border-radius: 0.8rem;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  transition: all 0.2s;
+}
+.timeline-item:hover {
+  border-color: var(--accent);
+}
+.timeline-item.highlight {
+  border-color: var(--orange-accent);
+  background: var(--orange-bg);
+}
+.timeline-marker {
+  width: 2.4rem; height: 2.4rem;
+  border-radius: 50%;
+  background: var(--light);
+  color: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  margin: 0 auto 0.6rem;
+}
+.timeline-item.highlight .timeline-marker {
+  background: var(--orange-accent);
+  color: var(--white);
+}
+.timeline-period {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+.timeline-desc {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  line-height: 1.4;
+}
+
+/* Comparison Table */
+table.comparison {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  margin-top: 1.2rem;
+  border: 1px solid var(--gray-200);
+}
+table.comparison th {
+  background: var(--dark);
+  color: var(--white);
+  padding: 0.8rem 1rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: left;
+}
+table.comparison td {
+  padding: 0.7rem 1rem;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+table.comparison tr:nth-child(even) td {
+  background: var(--gray-50);
+}
+table.comparison tr:last-child td {
+  border-bottom: none;
+}
+
+/* Cover Slide */
+.cover-content {
+  text-align: center;
+  padding: 2rem 0;
+}
+.cover-content .year-badge { margin-bottom: 1.5rem; }
+.cover-content h1 {
+  font-size: 2.8rem;
+  background: linear-gradient(135deg, var(--dark), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.8rem;
+}
+.cover-content .cover-subtitle {
+  font-size: 1.3rem;
+  color: var(--gray-600);
+  font-weight: 400;
+  margin-bottom: 2rem;
+}
+.cover-tags {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* TOC */
+.toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.toc-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 0.8rem;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  cursor: pointer;
+  transition: all 0.25s;
+  text-decoration: none;
+  color: inherit;
+}
+.toc-item:hover {
+  border-color: var(--main);
+  background: var(--light);
+  transform: translateX(6px);
+}
+.toc-num {
+  width: 2.4rem; height: 2.4rem;
+  border-radius: 50%;
+  background: var(--light);
+  color: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.toc-item:hover .toc-num {
+  background: var(--main);
+  color: var(--white);
+}
+.toc-text h3 { font-size: 1.1rem; margin-bottom: 0.15rem; }
+.toc-text p { font-size: 0.85rem; color: var(--gray-600); margin: 0; }
+
+/* End Slide */
+.end-content {
+  text-align: center;
+  padding: 2rem 0;
+}
+.end-content h1 {
+  font-size: 2.6rem;
+  margin-bottom: 0.8rem;
+  background: linear-gradient(135deg, var(--dark), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.end-content .end-message {
+  font-size: 1.15rem;
+  color: var(--gray-600);
+  margin-bottom: 1.8rem;
+}
+
+/* Navigation */
+.nav-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--gray-200);
+  z-index: 999;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem; height: 2.6rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.5rem;
+  background: var(--white);
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--gray-700);
+  transition: all 0.2s;
+}
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--main);
+  color: var(--main);
+  background: var(--light);
+}
+.nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.nav-counter {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-600);
+  min-width: 5rem;
+  text-align: center;
+}
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 1024px) {
+  html, body { font-size: clamp(13px, 1.8vw, 18px); }
+  .browser-content { padding: 2rem 2rem; }
+}
+@media (max-width: 768px) {
+  html, body { font-size: clamp(13px, 2.8vw, 17px); }
+  .slide { padding: 1rem; }
+  .browser-content { padding: 1.5rem 1.2rem; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .club-grid { grid-template-columns: repeat(3, 1fr); }
+  .timeline { grid-template-columns: repeat(2, 1fr); }
+  .cover-content h1 { font-size: 2rem; }
+}
+@media (max-width: 480px) {
+  html, body { font-size: clamp(13px, 3.5vw, 16px); }
+  .browser-content { padding: 1.2rem 1rem; }
+  .club-grid { grid-template-columns: repeat(2, 1fr); }
+  .timeline { grid-template-columns: 1fr 1fr; }
+  .nav-btn { width: 2.2rem; height: 2.2rem; font-size: 0.95rem; }
+  h1 { font-size: 1.8rem; }
+}
+
+@media print {
+  .slide { page-break-after: always; opacity: 1 !important; pointer-events: auto !important; position: relative; }
+  .nav-bar, .progress-bar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- Slide 1: Cover -->
+  <div class="slide active" data-slide="0">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">인공지능과 피지컬컴퓨팅 · 오리엔테이션</div>
+      </div>
+      <div class="browser-content">
+        <div class="cover-content">
+          <div class="year-badge">2026학년도</div>
+          <h1>인공지능과 피지컬컴퓨팅</h1>
+          <p class="cover-subtitle">AI의 눈으로 보고, 로봇의 손으로 만들다</p>
+          <div class="cover-tags">
+            <span class="badge badge-blue">🤖 인공지능</span>
+            <span class="badge badge-purple">👁️ 시각 분류</span>
+            <span class="badge badge-orange">⚡ 피지컬컴퓨팅</span>
+            <span class="badge badge-green">🎮 로봇 제어</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2: TOC -->
+  <div class="slide" data-slide="1">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">목차</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">📋</div>
+          <h2>이번 수업에서 다룰 내용</h2>
+        </div>
+        <div class="toc-list">
+          <a class="toc-item" onclick="goToSlide(2)">
+            <div class="toc-num">1</div>
+            <div class="toc-text">
+              <h3>인공지능, 이미 우리 곁에 있다</h3>
+              <p>AI가 무엇이고, 어떻게 우리 생활을 바꾸고 있는지 알아봅니다</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(3)">
+            <div class="toc-num">2</div>
+            <div class="toc-text">
+              <h3>AI는 어떻게 '볼까'?</h3>
+              <p>인공지능의 시각적 분류 능력과 이미지 인식 원리를 탐구합니다</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(4)">
+            <div class="toc-num">3</div>
+            <div class="toc-text">
+              <h3>AI 분류, 어디에 쓰일까?</h3>
+              <p>시각 인식 AI가 실제로 활용되는 다양한 사례를 살펴봅니다</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(5)">
+            <div class="toc-num">4</div>
+            <div class="toc-text">
+              <h3>피지컬컴퓨팅이란?</h3>
+              <p>소프트웨어와 하드웨어가 만나는 피지컬컴퓨팅을 소개합니다</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(6)">
+            <div class="toc-num">5</div>
+            <div class="toc-text">
+              <h3>왜 AI + 피지컬컴퓨팅인가?</h3>
+              <p>피지컬 AI 시대, 왜 이 두 가지를 함께 배우는지 알아봅니다</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(7)">
+            <div class="toc-num">6</div>
+            <div class="toc-text">
+              <h3>실습 활동 미리보기</h3>
+              <p>이번 학기에 직접 만들고 체험할 활동을 미리 살펴봅니다</p>
+            </div>
+          </a>
+          <a class="toc-item" onclick="goToSlide(8)">
+            <div class="toc-num">7</div>
+            <div class="toc-text">
+              <h3>학기 일정과 평가 안내</h3>
+              <p>학습 로드맵, 수업 규칙, 평가 방법을 안내합니다</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: AI 소개 -->
+  <div class="slide" data-slide="2">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">01 · 인공지능 소개</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🤖</div>
+          <h2>인공지능, 이미 우리 곁에 있다</h2>
+          <p class="subtitle">우리가 매일 사용하는 AI 기술을 알아볼까요?</p>
+        </div>
+        <div class="highlight-box">
+          💡 <strong>인공지능(AI)</strong>이란 사람처럼 <strong>학습하고, 판단하고, 예측</strong>할 수 있는 컴퓨터 기술입니다.
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-icon">📱</div>
+            <h3>스마트폰 속 AI</h3>
+            <p>얼굴 인식 잠금해제, 음성 비서(시리, 빅스비), 사진 자동 분류가 모두 AI입니다.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🎵</div>
+            <h3>추천 알고리즘</h3>
+            <p>유튜브 영상 추천, 음악 추천 등 내 취향을 분석해서 콘텐츠를 골라줍니다.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🔍</div>
+            <h3>검색과 번역</h3>
+            <p>구글 검색, 파파고 번역 등 AI가 언어를 이해하고 처리합니다.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🚗</div>
+            <h3>자율주행 기술</h3>
+            <p>카메라로 도로를 인식하고 스스로 운전하는 자동차에 AI가 사용됩니다.</p>
+          </div>
+        </div>
+        <div class="info-box">
+          ✨ 이번 수업에서는 AI 중에서도 <strong>'눈'의 역할을 하는 시각 인식 AI</strong>를 직접 만들어 보고, 로봇과 연결하는 경험을 합니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: AI 시각적 분류 -->
+  <div class="slide" data-slide="3">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">02 · AI의 시각적 분류 능력</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">👁️</div>
+          <h2>AI는 어떻게 '볼까'?</h2>
+          <p class="subtitle">컴퓨터가 이미지를 이해하는 3단계 과정</p>
+        </div>
+        <div class="grid-3">
+          <div class="card" style="border-top: 3px solid var(--main);">
+            <div class="card-icon">📸</div>
+            <h3>1단계: 입력</h3>
+            <p>카메라나 이미지 파일로 사진을 입력받습니다. AI는 이 사진을 <strong>숫자 데이터(픽셀)</strong>로 변환합니다.</p>
+          </div>
+          <div class="card" style="border-top: 3px solid var(--purple-accent);">
+            <div class="card-icon">🧠</div>
+            <h3>2단계: 분석</h3>
+            <p><strong>학습된 모델</strong>이 이미지의 특징(색, 형태, 패턴)을 분석합니다. 수천 장의 사진으로 미리 학습해 둔 것이죠.</p>
+          </div>
+          <div class="card" style="border-top: 3px solid var(--green-sub);">
+            <div class="card-icon">🏷️</div>
+            <h3>3단계: 분류</h3>
+            <p>분석 결과를 바탕으로 <strong>"이것은 고양이입니다 (95%)"</strong>처럼 결과와 확률을 알려줍니다.</p>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 1.5rem;">
+          🎯 우리는 <strong>Teachable Machine</strong>을 사용하여 직접 AI 분류 모델을 학습시켜 볼 거예요!<br>
+          코딩 없이도 나만의 AI를 만들 수 있습니다.
+        </div>
+        <div class="info-box">
+          🔑 <strong>핵심 개념</strong> — 이미지 분류(Image Classification): 이미지를 보고 "이것이 무엇인지" 카테고리를 정해주는 AI 기술
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: AI 분류 활용 사례 -->
+  <div class="slide" data-slide="4">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">03 · AI 분류 활용 사례</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🌍</div>
+          <h2>AI 분류, 어디에 쓰일까?</h2>
+          <p class="subtitle">시각 인식 AI가 세상을 바꾸는 실제 사례들</p>
+        </div>
+        <div class="club-grid">
+          <div class="club-item">
+            <div class="emoji">🏥</div>
+            <div class="name">의료 진단</div>
+            <div class="desc">X-ray, CT 사진에서 질병을 찾아냅니다</div>
+          </div>
+          <div class="club-item">
+            <div class="emoji">♻️</div>
+            <div class="name">재활용 분류</div>
+            <div class="desc">쓰레기를 자동으로 분류하는 AI 로봇</div>
+          </div>
+          <div class="club-item">
+            <div class="emoji">🚘</div>
+            <div class="name">자율주행</div>
+            <div class="desc">신호등, 보행자, 차선을 실시간으로 인식</div>
+          </div>
+          <div class="club-item">
+            <div class="emoji">🌾</div>
+            <div class="name">스마트 농업</div>
+            <div class="desc">작물의 병충해를 사진으로 진단</div>
+          </div>
+          <div class="club-item">
+            <div class="emoji">🔒</div>
+            <div class="name">보안 시스템</div>
+            <div class="desc">얼굴 인식으로 출입을 관리합니다</div>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 1.8rem;">
+          🤔 <strong>생각해 봅시다</strong> — 우리 학교나 일상에서 AI 시각 분류를 활용하면 어떤 문제를 해결할 수 있을까요?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: 피지컬컴퓨팅 소개 -->
+  <div class="slide" data-slide="5">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">04 · 피지컬컴퓨팅 소개</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">⚡</div>
+          <h2>피지컬컴퓨팅이란?</h2>
+          <p class="subtitle">소프트웨어와 하드웨어가 만나는 순간</p>
+        </div>
+        <div class="highlight-box">
+          🔗 <strong>피지컬컴퓨팅</strong> = 소프트웨어(코드) + 하드웨어(센서·모터·LED) → <strong>현실 세계와 상호작용</strong>하는 시스템
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-icon">🖥️</div>
+            <h3>소프트웨어 영역</h3>
+            <p>블록 코딩이나 파이썬 같은 프로그래밍 언어로 <strong>명령을 작성</strong>합니다. "센서 값이 30 이상이면 모터를 동작시켜라" 같은 논리를 만듭니다.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🔌</div>
+            <h3>하드웨어 영역</h3>
+            <p><strong>센서</strong>(온도, 빛, 거리)로 정보를 수집하고, <strong>모터, LED, 스피커</strong> 등으로 결과를 출력합니다. 현실 세계에 직접 영향을 줍니다.</p>
+          </div>
+        </div>
+        <div class="grid-3" style="margin-top: 1rem;">
+          <div class="card" style="text-align: center;">
+            <div class="card-icon">📡</div>
+            <h3>입력(센서)</h3>
+            <p>온도, 빛, 소리, 거리, 기울기 등 주변 환경 감지</p>
+          </div>
+          <div class="card" style="text-align: center;">
+            <div class="card-icon">💻</div>
+            <h3>처리(프로그램)</h3>
+            <p>센서 데이터를 분석하고 판단하는 코드 실행</p>
+          </div>
+          <div class="card" style="text-align: center;">
+            <div class="card-icon">💡</div>
+            <h3>출력(동작)</h3>
+            <p>LED 점등, 모터 회전, 소리 재생 등 물리적 반응</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: 왜 AI + 피지컬컴퓨팅인가? -->
+  <div class="slide" data-slide="6">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">왜 인공지능과 피지컬컴퓨팅인가?</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🔮</div>
+          <h2>왜 인공지능과 피지컬컴퓨팅을 함께 배울까?</h2>
+          <p class="subtitle">AI가 디지털 세계를 넘어 현실 세계로 나오고 있습니다</p>
+        </div>
+        <div class="highlight-box">
+          🌟 <strong>피지컬 AI(Physical AI)</strong> — AI가 로봇의 몸을 갖고 현실 세계에서 직접 보고, 판단하고, 행동하는 기술.<br>
+          2026년 CES에서 엔비디아 젠슨 황 CEO가 가장 강조한 키워드입니다.
+        </div>
+        <div class="grid-2" style="margin-top: 1.2rem;">
+          <div style="border-radius: 0.8rem; overflow: hidden; border: 1px solid var(--gray-200); aspect-ratio: 16/9;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/HKiEtvF6ftQ" title="CES 2026 피지컬 AI 총정리" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;"></iframe>
+          </div>
+          <div style="border-radius: 0.8rem; overflow: hidden; border: 1px solid var(--gray-200); aspect-ratio: 16/9;">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/F0sKNsX2B9w" title="피지컬 AI 실증 연구소 개소" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;"></iframe>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top: 0.6rem;">
+          <p style="font-size: 0.85rem; color: var(--gray-600); text-align: center;">CES 2026 · 피지컬 AI 총정리 (채널A)</p>
+          <p style="font-size: 0.85rem; color: var(--gray-600); text-align: center;">피지컬 AI 실증 연구소 개소 (KBS)</p>
+        </div>
+        <div class="info-box" style="margin-top: 1rem;">
+          💡 AI가 눈(카메라)으로 보고 판단한 결과를, 로봇이 손(모터)으로 실행하는 것 — 이것이 바로 우리가 이 수업에서 <strong>직접 만들어 볼 것</strong>입니다. 세계적인 기술 트렌드를 우리 교실에서 체험해 봅시다!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: 실습 활동 -->
+  <div class="slide" data-slide="7">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">06 · 실습 활동 미리보기</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🛠️</div>
+          <h2>이런 것들을 만들어 볼 거예요</h2>
+          <p class="subtitle">직접 손으로 만들고, 코드를 짜고, AI를 연결합니다</p>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">🧪</div>
+          <div class="activity-body">
+            <h3>나만의 AI 분류 모델 만들기</h3>
+            <p>Teachable Machine으로 카메라에 비친 물체를 분류하는 나만의 AI를 훈련시킵니다. 예를 들어 가위바위보를 인식하거나, 재활용품을 자동 분류하는 AI를 만들어 봅니다.</p>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">🤖</div>
+          <div class="activity-body">
+            <h3>AI + 로봇 제어 프로젝트</h3>
+            <p>학습시킨 AI 모델과 마이크로비트(micro:bit)를 연결하여 로봇을 제어합니다. AI가 인식한 결과에 따라 로봇이 다르게 반응하도록 프로그래밍합니다.</p>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">🚦</div>
+          <div class="activity-body">
+            <h3>센서 활용 자동화 시스템</h3>
+            <p>빛 센서, 온도 센서, 거리 센서 등을 활용하여 자동으로 반응하는 시스템을 만듭니다. 예: 어두워지면 자동으로 켜지는 스마트 조명 만들기.</p>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">🎨</div>
+          <div class="activity-body">
+            <h3>창의 프로젝트 발표</h3>
+            <p>배운 기술을 활용해 팀별로 자유 주제의 창의 프로젝트를 기획하고 제작합니다. 학기 말에 발표회를 열어 서로의 작품을 공유합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: 학기 일정 -->
+  <div class="slide" data-slide="8">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">07 · 학습 로드맵</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🗓️</div>
+          <h2>우리의 학습 여정</h2>
+          <p class="subtitle">한 학기 동안의 학습 로드맵입니다</p>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker">1</div>
+            <div class="timeline-period">3~4월</div>
+            <div class="timeline-desc"><strong>AI 기초</strong><br>인공지능 개념 이해,<br>Teachable Machine으로<br>AI 모델 훈련하기</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">2</div>
+            <div class="timeline-period">5월</div>
+            <div class="timeline-desc"><strong>피지컬컴퓨팅 입문</strong><br>아두이노 기초,<br>센서와 출력장치<br>프로그래밍</div>
+          </div>
+          <div class="timeline-item highlight">
+            <div class="timeline-marker">3</div>
+            <div class="timeline-period">6월</div>
+            <div class="timeline-desc"><strong>AI + 로봇 융합</strong><br>AI 모델과 로봇 연결,<br>자동 분류 시스템<br>제작 실습</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker">4</div>
+            <div class="timeline-period">7월</div>
+            <div class="timeline-desc"><strong>창의 프로젝트</strong><br>팀별 자유 프로젝트<br>기획·제작·발표회</div>
+          </div>
+        </div>
+        <div class="info-box" style="margin-top: 1.5rem;">
+          🌟 <strong>3단계(AI + 로봇 융합)</strong>가 이 수업의 하이라이트입니다! 1·2단계에서 배운 내용을 합쳐 진짜 동작하는 AI 로봇 시스템을 만들어 봅니다.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: 수업 도구 -->
+  <div class="slide" data-slide="9">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">수업에서 사용할 도구들</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🧰</div>
+          <h2>수업에서 사용할 도구들</h2>
+          <p class="subtitle">소프트웨어와 하드웨어 도구를 소개합니다</p>
+        </div>
+        <div class="grid-2">
+          <div class="card" style="border-left: 4px solid var(--main);">
+            <div class="card-icon">🌐</div>
+            <h3>Teachable Machine</h3>
+            <p>구글에서 만든 웹 기반 AI 학습 도구. 코딩 없이 이미지, 소리, 자세를 분류하는 AI 모델을 만들 수 있습니다.</p>
+          </div>
+          <div class="card" style="border-left: 4px solid var(--purple-accent);">
+            <div class="card-icon">🔌</div>
+            <h3>Arduino (아두이노)</h3>
+            <p>전 세계에서 가장 많이 사용되는 오픈소스 마이크로컨트롤러 보드. 센서, 모터 등 다양한 부품을 연결하여 피지컬컴퓨팅 프로젝트를 만들 수 있습니다.</p>
+          </div>
+          <div class="card" style="border-left: 4px solid var(--green-sub);">
+            <div class="card-icon">🐍</div>
+            <h3>Python (파이썬)</h3>
+            <p>AI와 데이터 분석에 가장 많이 쓰이는 프로그래밍 언어. 읽기 쉬운 문법으로 초보자도 빠르게 배울 수 있으며, 아두이노 제어에도 활용합니다.</p>
+          </div>
+          <div class="card" style="border-left: 4px solid var(--orange-accent);">
+            <div class="card-icon">🦾</div>
+            <h3>6-DOF 로봇 팔</h3>
+            <p>6개의 관절(자유도)을 가진 로봇 팔. AI가 인식한 결과에 따라 물체를 집고, 옮기고, 분류하는 동작을 프로그래밍할 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top: 1.2rem;">
+          💻 수업에 필요한 도구는 <strong>모두 학교에서 제공</strong>됩니다. 개인 노트북이 있다면 가져와도 좋아요!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: 수업 규칙과 평가 -->
+  <div class="slide" data-slide="10">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">수업 규칙과 평가</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">📝</div>
+          <h2>수업 규칙과 평가</h2>
+          <p class="subtitle">함께 지켜야 할 약속과 평가 방법을 안내합니다</p>
+        </div>
+        <div class="grid-2">
+          <div>
+            <h3 style="margin-bottom: 0.8rem;">📌 수업 규칙</h3>
+            <div class="task-box">
+              <div class="task-num" style="background: var(--main);">1</div>
+              <div class="task-body">
+                <h3>안전 최우선</h3>
+                <p>장비와 도구를 안전하게 다루고, 사용 후 정리정돈합니다</p>
+              </div>
+            </div>
+            <div class="task-box">
+              <div class="task-num" style="background: var(--purple-accent);">2</div>
+              <div class="task-body">
+                <h3>협력과 존중</h3>
+                <p>팀원과 역할을 나누고, 서로의 아이디어를 존중합니다</p>
+              </div>
+            </div>
+            <div class="task-box">
+              <div class="task-num" style="background: var(--green-sub);">3</div>
+              <div class="task-body">
+                <h3>기록하는 습관</h3>
+                <p>실습 과정과 결과를 학습 포트폴리오에 기록합니다</p>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h3 style="margin-bottom: 0.8rem;">📊 평가 방법</h3>
+            <table class="comparison">
+              <tr>
+                <th>평가 항목</th>
+                <th>비율</th>
+              </tr>
+              <tr>
+                <td>📒 학습 포트폴리오</td>
+                <td><strong>40%</strong></td>
+              </tr>
+              <tr>
+                <td>🧪 프로젝트 1</td>
+                <td><strong>30%</strong></td>
+              </tr>
+              <tr>
+                <td>🎯 프로젝트 2</td>
+                <td><strong>30%</strong></td>
+              </tr>
+            </table>
+            <div class="info-box" style="margin-top: 0.8rem;">
+              ✅ 결과보다 <strong>과정과 노력</strong>을 중시합니다. 실패해도 괜찮아요!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 12: End -->
+  <div class="slide" data-slide="11">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">마무리</div>
+      </div>
+      <div class="browser-content">
+        <div class="end-content">
+          <h1>함께 만들어 갈<br>멋진 한 학기!</h1>
+          <p class="end-message">AI의 눈으로 세상을 보고, 나만의 로봇으로 세상을 바꿔 봅시다 🚀</p>
+          <div class="highlight-box" style="max-width: 600px; margin: 0 auto 1.5rem;">
+            <strong>이번 학기 키워드</strong><br><br>
+            <span class="badge badge-blue" style="margin: 0.2rem;">🤖 인공지능</span>
+            <span class="badge badge-purple" style="margin: 0.2rem;">👁️ 시각 분류</span>
+            <span class="badge badge-orange" style="margin: 0.2rem;">⚡ 피지컬컴퓨팅</span><br>
+            <span class="badge badge-green" style="margin: 0.2rem;">🎮 로봇 제어</span>
+            <span class="badge badge-blue" style="margin: 0.2rem;">🧩 블록 코딩</span>
+            <span class="badge badge-purple" style="margin: 0.2rem;">🎨 창의 프로젝트</span>
+          </div>
+          <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <a href="https://docs.google.com/forms/d/e/YOUR_GOOGLE_DOC_ID/viewform" target="_blank"
+               style="display: inline-block; padding: 0.8rem 2rem; background: var(--dark); color: var(--white);
+                      border-radius: 2rem; font-size: 1.1rem; font-weight: 700; text-decoration: none;
+                      box-shadow: 0 4px 15px rgba(21,101,192,0.3); transition: all 0.2s;">
+              📝 오리엔테이션 설문
+            </a>
+            <a href="https://classroom.google.com/c/ODE5MDkwNjkyNzcw?cjc=r56dvgd2" target="_blank"
+               style="display: inline-block; padding: 0.8rem 2rem; background: #0f9d58; color: var(--white);
+                      border-radius: 2rem; font-size: 1.1rem; font-weight: 700; text-decoration: none;
+                      box-shadow: 0 4px 15px rgba(15,157,88,0.3); transition: all 0.2s;">
+              🏫 구글 클래스룸 참여
+            </a>
+          </div>
+          <p style="color: var(--gray-600); font-size: 0.9rem; margin-top: 0.8rem;">
+            궁금한 점이 있으면 언제든 질문하세요!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation Bar -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>◀</button>
+  <span class="nav-counter" id="navCounter">1 / 12</span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()">▶</button>
+</div>
+
+<script>
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+const progressBar = document.getElementById('progressBar');
+const navCounter = document.getElementById('navCounter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function updateSlide() {
+  slides.forEach((s, i) => {
+    s.classList.toggle('active', i === currentSlide);
+  });
+  progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+  navCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlides - 1;
+}
+
+function nextSlide() {
+  if (currentSlide < totalSlides - 1) {
+    currentSlide++;
+    updateSlide();
+  }
+}
+
+function prevSlide() {
+  if (currentSlide > 0) {
+    currentSlide--;
+    updateSlide();
+  }
+}
+
+function goToSlide(index) {
+  if (index >= 0 && index < totalSlides) {
+    currentSlide = index;
+    updateSlide();
+  }
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+  if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+});
+
+// Touch swipe
+let touchStartX = 0;
+let touchEndX = 0;
+document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+document.addEventListener('touchend', function(e) {
+  touchEndX = e.changedTouches[0].screenX;
+  const diff = touchStartX - touchEndX;
+  if (Math.abs(diff) > 50) {
+    if (diff > 0) nextSlide();
+    else prevSlide();
+  }
+}, { passive: true });
+
+// Initialize
+updateSlide();
+</script>
+
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

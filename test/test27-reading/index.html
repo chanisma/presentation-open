@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>독서의 힘 — 효과적인 독서 방법</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <style>
+    @font-face {
+      font-family: 'Pretendard Variable';
+      src: url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css');
+    }
+  </style>
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* 1. Reset & CSS Variables */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Style 34: 교실 칠판 */
+      --style-bg: #1A3A2A;
+      --style-bg-dark: #162D20;
+      --style-primary: #F5F5F0;
+      --style-accent: #FFE680;
+      --style-pink: #FFB6C1;
+      --style-blue: #87CEEB;
+      --style-text: #F5F5F0;
+      --style-text-secondary: rgba(245, 245, 240, 0.75);
+      --style-divider: rgba(245, 245, 240, 0.4);
+      --style-wood: #2C1810;
+      --style-wood-light: #3D2415;
+      --style-erase: rgba(255, 255, 255, 0.03);
+      --style-chalk-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+
+      /* Layout */
+      --main: #FFE680;
+      --white: #F5F5F0;
+    }
+
+    /* 2. Base Typography */
+    html, body {
+      font-family: 'Pretendard Variable', 'Noto Sans KR', sans-serif;
+      font-size: clamp(16px, 1.5vw, 28px);
+      background: var(--style-wood);
+      color: var(--style-text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    h1 { font-size: 2.4rem; font-weight: 900; }
+    h2 { font-size: 1.5rem; font-weight: 700; }
+    h3 { font-size: 1.15rem; font-weight: 600; }
+    p  { font-size: 1rem; line-height: 1.7; }
+
+    /* 3. Slide Container & Navigation */
+    .presentation {
+      position: fixed;
+      inset: 0;
+      padding: 3px 0 42px;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      padding: 1.2rem;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* 4. Browser Card Chrome */
+    .browser-card {
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      max-width: 1200px;
+      background: var(--style-bg);
+      border-radius: 0.6rem;
+      /* 우드 프레임 테두리 */
+      border: 12px solid var(--style-wood);
+      box-shadow:
+        0 0 0 2px var(--style-wood-light),
+        inset 0 0 0 1px rgba(245,245,240,0.08),
+        0 8px 32px rgba(0,0,0,0.6);
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.8rem 2rem;
+      position: relative;
+    }
+
+    /* 칠판 지운 흔적 */
+    .browser-content::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 180px 80px at 20% 30%, var(--style-erase), transparent),
+        radial-gradient(ellipse 220px 60px at 70% 60%, var(--style-erase), transparent),
+        radial-gradient(ellipse 150px 100px at 50% 85%, var(--style-erase), transparent);
+      pointer-events: none;
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.8rem;
+      background: var(--style-wood-light);
+      border-bottom: 2px solid var(--style-wood);
+      flex-shrink: 0;
+    }
+    .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; flex-shrink: 0; }
+    .dot.red    { background: #FF5F57; }
+    .dot.yellow { background: #FEBC2E; }
+    .dot.green  { background: #28C840; }
+    .topbar-title {
+      margin: 0 auto;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--style-accent);
+      letter-spacing: 0.05em;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--style-accent);
+      transition: width 0.3s ease;
+      z-index: 100;
+    }
+
+    /* Nav Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background: var(--style-wood);
+      border-top: 1px solid var(--style-wood-light);
+      z-index: 100;
+      padding: 0 1rem;
+    }
+    .nav-btn {
+      width: 1.8rem; height: 1.8rem;
+      background: var(--style-wood-light);
+      border: 1px solid var(--style-divider);
+      border-radius: 0.3rem;
+      color: var(--style-primary);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--style-bg); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-btn svg { width: 1rem; height: 1rem; fill: currentColor; }
+    .nav-counter {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      display: flex; align-items: center; gap: 0.3rem;
+    }
+    .slide-input {
+      width: 2rem;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--style-divider);
+      color: var(--style-accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+    .slide-input:focus { outline: none; border-bottom-color: var(--style-accent); }
+
+    /* Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px; left: 0;
+      background: var(--style-accent);
+      color: var(--style-wood);
+      padding: 8px 16px;
+      z-index: 9999;
+      font-size: 14px;
+      border-radius: 0 0 4px 0;
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    /* 5. Components */
+
+    /* Chalk text effect */
+    .chalk-text {
+      text-shadow: var(--style-chalk-shadow);
+    }
+
+    /* Section icon */
+    .section-icon {
+      display: inline;
+      font-size: 1.2em;
+      margin-right: 0.4em;
+      vertical-align: -0.1em;
+    }
+
+    /* Section header */
+    .section-header {
+      margin-bottom: 0.8rem;
+    }
+    .section-header h2 {
+      color: var(--style-primary);
+      text-shadow: var(--style-chalk-shadow);
+      margin-bottom: 0.2rem;
+    }
+    .section-subtitle {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      margin-left: 0.2rem;
+    }
+    .chalk-rule {
+      height: 2px;
+      background: var(--style-divider);
+      border: none;
+      border-radius: 1px;
+      margin: 0.5rem 0 0.8rem;
+    }
+
+    /* Highlight box */
+    .highlight-box {
+      background: rgba(255, 230, 128, 0.1);
+      border-left: 3px solid var(--style-accent);
+      border-radius: 0 0.4rem 0.4rem 0;
+      padding: 0.7rem 1rem;
+      margin: 0.6rem 0;
+    }
+    .highlight-box p {
+      color: var(--style-primary);
+      font-size: 0.95rem;
+    }
+
+    /* Card grid */
+    .card-grid {
+      display: grid;
+      gap: 0.6rem;
+      margin-top: 0.6rem;
+    }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: rgba(245, 245, 240, 0.06);
+      border: 1px solid var(--style-divider);
+      border-radius: 0.5rem;
+      padding: 0.8rem 1rem;
+    }
+    .card-icon {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .card-title {
+      color: var(--style-accent);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      text-shadow: var(--style-chalk-shadow);
+    }
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Activity list */
+    .activity-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.6rem;
+    }
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      background: rgba(245, 245, 240, 0.05);
+      border: 1px solid var(--style-divider);
+      border-radius: 0.5rem;
+      padding: 0.7rem 1rem;
+    }
+    .activity-icon {
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .activity-title {
+      color: var(--style-accent);
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+    .activity-desc {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Tip list */
+    .tip-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+    .tip-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid rgba(245,245,240,0.1);
+      font-size: 0.95rem;
+      color: var(--style-text);
+    }
+    .tip-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.3rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .badge-accent {
+      background: rgba(255, 230, 128, 0.2);
+      color: var(--style-accent);
+      border: 1px solid rgba(255, 230, 128, 0.4);
+    }
+    .badge-pink {
+      background: rgba(255, 182, 193, 0.2);
+      color: var(--style-pink);
+      border: 1px solid rgba(255, 182, 193, 0.4);
+    }
+    .badge-blue {
+      background: rgba(135, 206, 235, 0.2);
+      color: var(--style-blue);
+      border: 1px solid rgba(135, 206, 235, 0.4);
+    }
+
+    /* Date stamp */
+    .date-stamp {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--style-accent);
+      position: absolute;
+      top: 1rem;
+      left: 1.5rem;
+      opacity: 0.85;
+    }
+
+    /* 6. Slide-specific styles */
+
+    /* Cover */
+    .cover-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100%;
+      gap: 0.5rem;
+      padding: 2rem;
+    }
+    .cover-title {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 900;
+      font-size: 2.4rem;
+      color: var(--style-primary);
+      text-shadow: var(--style-chalk-shadow);
+      line-height: 1.3;
+      transform: rotate(-0.5deg);
+    }
+    .cover-subtitle {
+      font-size: 1.1rem;
+      color: var(--style-pink);
+      text-shadow: var(--style-chalk-shadow);
+      margin-top: 0.3rem;
+    }
+    .cover-divider {
+      width: 60%;
+      height: 2px;
+      background: var(--style-divider);
+      border-radius: 1px;
+      margin: 0.6rem auto;
+    }
+    .cover-meta {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    /* TOC */
+    .toc-slide {
+      padding-top: 1.2rem;
+    }
+    .toc-slide h2 {
+      color: var(--style-accent);
+      text-shadow: var(--style-chalk-shadow);
+      margin-bottom: 0.6rem;
+      transform: rotate(-0.5deg);
+      display: inline-block;
+    }
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid var(--style-divider);
+      cursor: pointer;
+      transition: background 0.15s;
+      border-radius: 0.3rem;
+    }
+    .toc-item:hover { background: rgba(255,230,128,0.07); }
+    .toc-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--style-accent);
+      min-width: 1.8rem;
+    }
+    .toc-text {
+      flex: 1;
+      font-size: 0.95rem;
+      color: var(--style-primary);
+    }
+    .toc-arrow {
+      color: var(--style-text-secondary);
+      font-size: 0.9rem;
+    }
+
+    /* End slide */
+    .end-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100%;
+      gap: 0.6rem;
+    }
+    .end-title {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 900;
+      font-size: 2rem;
+      color: var(--style-accent);
+      text-shadow: var(--style-chalk-shadow);
+      transform: rotate(-0.5deg);
+    }
+    .end-subtitle {
+      font-size: 1rem;
+      color: var(--style-text-secondary);
+    }
+
+    /* Two-column */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 0.6rem;
+    }
+    .col-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--style-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.4rem;
+      border-bottom: 1px solid var(--style-divider);
+      padding-bottom: 0.3rem;
+    }
+    .chalk-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .chalk-list li {
+      font-size: 0.9rem;
+      color: var(--style-primary);
+      padding-left: 0.8rem;
+      position: relative;
+      line-height: 1.5;
+    }
+    .chalk-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--style-accent);
+      font-weight: 700;
+    }
+
+    /* Step grid 2x2 */
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      margin-top: 0.6rem;
+    }
+    .step-item {
+      background: rgba(245, 245, 240, 0.05);
+      border: 1px solid var(--style-divider);
+      border-radius: 0.5rem;
+      padding: 0.7rem 0.9rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+    .step-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--style-accent);
+      min-width: 1.8rem;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--style-pink);
+      margin-bottom: 0.2rem;
+    }
+    .step-desc {
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      line-height: 1.5;
+    }
+
+    /* 7. Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .slide { padding: 1.5rem; }
+      .browser-card { border-radius: 0.8rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3, .two-col, .step-grid { grid-template-columns: 1fr; }
+      .browser-topbar { padding: 0.4rem 0.8rem; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      h1 { font-size: 1.7rem; }
+      h2 { font-size: 1.2rem; }
+      .browser-content { padding: 0.8rem; }
+    }
+
+    /* 8. Accessibility */
+    @media (prefers-contrast: high) {
+      :root {
+        --style-bg: #000000;
+        --style-primary: #ffffff;
+        --style-accent: #ffff00;
+      }
+      .browser-card { border: 2px solid #ffffff; }
+      .badge { border: 2px solid currentColor; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* 9. Animation */
+    .slide { transition: opacity 0.35s ease; }
+    #fsCompress { display: none; }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">국어 수업 자료</span>
+        </div>
+        <div class="browser-content cover-slide">
+          <span class="date-stamp">2026. 03. 23</span>
+          <div class="badge badge-accent">중학교 국어</div>
+          <h1 class="cover-title chalk-text">📚 독서의 힘</h1>
+          <p class="cover-subtitle">효과적인 독서 방법</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>국어과 수업자료</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-03">2026년 3월</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: TOC -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">목차</span>
+        </div>
+        <div class="browser-content toc-slide">
+          <h2 class="chalk-text">오늘 배울 내용</h2>
+          <hr class="chalk-rule" aria-hidden="true">
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0"
+                  aria-label="3번 슬라이드로 이동: 왜 독서를 해야 할까?"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                <span class="toc-num" aria-hidden="true">01</span>
+                <span class="toc-text">왜 독서를 해야 할까?</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                  aria-label="4번 슬라이드로 이동: 독서 전 준비하기"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num" aria-hidden="true">02</span>
+                <span class="toc-text">독서 전 준비하기</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                  aria-label="5번 슬라이드로 이동: 효과적인 독서 전략"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num" aria-hidden="true">03</span>
+                <span class="toc-text">효과적인 독서 전략</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                  aria-label="6번 슬라이드로 이동: 독서 후 정리하기"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                <span class="toc-num" aria-hidden="true">04</span>
+                <span class="toc-text">독서 후 정리하기</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                  aria-label="7번 슬라이드로 이동: 독서 습관 만들기"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num" aria-hidden="true">05</span>
+                <span class="toc-text">독서 습관 만들기</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 왜 독서를 해야 할까? -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 왜 독서를 해야 할까?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">독서의 필요성</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2 class="chalk-text"><span class="section-icon" aria-hidden="true">📖</span>왜 독서를 해야 할까?</h2>
+            <p class="section-subtitle">독서가 우리에게 주는 것들</p>
+          </div>
+          <hr class="chalk-rule" aria-hidden="true">
+          <div class="card-grid grid-2" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🧠</span>
+              <h3 class="card-title">사고력 향상</h3>
+              <p class="card-desc">논리적으로 생각하고 문제를 해결하는 힘이 커진다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">💬</span>
+              <h3 class="card-title">어휘력 증가</h3>
+              <p class="card-desc">다양한 단어를 익혀 표현 능력이 풍부해진다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">배경지식 축적</h3>
+              <p class="card-desc">세상을 이해하는 폭이 넓어지고 학습 능력이 오른다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">공감 능력 발달</h3>
+              <p class="card-desc">등장인물의 감정을 이해하며 타인을 배려하게 된다.</p>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>책 한 권은 수백 명의 경험을 담고 있다 — 독서는 가장 빠른 성장의 길이다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 독서 전 준비하기 -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 독서 전 준비하기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">독서 전 준비</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2 class="chalk-text"><span class="section-icon" aria-hidden="true">✏️</span>독서 전 준비하기</h2>
+            <p class="section-subtitle">읽기 전 목적과 배경을 점검하라</p>
+          </div>
+          <hr class="chalk-rule" aria-hidden="true">
+          <div class="two-col">
+            <div>
+              <p class="col-label">확인할 것</p>
+              <ul class="chalk-list" role="list">
+                <li>제목·표지·차례 훑어보기</li>
+                <li>읽는 목적 정하기 (재미? 정보?)</li>
+                <li>아는 내용 떠올리기 (배경지식 활성화)</li>
+                <li>궁금한 점을 질문으로 만들기</li>
+              </ul>
+            </div>
+            <div>
+              <p class="col-label">왜 중요한가?</p>
+              <ul class="chalk-list" role="list">
+                <li>목적이 있어야 집중이 된다</li>
+                <li>배경지식이 있으면 이해가 쉽다</li>
+                <li>질문이 있으면 능동적으로 읽게 된다</li>
+                <li>읽은 후 성취감이 높아진다</li>
+              </ul>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p><strong style="color:var(--style-accent)">SQ3R 전략</strong> — Survey(훑기) · Question(질문) · Read · Recite · Review</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 효과적인 독서 전략 -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 효과적인 독서 전략">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">독서 전략</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2 class="chalk-text"><span class="section-icon" aria-hidden="true">🎯</span>효과적인 독서 전략</h2>
+            <p class="section-subtitle">읽는 중에 실천할 수 있는 방법들</p>
+          </div>
+          <hr class="chalk-rule" aria-hidden="true">
+          <div class="step-grid" role="list">
+            <div class="step-item" role="listitem">
+              <span class="step-num" aria-hidden="true">01</span>
+              <div>
+                <p class="step-title">밑줄 & 메모</p>
+                <p class="step-desc">중요한 문장에 밑줄 긋고 여백에 짧은 생각을 적는다.</p>
+              </div>
+            </div>
+            <div class="step-item" role="listitem">
+              <span class="step-num" aria-hidden="true">02</span>
+              <div>
+                <p class="step-title">문단 요약</p>
+                <p class="step-desc">각 문단을 읽은 후 핵심 문장을 한 줄로 요약한다.</p>
+              </div>
+            </div>
+            <div class="step-item" role="listitem">
+              <span class="step-num" aria-hidden="true">03</span>
+              <div>
+                <p class="step-title">모르는 단어 체크</p>
+                <p class="step-desc">이해가 안 되는 어휘는 표시 후 나중에 한꺼번에 찾는다.</p>
+              </div>
+            </div>
+            <div class="step-item" role="listitem">
+              <span class="step-num" aria-hidden="true">04</span>
+              <div>
+                <p class="step-title">질문과 연결</p>
+                <p class="step-desc">읽기 전 세운 질문의 답을 찾으며 읽는다.</p>
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>눈으로만 읽지 말고 손으로 기록하며 읽자 — 기억력이 3배 높아진다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 독서 후 정리하기 -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 독서 후 정리하기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">독서 후 정리</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2 class="chalk-text"><span class="section-icon" aria-hidden="true">📝</span>독서 후 정리하기</h2>
+            <p class="section-subtitle">읽고 나서 내 것으로 만드는 방법</p>
+          </div>
+          <hr class="chalk-rule" aria-hidden="true">
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">🗺️</span>
+              <div class="activity-body">
+                <h3 class="activity-title">마인드맵 그리기</h3>
+                <p class="activity-desc">책의 핵심 개념을 중심에 놓고 가지를 뻗어가며 내용을 시각화한다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">✍️</span>
+              <div class="activity-body">
+                <h3 class="activity-title">독서 일기 쓰기</h3>
+                <p class="activity-desc">줄거리 요약 + 인상 깊은 구절 + 나의 생각을 기록한다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <div class="activity-body">
+                <h3 class="activity-title">친구에게 설명하기</h3>
+                <p class="activity-desc">읽은 내용을 말로 설명하면 이해가 완성되고 기억이 오래간다.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 독서 습관 만들기 -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 독서 습관 만들기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">독서 습관</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2 class="chalk-text"><span class="section-icon" aria-hidden="true">📅</span>독서 습관 만들기</h2>
+            <p class="section-subtitle">꾸준한 독서를 위한 실천 전략</p>
+          </div>
+          <hr class="chalk-rule" aria-hidden="true">
+          <div class="card-grid grid-3" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">⏰</span>
+              <h3 class="card-title">정해진 시간</h3>
+              <p class="card-desc">매일 같은 시간에 20분씩 읽는 것이 가장 효과적이다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">📌</span>
+              <h3 class="card-title">독서 목표 설정</h3>
+              <p class="card-desc">한 달에 책 1권처럼 구체적이고 달성 가능한 목표를 세운다.</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">독서 기록장</h3>
+              <p class="card-desc">읽은 책 목록을 기록하면 성취감이 생겨 지속하게 된다.</p>
+            </div>
+          </div>
+          <ul class="tip-list" role="list">
+            <li class="tip-item"><span class="tip-icon" aria-hidden="true">—</span> 좋아하는 장르부터 시작해 독서에 흥미를 붙인다</li>
+            <li class="tip-item"><span class="tip-icon" aria-hidden="true">—</span> 스마트폰 대신 잠들기 전 10분 독서를 실천한다</li>
+            <li class="tip-item"><span class="tip-icon" aria-hidden="true">—</span> 친구와 함께 같은 책을 읽고 이야기를 나눈다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: End -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 마무리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">마무리</span>
+        </div>
+        <div class="browser-content end-slide">
+          <div class="badge badge-accent">오늘의 핵심 정리</div>
+          <h2 class="end-title chalk-text">📚 독서는 힘이다</h2>
+          <p class="end-subtitle">준비 → 전략적 읽기 → 정리 → 꾸준한 습관</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="highlight-box" role="note" style="max-width:600px;text-align:left;">
+            <p>오늘 배운 방법을 한 가지만 골라 이번 주부터 직접 실천해 보세요. 작은 실천이 큰 변화를 만듭니다.</p>
+          </div>
+          <p class="end-subtitle" style="margin-top:0.5rem;">수고하셨습니다!</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled
+            aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()"
+            aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const TOTAL = 8;
+    let current = 0;
+
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    const progressBar = document.getElementById('progressBar');
+    const announce = document.getElementById('slideAnnounce');
+
+    function updateUI() {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === current);
+      });
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === TOTAL - 1;
+      slideInput.value = current + 1;
+      const pct = ((current + 1) / TOTAL) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', current + 1);
+      const title = slides[current].getAttribute('aria-label') || ('슬라이드 ' + (current + 1));
+      announce.textContent = title;
+    }
+
+    function goToSlide(idx) {
+      if (idx >= 0 && idx < TOTAL) {
+        current = idx;
+        updateUI();
+      }
+    }
+
+    function prevSlide() { goToSlide(current - 1); }
+    function nextSlide() { goToSlide(current + 1); }
+
+    slideInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const v = parseInt(slideInput.value, 10);
+        if (!isNaN(v)) goToSlide(v - 1);
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (document.activeElement === slideInput) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); prevSlide(); }
+    });
+
+    function toggleFullscreen() {
+      const exp = document.getElementById('fsExpand');
+      const cmp = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          exp.style.display = 'none';
+          cmp.style.display = '';
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          exp.style.display = '';
+          cmp.style.display = 'none';
+        }).catch(() => {});
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const exp = document.getElementById('fsExpand');
+      const cmp = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        exp.style.display = '';
+        cmp.style.display = 'none';
+      }
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>

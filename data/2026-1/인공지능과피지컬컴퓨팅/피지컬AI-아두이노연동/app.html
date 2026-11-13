@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>손동작 인식 스마트 조명 - 피지컬 AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <style>
+    :root {
+      --bg: #0F0F2D;
+      --primary: #A78BFA;
+      --accent: #67E8F9;
+      --text: #FFFFFF;
+      --text-sec: #C8C8E0;
+      --glass: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.15);
+      --success: #34D399;
+      --warn: #FBBF24;
+      --danger: #F87171;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(167,139,250,0.12), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(103,232,249,0.08), transparent);
+      color: var(--text);
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 1.5rem 1rem;
+    }
+
+    h1 {
+      font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 0.3rem;
+    }
+    .subtitle { color: var(--text-sec); font-size: 0.85rem; margin-bottom: 1.2rem; }
+
+    .setup-panel {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      width: 100%; max-width: 600px;
+      backdrop-filter: blur(20px);
+      margin-bottom: 1rem;
+    }
+    .setup-panel h2 { font-size: 1rem; color: var(--accent); margin-bottom: 0.8rem; }
+    .input-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+    .input-group label { font-size: 0.85rem; color: var(--text-sec); }
+    .input-group input {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      color: var(--text); font-size: 0.9rem; outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-group input:focus { border-color: var(--accent); }
+    .input-group input::placeholder { color: rgba(200,200,224,0.4); }
+    .input-hint { font-size: 0.75rem; color: var(--text-sec); opacity: 0.7; margin-top: 0.2rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid var(--glass-border); border-radius: 0.5rem;
+      background: var(--glass); color: var(--text);
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; backdrop-filter: blur(10px);
+    }
+    .btn:hover { border-color: var(--primary); background: rgba(167,139,250,0.15); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn--primary { background: rgba(167,139,250,0.2); border-color: rgba(167,139,250,0.4); }
+    .btn--accent { background: rgba(103,232,249,0.15); border-color: rgba(103,232,249,0.3); }
+    .btn--danger { background: rgba(248,113,113,0.15); border-color: rgba(248,113,113,0.3); }
+    .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .status-bar {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 1rem; width: 100%; max-width: 600px;
+    }
+    .status-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--text-sec); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+    .status-dot--on { background: var(--success); box-shadow: 0 0 6px var(--success); }
+    .status-dot--warn { background: var(--warn); box-shadow: 0 0 6px var(--warn); }
+    .status-dot--off { background: var(--danger); }
+
+    .main-area {
+      display: flex; gap: 1.5rem; flex-wrap: wrap;
+      justify-content: center; width: 100%; max-width: 900px;
+    }
+    .webcam-panel {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 1rem; padding: 1rem; text-align: center;
+      backdrop-filter: blur(20px); flex: 1; min-width: 300px; max-width: 400px;
+    }
+    .webcam-panel h3 { font-size: 0.9rem; color: var(--accent); margin-bottom: 0.6rem; }
+    #webcam-container {
+      width: 100%; aspect-ratio: 4/3;
+      background: rgba(0,0,0,0.4); border-radius: 0.6rem; overflow: hidden;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 0.6rem;
+    }
+    #webcam-container canvas { width: 100% !important; height: 100% !important; object-fit: cover; }
+    .webcam-placeholder { color: var(--text-sec); font-size: 0.85rem; }
+
+    .prediction-panel {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 1rem; padding: 1rem; backdrop-filter: blur(20px);
+      flex: 1; min-width: 280px; max-width: 400px;
+    }
+    .prediction-panel h3 { font-size: 0.9rem; color: var(--primary); margin-bottom: 0.6rem; }
+    .prediction-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .pred-item { display: flex; align-items: center; gap: 0.6rem; }
+    .pred-label { font-size: 0.85rem; font-weight: 600; min-width: 4rem; color: var(--text); }
+    .pred-bar-bg {
+      flex: 1; height: 20px;
+      background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--glass-border);
+    }
+    .pred-bar {
+      height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 10px; transition: width 0.15s ease; min-width: 0;
+    }
+    .pred-bar--active { background: linear-gradient(90deg, var(--accent), var(--success)); }
+    .pred-value {
+      font-size: 0.8rem; color: var(--text-sec); min-width: 2.5rem;
+      text-align: right; font-variant-numeric: tabular-nums;
+    }
+
+    .current-command {
+      margin-top: 1rem; padding: 0.8rem;
+      background: rgba(0,0,0,0.3); border-radius: 0.6rem;
+      border: 1px solid var(--glass-border); text-align: center;
+    }
+    .cmd-label { font-size: 0.75rem; color: var(--text-sec); margin-bottom: 0.3rem; }
+    .cmd-value { font-size: 1.5rem; font-weight: 700; }
+    .cmd-R { color: #F87171; }
+    .cmd-G { color: #34D399; }
+    .cmd-B { color: #60A5FA; }
+    .cmd-O { color: var(--text-sec); }
+
+    .led-indicator { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.8rem; }
+    .led {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.2s;
+    }
+    .led--red-on { background: #EF4444; box-shadow: 0 0 15px #EF4444, 0 0 30px rgba(239,68,68,0.4); border-color: #EF4444; }
+    .led--green-on { background: #22C55E; box-shadow: 0 0 15px #22C55E, 0 0 30px rgba(34,197,94,0.4); border-color: #22C55E; }
+    .led--blue-on { background: #3B82F6; box-shadow: 0 0 15px #3B82F6, 0 0 30px rgba(59,130,246,0.4); border-color: #3B82F6; }
+
+    .log-area { margin-top: 1rem; width: 100%; max-width: 600px; }
+    .log-area h3 { font-size: 0.85rem; color: var(--text-sec); margin-bottom: 0.3rem; }
+    .log-box {
+      background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+      border-radius: 0.5rem; padding: 0.5rem 0.7rem;
+      font-family: monospace; font-size: 0.75rem; color: var(--text-sec);
+      height: 80px; overflow-y: auto; line-height: 1.6;
+    }
+
+    .mapping-section { margin-top: 0.8rem; }
+    .mapping-section h3 { font-size: 0.85rem; color: var(--text-sec); margin-bottom: 0.4rem; }
+    .mapping-grid {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      gap: 0.3rem 0.5rem; align-items: center; font-size: 0.82rem;
+    }
+    .map-class { color: var(--text); font-weight: 500; }
+    .map-arrow { color: var(--text-sec); text-align: center; }
+    .map-cmd { color: var(--accent); font-weight: 600; }
+
+    @media (max-width: 640px) {
+      .main-area { flex-direction: column; }
+      .webcam-panel, .prediction-panel { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <h1>손동작 인식 스마트 조명</h1>
+  <p class="subtitle">Teachable Machine × Arduino — 피지컬 AI 프로젝트</p>
+
+  <!-- Setup -->
+  <div class="setup-panel" id="setupPanel">
+    <h2>1. 모델 설정</h2>
+    <div class="input-group">
+      <label for="modelUrl">Teachable Machine 모델 URL</label>
+      <input type="text" id="modelUrl" placeholder="https://teachablemachine.withgoogle.com/models/XXXXXXX/">
+      <p class="input-hint">Teachable Machine에서 "모델 내보내기" → "업로드" 후 복사한 링크</p>
+    </div>
+
+    <div class="mapping-section">
+      <h3>클래스 → 명령 매핑 (모델 로드 후 자동 표시)</h3>
+      <div id="mappingDisplay" class="mapping-grid" style="color:var(--text-sec); font-size:0.8rem;">
+        모델을 먼저 로드하세요
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:1rem;">
+      <button class="btn btn--primary" id="btnLoadModel">모델 로드</button>
+      <button class="btn btn--accent" id="btnConnect" disabled>아두이노 연결</button>
+      <button class="btn btn--danger" id="btnDisconnect" disabled>연결 해제</button>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-item">
+      <span class="status-dot" id="statusModel"></span>
+      <span id="statusModelText">모델: 대기</span>
+    </div>
+    <div class="status-item">
+      <span class="status-dot" id="statusSerial"></span>
+      <span id="statusSerialText">시리얼: 대기</span>
+    </div>
+    <div class="status-item">
+      <span class="status-dot" id="statusCam"></span>
+      <span id="statusCamText">웹캠: 대기</span>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-area">
+    <div class="webcam-panel">
+      <h3>웹캠</h3>
+      <div id="webcam-container">
+        <span class="webcam-placeholder">모델을 로드하면 웹캠이 켜집니다</span>
+      </div>
+      <div class="led-indicator">
+        <div class="led" id="ledR" title="빨강 LED"></div>
+        <div class="led" id="ledG" title="초록 LED"></div>
+        <div class="led" id="ledB" title="파랑 LED"></div>
+      </div>
+    </div>
+    <div class="prediction-panel">
+      <h3>AI 인식 결과</h3>
+      <ul class="prediction-list" id="predictionList">
+        <li style="color:var(--text-sec); font-size:0.85rem;">모델 로드 후 표시됩니다</li>
+      </ul>
+      <div class="current-command">
+        <div class="cmd-label">현재 전송 명령</div>
+        <div class="cmd-value cmd-O" id="cmdDisplay">-</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div class="log-area">
+    <h3>로그</h3>
+    <div class="log-box" id="logBox"></div>
+  </div>
+
+  <script>
+    // ─── State ───
+    var model, webcam, maxPredictions;
+    var port, writer;
+    var isRunning = false;
+    var lastCommand = '';
+    var defaultMapping = {};
+    var commands = ['R', 'G', 'B', 'O'];
+    var commandLabels = { R: '빨강 LED', G: '초록 LED', B: '파랑 LED', O: '끄기' };
+
+    // ─── DOM ───
+    var btnLoad = document.getElementById('btnLoadModel');
+    var btnConnect = document.getElementById('btnConnect');
+    var btnDisconnect = document.getElementById('btnDisconnect');
+    var modelUrlInput = document.getElementById('modelUrl');
+    var logBox = document.getElementById('logBox');
+    var predList = document.getElementById('predictionList');
+    var cmdDisplay = document.getElementById('cmdDisplay');
+    var mappingDisplay = document.getElementById('mappingDisplay');
+    var ledR = document.getElementById('ledR');
+    var ledG = document.getElementById('ledG');
+    var ledB = document.getElementById('ledB');
+    var statusModel = document.getElementById('statusModel');
+    var statusSerial = document.getElementById('statusSerial');
+    var statusCam = document.getElementById('statusCam');
+    var statusModelText = document.getElementById('statusModelText');
+    var statusSerialText = document.getElementById('statusSerialText');
+    var statusCamText = document.getElementById('statusCamText');
+
+    // ─── Logging ───
+    function log(msg, type) {
+      var entry = document.createElement('div');
+      if (type) entry.className = 'log-' + type;
+      var time = new Date().toLocaleTimeString('ko-KR', { hour12: false });
+      entry.textContent = '[' + time + '] ' + msg;
+      if (type === 'info') entry.style.color = '#67E8F9';
+      else if (type === 'success') entry.style.color = '#34D399';
+      else if (type === 'error') entry.style.color = '#F87171';
+      logBox.appendChild(entry);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    // ─── Model ───
+    btnLoad.addEventListener('click', async function() {
+      var url = modelUrlInput.value.trim();
+      if (!url) { log('모델 URL을 입력하세요.', 'error'); return; }
+      if (!url.endsWith('/')) url += '/';
+
+      btnLoad.disabled = true;
+      btnLoad.textContent = '로딩 중...';
+      statusModel.className = 'status-dot status-dot--warn';
+      statusModelText.textContent = '모델: 로딩...';
+      log('모델 로드 시작: ' + url, 'info');
+
+      try {
+        var modelURL = url + 'model.json';
+        var metadataURL = url + 'metadata.json';
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        var classNames = [];
+        for (var i = 0; i < maxPredictions; i++) {
+          classNames.push(model.getClassLabels()[i]);
+        }
+        classNames.forEach(function(name, idx) {
+          defaultMapping[name] = commands[idx] || 'O';
+        });
+
+        // Display mapping using DOM methods
+        mappingDisplay.textContent = '';
+        classNames.forEach(function(name) {
+          var cmd = defaultMapping[name];
+          var spanClass = document.createElement('span');
+          spanClass.className = 'map-class';
+          spanClass.textContent = name;
+          var spanArrow = document.createElement('span');
+          spanArrow.className = 'map-arrow';
+          spanArrow.textContent = '→';
+          var spanCmd = document.createElement('span');
+          spanCmd.className = 'map-cmd';
+          spanCmd.textContent = cmd + ' (' + (commandLabels[cmd] || '알 수 없음') + ')';
+          mappingDisplay.appendChild(spanClass);
+          mappingDisplay.appendChild(spanArrow);
+          mappingDisplay.appendChild(spanCmd);
+        });
+
+        log('모델 로드 성공! 클래스: ' + classNames.join(', '), 'success');
+        statusModel.className = 'status-dot status-dot--on';
+        statusModelText.textContent = '모델: 로드됨 (' + maxPredictions + '개 클래스)';
+
+        await startWebcam();
+        btnConnect.disabled = false;
+      } catch (err) {
+        log('모델 로드 실패: ' + err.message, 'error');
+        statusModel.className = 'status-dot status-dot--off';
+        statusModelText.textContent = '모델: 실패';
+      }
+      btnLoad.disabled = false;
+      btnLoad.textContent = '모델 로드';
+    });
+
+    // ─── Webcam ───
+    async function startWebcam() {
+      var container = document.getElementById('webcam-container');
+      container.textContent = '';
+
+      webcam = new tmImage.Webcam(320, 240, true);
+      await webcam.setup();
+      await webcam.play();
+      container.appendChild(webcam.canvas);
+
+      statusCam.className = 'status-dot status-dot--on';
+      statusCamText.textContent = '웹캠: 활성';
+      log('웹캠 활성화 완료', 'success');
+
+      // Build prediction UI using DOM methods
+      predList.textContent = '';
+      for (var i = 0; i < maxPredictions; i++) {
+        var className = model.getClassLabels()[i];
+        var li = document.createElement('li');
+        li.className = 'pred-item';
+
+        var label = document.createElement('span');
+        label.className = 'pred-label';
+        label.textContent = className;
+
+        var barBg = document.createElement('div');
+        barBg.className = 'pred-bar-bg';
+        var bar = document.createElement('div');
+        bar.className = 'pred-bar';
+        bar.id = 'bar-' + i;
+        bar.style.width = '0%';
+        barBg.appendChild(bar);
+
+        var val = document.createElement('span');
+        val.className = 'pred-value';
+        val.id = 'val-' + i;
+        val.textContent = '0%';
+
+        li.appendChild(label);
+        li.appendChild(barBg);
+        li.appendChild(val);
+        predList.appendChild(li);
+      }
+
+      isRunning = true;
+      window.requestAnimationFrame(loop);
+    }
+
+    async function loop() {
+      if (!isRunning) return;
+      webcam.update();
+      await predict();
+      window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+      if (!model) return;
+      var predictions = await model.predict(webcam.canvas);
+      var bestIdx = 0, bestProb = 0;
+
+      for (var i = 0; i < maxPredictions; i++) {
+        var prob = predictions[i].probability;
+        var pct = Math.round(prob * 100);
+        var bar = document.getElementById('bar-' + i);
+        var val = document.getElementById('val-' + i);
+        if (bar) { bar.style.width = pct + '%'; bar.className = 'pred-bar'; }
+        if (val) val.textContent = pct + '%';
+        if (prob > bestProb) { bestProb = prob; bestIdx = i; }
+      }
+
+      var bestBar = document.getElementById('bar-' + bestIdx);
+      if (bestBar) bestBar.className = 'pred-bar pred-bar--active';
+
+      var bestClass = predictions[bestIdx].className;
+      var cmd = defaultMapping[bestClass] || 'O';
+
+      ledR.className = cmd === 'R' ? 'led led--red-on' : 'led';
+      ledG.className = cmd === 'G' ? 'led led--green-on' : 'led';
+      ledB.className = cmd === 'B' ? 'led led--blue-on' : 'led';
+
+      cmdDisplay.textContent = cmd + ' (' + bestClass + ')';
+      cmdDisplay.className = 'cmd-value cmd-' + cmd;
+
+      if (cmd !== lastCommand && bestProb > 0.7) {
+        lastCommand = cmd;
+        await sendSerial(cmd);
+      }
+    }
+
+    // ─── Serial ───
+    btnConnect.addEventListener('click', async function() {
+      if (!('serial' in navigator)) {
+        log('이 브라우저는 Web Serial API를 지원하지 않습니다. Chrome을 사용하세요.', 'error');
+        return;
+      }
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 9600 });
+        var textEncoder = new TextEncoderStream();
+        textEncoder.readable.pipeTo(port.writable);
+        writer = textEncoder.writable.getWriter();
+
+        statusSerial.className = 'status-dot status-dot--on';
+        statusSerialText.textContent = '시리얼: 연결됨';
+        log('아두이노 연결 성공!', 'success');
+        btnConnect.disabled = true;
+        btnDisconnect.disabled = false;
+      } catch (err) {
+        if (err.name === 'NotFoundError') {
+          log('포트 선택이 취소되었습니다.', 'info');
+        } else {
+          log('시리얼 연결 실패: ' + err.message, 'error');
+        }
+        statusSerial.className = 'status-dot status-dot--off';
+        statusSerialText.textContent = '시리얼: 실패';
+      }
+    });
+
+    btnDisconnect.addEventListener('click', async function() {
+      try {
+        if (writer) { writer.releaseLock(); writer = null; }
+        if (port) { await port.close(); port = null; }
+        statusSerial.className = 'status-dot';
+        statusSerialText.textContent = '시리얼: 대기';
+        log('아두이노 연결 해제됨', 'info');
+        btnConnect.disabled = false;
+        btnDisconnect.disabled = true;
+        lastCommand = '';
+      } catch (err) {
+        log('연결 해제 오류: ' + err.message, 'error');
+      }
+    });
+
+    async function sendSerial(cmd) {
+      if (!writer) return;
+      try { await writer.write(cmd); }
+      catch (err) { log('전송 오류: ' + err.message, 'error'); }
+    }
+
+    window.addEventListener('beforeunload', function() {
+      isRunning = false;
+      if (webcam) webcam.stop();
+    });
+  </script>
+</body>
+</html>

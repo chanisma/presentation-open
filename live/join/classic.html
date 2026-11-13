@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수업 참여</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8fafc; --card: #ffffff; --fg: #1e293b; --sub: #64748b;
+    --line: #e2e8f0; --blue: #3b82f6; --green: #10b981; --red: #ef4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--fg);
+         min-height: 100vh; display: flex; flex-direction: column; }
+  header { padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+           border-bottom: 1px solid var(--line); background: var(--card); }
+  header .brand { font-weight: 800; font-size: 15px; color: var(--sub); }
+  header .session { font-size: 13px; color: var(--sub); display: none; }
+  header .session b { color: var(--blue); letter-spacing: .1em; }
+  main { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px 60px; }
+  .card { width: min(560px, 100%); background: var(--card); border: 1px solid var(--line);
+          border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(15,23,42,.05); }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { color: var(--sub); font-size: 14px; margin-bottom: 22px; line-height: 1.5; }
+  label { display: block; font-size: 13px; font-weight: 700; color: var(--sub); margin: 16px 0 6px; }
+  input[type=text] { width: 100%; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 12px;
+          font-size: 16px; font-family: inherit; outline: none; }
+  input[type=text]:focus { border-color: var(--blue); }
+  #codeInput { text-transform: uppercase; letter-spacing: .25em; font-weight: 800; font-size: 22px; text-align: center; }
+  .btn { width: 100%; margin-top: 20px; padding: 14px; border: 0; border-radius: 12px; cursor: pointer;
+         background: var(--blue); color: #fff; font-size: 16px; font-weight: 700; font-family: inherit; }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn--ghost { background: #f1f5f9; color: var(--fg); }
+  .error { margin-top: 14px; color: var(--red); font-size: 14px; display: none; }
+  .waiting { text-align: center; padding: 30px 0 22px; }
+  .waiting .pulse { width: 52px; height: 52px; margin: 0 auto 18px; border-radius: 50%;
+                    background: var(--blue); opacity: .25; animation: lpPulse 1.6s ease-in-out infinite; }
+  @keyframes lpPulse { 0%,100% { transform: scale(.85); opacity: .18; } 50% { transform: scale(1.08); opacity: .38; } }
+  .prompt { font-size: 20px; font-weight: 800; line-height: 1.45; margin-bottom: 20px; }
+  .choice { display: flex; flex-direction: column; gap: 10px; }
+  .choice button { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+    padding: 15px 16px; border: 1.5px solid var(--line); border-radius: 14px; background: #fff;
+    font-size: 16px; font-family: inherit; cursor: pointer; line-height: 1.4; }
+  .choice button .num { flex: none; width: 28px; height: 28px; border-radius: 8px; background: #f1f5f9;
+    color: var(--sub); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .choice button.sel { border-color: var(--blue); background: #eff6ff; }
+  .choice button.sel .num { background: var(--blue); color: #fff; }
+  .oxwrap { display: flex; gap: 14px; }
+  .oxwrap button { flex: 1; padding: 26px 0; border: 1.5px solid var(--line); border-radius: 18px;
+    background: #fff; cursor: pointer; font-family: inherit; }
+  .oxwrap button .mark { font-size: 44px; font-weight: 800; line-height: 1; }
+  .oxwrap button:first-child .mark { color: var(--green); }
+  .oxwrap button:last-child .mark { color: var(--red); }
+  .oxwrap button.sel { border-width: 3px; }
+  .oxwrap button:first-child.sel { border-color: var(--green); background: #ecfdf5; }
+  .oxwrap button:last-child.sel { border-color: var(--red); background: #fef2f2; }
+  textarea { width: 100%; min-height: 120px; padding: 13px 14px; border: 1.5px solid var(--line);
+    border-radius: 12px; font-size: 16px; font-family: inherit; resize: vertical; outline: none; }
+  textarea:focus { border-color: var(--blue); }
+  .hint { margin-top: 10px; font-size: 12.5px; color: var(--sub); }
+  .done { text-align: center; padding: 26px 0 16px; }
+  .done .ic { width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%; background: #ecfdf5;
+    color: var(--green); font-size: 28px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .round-banner { background: #fff7ed; border: 1.5px solid #fdba74; color: #9a3412;
+    border-radius: 12px; padding: 10px 14px; font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+  .gamify-banner { background: #f5f3ff; border: 1.5px solid #c4b5fd; color: #5b21b6;
+    border-radius: 12px; padding: 10px 14px; font-size: 14px; margin-bottom: 16px;
+    line-height: 1.5; font-weight: 700; }
+  .rating { display: flex; gap: 8px; }
+  .rating button { flex: 1; padding: 13px 0 10px; border: 1.5px solid var(--line); border-radius: 12px;
+    background: #fff; cursor: pointer; font-family: inherit; text-align: center; }
+  .rating button .n { font-size: 20px; font-weight: 800; display: block; }
+  .rating button .t { display: block; font-size: 10.5px; color: var(--sub); margin-top: 3px; line-height: 1.3; }
+  .rating button.sel { border-color: var(--blue); background: #eff6ff; }
+  .rating button.sel .n { color: var(--blue); }
+  /* ── 코드 문항 (컴퓨터실 전제 — 카드 폭 확장) ── */
+  .card--code { width: min(980px, 100%); }
+  .code-editor { width: 100%; min-height: 220px; padding: 14px; border: 1.5px solid var(--line);
+    border-radius: 12px; font-family: Consolas, 'D2Coding', 'Courier New', monospace;
+    font-size: 14.5px; line-height: 1.55; background: #0f172a; color: #e2e8f0;
+    resize: vertical; outline: none; tab-size: 4; white-space: pre; overflow-x: auto; }
+  .code-editor:focus { border-color: var(--blue); }
+  .code-toolbar { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+  .code-toolbar .btn-run { padding: 10px 22px; border: 0; border-radius: 10px; cursor: pointer;
+    background: #0f766e; color: #fff; font-weight: 700; font-size: 14.5px; font-family: inherit; }
+  .code-toolbar .btn-run:disabled { opacity: .5; cursor: default; }
+  .code-status { font-size: 12.5px; color: var(--sub); }
+  .code-out { margin-top: 12px; background: #0f172a; color: #cbd5e1; border-radius: 10px;
+    padding: 12px 14px; font-family: Consolas, monospace; font-size: 13px; white-space: pre-wrap;
+    max-height: 160px; overflow-y: auto; }
+  .code-out.err { color: #fca5a5; }
+  .tests { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .tests .t { display: flex; gap: 10px; align-items: baseline; font-family: Consolas, monospace;
+    font-size: 13px; padding: 8px 12px; border-radius: 8px; background: #f1f5f9; overflow-wrap: anywhere; }
+  .tests .t.ok { background: #ecfdf5; } .tests .t.no { background: #fef2f2; }
+  .tests .t .mark { font-weight: 800; flex: none; }
+  .tests .t.ok .mark { color: #059669; } .tests .t.no .mark { color: #dc2626; }
+  .web-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  @media (max-width: 760px) { .web-wrap { grid-template-columns: 1fr; } }
+  .web-wrap iframe { width: 100%; min-height: 260px; border: 1.5px solid var(--line);
+    border-radius: 12px; background: #fff; }
+  .submitted-note { margin-top: 10px; font-size: 13px; color: #047857; font-weight: 700; }
+  .verdict { margin: 0 0 16px; padding: 12px 16px; border-radius: 12px; font-weight: 700; font-size: 15px; }
+  .verdict--ok { background: #ecfdf5; color: #047857; }
+  .verdict--no { background: #fef2f2; color: #b91c1c; }
+  .verdict--na { background: #f1f5f9; color: var(--sub); }
+  /* ── 미러 모드: 호스트의 현재 슬라이드를 따라가고, 문항은 그 위 모달로 ── */
+  #mirrorWrap { position: fixed; left: 0; right: 0; bottom: 0; top: 53px; z-index: 0;
+    display: none; background: #0e1526; }
+  #mirrorWrap iframe { width: 100%; height: 100%; border: 0; display: block; }
+  #mirrorShield { position: absolute; inset: 0; z-index: 1; } /* 학생의 덱 조작 차단 */
+  body.mirror #mirrorWrap { display: block; }
+  body.mirror main { position: fixed; left: 0; right: 0; bottom: 0; top: 53px; z-index: 30;
+    margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center;
+    background: rgba(9, 14, 26, .42); pointer-events: none; overflow-y: auto; }
+  body.mirror main .card { pointer-events: auto; max-height: 82vh; overflow-y: auto;
+    box-shadow: 0 24px 70px rgba(0,0,0,.5); }
+  body.mirror.idle main, body.mirror.peek main { display: none; }
+  .mirror-pill { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 40;
+    display: none; align-items: center; gap: 10px; background: rgba(15,23,42,.9); color: #cbd5e1;
+    border: 1px solid rgba(148,163,184,.3); border-radius: 999px; padding: 8px 16px;
+    font-size: 13px; white-space: nowrap; }
+  body.mirror .mirror-pill { display: flex; }
+  .mirror-pill button { display: none; border: 0; border-radius: 999px; padding: 5px 13px;
+    cursor: pointer; background: var(--blue); color: #fff; font-weight: 700;
+    font-family: inherit; font-size: 12.5px; }
+  .mirror-pill button.show { display: inline-block; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">수업 라이브</div>
+  <div class="session" id="sessInfo">세션 <b id="sessCode"></b></div>
+</header>
+<main><div class="card" id="app"></div></main>
+<div id="mirrorWrap"><iframe id="mirrorFrame" title="선생님 수업 화면"></iframe><div id="mirrorShield"></div></div>
+<div class="mirror-pill"><span id="mirrorMsg"></span><button id="peekBtn" type="button"></button></div>
+
+<script type="module">
+import { getClientId } from '../runtime/config.js?v=2';
+import { createDriver } from '../runtime/driver.js?v=1';
+import { renderAggregates } from '../runtime/charts.js?v=1';
+import { createPythonRunner, renderWebPreview } from '../runtime/code-runner.js?v=1';
+
+const app = document.getElementById('app');
+const params = new URLSearchParams(location.search);
+const clientId = getClientId();
+
+let driver = null;
+let channel = { ok: false, send() {}, close() {} };
+let code = (params.get('code') || sessionStorage.getItem('lp.code') || '').toUpperCase();
+let me = null;                 // lp_join 결과
+let answered = new Set();      // 제출 완료 키: `${activityId}:${round}`
+let selected = null;           // 현재 선택 (choice 인덱스 | ox boolean | exit 별점)
+let lastSig = '';              // re-render 시그니처 (타이핑 보호)
+let pollTimer = null;
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const ansKey = (a) => a.id + ':' + (a.round || 1);
+
+function myAnswer(actId, round) {
+  try { return JSON.parse(localStorage.getItem(`lp.ans.${actId}:${round || 1}`) || 'null'); } catch (e) { return null; }
+}
+
+// ── 화면 1: 참여 폼 ──
+function renderJoinForm(msg) {
+  lastSig = 'joinform';
+  app.innerHTML = `
+    <h1>수업 참여하기</h1>
+    <p class="sub">선생님 화면에 표시된 6자리 세션 코드를 입력하세요.</p>
+    <label for="codeInput">세션 코드</label>
+    <input type="text" id="codeInput" maxlength="6" autocomplete="off" spellcheck="false" value="${esc(code)}">
+    <label for="nickInput">이름</label>
+    <input type="text" id="nickInput" maxlength="30" autocomplete="off" placeholder="예: 한시우"
+           value="${esc(localStorage.getItem('lp.nickname') || '')}">
+    <button class="btn" id="joinBtn">참여하기</button>
+    <p class="error" id="joinErr"></p>`;
+  if (msg) { const e = app.querySelector('#joinErr'); e.textContent = msg; e.style.display = 'block'; }
+  const codeEl = app.querySelector('#codeInput');
+  const nickEl = app.querySelector('#nickInput');
+  const go = () => join(codeEl.value.trim().toUpperCase(), nickEl.value.trim());
+  app.querySelector('#joinBtn').addEventListener('click', go);
+  [codeEl, nickEl].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); }));
+  (code ? nickEl : codeEl).focus();
+}
+
+async function join(inputCode, nickname) {
+  const err = app.querySelector('#joinErr');
+  if (!/^[A-Z0-9]{6}$/.test(inputCode)) {
+    err.textContent = '세션 코드는 6자리입니다.'; err.style.display = 'block'; return;
+  }
+  if (!nickname) { err.textContent = '이름을 입력해주세요.'; err.style.display = 'block'; return; }
+  const btn = app.querySelector('#joinBtn');
+  btn.disabled = true; btn.textContent = '연결 중…';
+  try {
+    me = await driver.join(inputCode, {
+      clientId, nickname, studentNo: localStorage.getItem('lp.studentNo') || null,
+    });
+    code = me.code;
+    sessionStorage.setItem('lp.code', code);
+    localStorage.setItem('lp.nickname', nickname);
+    if (me.nameMode === 'named' && !me.myStudentNo) { renderStudentNoForm(); return; }
+    await enterSession();
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '참여하기';
+    err.textContent = /not found|ended/i.test(e.message)
+      ? '세션을 찾을 수 없습니다. 코드를 확인해주세요.' : ('연결 실패: ' + e.message);
+    err.style.display = 'block';
+  }
+}
+
+// 기명 세션: 학번 입력 단계
+function renderStudentNoForm() {
+  lastSig = 'studentno';
+  app.innerHTML = `
+    <h1>학번 입력</h1>
+    <p class="sub">이 세션은 <b>기명 참여</b>입니다. 학번을 입력해주세요.</p>
+    <label for="snoInput">학번</label>
+    <input type="text" id="snoInput" maxlength="20" autocomplete="off" placeholder="예: 10130"
+           value="${esc(localStorage.getItem('lp.studentNo') || '')}">
+    <button class="btn" id="snoBtn">계속하기</button>
+    <p class="error" id="snoErr"></p>`;
+  const input = app.querySelector('#snoInput');
+  const err = app.querySelector('#snoErr');
+  const go = async () => {
+    const v = input.value.trim();
+    if (!v) { err.textContent = '학번을 입력해주세요.'; err.style.display = 'block'; return; }
+    const btn = app.querySelector('#snoBtn');
+    btn.disabled = true;
+    try {
+      me = await driver.join(code, {
+        clientId, nickname: localStorage.getItem('lp.nickname') || '', studentNo: v,
+      });
+      localStorage.setItem('lp.studentNo', v);
+      await enterSession();
+    } catch (e) {
+      btn.disabled = false;
+      err.textContent = '연결 실패: ' + e.message; err.style.display = 'block';
+    }
+  };
+  app.querySelector('#snoBtn').addEventListener('click', go);
+  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+  input.focus();
+}
+
+async function enterSession() {
+  (me.myResponses || []).forEach((r) => answered.add(r.activityId + ':' + (r.round || 1)));
+  document.getElementById('sessCode').textContent = code;
+  document.getElementById('sessInfo').style.display = 'block';
+  setupMirror();
+  applyInteract(!!me.allowInteract);
+  channel = await driver.connectChannel(code, onLiveEvent);
+  startPolling();
+  lastSig = '';
+  applyState({ status: 'open', currentActivity: me.currentActivity,
+               currentSlide: me.currentSlide, revealedAggregates: null }, true);
+  refresh();
+}
+
+// ── 미러 모드: 호스트 덱을 iframe으로 열고 currentSlide를 따라간다 ──
+let mirror = false;
+let peek = false;              // 문항 모달을 잠깐 숨기고 슬라이드만 보기
+let mirrorReady = false;
+let allowInteract = false;     // 교사가 푼 "학생 조작 허용" (세션 플래그 v11)
+let lastMirrorSlide = -1;
+let lastMirrorClicks = -1;
+let lastKnownSlide = 0;
+let lastModalKey = '';
+
+function setupMirror() {
+  if (!me.deckPath) return;
+  mirror = true;
+  document.body.classList.add('mirror');
+  const headerH = document.querySelector('header').offsetHeight;
+  document.getElementById('mirrorWrap').style.top = headerH + 'px';
+  document.querySelector('main').style.top = headerH + 'px';
+  const frame = document.getElementById('mirrorFrame');
+  frame.addEventListener('load', () => {
+    mirrorReady = true;
+    lastMirrorSlide = -1;
+    try {
+      // 미러 전용: 슬라이드 전환을 짧게 (원본 덱 0.45s 페이드 → 반응 체감 0.5초 내 완료)
+      const st = frame.contentDocument.createElement('style');
+      st.textContent = '.slide { transition-duration: .18s !important; }';
+      frame.contentDocument.head.appendChild(st);
+    } catch (e) { /* 접근 불가 시 원본 전환 유지 */ }
+    syncMirror(lastKnownSlide);
+  });
+  // 디렉터리 URL (서버 리다이렉트의 쿼리 소실 무관, ?live 없음 → 일반 덱으로 로드)
+  frame.src = '../../' + me.deckPath.replace(/index\.html$/, '');
+  document.getElementById('peekBtn').addEventListener('click', () => {
+    peek = !peek;
+    document.body.classList.toggle('peek', peek);
+    syncPill();
+  });
+  syncPill();
+}
+
+// 차단막(#mirrorShield) 제거/복구 — 교사가 [학생 조작]을 풀면 학생이 덱을 직접 누른다
+function applyInteract(v) {
+  if (typeof v !== 'boolean' || v === allowInteract) return;
+  allowInteract = v;
+  const shield = document.getElementById('mirrorShield');
+  if (shield) shield.style.display = v ? 'none' : '';
+  syncPill(lastPillShowable);
+}
+
+function syncMirror(n, clicks) {
+  if (Number.isInteger(n)) lastKnownSlide = n;
+  if (Number.isInteger(clicks)) lastKnownClicks = clicks;
+  if (!mirror || !mirrorReady) return;
+  try {
+    const frame = document.getElementById('mirrorFrame');
+    const doc = frame.contentDocument;
+    // 네이티브 React 덱(bolt 엔진, #root 마커): hash 내비게이션(초기 안전망)
+    // + postMessage로 빌드 단계(clicks)까지 전달 — 슬라이드 안에서 하나씩
+    // 열리는 요소도 호스트를 따라간다 (엔진의 deck-mirror 수신 effect)
+    if (doc?.getElementById('root')) {
+      // 조작 허용 중에는 "같은 위치"를 되풀이 밀어넣지 않는다 — 폴링이 학생이
+      // 방금 넘긴 슬라이드를 되돌리기 때문 (교사가 실제로 움직이면 다시 따라간다)
+      if (allowInteract && lastKnownSlide === lastMirrorSlide
+          && lastKnownClicks === lastMirrorClicks) return;
+      const target = '#' + (lastKnownSlide + 1);
+      if (frame.contentWindow.location.hash !== target) {
+        frame.contentWindow.location.hash = target;
+      }
+      frame.contentWindow.postMessage(
+        { type: 'deck-mirror', slide: lastKnownSlide, clicks: lastKnownClicks },
+        location.origin
+      );
+      lastMirrorSlide = lastKnownSlide;
+      lastMirrorClicks = lastKnownClicks;
+      return;
+    }
+    const slides = doc?.querySelectorAll('.slide');
+    if (!slides || !slides.length) return;
+    const idx = Math.max(0, Math.min(slides.length - 1, lastKnownSlide));
+    if (idx === lastMirrorSlide) return;
+    lastMirrorSlide = idx;
+    slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+  } catch (e) { /* 프레임 접근 불가 시 다음 동기화에서 재시도 */ }
+}
+
+let lastPillShowable = false;
+function syncPill(showable) {
+  if (!mirror) return;
+  lastPillShowable = !!showable;
+  const msg = document.getElementById('mirrorMsg');
+  const btn = document.getElementById('peekBtn');
+  if (!showable) {
+    msg.textContent = allowInteract
+      ? `세션 ${code} · 직접 넘겨볼 수 있어요 — 선생님이 넘기면 그 화면으로 돌아갑니다`
+      : `세션 ${code} · 선생님 화면을 따라가는 중 — 문항이 열리면 여기에 표시됩니다`;
+    btn.classList.remove('show');
+  } else if (peek) {
+    msg.textContent = '문항이 열려 있어요';
+    btn.textContent = '문항 보기';
+    btn.classList.add('show');
+  } else {
+    msg.textContent = `세션 ${code}`;
+    btn.textContent = '슬라이드만 보기';
+    btn.classList.add('show');
+  }
+}
+
+// ── 실시간 이벤트: 페이로드 동봉 → 재조회 없이 즉시 반영 (지연 최소화) ──
+let lastActivity = null;
+let reconcileTimer = null;
+function scheduleReconcile() {   // 직접 반영 후 서버 상태로 보정 (유실·경합 안전망)
+  clearTimeout(reconcileTimer);
+  reconcileTimer = setTimeout(refresh, 1500);
+}
+
+// 슬라이드 핑 순서 보호: 연타 시 늦게 도착한 옛 핑(seq 역전)은 버린다.
+// 최근 핑 시각은 DB 보정(reconcile)이 미러를 뒤로 당기지 않게 하는 기준.
+let lastSlideSeq = 0;
+let lastSlidePingAt = 0;
+let lastKnownClicks = 0;
+
+function onLiveEvent(p) {
+  if (!p || !p.type) { refresh(); return; }
+  switch (p.type) {
+    case 'slide':
+      if (Number.isInteger(p.index)) {
+        if (typeof p.seq === 'number') {
+          if (p.seq <= lastSlideSeq) return; // 순서 역전 — 무시
+          lastSlideSeq = p.seq;
+        }
+        lastSlidePingAt = Date.now();
+        syncMirror(p.index, Number.isInteger(p.clicks) ? p.clicks : 0);
+      }
+      return;
+    case 'activity':
+      if (p.activity) {
+        applyState({ status: 'open', currentActivity: p.activity, revealedAggregates: null });
+        scheduleReconcile();
+        return;
+      }
+      break;
+    case 'close':
+      if (lastActivity && p.activityId === lastActivity.id) {
+        applyState({ status: 'open', currentActivity: { ...lastActivity, status: 'closed' }, revealedAggregates: null });
+        scheduleReconcile();
+        return;
+      }
+      break;
+    case 'reveal':
+      if (p.agg && lastActivity && p.activityId === lastActivity.id) {
+        applyState({ status: 'open', currentActivity: { ...lastActivity, status: 'revealed' }, revealedAggregates: p.agg });
+        scheduleReconcile();
+        return;
+      }
+      break;
+    case 'end':
+      applyState({ status: 'ended' });
+      return;
+    case 'interact':
+      applyInteract(!!p.on);   // 차단막만 바뀐다 — 재조회 불필요
+      return;
+    case 'submitted':
+      return; // 다른 학생의 제출 핑 — 교사용
+    default:
+      break;
+  }
+  refresh(); // 모르는/불완전한 이벤트는 재조회로 수렴
+}
+
+// ── 상태 재조회 (보정용 폴링 — 실시간 채널 없으면 2초로 단축) ──
+async function refresh() {
+  if (!me) return;
+  try {
+    const st = await driver.studentState(code, clientId);
+    applyState(st, false);
+  } catch (e) { /* 일시적 네트워크 오류는 다음 폴링에서 복구 */ }
+}
+
+function startPolling() {
+  clearInterval(pollTimer);
+  pollTimer = setInterval(refresh, channel.ok ? 5000 : 2000);
+}
+
+function sigOf(st) {
+  const a = st.currentActivity;
+  // code 문항은 재제출 가능 — 제출 여부로 재렌더하지 않음 (작성 중 코드 보호)
+  const answeredSig = a && (a.kind === 'code' ? 'code' : answered.has(ansKey(a)));
+  return [st.status, a && a.id, a && a.status, a && a.round,
+          st.revealedAggregates && st.revealedAggregates.total,
+          answeredSig].join('|');
+}
+
+function applyState(st, force) {
+  applyInteract(st.allowInteract);   // 핑 유실·늦은 입장 대비 (폴링으로 수렴)
+  // DB의 슬라이드는 입장·재접속 복구용 — 호스트의 DB 반영이 디바운스(400ms)라
+  // 연타 직후엔 옛 값일 수 있다. 최근 브로드캐스트 핑이 있으면 핑이 우선.
+  if (Date.now() - lastSlidePingAt > 4000) syncMirror(st.currentSlide);
+
+  const sig = sigOf(st);
+  if (!force && sig === lastSig) return;  // 변화 없으면 재렌더 금지 (타이핑 보호)
+  lastSig = sig;
+
+  const a = st.currentActivity;
+  if (a) lastActivity = a;   // 실시간 이벤트(close/reveal)의 대상 매칭용
+
+  // 미러 모드: 문항이 열려 있을 때만 모달 표시, 새 문항/상태 전환 시 peek 해제
+  if (mirror) {
+    const showable = !!(a && (a.status === 'open' || a.status === 'revealed')) || st.status === 'ended';
+    const modalKey = st.status === 'ended' ? 'ended' : (a ? a.id + ':' + a.status : '');
+    if (modalKey !== lastModalKey) { lastModalKey = modalKey; peek = false; }
+    document.body.classList.toggle('idle', !showable);
+    document.body.classList.toggle('peek', peek && showable);
+    syncPill(showable && st.status !== 'ended');
+  }
+
+  if (st.status === 'ended') { renderEnded(); clearInterval(pollTimer); return; }
+  document.querySelector('.card').classList.toggle('card--code',
+    !!(a && a.kind === 'code' && a.status === 'open'));
+  // 문항 닫기 = 문항/결과 화면 제거 — 카드 모드는 중립 대기, 미러 모드는 슬라이드만 남음
+  if (!a || a.status === 'closed') { renderWaiting(null); return; }
+  if (a.status === 'revealed') { renderRevealed(a, st.revealedAggregates); return; }
+  if (a.status === 'open') {
+    if (a.kind === 'code') renderCodeActivity(a);
+    else if (answered.has(ansKey(a))) renderSubmitted(a);
+    else renderActivity(a);
+  }
+}
+
+function renderWaiting(msgTop) {
+  app.innerHTML = `
+    <div class="waiting">
+      <div class="pulse"></div>
+      <h1>${esc(msgTop || '잠시만 기다려주세요')}</h1>
+      <p class="sub" style="margin-top:8px">선생님이 다음 활동을 열면 자동으로 표시됩니다.</p>
+    </div>`;
+}
+
+function renderEnded() {
+  app.innerHTML = `
+    <div class="waiting">
+      <h1>수업 세션이 종료되었습니다</h1>
+      <p class="sub" style="margin-top:8px">참여해줘서 고마워요! 창을 닫아도 됩니다.</p>
+    </div>`;
+}
+
+function renderSubmitted(a) {
+  const roundLabel = a && (a.round || 1) > 1 ? '2차 투표 제출 완료!' : '제출 완료!';
+  app.innerHTML = `
+    <div class="done">
+      <div class="ic">✓</div>
+      <h1>${roundLabel}</h1>
+      <p class="sub" style="margin-top:8px">선생님이 결과를 공개하면 여기에 표시됩니다.</p>
+    </div>`;
+}
+
+// ── 문항 렌더 ──
+function renderActivity(a) {
+  selected = null;
+  const cfg = a.config || {};
+  const round = a.round || 1;
+
+  // 스피드 퀴즈 배너 — gamify 세션의 점수 대상 문항 (서버가 a.gamify로 판정)
+  let banner = '';
+  if (a.gamify) {
+    banner += '<div class="gamify-banner">⚡ 스피드 퀴즈 — 빠르고 정확할수록 점수가 높아요!</div>';
+  }
+
+  // Peer Instruction 2차 투표 배너 (1차 선택 상기)
+  if (round > 1) {
+    const prev = myAnswer(a.id, 1);
+    let prevText = '';
+    if (prev && a.kind === 'choice' && Number.isInteger(prev.choice)) prevText = ` 내 1차 선택: ${prev.choice + 1}번`;
+    else if (prev && a.kind === 'ox' && typeof prev.ox === 'boolean') prevText = ` 내 1차 선택: ${prev.ox ? 'O' : 'X'}`;
+    banner += `<div class="round-banner"><b>2차 투표</b> — 짝과 토론한 내용을 바탕으로 다시 선택하세요!${esc(prevText)}</div>`;
+  }
+
+  let body = '';
+  if (a.kind === 'choice') {
+    body = `<div class="choice">${(cfg.options || []).map((opt, i) =>
+      `<button data-i="${i}"><span class="num">${i + 1}</span><span>${esc(opt)}</span></button>`).join('')}</div>
+      <p class="hint">숫자 키(1~${(cfg.options || []).length})로 선택, Enter로 제출할 수 있어요.</p>`;
+  } else if (a.kind === 'ox') {
+    body = `<div class="oxwrap">
+      <button data-ox="true"><span class="mark">O</span></button>
+      <button data-ox="false"><span class="mark">X</span></button></div>
+      <p class="hint">O/X 키로 선택, Enter로 제출할 수 있어요.</p>`;
+  } else if (a.kind === 'wordcloud') {
+    const draft = localStorage.getItem('lp.draft.' + a.id) || '';
+    body = `<input type="text" id="cloudInput" maxlength="30" autocomplete="off"
+      placeholder="한 단어 또는 짧은 구절로!" value="${esc(draft)}">
+      <p class="hint">친구들과 같은 단어를 쓰면 결과 화면에서 더 크게 보여요.</p>`;
+  } else if (a.kind === 'exit') {
+    const labels = ['전혀<br>모르겠어요', '조금<br>어려웠어요', '보통이에요', '잘<br>이해했어요', '완벽해요!'];
+    body = `<label style="margin-top:0">오늘 수업, 얼마나 이해했나요?</label>
+      <div class="rating">${[1, 2, 3, 4, 5].map((n) =>
+        `<button data-r="${n}"><span class="n">${n}</span><span class="t">${labels[n - 1]}</span></button>`).join('')}</div>
+      <textarea id="exitText" maxlength="300" style="margin-top:14px;min-height:80px"
+        placeholder="선생님께 남길 질문이나 한마디 (선택)"></textarea>
+      <p class="hint">숫자 키(1~5)로 선택할 수 있어요.</p>`;
+  } else {
+    const draft = localStorage.getItem('lp.draft.' + a.id) || '';
+    body = `<textarea id="shortInput" maxlength="500" placeholder="여기에 답을 입력하세요">${esc(draft)}</textarea>
+      <p class="hint">입력 내용은 자동 임시저장됩니다.</p>`;
+  }
+
+  app.innerHTML = `${banner}<h2 class="prompt">${esc(a.prompt)}</h2>${body}
+    <button class="btn" id="submitBtn" disabled>제출하기</button>
+    <p class="error" id="subErr"></p>`;
+
+  const submitBtn = app.querySelector('#submitBtn');
+  const setSel = (v) => { selected = v; syncSel(); submitBtn.disabled = false; };
+  const syncSel = () => {
+    app.querySelectorAll('.choice button').forEach((b) => b.classList.toggle('sel', Number(b.dataset.i) === selected));
+    app.querySelectorAll('.oxwrap button').forEach((b) => b.classList.toggle('sel', (b.dataset.ox === 'true') === selected));
+    app.querySelectorAll('.rating button').forEach((b) => b.classList.toggle('sel', Number(b.dataset.r) === selected));
+  };
+  app.querySelectorAll('.choice button').forEach((b) => b.addEventListener('click', () => setSel(Number(b.dataset.i))));
+  app.querySelectorAll('.oxwrap button').forEach((b) => b.addEventListener('click', () => setSel(b.dataset.ox === 'true')));
+  app.querySelectorAll('.rating button').forEach((b) => b.addEventListener('click', () => setSel(Number(b.dataset.r))));
+
+  const ta = app.querySelector('#shortInput');
+  if (ta) {
+    submitBtn.disabled = !ta.value.trim();
+    ta.addEventListener('input', () => {
+      localStorage.setItem('lp.draft.' + a.id, ta.value);
+      submitBtn.disabled = !ta.value.trim();
+    });
+  }
+  const cloud = app.querySelector('#cloudInput');
+  if (cloud) {
+    submitBtn.disabled = !cloud.value.trim();
+    cloud.addEventListener('input', () => {
+      localStorage.setItem('lp.draft.' + a.id, cloud.value);
+      submitBtn.disabled = !cloud.value.trim();
+    });
+    cloud.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !submitBtn.disabled) submitBtn.click(); });
+    cloud.focus();
+  }
+  submitBtn.addEventListener('click', () => submit(a));
+}
+
+async function submit(a) {
+  const btn = app.querySelector('#submitBtn');
+  const err = app.querySelector('#subErr');
+  let payload = null;
+  if (a.kind === 'choice') { if (selected === null) return; payload = { choice: selected }; }
+  else if (a.kind === 'ox') { if (selected === null) return; payload = { ox: selected }; }
+  else if (a.kind === 'wordcloud') {
+    const v = app.querySelector('#cloudInput').value.trim();
+    if (!v) return; payload = { text: v };
+  } else if (a.kind === 'exit') {
+    if (selected === null) return;
+    const t = (app.querySelector('#exitText')?.value || '').trim();
+    payload = { rating: selected, text: t };
+  } else {
+    const v = app.querySelector('#shortInput').value.trim();
+    if (!v) return; payload = { text: v };
+  }
+  btn.disabled = true; btn.textContent = '제출 중…';
+  try {
+    const r = await driver.submit(a.id, me.participantId, clientId, payload);
+    if (r.ok || r.reason === 'duplicate') {
+      const round = r.round || a.round || 1;
+      answered.add(a.id + ':' + round);
+      localStorage.setItem(`lp.ans.${a.id}:${round}`, JSON.stringify(payload));
+      localStorage.removeItem('lp.draft.' + a.id);
+      channel.send({ type: 'submitted' });   // 교사 카운트 즉시 갱신용 핑
+      lastSig = ''; // 강제 재렌더
+      applyState({ status: 'open', currentActivity: a, revealedAggregates: null }, true);
+    } else if (r.reason === 'not_open') {
+      err.textContent = '답변이 마감되었습니다.'; err.style.display = 'block';
+      btn.textContent = '제출하기';
+    }
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '제출하기';
+    err.textContent = '제출 실패: ' + e.message; err.style.display = 'block';
+  }
+}
+
+// ── 코드 문항 (Python: Pyodide 워커 채점 / Web: iframe 샌드박스 미리보기) ──
+let pyRunner = null;
+let lastRun = {};   // activityId → {code, passed, total, results}
+
+function renderCodeActivity(a) {
+  const cfg = a.config || {};
+  const lang = cfg.language === 'web' ? 'web' : 'python';
+  const tests = Array.isArray(cfg.tests) ? cfg.tests : [];
+  const draft = localStorage.getItem('lp.draft.' + a.id) ?? (cfg.starter || '');
+  const wasSubmitted = answered.has(ansKey(a));
+  document.querySelector('.card').classList.add('card--code');
+
+  if (lang === 'python') {
+    app.innerHTML = `
+      <h2 class="prompt">${esc(a.prompt)}</h2>
+      <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+      <div class="code-toolbar">
+        <button class="btn-run" id="runBtn">실행${tests.length ? ' + 채점' : ''}</button>
+        <span class="code-status" id="engineStatus">파이썬 엔진 준비 중… (최초 1회 약 10MB)</span>
+      </div>
+      <div class="code-out hidden" id="codeOut"></div>
+      <div class="tests" id="testList"></div>
+      <button class="btn" id="submitBtn" disabled>제출하기</button>
+      <p class="hint" id="submitHint">${tests.length ? '실행해서 결과를 확인한 뒤 제출할 수 있어요. 제출 후에도 고쳐서 다시 제출 가능!' : '실행해본 뒤 제출하세요.'}</p>
+      <p class="submitted-note ${wasSubmitted ? '' : 'hidden'}" id="subNote">제출됨 — 더 나은 코드로 다시 제출할 수 있어요</p>
+      <p class="error" id="subErr"></p>`;
+
+    const editor = app.querySelector('#codeEditor');
+    editor.value = draft;
+    const runBtn = app.querySelector('#runBtn');
+    const submitBtn = app.querySelector('#submitBtn');
+    const statusEl = app.querySelector('#engineStatus');
+    const outEl = app.querySelector('#codeOut');
+    const testList = app.querySelector('#testList');
+
+    if (!pyRunner) {
+      pyRunner = createPythonRunner({
+        onStatus: (s) => {
+          const el = app.querySelector('#engineStatus');
+          if (!el) return;
+          if (s === 'loading') el.textContent = '파이썬 엔진 준비 중… (최초 1회 약 10MB)';
+          else if (s === 'ready') el.textContent = '엔진 준비 완료';
+          else if (s === 'running') el.textContent = '실행 중…';
+          else if (s === 'error') el.textContent = '엔진 오류 — 새로고침 후 다시 시도해주세요';
+        },
+      });
+    }
+    pyRunner.preload();
+
+    const syncSubmit = () => {
+      const lr = lastRun[a.id];
+      submitBtn.disabled = !(lr && lr.code === editor.value);
+      submitBtn.textContent = wasSubmitted || answered.has(ansKey(a)) ? '다시 제출하기' : '제출하기';
+    };
+    syncSubmit();
+
+    editor.addEventListener('input', () => {
+      localStorage.setItem('lp.draft.' + a.id, editor.value);
+      syncSubmit();
+    });
+    editor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = editor.selectionStart;
+        editor.setRangeText('    ', s, editor.selectionEnd, 'end');
+        editor.dispatchEvent(new Event('input'));
+      }
+    });
+
+    runBtn.addEventListener('click', async () => {
+      runBtn.disabled = true;
+      outEl.classList.add('hidden');
+      testList.innerHTML = '';
+      try {
+        const r = await pyRunner.run(editor.value, tests);
+        if (r.error) {
+          outEl.textContent = r.error;
+          outEl.classList.remove('hidden');
+          outEl.classList.add('err');
+        } else {
+          if (r.stdout) {
+            outEl.textContent = r.stdout;
+            outEl.classList.remove('hidden');
+            outEl.classList.remove('err');
+          }
+          testList.innerHTML = (r.results || []).map((t) => `
+            <div class="t ${t.ok ? 'ok' : 'no'}">
+              <span class="mark">${t.ok ? '통과' : '실패'}</span>
+              <span>${esc(t.call)} → ${esc(t.got)}${t.ok ? '' : ` (기대값: ${esc(t.expected)})`}</span>
+            </div>`).join('');
+          const passed = (r.results || []).filter((t) => t.ok).length;
+          lastRun[a.id] = { code: editor.value, passed, total: tests.length, results: r.results || [] };
+        }
+      } catch (e) {
+        outEl.textContent = e.message;
+        outEl.classList.remove('hidden');
+        outEl.classList.add('err');
+      } finally {
+        runBtn.disabled = false;
+        syncSubmit();
+      }
+    });
+
+    submitBtn.addEventListener('click', () => submitCode(a, {
+      lang: 'python',
+      code: editor.value.slice(0, 8000),
+      passed: lastRun[a.id].passed,
+      total: lastRun[a.id].total,
+      results: (lastRun[a.id].results || []).map((t) => ({
+        call: t.call, expected: t.expected, got: String(t.got).slice(0, 120), ok: t.ok,
+      })),
+    }));
+  } else {
+    // ── web (HTML/CSS/JS) ──
+    app.innerHTML = `
+      <h2 class="prompt">${esc(a.prompt)}</h2>
+      <div class="web-wrap">
+        <textarea class="code-editor" id="codeEditor" spellcheck="false" placeholder="여기에 HTML을 작성하세요"></textarea>
+        <iframe id="webPreview" sandbox="allow-scripts" title="미리보기"></iframe>
+      </div>
+      <div class="code-toolbar">
+        <button class="btn-run" id="runBtn">미리보기 새로고침</button>
+        <span class="code-status">입력하면 1초 후 자동으로 미리보기가 갱신됩니다</span>
+      </div>
+      <button class="btn" id="submitBtn" disabled>제출하기</button>
+      <p class="submitted-note ${wasSubmitted ? '' : 'hidden'}" id="subNote">제출됨 — 고쳐서 다시 제출할 수 있어요</p>
+      <p class="error" id="subErr"></p>`;
+
+    const editor = app.querySelector('#codeEditor');
+    const iframe = app.querySelector('#webPreview');
+    const submitBtn = app.querySelector('#submitBtn');
+    editor.value = draft;
+    renderWebPreview(iframe, editor.value);
+    submitBtn.disabled = !editor.value.trim();
+    submitBtn.textContent = wasSubmitted ? '다시 제출하기' : '제출하기';
+
+    let previewTimer = null;
+    editor.addEventListener('input', () => {
+      localStorage.setItem('lp.draft.' + a.id, editor.value);
+      submitBtn.disabled = !editor.value.trim();
+      clearTimeout(previewTimer);
+      previewTimer = setTimeout(() => renderWebPreview(iframe, editor.value), 1000);
+    });
+    editor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const s = editor.selectionStart;
+        editor.setRangeText('  ', s, editor.selectionEnd, 'end');
+        editor.dispatchEvent(new Event('input'));
+      }
+    });
+    app.querySelector('#runBtn').addEventListener('click', () => renderWebPreview(iframe, editor.value));
+    submitBtn.addEventListener('click', () => submitCode(a, { lang: 'web', code: editor.value.slice(0, 8000) }));
+  }
+}
+
+async function submitCode(a, payload) {
+  const btn = app.querySelector('#submitBtn');
+  const err = app.querySelector('#subErr');
+  btn.disabled = true; btn.textContent = '제출 중…';
+  try {
+    const r = await driver.submit(a.id, me.participantId, clientId, payload);
+    if (r.ok) {
+      const round = r.round || a.round || 1;
+      answered.add(a.id + ':' + round);
+      channel.send({ type: 'submitted' });   // 교사 카운트 즉시 갱신용 핑
+      const note = app.querySelector('#subNote');
+      if (note) {
+        note.classList.remove('hidden');
+        note.textContent = payload.total !== undefined
+          ? `제출 완료 (${payload.passed}/${payload.total} 통과)${r.updated ? ' — 갱신됨' : ''} · 더 고쳐서 다시 제출할 수 있어요`
+          : `제출 완료${r.updated ? ' (갱신됨)' : ''} · 고쳐서 다시 제출할 수 있어요`;
+      }
+      btn.textContent = '다시 제출하기';
+      btn.disabled = false;
+    } else {
+      err.textContent = '답변이 마감되었습니다.'; err.style.display = 'block';
+      btn.textContent = '제출하기'; btn.disabled = false;
+    }
+  } catch (e) {
+    btn.disabled = false; btn.textContent = '제출하기';
+    err.textContent = '제출 실패: ' + e.message; err.style.display = 'block';
+  }
+}
+
+// ── 결과 공개 화면 ──
+function renderRevealed(a, agg) {
+  let verdict = '';
+  const mine = myAnswer(a.id, a.round || 1);
+  // 응답 여부는 answered 집합 기준 — code 등 localStorage에 답을 안 남기는 유형도 정확히 판정
+  const responded = answered.has(ansKey(a)) || !!mine;
+  if (agg && agg.answer !== undefined && agg.answer !== null && mine) {
+    const isOk = a.kind === 'choice' ? Number(agg.answer) === mine.choice
+               : a.kind === 'ox' ? (agg.answer === true || agg.answer === 'true') === mine.ox : null;
+    if (isOk !== null) {
+      verdict = isOk
+        ? '<div class="verdict verdict--ok">정답이에요! 🎉</div>'
+        : '<div class="verdict verdict--no">아쉬워요, 다음 문제로 만회해요!</div>';
+    }
+  } else if (!responded) {
+    verdict = '<div class="verdict verdict--na">이 문항에는 응답하지 않았어요.</div>';
+  }
+  // code 문항: 내 최근 채점 결과가 있으면 개인 통과율 표시
+  if (a.kind === 'code' && lastRun[a.id] && Number.isInteger(lastRun[a.id].total) && lastRun[a.id].total > 0) {
+    const lr = lastRun[a.id];
+    verdict = `<div class="verdict ${lr.passed === lr.total ? 'verdict--ok' : 'verdict--na'}">내 결과: ${lr.passed}/${lr.total} 통과</div>`;
+  }
+  app.innerHTML = `<h2 class="prompt">${esc(a.prompt)}</h2>${verdict}<div id="chart"></div>`;
+  renderAggregates(app.querySelector('#chart'), { kind: a.kind, config: a.config || {} }, agg || {}, { theme: 'light' });
+}
+
+// ── 키보드 UX (컴퓨터실 전제) ──
+document.addEventListener('keydown', (e) => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea') return;
+  const btn = app.querySelector('#submitBtn');
+  if (!btn) return;
+  if (/^[1-9]$/.test(e.key)) {
+    const b = app.querySelector(`.choice button[data-i="${Number(e.key) - 1}"]`)
+           || app.querySelector(`.rating button[data-r="${e.key}"]`);
+    if (b) b.click();
+  } else if (e.key === 'o' || e.key === 'O' || e.key === 'ㅐ') {
+    const b = app.querySelector('.oxwrap button[data-ox="true"]'); if (b) b.click();
+  } else if (e.key === 'x' || e.key === 'X' || e.key === 'ㅌ') {
+    const b = app.querySelector('.oxwrap button[data-ox="false"]'); if (b) b.click();
+  } else if (e.key === 'Enter' && !btn.disabled) {
+    btn.click();
+  }
+});
+
+// ── 시작 ──
+(async () => {
+  driver = await createDriver();
+  renderJoinForm();
+})();
+</script>
+</body>
+</html>

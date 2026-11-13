@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>11차시 - JavaScript 기초 2 — 반복문 · 함수 · DOM · 이벤트</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── 1. Reset & CSS Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #F8F8F2;
+      --style-primary: #1A1A2E;
+      --style-accent: #E8FF3B;
+      --style-accent2: #FF6B6B;
+      --style-accent3: #4ECDC4;
+      --style-accent4: #FFE66D;
+      --style-accent5: #A78BFA;
+      --style-text: #1A1A2E;
+      --style-text-secondary: #4A4A4A;
+      --cell-radius: 1rem;
+      --cell-gap: 0.5rem;
+    }
+
+    /* ── 2. Base Typography ── */
+    html, body { font-size: clamp(16px, 1.5vw, 28px); font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--style-bg); color: var(--style-text); overflow: hidden; height: 100%; }
+    h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.2; }
+    h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+    h3 { font-size: 1.05rem; font-weight: 600; line-height: 1.4; }
+    p, li { line-height: 1.7; }
+    code { font-family: 'Consolas', 'Courier New', monospace; }
+
+    /* ── 3. Accessibility ── */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-primary); color: #fff; padding: 8px 16px; z-index: 9999; font-size: 14px; border-radius: 0 0 4px 0; transition: top 0.2s; text-decoration: none; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent3); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+    /* ── 4. Slide Container ── */
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--style-accent3); z-index: 100; transition: width 0.3s ease; transform: translateZ(0); }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0.8rem 1.2rem; opacity: 0; pointer-events: none; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ── 5. Browser Card ── */
+    .browser-card { width: 100%; max-width: 1200px; max-height: calc(100vh - 4.8rem); display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 1.2rem; box-shadow: 0 8px 32px rgba(26,26,46,0.08); }
+    .browser-card--frameless { background: transparent; box-shadow: none; }
+    .browser-card--dark { background: var(--style-primary); box-shadow: 0 12px 48px rgba(0,0,0,0.35); }
+    .browser-topbar { display: flex; align-items: center; padding: 0.5rem 1rem; background: var(--style-primary); border-radius: 1.2rem 1.2rem 0 0; min-height: 35px; flex-shrink: 0; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .dot.red { background: #FF6B6B; }
+    .dot.yellow { background: #FFE66D; }
+    .dot.green { background: #4ECDC4; }
+    .topbar-title { margin: 0 auto; color: rgba(255,255,255,0.7); font-size: 0.82rem; font-weight: 500; }
+    .browser-content { flex: 1; overflow-y: auto; padding: 1.2rem 2rem 1rem; }
+
+    /* ── 6. Section Header ── */
+    .section-header { margin-bottom: 0.8rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { color: var(--style-text-secondary); font-size: 0.88rem; margin-top: 0.2rem; }
+    .section-badge { display: inline-block; background: var(--style-accent3); color: var(--style-primary); padding: 0.15rem 0.7rem; border-radius: 1rem; font-size: 0.72rem; font-weight: 700; margin-bottom: 0.35rem; letter-spacing: 0.04em; }
+
+    /* ── 7. Bento Grid Cells ── */
+    .bento-grid { display: grid; gap: var(--cell-gap); }
+    .bento-grid-2 { grid-template-columns: 1fr 1fr; }
+    .bento-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .bento-cell { border-radius: var(--cell-radius); padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .bento-cell--dark   { background: var(--style-primary); color: #fff; }
+    .bento-cell--accent { background: var(--style-accent);  color: var(--style-primary); }
+    .bento-cell--coral  { background: var(--style-accent2); color: #fff; }
+    .bento-cell--teal   { background: var(--style-accent3); color: var(--style-primary); }
+    .bento-cell--warm   { background: var(--style-accent4); color: var(--style-primary); }
+    .bento-cell--purple { background: var(--style-accent5); color: #fff; }
+    .bento-cell--light  { background: #F0F0F0; color: var(--style-primary); }
+    .bento-cell--span2  { grid-column: span 2; }
+    .bento-cell h3 { font-size: 1rem; font-weight: 700; }
+    .bento-cell p  { font-size: 0.88rem; line-height: 1.5; }
+    .bento-cell ul { padding-left: 1.1rem; font-size: 0.86rem; }
+    .bento-cell li { margin-bottom: 0.25rem; }
+    .bento-cell code { font-size: 0.82rem; background: rgba(0,0,0,0.08); padding: 0.1em 0.35em; border-radius: 4px; }
+    .bento-cell--dark code   { background: rgba(255,255,255,0.15); }
+    .bento-cell--teal code,
+    .bento-cell--warm code   { background: rgba(0,0,0,0.1); }
+
+    /* ── 8. Code Block (VS Code Dark+ 테마) ── */
+    .code-block { background: #1E1E1E; color: #D4D4D4; border-radius: 0.6rem; padding: 0.65rem 1rem; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.8rem; line-height: 1.65; overflow-x: auto; white-space: pre; }
+    .code-block .kw   { color: #569CD6; }   /* keyword */
+    .code-block .val  { color: #B5CEA8; }   /* number */
+    .code-block .str  { color: #CE9178; }   /* string */
+    .code-block .fn   { color: #DCDCAA; }   /* function name */
+    .code-block .prop { color: #9CDCFE; }   /* property */
+    .code-block .cmt  { color: #6A9955; }   /* comment */
+    .code-block .tag  { color: #4EC9B0; }   /* HTML tag */
+    .code-block .attr { color: #9CDCFE; }   /* attribute */
+    .code-block--sm   { font-size: 0.75rem; line-height: 1.6; }
+    .code-block--xs   { font-size: 0.68rem; line-height: 1.55; }
+
+    /* ── 9. for문 / function / event 해부 표시 ── */
+    .anatomy-box { background: #1E1E1E; border-radius: 0.6rem; padding: 0.7rem 1rem; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.92rem; line-height: 1.8; margin-bottom: 0.5rem; }
+    .ah-kw   { color: #569CD6; }
+    .ah-name { color: #DCDCAA; background: rgba(220,220,170,0.15); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-init { color: #FF6B6B; background: rgba(255,107,107,0.18); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-cond { color: #4ECDC4; background: rgba(78,205,196,0.18); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-step { color: #FFE66D; background: rgba(255,230,109,0.18); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-param{ color: #9CDCFE; background: rgba(156,220,254,0.12); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-ret  { color: #4ECDC4; background: rgba(78,205,196,0.15); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-ev   { color: #CE9178; background: rgba(206,145,120,0.15); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-fn   { color: #4ECDC4; background: rgba(78,205,196,0.15); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-el   { color: #9CDCFE; background: rgba(156,220,254,0.12); padding: 0.04em 0.3em; border-radius: 3px; }
+    .ah-plain{ color: #D4D4D4; }
+
+    /* ── 10. Stat Grid ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--cell-gap); }
+    .stat-item { border-radius: var(--cell-radius); padding: 0.8rem; text-align: center; }
+    .stat-num  { font-size: 1.7rem; font-weight: 800; display: block; font-family: 'Consolas', 'Inter', sans-serif; }
+    .stat-label{ font-size: 0.82rem; margin-top: 0.2rem; display: block; line-height: 1.4; }
+    .stat-item.bento-cell--dark   .stat-label { color: rgba(255,255,255,0.75); }
+    .stat-item.bento-cell--teal   .stat-label,
+    .stat-item.bento-cell--warm   .stat-label { color: var(--style-primary); opacity: 0.75; }
+
+    /* ── 11. Highlight Box ── */
+    .highlight-box { background: var(--style-accent); color: var(--style-primary); padding: 0.55rem 1rem; border-radius: 0.6rem; font-size: 0.88rem; font-weight: 500; margin-top: 0.5rem; }
+    .highlight-box--teal { background: var(--style-accent3); }
+    .highlight-box--dark { background: var(--style-primary); color: #fff; border-left: 4px solid var(--style-accent3); }
+    .highlight-box code { background: rgba(0,0,0,0.1); font-size: 0.82rem; padding: 0.1em 0.3em; border-radius: 3px; }
+
+    /* ── 12. Task List ── */
+    .task-list { display: flex; flex-direction: column; gap: 0.45rem; }
+    .task-item { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.6rem 0.8rem; border-radius: 0.6rem; background: #F0F0F0; }
+    .task-num  { background: var(--style-primary); color: #fff; width: 1.6rem; height: 1.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+    .task-num--teal { background: var(--style-accent3); color: var(--style-primary); }
+    .task-item h3 { font-size: 0.95rem; margin-bottom: 0.1rem; }
+    .task-item p  { font-size: 0.85rem; color: var(--style-text-secondary); }
+
+    /* ── 13. Two Column ── */
+    .two-col       { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .two-col--6040 { grid-template-columns: 6fr 4fr; }
+    .col-box       { background: #F0F0F0; border-radius: var(--cell-radius); padding: 0.8rem 1rem; }
+    .col-box--dark { background: var(--style-primary); color: #fff; }
+    .col-label     { display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem; }
+
+    /* ── 14. Comparison Table ── */
+    .comp-table    { width: 100%; border-collapse: collapse; border-radius: 0.6rem; overflow: hidden; font-size: 0.86rem; }
+    .comp-table th { background: var(--style-primary); color: #fff; padding: 0.45rem 0.8rem; text-align: left; font-weight: 600; }
+    .comp-table td { padding: 0.4rem 0.8rem; border-bottom: 1px solid #E8E8E8; vertical-align: middle; }
+    .comp-table tr:nth-child(even) td { background: #F5F5F0; }
+    .comp-table code { font-size: 0.8rem; background: rgba(26,26,46,0.06); padding: 0.1em 0.3em; border-radius: 3px; font-family: 'Consolas', monospace; }
+    .comp-table .good { color: #2d8a49; font-weight: 600; }
+    .comp-table .bad  { color: #e53935; }
+
+    /* ── 15. Method Card ── */
+    .method-card        { border-radius: 0.6rem; border-left: 4px solid; padding: 0.55rem 0.85rem; background: #F0F0F0; margin-bottom: 0.4rem; }
+    .method-card--teal  { border-color: var(--style-accent3); }
+    .method-card--coral { border-color: var(--style-accent2); }
+    .method-card--warm  { border-color: var(--style-accent4); }
+    .method-name        { font-family: 'Consolas', monospace; font-size: 0.88rem; font-weight: 700; color: var(--style-primary); }
+    .method-desc        { font-size: 0.82rem; color: var(--style-text-secondary); margin-top: 0.15rem; }
+
+    /* ── 16. Result Preview ── */
+    .result-preview { background: #1A1A2E; border-radius: 0.6rem; padding: 0.55rem 0.85rem; margin-top: 0.3rem; }
+    .rp-label  { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-bottom: 0.2rem; font-family: 'Consolas', monospace; }
+    .rp-output { font-family: 'Consolas', monospace; font-size: 0.88rem; color: var(--style-accent3); font-weight: 600; }
+    .rp-output--pre { white-space: pre; line-height: 1.6; }
+
+    /* ── 17. Roadmap ── */
+    .roadmap       { display: flex; align-items: center; gap: 0; }
+    .roadmap-item  { flex: 1; }
+    .roadmap-box   { border-radius: 0.8rem; padding: 0.7rem 0.5rem; text-align: center; }
+    .roadmap-box--dark   { background: var(--style-primary); color: #fff; }
+    .roadmap-box--teal   { background: var(--style-accent3); color: var(--style-primary); }
+    .roadmap-box--coral  { background: var(--style-accent2); color: #fff; }
+    .roadmap-box--purple { background: var(--style-accent5); color: #fff; }
+    .roadmap-num   { font-size: 0.68rem; font-weight: 700; opacity: 0.7; margin-bottom: 0.2rem; letter-spacing: 0.05em; }
+    .roadmap-title { font-size: 1.05rem; font-weight: 800; }
+    .roadmap-desc  { font-size: 0.72rem; margin-top: 0.25rem; opacity: 0.85; line-height: 1.4; }
+    .roadmap-arrow { color: var(--style-text-secondary); font-size: 1.1rem; padding: 0 0.4rem; flex-shrink: 0; font-weight: 300; }
+
+    /* ── 18. Challenge Box ── */
+    .challenge-box  { background: #0F0F1E; border-radius: var(--cell-radius); padding: 0.75rem 1rem; color: #fff; border: 1px solid rgba(78,205,196,0.5); margin-bottom: 0.4rem; }
+    .chal-label     { font-size: 0.68rem; font-weight: 700; color: var(--style-accent3); letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+    .chal-title     { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .chal-desc      { font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+    .chal-desc code { background: rgba(255,255,255,0.1); font-size: 0.78rem; padding: 0.1em 0.3em; border-radius: 3px; color: var(--style-accent); }
+
+    /* ── 19. Lang Badge ── */
+    .lang-badge     { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 0.3rem; font-size: 0.75rem; font-weight: 700; font-family: 'Consolas', monospace; }
+    .lang-badge--js { background: #F0DB4F; color: #323330; }
+
+    /* ── 20. Cover Slide ── */
+    .cover-slide    { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 100%; color: #fff; padding: 2rem; }
+    .cover-badge    { display: inline-block; background: var(--style-accent3); color: var(--style-primary); padding: 0.3rem 1.1rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 700; margin-bottom: 1.2rem; letter-spacing: 0.05em; }
+    .cover-title    { margin-bottom: 0.6rem; color: #fff; }
+    .cover-title em { color: var(--style-accent); font-style: normal; }
+    .cover-subtitle { color: rgba(255,255,255,0.7); font-size: 1.05rem; font-weight: 400; margin-bottom: 1.3rem; letter-spacing: 0.03em; }
+    .cover-tags     { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .cover-tag      { background: rgba(78,205,196,0.15); border: 1px solid rgba(78,205,196,0.4); color: var(--style-accent3); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.8rem; font-weight: 600; font-family: 'Consolas', monospace; }
+    .cover-divider  { width: 60px; height: 4px; background: var(--style-accent3); border-radius: 2px; margin: 0 auto 1rem; }
+    .cover-meta     { font-size: 0.88rem; color: rgba(255,255,255,0.45); display: flex; gap: 0.5rem; justify-content: center; }
+
+    /* ── 21. End / Summary Slide ── */
+    .end-slide      { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 100%; }
+    .end-title      { font-size: 1.8rem; margin-bottom: 1rem; }
+
+    /* ── 22. Animations ── */
+    @keyframes popUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .bento-cell,
+    .slide.active .stat-item,
+    .slide.active .task-item,
+    .slide.active .roadmap-item,
+    .slide.active .method-card { animation: popUp 0.5s ease-out both; }
+    .slide.active .bento-cell:nth-child(2),
+    .slide.active .stat-item:nth-child(2),
+    .slide.active .task-item:nth-child(2),
+    .slide.active .roadmap-item:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .bento-cell:nth-child(3),
+    .slide.active .stat-item:nth-child(3),
+    .slide.active .task-item:nth-child(3),
+    .slide.active .roadmap-item:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .bento-cell:nth-child(4),
+    .slide.active .task-item:nth-child(4),
+    .slide.active .roadmap-item:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .bento-cell:nth-child(5) { animation-delay: 0.32s; }
+    .slide.active .bento-cell:nth-child(6) { animation-delay: 0.40s; }
+    .slide.active .method-card:nth-child(2) { animation-delay: 0.08s; }
+
+    /* ── 23. Nav Bar ── */
+    .nav-bar  { position: fixed; bottom: 0; left: 0; right: 0; height: 42px; background: var(--style-primary); display: flex; align-items: center; justify-content: center; gap: 0.8rem; z-index: 50; padding: 0 1rem; }
+    .nav-btn  { background: none; border: none; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s; }
+    .nav-btn:hover { background: rgba(255,255,255,0.15); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn:disabled:hover { background: none; }
+    .nav-btn svg { width: 18px; height: 18px; fill: #fff; }
+    .nav-counter  { color: rgba(255,255,255,0.7); font-size: 14px; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 2px; }
+    .slide-input  { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 28px; text-align: center; font-size: 14px; font-family: 'Inter', sans-serif; border-radius: 4px; padding: 2px; }
+    .slide-input:focus { outline: 2px solid var(--style-accent3); }
+
+    /* ── 24. Responsive ── */
+    @media (max-width: 1024px) { html, body { font-size: clamp(15px, 2vw, 22px); } }
+    @media (max-width: 768px) {
+      .bento-grid-2, .bento-grid-3, .stat-grid, .two-col, .two-col--6040 { grid-template-columns: 1fr; }
+      .bento-cell--span2 { grid-column: span 1; }
+      .roadmap { flex-direction: column; }
+      .roadmap-arrow { transform: rotate(90deg); padding: 0.2rem 0; }
+    }
+    @media (max-width: 480px) { html, body { font-size: clamp(14px, 3.5vw, 18px); } .browser-content { padding: 0.8rem; } h1 { font-size: 1.7rem; } h2 { font-size: 1.2rem; } }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="21" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ═══ Slide 1: Cover ═══ -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--dark">
+        <div class="browser-content cover-slide">
+          <div class="cover-badge">11차시 · 프로그래밍</div>
+          <h1 class="cover-title">JavaScript <em>기초 2</em></h1>
+          <p class="cover-subtitle">반복문 · 함수 · DOM · 이벤트</p>
+          <div class="cover-tags">
+            <span class="cover-tag">for / while</span>
+            <span class="cover-tag">function</span>
+            <span class="cover-tag">document</span>
+            <span class="cover-tag">addEventListener</span>
+          </div>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>샘플고등학교</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026">2026학년도</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 2: 지난 시간 복습 ═══ -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 지난 시간 복습">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">지난 시간 복습</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 지난 시간에 배운 내용</h2>
+            <p class="section-subtitle">자바스크립트 기초 1에서 배운 핵심 개념을 빠르게 복습합니다</p>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-item bento-cell--dark">
+              <span class="stat-num" style="font-size:1.3rem;">let</span>
+              <span class="stat-label">변수 선언<br><code style="font-size:0.72rem;color:var(--style-accent3);">let x = 10;</code></span>
+            </div>
+            <div class="stat-item bento-cell--teal">
+              <span class="stat-num" style="font-size:1.5rem;">±×÷</span>
+              <span class="stat-label">연산자<br>산술 · 비교 · 논리</span>
+            </div>
+            <div class="stat-item bento-cell--warm">
+              <span class="stat-num" style="font-size:1.3rem;">if</span>
+              <span class="stat-label">조건문<br>if / else if / else</span>
+            </div>
+          </div>
+          <div class="bento-grid bento-grid-2" style="margin-top:0.5rem;">
+            <div class="bento-cell bento-cell--light">
+              <h3>기억하세요</h3>
+              <ul>
+                <li><code>let</code> — 변경 가능한 변수 선언</li>
+                <li><code>const</code> — 변경 불가 상수 선언</li>
+                <li><code>===</code> — 엄격한 동일 비교</li>
+                <li>문장 끝에 <code>;</code> 세미콜론</li>
+              </ul>
+            </div>
+            <div class="bento-cell bento-cell--dark">
+              <h3 style="margin-bottom:0.3rem;">복습 코드</h3>
+              <div class="code-block code-block--sm"><span class="kw">let</span> year = <span class="val">2026</span>;
+<span class="kw">let</span> birth = <span class="val">2009</span>;
+<span class="kw">let</span> age = year - birth;
+
+<span class="kw">if</span> (age >= <span class="val">18</span>) {
+  console.<span class="fn">log</span>(<span class="str">"성인"</span>);
+} <span class="kw">else</span> {
+  console.<span class="fn">log</span>(<span class="str">"미성년자"</span>);
+}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 3: 오늘의 로드맵 ═══ -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 오늘의 로드맵">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">오늘 배울 내용</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◉</span> 오늘의 학습 로드맵</h2>
+            <p class="section-subtitle">4가지 주제를 순서대로 배워 인터랙티브한 웹 앱을 직접 만듭니다</p>
+          </div>
+          <div class="roadmap" style="margin-bottom:0.6rem;">
+            <div class="roadmap-item">
+              <div class="roadmap-box roadmap-box--dark">
+                <div class="roadmap-num">STEP 1</div>
+                <div class="roadmap-title">반복문</div>
+                <div class="roadmap-desc">for / while<br>같은 작업을 여러 번</div>
+              </div>
+            </div>
+            <div class="roadmap-arrow" aria-hidden="true">→</div>
+            <div class="roadmap-item">
+              <div class="roadmap-box roadmap-box--teal">
+                <div class="roadmap-num">STEP 2</div>
+                <div class="roadmap-title">함수</div>
+                <div class="roadmap-desc">function<br>코드를 묶어서 재사용</div>
+              </div>
+            </div>
+            <div class="roadmap-arrow" aria-hidden="true">→</div>
+            <div class="roadmap-item">
+              <div class="roadmap-box roadmap-box--coral">
+                <div class="roadmap-num">STEP 3</div>
+                <div class="roadmap-title">DOM</div>
+                <div class="roadmap-desc">document<br>HTML을 JS로 조작</div>
+              </div>
+            </div>
+            <div class="roadmap-arrow" aria-hidden="true">→</div>
+            <div class="roadmap-item">
+              <div class="roadmap-box roadmap-box--purple">
+                <div class="roadmap-num">STEP 4</div>
+                <div class="roadmap-title">이벤트</div>
+                <div class="roadmap-desc">addEventListener<br>사용자 행동에 반응</div>
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box">
+            이 4가지를 모두 배우면 <strong>버튼을 클릭하면 반응하는 진짜 웹 앱</strong>을 직접 만들 수 있습니다!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 4: for문 기본 구조 ═══ -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: for문 기본 구조">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">반복문 — for문 구조</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 1 · 반복문</div>
+            <h2><span class="section-icon" aria-hidden="true">◆</span> for문 기본 구조</h2>
+            <p class="section-subtitle">같은 코드를 원하는 횟수만큼 자동으로 반복합니다</p>
+          </div>
+          <!-- for문 anatomy display -->
+          <div class="anatomy-box">
+<span class="ah-kw">for</span><span class="ah-plain"> (</span><span class="ah-init">let i = 0</span><span class="ah-plain">; </span><span class="ah-cond">i &lt; 5</span><span class="ah-plain">; </span><span class="ah-step">i++</span><span class="ah-plain">) {</span>
+<span class="ah-plain">  console.</span><span style="color:#DCDCAA;">log</span><span class="ah-plain">(i);  </span><span style="color:#6A9955;">// 0, 1, 2, 3, 4 순서로 출력</span>
+<span class="ah-plain">}</span>
+          </div>
+          <div class="bento-grid bento-grid-3">
+            <div class="bento-cell" style="background:#ffe5e5;border-top:3px solid var(--style-accent2);">
+              <h3 style="color:#c0392b;">초기값</h3>
+              <code style="font-size:0.85rem;color:#c0392b;">let i = 0</code>
+              <p style="font-size:0.82rem;color:#555;margin-top:0.2rem;">반복 시작 전 <strong>딱 한 번</strong>만 실행<br>보통 변수 i를 0으로 초기화</p>
+            </div>
+            <div class="bento-cell" style="background:#e0f5f5;border-top:3px solid var(--style-accent3);">
+              <h3 style="color:#0d5a55;">조건식</h3>
+              <code style="font-size:0.85rem;color:#0d5a55;">i &lt; 5</code>
+              <p style="font-size:0.82rem;color:#555;margin-top:0.2rem;"><strong>true</strong>이면 계속 반복<br><strong>false</strong>가 되면 반복 종료</p>
+            </div>
+            <div class="bento-cell" style="background:#fff8e0;border-top:3px solid var(--style-accent4);">
+              <h3 style="color:#7a5c00;">증감식</h3>
+              <code style="font-size:0.85rem;color:#7a5c00;">i++</code>
+              <p style="font-size:0.82rem;color:#555;margin-top:0.2rem;">한 번 반복할 때마다 실행<br><code>i++</code>는 <code>i = i + 1</code>과 동일</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 5: for문 실습 ═══ -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: for문 실습">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">반복문 — for문 실습</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 1 · 반복문</div>
+            <h2><span class="section-icon" aria-hidden="true">✦</span> for문 실습 예제</h2>
+            <p class="section-subtitle">직접 따라 입력하고 콘솔(F12)에서 결과를 확인해보세요</p>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="col-label">
+                <span class="lang-badge lang-badge--js">예제 1</span>
+                <span style="font-size:0.82rem;color:var(--style-text-secondary);">1~10 합계 구하기</span>
+              </div>
+              <div class="code-block code-block--sm"><span class="kw">let</span> sum = <span class="val">0</span>;
+
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="val">1</span>; i &lt;= <span class="val">10</span>; i++) {
+  sum = sum + i;
+}
+
+console.<span class="fn">log</span>(<span class="str">"합계:"</span>, sum);</div>
+              <div class="result-preview">
+                <div class="rp-label">▶ 콘솔 출력</div>
+                <div class="rp-output">합계: 55</div>
+              </div>
+            </div>
+            <div>
+              <div class="col-label">
+                <span class="lang-badge lang-badge--js">예제 2</span>
+                <span style="font-size:0.82rem;color:var(--style-text-secondary);">구구단 3단 출력</span>
+              </div>
+              <div class="code-block code-block--sm"><span class="kw">let</span> dan = <span class="val">3</span>;
+
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="val">1</span>; i &lt;= <span class="val">9</span>; i++) {
+  <span class="kw">let</span> result = dan * i;
+  console.<span class="fn">log</span>(
+    dan + <span class="str">" × "</span> + i
+    + <span class="str">" = "</span> + result
+  );
+}</div>
+              <div class="result-preview">
+                <div class="rp-label">▶ 콘솔 출력</div>
+                <div class="rp-output rp-output--pre">3 × 1 = 3
+3 × 2 = 6
+3 × 3 = 9 ...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 6: while문 ═══ -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: while문">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">반복문 — while문</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 1 · 반복문</div>
+            <h2><span class="section-icon" aria-hidden="true">◆</span> while문 — for문과 비교</h2>
+            <p class="section-subtitle">조건이 true인 동안 반복 — 횟수가 정해지지 않을 때 유용합니다</p>
+          </div>
+          <div class="two-col" style="margin-bottom:0.5rem;">
+            <div class="col-box col-box--dark">
+              <div class="col-label"><span class="lang-badge lang-badge--js">for문</span></div>
+              <div class="code-block code-block--sm"><span class="cmt">// 반복 횟수가 정해진 경우</span>
+<span class="kw">for</span> (<span class="kw">let</span> i = <span class="val">1</span>; i &lt;= <span class="val">5</span>; i++) {
+  console.<span class="fn">log</span>(i);
+}
+<span class="cmt">// → 1, 2, 3, 4, 5</span></div>
+            </div>
+            <div class="col-box col-box--dark">
+              <div class="col-label"><span class="lang-badge lang-badge--js">while문</span></div>
+              <div class="code-block code-block--sm"><span class="cmt">// 같은 결과를 while로</span>
+<span class="kw">let</span> i = <span class="val">1</span>;
+
+<span class="kw">while</span> (i &lt;= <span class="val">5</span>) {
+  console.<span class="fn">log</span>(i);
+  i++;
+}
+<span class="cmt">// → 1, 2, 3, 4, 5</span></div>
+            </div>
+          </div>
+          <table class="comp-table">
+            <thead>
+              <tr><th>구분</th><th>for문</th><th>while문</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>언제?</td><td>반복 횟수가 <span class="good">정해진</span> 경우</td><td>조건에 따라 <span class="good">유동적</span>인 경우</td></tr>
+              <tr><td>초기값/증감</td><td>괄호 안에 <span class="good">한 줄로</span> 작성</td><td><span class="bad">따로 직접</span> 작성 필요</td></tr>
+              <tr><td>주의사항</td><td>거의 없음</td><td><span class="bad">무한루프</span> 주의!</td></tr>
+            </tbody>
+          </table>
+          <div class="highlight-box" style="margin-top:0.4rem;">
+            <strong>결론:</strong> 반복 횟수를 미리 알면 <code>for</code>, 조건이 변수에 따라 달라지면 <code>while</code> — 대부분의 경우 <code>for</code>가 더 안전합니다
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 7: 반복문 실습 챌린지 ═══ -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 반복문 실습 챌린지">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">반복문 — 실습 챌린지</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 1 · 반복문</div>
+            <h2><span class="section-icon" aria-hidden="true">◉</span> 실습 챌린지</h2>
+            <p class="section-subtitle">배운 내용으로 직접 코드를 완성해보세요 — 빈칸을 채워 실행해보기</p>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="challenge-box">
+                <div class="chal-label">◆ CHALLENGE A</div>
+                <div class="chal-title">1~100 중 짝수만 출력</div>
+                <div class="chal-desc">힌트: 나머지 연산 <code>i % 2 === 0</code></div>
+              </div>
+              <div class="code-block code-block--sm"><span class="kw">for</span> (<span class="kw">let</span> i = <span class="val">1</span>; i &lt;= <span class="val">100</span>; i++) {
+  <span class="kw">if</span> (___________) {
+    console.<span class="fn">log</span>(i);
+  }
+}
+<span class="cmt">// 2, 4, 6, 8 ... 100</span></div>
+            </div>
+            <div>
+              <div class="challenge-box">
+                <div class="chal-label">◆ CHALLENGE B</div>
+                <div class="chal-title">별 피라미드 만들기</div>
+                <div class="chal-desc">힌트: <code>"★".repeat(n)</code></div>
+              </div>
+              <div class="code-block code-block--sm"><span class="kw">for</span> (<span class="kw">let</span> i = <span class="val">1</span>; i &lt;= <span class="val">5</span>; i++) {
+  console.<span class="fn">log</span>(<span class="str">"★"</span>.<span class="fn">repeat</span>(i));
+}</div>
+              <div class="result-preview">
+                <div class="rp-label">▶ 기대 출력</div>
+                <div class="rp-output rp-output--pre">★
+★★
+★★★
+★★★★
+★★★★★</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 8: 함수란? ═══ -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 함수란">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">함수 (Function)</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 2 · 함수</div>
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 함수란?</h2>
+            <p class="section-subtitle">재사용 가능한 코드를 하나의 묶음으로 만드는 것</p>
+          </div>
+          <div class="two-col" style="margin-bottom:0.5rem;">
+            <div class="bento-grid" style="gap:0.5rem;align-content:start;">
+              <div class="bento-cell bento-cell--teal">
+                <h3>자판기 비유</h3>
+                <p>버튼을 누르면 → 음료가 나온다<br><br>함수 이름을 <strong>호출</strong>하면 → 코드가 실행된다</p>
+              </div>
+              <div class="bento-cell bento-cell--warm">
+                <h3>레시피 비유</h3>
+                <p>재료(매개변수)를 넣으면 → 요리(결과값)가 나온다<br><br>같은 레시피로 여러 번 요리 가능!</p>
+              </div>
+            </div>
+            <div class="col-box col-box--dark">
+              <p style="font-size:0.78rem;color:rgba(255,255,255,0.5);margin-bottom:0.4rem;">함수가 없을 때 — 코드 중복</p>
+              <div class="code-block code-block--sm"><span class="cmt">// 같은 코드가 3번 반복!</span>
+console.<span class="fn">log</span>(<span class="str">"안녕 김철수"</span>);
+console.<span class="fn">log</span>(<span class="str">"안녕 이영희"</span>);
+console.<span class="fn">log</span>(<span class="str">"안녕 박민준"</span>);</div>
+              <p style="font-size:0.78rem;color:var(--style-accent);margin:0.4rem 0;font-weight:700;">↓ 함수로 만들면</p>
+              <div class="code-block code-block--sm"><span class="kw">function</span> <span class="fn">greet</span>(name) {
+  console.<span class="fn">log</span>(<span class="str">"안녕 "</span> + name);
+}
+<span class="fn">greet</span>(<span class="str">"김철수"</span>);
+<span class="fn">greet</span>(<span class="str">"이영희"</span>);
+<span class="fn">greet</span>(<span class="str">"박민준"</span>);</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 9: 함수 선언과 호출 ═══ -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 함수 선언과 호출">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">함수 — 선언과 호출</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 2 · 함수</div>
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 함수 선언과 호출</h2>
+            <p class="section-subtitle">function 키워드로 함수를 만들고, 이름을 불러 실행합니다</p>
+          </div>
+          <!-- function anatomy -->
+          <div class="anatomy-box">
+<span class="ah-kw">function</span> <span class="ah-name">add</span><span class="ah-plain">(</span><span class="ah-param">a, b</span><span class="ah-plain">) {</span>
+<span class="ah-plain">  </span><span class="ah-kw">return</span> <span class="ah-ret">a + b</span><span class="ah-plain">;</span>
+<span class="ah-plain">}</span>
+          </div>
+          <div class="bento-grid bento-grid-3" style="margin-bottom:0.45rem;">
+            <div class="bento-cell" style="background:#f5f5dc;border-top:3px solid #DCDCAA;">
+              <h3>함수 이름</h3>
+              <code style="font-size:0.82rem;">add</code>
+              <p style="font-size:0.8rem;color:#555;margin-top:0.2rem;">호출할 때 사용하는 이름<br>동사로 짓는 것이 관례</p>
+            </div>
+            <div class="bento-cell" style="background:#e8f4ff;border-top:3px solid #9CDCFE;">
+              <h3>매개변수</h3>
+              <code style="font-size:0.82rem;">a, b</code>
+              <p style="font-size:0.8rem;color:#555;margin-top:0.2rem;">함수에 전달하는 입력값<br>여러 개 가능, 없어도 됨</p>
+            </div>
+            <div class="bento-cell" style="background:#e0f5f5;border-top:3px solid var(--style-accent3);">
+              <h3>반환값 (return)</h3>
+              <code style="font-size:0.82rem;">a + b</code>
+              <p style="font-size:0.8rem;color:#555;margin-top:0.2rem;">결과를 돌려줌<br>없으면 <code>undefined</code> 반환</p>
+            </div>
+          </div>
+          <div class="code-block code-block--sm"><span class="cmt">// 함수 호출 — 숫자를 전달하면 합계가 돌아옴</span>
+<span class="kw">let</span> result1 = <span class="fn">add</span>(<span class="val">3</span>, <span class="val">5</span>);    <span class="cmt">// result1 = 8</span>
+<span class="kw">let</span> result2 = <span class="fn">add</span>(<span class="val">10</span>, <span class="val">20</span>);  <span class="cmt">// result2 = 30</span>
+console.<span class="fn">log</span>(result1, result2);  <span class="cmt">// 8 30</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 10: 함수 실습 예제 ═══ -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 함수 실습 예제">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">함수 — 실습 예제</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 2 · 함수</div>
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 함수 실습 예제</h2>
+            <p class="section-subtitle">두 가지 함수를 직접 작성하고 콘솔에서 실행해보세요</p>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="col-label">
+                <span class="lang-badge lang-badge--js">예제 1</span>
+                <span style="font-size:0.82rem;color:var(--style-text-secondary);">두 수의 합 반환</span>
+              </div>
+              <div class="code-block code-block--sm"><span class="kw">function</span> <span class="fn">add</span>(a, b) {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="kw">let</span> x = <span class="fn">add</span>(<span class="val">3</span>, <span class="val">7</span>);
+<span class="kw">let</span> y = <span class="fn">add</span>(<span class="val">10</span>, <span class="val">25</span>);
+console.<span class="fn">log</span>(x);  <span class="cmt">// 10</span>
+console.<span class="fn">log</span>(y);  <span class="cmt">// 35</span></div>
+              <div class="result-preview">
+                <div class="rp-label">▶ 콘솔 출력</div>
+                <div class="rp-output">10<br>35</div>
+              </div>
+            </div>
+            <div>
+              <div class="col-label">
+                <span class="lang-badge lang-badge--js">예제 2</span>
+                <span style="font-size:0.82rem;color:var(--style-text-secondary);">인사말 출력 함수</span>
+              </div>
+              <div class="code-block code-block--sm"><span class="kw">function</span> <span class="fn">greet</span>(name, grade) {
+  <span class="kw">return</span> grade + <span class="str">"학년 "</span>
+    + name + <span class="str">"님, 안녕!"</span>;
+}
+
+<span class="kw">let</span> msg = <span class="fn">greet</span>(<span class="str">"김지은"</span>, <span class="val">2</span>);
+console.<span class="fn">log</span>(msg);</div>
+              <div class="result-preview">
+                <div class="rp-label">▶ 콘솔 출력</div>
+                <div class="rp-output">2학년 김지은님, 안녕!</div>
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.45rem;">
+            함수는 한 번 만들면 <strong>몇 번이든 재사용</strong> 가능! 같은 코드를 여러 번 쓰지 않아도 됩니다
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 11: 왜 함수를 쓰는가? ═══ -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 왜 함수를 쓰는가">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">함수 — 필요성</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 2 · 함수</div>
+            <h2><span class="section-icon" aria-hidden="true">◉</span> 왜 함수를 써야 할까?</h2>
+            <p class="section-subtitle">코드 반복 vs 함수 사용 — 무엇이 달라지는지 직접 비교합니다</p>
+          </div>
+          <div class="two-col">
+            <div class="col-box" style="border:2px solid var(--style-accent2);">
+              <div class="col-label">
+                <span style="background:#ffe5e5;color:#c0392b;padding:0.15rem 0.5rem;border-radius:0.3rem;font-size:0.75rem;font-weight:700;">✗ 함수 없이 (BAD)</span>
+              </div>
+              <div class="code-block code-block--sm"><span class="cmt">// 세금 계산 — 3번 중복!</span>
+<span class="kw">let</span> p1 = <span class="val">10000</span> * <span class="val">1.1</span>;
+console.<span class="fn">log</span>(<span class="str">"상품1:"</span>, p1);
+
+<span class="kw">let</span> p2 = <span class="val">25000</span> * <span class="val">1.1</span>;
+console.<span class="fn">log</span>(<span class="str">"상품2:"</span>, p2);
+
+<span class="kw">let</span> p3 = <span class="val">8500</span> * <span class="val">1.1</span>;
+console.<span class="fn">log</span>(<span class="str">"상품3:"</span>, p3);
+
+<span class="cmt">// 세율 변경? → 3곳 모두 수정!</span></div>
+            </div>
+            <div class="col-box" style="border:2px solid var(--style-accent3);">
+              <div class="col-label">
+                <span style="background:#e0f5f5;color:#0d5a55;padding:0.15rem 0.5rem;border-radius:0.3rem;font-size:0.75rem;font-weight:700;">✓ 함수 사용 (GOOD)</span>
+              </div>
+              <div class="code-block code-block--sm"><span class="cmt">// 세금 계산 함수 1개만!</span>
+<span class="kw">function</span> <span class="fn">withTax</span>(price) {
+  <span class="kw">return</span> price * <span class="val">1.1</span>;
+}
+
+console.<span class="fn">log</span>(<span class="str">"상품1:"</span>, <span class="fn">withTax</span>(<span class="val">10000</span>));
+console.<span class="fn">log</span>(<span class="str">"상품2:"</span>, <span class="fn">withTax</span>(<span class="val">25000</span>));
+console.<span class="fn">log</span>(<span class="str">"상품3:"</span>, <span class="fn">withTax</span>(<span class="val">8500</span>));
+
+<span class="cmt">// 세율 변경? → 함수 1곳만!</span></div>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.45rem;">
+            함수를 쓰면 — <strong>수정이 쉬워지고</strong>, <strong>오류가 줄어들고</strong>, <strong>코드를 이해하기 쉬워집니다</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 12: DOM이란? ═══ -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: DOM이란">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">DOM (Document Object Model)</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 3 · DOM</div>
+            <h2><span class="section-icon" aria-hidden="true">◆</span> DOM이란?</h2>
+            <p class="section-subtitle">HTML 문서를 자바스크립트가 다룰 수 있는 트리 구조로 표현한 것</p>
+          </div>
+          <div class="two-col two-col--6040">
+            <!-- DOM 트리 다이어그램 -->
+            <div style="background:#F8F8F5;border-radius:0.8rem;padding:0.9rem 1rem;font-family:'Consolas',monospace;font-size:0.78rem;">
+              <div style="text-align:center;margin-bottom:0.5rem;">
+                <span style="background:var(--style-accent5);color:#fff;padding:0.2rem 0.9rem;border-radius:0.3rem;font-weight:700;">document</span>
+              </div>
+              <div style="display:flex;justify-content:center;"><div style="width:2px;height:14px;background:#ccc;"></div></div>
+              <div style="text-align:center;margin-bottom:0.5rem;">
+                <span style="background:var(--style-accent2);color:#fff;padding:0.2rem 0.9rem;border-radius:0.3rem;font-weight:700;">&lt;html&gt;</span>
+              </div>
+              <div style="display:flex;justify-content:center;gap:2.5rem;">
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                  <div style="width:2px;height:14px;background:#ccc;"></div>
+                  <span style="background:var(--style-accent3);color:var(--style-primary);padding:0.2rem 0.7rem;border-radius:0.3rem;font-weight:600;">&lt;head&gt;</span>
+                  <div style="width:2px;height:12px;background:#ccc;"></div>
+                  <span style="background:#E8E8F0;color:var(--style-primary);padding:0.15rem 0.5rem;border-radius:0.3rem;border:1px solid #ccc;">&lt;title&gt;</span>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;">
+                  <div style="width:2px;height:14px;background:#ccc;"></div>
+                  <span style="background:var(--style-accent4);color:var(--style-primary);padding:0.2rem 0.7rem;border-radius:0.3rem;font-weight:600;">&lt;body&gt;</span>
+                  <div style="display:flex;gap:0.6rem;margin-top:0.35rem;">
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                      <div style="width:2px;height:12px;background:#ccc;"></div>
+                      <span style="background:#E8E8F0;color:var(--style-primary);padding:0.15rem 0.5rem;border-radius:0.3rem;border:1px solid #ccc;">&lt;h1&gt;</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                      <div style="width:2px;height:12px;background:#ccc;"></div>
+                      <span style="background:#E8E8F0;color:var(--style-primary);padding:0.15rem 0.5rem;border-radius:0.3rem;border:1px solid #ccc;">&lt;p&gt;</span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                      <div style="width:2px;height:12px;background:#ccc;"></div>
+                      <span style="background:#E8E8F0;color:var(--style-primary);padding:0.15rem 0.5rem;border-radius:0.3rem;border:1px solid #ccc;">&lt;div&gt;</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+              <div class="bento-cell bento-cell--dark">
+                <h3>DOM = 문서 객체 모델</h3>
+                <p style="font-size:0.84rem;">브라우저가 HTML을 읽으면 → 각 태그를 <strong style="color:var(--style-accent3);">객체(Object)</strong>로 변환 → JS가 이 객체를 통해 HTML 조작 가능</p>
+              </div>
+              <div class="bento-cell bento-cell--teal">
+                <h3>JS로 할 수 있는 것</h3>
+                <ul style="font-size:0.82rem;padding-left:1rem;">
+                  <li>텍스트 내용 변경</li>
+                  <li>색상, 크기 등 스타일 변경</li>
+                  <li>새 요소 추가 / 삭제</li>
+                  <li>사용자 입력에 반응</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 13: DOM 요소 선택 ═══ -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 13: DOM 요소 선택">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">DOM — 요소 선택</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 3 · DOM</div>
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 요소 선택하기</h2>
+            <p class="section-subtitle">HTML 요소를 먼저 선택(가져와야) 내용을 바꿀 수 있습니다</p>
+          </div>
+          <div class="method-card method-card--teal">
+            <div class="method-name">document.getElementById("id명")</div>
+            <div class="method-desc">id 속성으로 요소 1개를 정확하게 가져옵니다 — 가장 빠르고 정확</div>
+          </div>
+          <div class="method-card method-card--coral">
+            <div class="method-name">document.querySelector("CSS선택자")</div>
+            <div class="method-desc">CSS 선택자 문법으로 요소를 가져옵니다 — 첫 번째 일치하는 요소만 반환</div>
+          </div>
+          <div class="code-block code-block--sm" style="margin-bottom:0.3rem;"><span class="cmt">&lt;!-- HTML --&gt;</span>
+<span class="tag">&lt;h1</span> <span class="attr">id</span>=<span class="str">"title"</span><span class="tag">&gt;</span>안녕하세요<span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;p</span> <span class="attr">class</span>=<span class="str">"desc"</span><span class="tag">&gt;</span>설명 텍스트<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">id</span>=<span class="str">"btn"</span><span class="tag">&gt;</span>클릭<span class="tag">&lt;/button&gt;</span></div>
+          <div class="code-block code-block--sm"><span class="cmt">// JavaScript — 요소 선택</span>
+<span class="kw">let</span> title = document.<span class="fn">getElementById</span>(<span class="str">"title"</span>);
+<span class="kw">let</span> desc  = document.<span class="fn">querySelector</span>(<span class="str">".desc"</span>);   <span class="cmt">// 클래스</span>
+<span class="kw">let</span> btn   = document.<span class="fn">querySelector</span>(<span class="str">"#btn"</span>);    <span class="cmt">// id</span>
+console.<span class="fn">log</span>(title);  <span class="cmt">// &lt;h1 id="title"&gt;...&lt;/h1&gt;</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 14: DOM 요소 변경 ═══ -->
+    <div class="slide" data-slide="13" role="region" aria-label="슬라이드 14: DOM 요소 변경">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">DOM — 요소 변경</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 3 · DOM</div>
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 요소 내용과 스타일 바꾸기</h2>
+            <p class="section-subtitle">선택한 요소의 텍스트, 스타일, HTML을 자바스크립트로 변경합니다</p>
+          </div>
+          <div class="bento-grid bento-grid-3" style="margin-bottom:0.45rem;">
+            <div class="bento-cell" style="background:#e0f5f5;border-top:3px solid var(--style-accent3);">
+              <h3 style="font-family:'Consolas',monospace;font-size:0.95rem;">.textContent</h3>
+              <p style="font-size:0.82rem;color:#555;">텍스트만 변경<br>HTML 태그는 문자로 처리<br><strong style="color:#0d5a55;">가장 안전한 방법</strong></p>
+            </div>
+            <div class="bento-cell" style="background:#fff8e0;border-top:3px solid var(--style-accent4);">
+              <h3 style="font-family:'Consolas',monospace;font-size:0.95rem;">.style.속성</h3>
+              <p style="font-size:0.82rem;color:#555;">인라인 스타일 변경<br>CSS 속성을 camelCase로<br><code style="font-size:0.76rem;">backgroundColor, fontSize</code></p>
+            </div>
+            <div class="bento-cell" style="background:#ffe5e5;border-top:3px solid var(--style-accent2);">
+              <h3 style="font-family:'Consolas',monospace;font-size:0.95rem;">.innerHTML</h3>
+              <p style="font-size:0.82rem;color:#555;">HTML 태그 포함 변경<br>태그를 직접 삽입 가능<br><strong style="color:#c0392b;">⚠ 보안 주의 필요</strong></p>
+            </div>
+          </div>
+          <div class="code-block code-block--sm"><span class="kw">let</span> el = document.<span class="fn">getElementById</span>(<span class="str">"title"</span>);
+
+<span class="cmt">// 텍스트 변경</span>
+el.<span class="prop">textContent</span> = <span class="str">"반갑습니다!"</span>;
+
+<span class="cmt">// 스타일 변경 (CSS: color → JS: color, background-color → backgroundColor)</span>
+el.<span class="prop">style</span>.<span class="prop">color</span>           = <span class="str">"#FF6B6B"</span>;
+el.<span class="prop">style</span>.<span class="prop">fontSize</span>        = <span class="str">"2rem"</span>;
+el.<span class="prop">style</span>.<span class="prop">backgroundColor</span> = <span class="str">"#1A1A2E"</span>;
+
+<span class="cmt">// HTML 변경 (강조 태그 포함)</span>
+el.<span class="prop">innerHTML</span> = <span class="str">"&lt;strong&gt;강조된&lt;/strong&gt; 텍스트"</span>;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 15: DOM 실습 ═══ -->
+    <div class="slide" data-slide="14" role="region" aria-label="슬라이드 15: DOM 실습">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">DOM — 콘솔 실습</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 3 · DOM</div>
+            <h2><span class="section-icon" aria-hidden="true">◉</span> 콘솔에서 DOM 직접 조작하기</h2>
+            <p class="section-subtitle">F12 → 콘솔 탭에서 아래 코드를 입력하면 화면이 바로 바뀝니다</p>
+          </div>
+          <div class="task-list">
+            <div class="task-item">
+              <div class="task-num task-num--teal">1</div>
+              <div style="flex:1;">
+                <h3>페이지 제목 바꾸기</h3>
+                <div class="code-block code-block--xs" style="margin-top:0.25rem;">document.<span class="fn">querySelector</span>(<span class="str">"h1"</span>).<span class="prop">textContent</span> = <span class="str">"내가 바꾼 제목!"</span>;</div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-num task-num--teal">2</div>
+              <div style="flex:1;">
+                <h3>배경색을 다크 네이비로</h3>
+                <div class="code-block code-block--xs" style="margin-top:0.25rem;">document.<span class="prop">body</span>.<span class="prop">style</span>.<span class="prop">backgroundColor</span> = <span class="str">"#1A1A2E"</span>;</div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-num task-num--teal">3</div>
+              <div style="flex:1;">
+                <h3>첫 번째 단락 글자색 바꾸기</h3>
+                <div class="code-block code-block--xs" style="margin-top:0.25rem;">document.<span class="fn">querySelector</span>(<span class="str">"p"</span>).<span class="prop">style</span>.<span class="prop">color</span> = <span class="str">"#4ECDC4"</span>;</div>
+              </div>
+            </div>
+            <div class="task-item">
+              <div class="task-num task-num--teal">4</div>
+              <div style="flex:1;">
+                <h3>브라우저 탭 제목 변경</h3>
+                <div class="code-block code-block--xs" style="margin-top:0.25rem;">document.<span class="prop">title</span> = <span class="str">"내가 바꾼 탭 제목"</span>;</div>
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.4rem;">
+            어떤 웹사이트에서도 F12 → 콘솔에서 DOM을 조작할 수 있습니다 — <strong>새로고침하면 원래대로</strong> 돌아와요!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 16: 이벤트란? ═══ -->
+    <div class="slide" data-slide="15" role="region" aria-label="슬라이드 16: 이벤트란">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">이벤트 (Event)</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 4 · 이벤트</div>
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 이벤트란?</h2>
+            <p class="section-subtitle">사용자의 행동(클릭, 입력, 스크롤 등)을 감지하여 반응하는 것</p>
+          </div>
+          <div class="bento-grid bento-grid-3" style="margin-bottom:0.5rem;">
+            <div class="bento-cell bento-cell--dark" style="border-top:3px solid var(--style-accent3);">
+              <h3>마우스 이벤트</h3>
+              <ul style="font-size:0.82rem;padding-left:1rem;">
+                <li><code style="color:var(--style-accent3);">click</code> — 클릭</li>
+                <li><code style="color:var(--style-accent3);">dblclick</code> — 더블클릭</li>
+                <li><code style="color:var(--style-accent3);">mouseover</code> — 마우스 올림</li>
+              </ul>
+            </div>
+            <div class="bento-cell bento-cell--dark" style="border-top:3px solid var(--style-accent4);">
+              <h3>키보드 이벤트</h3>
+              <ul style="font-size:0.82rem;padding-left:1rem;">
+                <li><code style="color:var(--style-accent4);">keydown</code> — 키 누름</li>
+                <li><code style="color:var(--style-accent4);">keyup</code> — 키 뗌</li>
+                <li><code style="color:var(--style-accent4);">input</code> — 값 변경 시</li>
+              </ul>
+            </div>
+            <div class="bento-cell bento-cell--dark" style="border-top:3px solid var(--style-accent2);">
+              <h3>폼 이벤트</h3>
+              <ul style="font-size:0.82rem;padding-left:1rem;">
+                <li><code style="color:var(--style-accent2);">submit</code> — 폼 제출</li>
+                <li><code style="color:var(--style-accent2);">change</code> — 선택 변경</li>
+                <li><code style="color:var(--style-accent2);">focus</code> — 포커스</li>
+              </ul>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="bento-cell bento-cell--teal">
+              <h3>이벤트의 흐름</h3>
+              <p style="font-size:0.85rem;">사용자 행동 → 브라우저가 감지 → 등록된 함수(핸들러) 실행</p>
+            </div>
+            <div class="bento-cell bento-cell--accent">
+              <h3>이 수업에서 배울 것</h3>
+              <p style="font-size:0.85rem;"><code>addEventListener</code>로 이벤트를 감지하고 원하는 동작을 연결합니다</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 17: addEventListener ═══ -->
+    <div class="slide" data-slide="16" role="region" aria-label="슬라이드 17: addEventListener 사용법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">이벤트 — addEventListener</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 4 · 이벤트</div>
+            <h2><span class="section-icon" aria-hidden="true">✦</span> addEventListener 사용법</h2>
+            <p class="section-subtitle">요소에 이벤트를 등록하는 가장 현대적인 방법</p>
+          </div>
+          <!-- addEventListener anatomy -->
+          <div class="anatomy-box">
+<span class="ah-el">요소</span><span class="ah-plain">.</span><span style="color:#DCDCAA;">addEventListener</span><span class="ah-plain">(</span><span class="ah-ev">"이벤트 종류"</span><span class="ah-plain">, </span><span class="ah-fn">실행할 함수</span><span class="ah-plain">);</span>
+          </div>
+          <div class="bento-grid bento-grid-3" style="margin-bottom:0.45rem;">
+            <div class="bento-cell" style="background:#e8f4ff;border-top:3px solid #9CDCFE;">
+              <h3>요소 (Element)</h3>
+              <code style="font-size:0.82rem;">btn, el, ...</code>
+              <p style="font-size:0.8rem;color:#555;margin-top:0.2rem;">getElementById나 querySelector로 선택한 요소</p>
+            </div>
+            <div class="bento-cell" style="background:#fff3e8;border-top:3px solid #CE9178;">
+              <h3>이벤트 종류</h3>
+              <code style="font-size:0.82rem;">"click"</code>
+              <p style="font-size:0.8rem;color:#555;margin-top:0.2rem;">문자열로 전달<br>"click", "input", "keydown" 등</p>
+            </div>
+            <div class="bento-cell" style="background:#e0f5f5;border-top:3px solid var(--style-accent3);">
+              <h3>실행할 함수</h3>
+              <code style="font-size:0.82rem;">function() &#123;&#125;</code>
+              <p style="font-size:0.8rem;color:#555;margin-top:0.2rem;">이벤트 발생 시 실행<br>익명 함수로 바로 작성</p>
+            </div>
+          </div>
+          <div class="code-block code-block--sm"><span class="kw">let</span> btn = document.<span class="fn">getElementById</span>(<span class="str">"myBtn"</span>);
+
+btn.<span class="fn">addEventListener</span>(<span class="str">"click"</span>, <span class="kw">function</span>() {
+  console.<span class="fn">log</span>(<span class="str">"버튼이 클릭되었습니다!"</span>);
+});</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 18: 이벤트 실습 ═══ -->
+    <div class="slide" data-slide="17" role="region" aria-label="슬라이드 18: 이벤트 실습">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">이벤트 — 실습</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">STEP 4 · 이벤트</div>
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 이벤트 실습 — 버튼 반응 만들기</h2>
+            <p class="section-subtitle">버튼 클릭에 반응하는 두 가지 예제를 따라해보세요</p>
+          </div>
+          <div class="two-col">
+            <div>
+              <div class="col-label">
+                <span class="lang-badge lang-badge--js">예제 1</span>
+                <span style="font-size:0.82rem;color:var(--style-text-secondary);">클릭 시 텍스트 변경</span>
+              </div>
+              <div class="code-block code-block--xs"><span class="tag">&lt;h2</span> <span class="attr">id</span>=<span class="str">"msg"</span><span class="tag">&gt;</span>안녕하세요<span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">id</span>=<span class="str">"btn1"</span><span class="tag">&gt;</span>클릭하세요<span class="tag">&lt;/button&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">let</span> btn1 = document
+  .<span class="fn">getElementById</span>(<span class="str">"btn1"</span>);
+<span class="kw">let</span> msg = document
+  .<span class="fn">getElementById</span>(<span class="str">"msg"</span>);
+
+btn1.<span class="fn">addEventListener</span>(<span class="str">"click"</span>,
+  <span class="kw">function</span>() {
+    msg.<span class="prop">textContent</span> = <span class="str">"클릭했어요!"</span>;
+  }
+);
+<span class="tag">&lt;/script&gt;</span></div>
+            </div>
+            <div>
+              <div class="col-label">
+                <span class="lang-badge lang-badge--js">예제 2</span>
+                <span style="font-size:0.82rem;color:var(--style-text-secondary);">색상 토글</span>
+              </div>
+              <div class="code-block code-block--xs"><span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="str">"box"</span><span class="tag">&gt;</span>색상 박스<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">id</span>=<span class="str">"btn2"</span><span class="tag">&gt;</span>색상 바꾸기<span class="tag">&lt;/button&gt;</span>
+
+<span class="tag">&lt;script&gt;</span>
+<span class="kw">let</span> btn2 = document
+  .<span class="fn">getElementById</span>(<span class="str">"btn2"</span>);
+<span class="kw">let</span> box = document
+  .<span class="fn">getElementById</span>(<span class="str">"box"</span>);
+<span class="kw">let</span> isDark = <span class="kw">false</span>;
+
+btn2.<span class="fn">addEventListener</span>(<span class="str">"click"</span>,
+  <span class="kw">function</span>() {
+    isDark = !isDark;
+    box.<span class="prop">style</span>.<span class="prop">background</span> =
+      isDark ? <span class="str">"#1A1A2E"</span>
+             : <span class="str">"#4ECDC4"</span>;
+  }
+);
+<span class="tag">&lt;/script&gt;</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 19: 종합 실습 - 카운터 앱 ═══ -->
+    <div class="slide" data-slide="18" role="region" aria-label="슬라이드 19: 종합 실습 카운터 앱">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">종합 실습 — 카운터 앱</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="section-badge">종합 실습</div>
+            <h2><span class="section-icon" aria-hidden="true">◉</span> 카운터 앱 만들기</h2>
+            <p class="section-subtitle">DOM + 이벤트를 합쳐 숫자를 증가/감소시키는 앱을 완성합니다</p>
+          </div>
+          <div class="two-col two-col--6040">
+            <div>
+              <div style="font-size:0.72rem;color:var(--style-text-secondary);margin-bottom:0.3rem;">HTML 구조</div>
+              <div class="code-block code-block--xs" style="margin-bottom:0.3rem;"><span class="tag">&lt;h1</span> <span class="attr">id</span>=<span class="str">"count"</span><span class="tag">&gt;</span>0<span class="tag">&lt;/h1&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">id</span>=<span class="str">"plus"</span><span class="tag">&gt;</span>+ 증가<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;button</span> <span class="attr">id</span>=<span class="str">"minus"</span><span class="tag">&gt;</span>- 감소<span class="tag">&lt;/button&gt;</span></div>
+              <div style="font-size:0.72rem;color:var(--style-text-secondary);margin-bottom:0.3rem;">JavaScript</div>
+              <div class="code-block code-block--xs"><span class="kw">let</span> count = <span class="val">0</span>;
+<span class="kw">let</span> display = document
+  .<span class="fn">getElementById</span>(<span class="str">"count"</span>);
+
+document.<span class="fn">getElementById</span>(<span class="str">"plus"</span>)
+  .<span class="fn">addEventListener</span>(<span class="str">"click"</span>,
+    <span class="kw">function</span>() {
+      count++;
+      display.<span class="prop">textContent</span> = count;
+    }
+  );
+
+document.<span class="fn">getElementById</span>(<span class="str">"minus"</span>)
+  .<span class="fn">addEventListener</span>(<span class="str">"click"</span>,
+    <span class="kw">function</span>() {
+      count--;
+      display.<span class="prop">textContent</span> = count;
+    }
+  );</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+              <div class="bento-cell bento-cell--dark" style="text-align:center;">
+                <p style="font-size:0.7rem;color:rgba(255,255,255,0.45);margin-bottom:0.3rem;">▶ 앱 미리보기</p>
+                <div style="font-size:3rem;font-weight:800;color:var(--style-accent3);font-family:'Consolas',monospace;line-height:1.2;">0</div>
+                <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.5rem;">
+                  <span style="background:var(--style-accent3);color:var(--style-primary);padding:0.3rem 0.8rem;border-radius:0.4rem;font-weight:700;font-size:0.82rem;">+ 증가</span>
+                  <span style="background:var(--style-accent2);color:#fff;padding:0.3rem 0.8rem;border-radius:0.4rem;font-weight:700;font-size:0.82rem;">- 감소</span>
+                </div>
+              </div>
+              <div class="task-item" style="background:#e0f5f5;">
+                <div class="task-num task-num--teal" style="font-size:0.68rem;width:2rem;height:2rem;">DOM</div>
+                <div><h3 style="font-size:0.88rem;">요소 선택</h3><p>count, plus, minus 버튼 요소 가져오기</p></div>
+              </div>
+              <div class="task-item" style="background:#fff8e0;">
+                <div class="task-num" style="background:var(--style-accent4);color:var(--style-primary);font-size:0.68rem;width:2rem;height:2rem;">EVT</div>
+                <div><h3 style="font-size:0.88rem;">이벤트 연결</h3><p>버튼 클릭 시 count 변수 증감 후 화면 갱신</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 20: 종합 정리 ═══ -->
+    <div class="slide" data-slide="19" role="region" aria-label="슬라이드 20: 종합 정리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">오늘 배운 내용 정리</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 오늘 배운 4가지 핵심</h2>
+            <p class="section-subtitle">이 4가지를 모두 합치면 동적인 웹 앱을 스스로 만들 수 있습니다!</p>
+          </div>
+          <div class="bento-grid bento-grid-2">
+            <div class="bento-cell bento-cell--dark">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;">
+                <span style="background:var(--style-accent3);color:var(--style-primary);padding:0.12rem 0.5rem;border-radius:0.3rem;font-size:0.68rem;font-weight:700;white-space:nowrap;">STEP 1</span>
+                <h3>반복문</h3>
+              </div>
+              <p style="font-size:0.84rem;">같은 작업을 원하는 횟수만큼 자동 반복</p>
+              <code style="font-size:0.76rem;color:var(--style-accent3);margin-top:0.25rem;display:block;">for (let i = 0; i &lt; 10; i++) &#123; &#125;</code>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;">
+                <span style="background:var(--style-primary);color:#fff;padding:0.12rem 0.5rem;border-radius:0.3rem;font-size:0.68rem;font-weight:700;white-space:nowrap;">STEP 2</span>
+                <h3>함수</h3>
+              </div>
+              <p style="font-size:0.84rem;">코드를 묶어서 이름을 붙이고 재사용</p>
+              <code style="font-size:0.76rem;color:var(--style-primary);margin-top:0.25rem;display:block;">function 이름(매개변수) &#123; return; &#125;</code>
+            </div>
+            <div class="bento-cell bento-cell--coral">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;">
+                <span style="background:rgba(255,255,255,0.25);color:#fff;padding:0.12rem 0.5rem;border-radius:0.3rem;font-size:0.68rem;font-weight:700;white-space:nowrap;">STEP 3</span>
+                <h3>DOM</h3>
+              </div>
+              <p style="font-size:0.84rem;">HTML을 JS로 선택하고 내용·스타일 조작</p>
+              <code style="font-size:0.76rem;color:#fff;margin-top:0.25rem;display:block;">document.getElementById("id")</code>
+            </div>
+            <div class="bento-cell bento-cell--purple">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.35rem;">
+                <span style="background:rgba(255,255,255,0.2);color:#fff;padding:0.12rem 0.5rem;border-radius:0.3rem;font-size:0.68rem;font-weight:700;white-space:nowrap;">STEP 4</span>
+                <h3>이벤트</h3>
+              </div>
+              <p style="font-size:0.84rem;">사용자 행동(클릭 등)을 감지하여 반응</p>
+              <code style="font-size:0.76rem;color:var(--style-accent);margin-top:0.25rem;display:block;">el.addEventListener("click", fn)</code>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.45rem;">
+            오늘 배운 4가지 = <strong>진짜 웹 앱의 기초!</strong> 반복문 + 함수 + DOM + 이벤트를 조합하면 무한한 가능성이 열립니다
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 21: 과제 & 다음 시간 예고 ═══ -->
+    <div class="slide" data-slide="20" role="region" aria-label="슬라이드 21: 과제 및 다음 시간 예고">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">과제 &amp; 다음 시간 예고</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 과제 &amp; 다음 시간</h2>
+            <p class="section-subtitle">오늘 배운 내용으로 직접 만들어보면서 완전히 내 것으로!</p>
+          </div>
+          <div class="two-col" style="margin-bottom:0.5rem;">
+            <div style="background:#fff3e0;border-radius:var(--cell-radius);padding:0.85rem 1rem;border-left:4px solid #FF9800;">
+              <h3 style="color:#e65100;margin-bottom:0.4rem;">과제 A — 숫자 맞추기 게임</h3>
+              <ul style="font-size:0.84rem;padding-left:1.1rem;color:var(--style-text-secondary);">
+                <li>1~10 중 랜덤 숫자 생성 <code>Math.random()</code></li>
+                <li>사용자가 숫자를 입력하면 정답 비교</li>
+                <li>맞으면 "정답!" 틀리면 힌트 표시</li>
+              </ul>
+            </div>
+            <div style="background:#e8f5e9;border-radius:var(--cell-radius);padding:0.85rem 1rem;border-left:4px solid #4CAF50;">
+              <h3 style="color:#1b5e20;margin-bottom:0.4rem;">과제 B — To-Do 리스트</h3>
+              <ul style="font-size:0.84rem;padding-left:1.1rem;color:var(--style-text-secondary);">
+                <li>입력 필드 + 추가 버튼 구성</li>
+                <li>버튼 클릭 시 항목을 목록에 추가</li>
+                <li>완료 체크 또는 삭제 기능 구현</li>
+              </ul>
+            </div>
+          </div>
+          <div class="bento-cell bento-cell--dark" style="border-left:4px solid var(--style-accent3);margin-bottom:0.4rem;">
+            <h3 style="color:var(--style-accent3);margin-bottom:0.3rem;">다음 시간 예고</h3>
+            <p style="font-size:0.85rem;">배열(Array) · 객체(Object) · 고급 DOM 조작 — 데이터를 리스트로 다루고 복잡한 UI 만들기</p>
+          </div>
+          <div class="highlight-box highlight-box--teal" style="color:var(--style-primary);">
+            <strong>제출 방법:</strong> VS Code에서 작성한 HTML 파일을 선생님 구글 드라이브 공유 폴더에 업로드
+            (파일명: <code>이름_과제번호.html</code>)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.presentation -->
+
+  <!-- ── 네비게이션 바 ── -->
+  <nav class="nav-bar" role="navigation" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" aria-label="이전 슬라이드" disabled>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <div class="nav-counter">
+      <input type="number" class="slide-input" id="slideInput" value="1" min="1" max="21" aria-label="슬라이드 번호 입력">
+      <span style="margin:0 2px;color:rgba(255,255,255,0.4);">/</span>
+      <span id="totalCount">21</span>
+    </div>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const TOTAL = 21;
+    let current = 0;
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    const progressBar = document.getElementById('progressBar');
+
+    function goTo(n) {
+      if (n < 0 || n >= TOTAL) return;
+      slides[current].classList.remove('active');
+      current = n;
+      slides[current].classList.add('active');
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === TOTAL - 1;
+      slideInput.value = current + 1;
+      progressBar.style.width = ((current + 1) / TOTAL * 100) + '%';
+      progressBar.setAttribute('aria-valuenow', current + 1);
+    }
+
+    prevBtn.addEventListener('click', function() { goTo(current - 1); });
+    nextBtn.addEventListener('click', function() { goTo(current + 1); });
+
+    slideInput.addEventListener('change', function() {
+      var v = parseInt(slideInput.value, 10);
+      if (!isNaN(v) && v >= 1 && v <= TOTAL) goTo(v - 1);
+      else slideInput.value = current + 1;
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.target === slideInput) return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault(); goTo(current + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault(); goTo(current - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault(); goTo(0);
+      } else if (e.key === 'End') {
+        e.preventDefault(); goTo(TOTAL - 1);
+      }
+    });
+
+    var touchStartX = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) goTo(dx < 0 ? current + 1 : current - 1);
+    }, { passive: true });
+
+    document.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      goTo(e.deltaY > 0 ? current + 1 : current - 1);
+    }, { passive: false });
+
+    goTo(0);
+  </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

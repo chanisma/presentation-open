@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI·디지털 활용 결과 보고서</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F8F8F2;
+      --primary: #1A1A2E;
+      --accent: #E8FF3B;
+      --coral: #FF6B6B;
+      --teal: #4ECDC4;
+      --warm: #FFE66D;
+      --text: #1A1A2E;
+      --sub: #555555;
+      --hint: #888888;
+      --cell: #FFFFFF;
+      --border: rgba(26,26,46,0.1);
+      --radius: 14px;
+      --gap: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── 랜딩 ── */
+    .landing {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem 1rem; gap: 1rem;
+    }
+    .landing-eyebrow {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--hint);
+    }
+    .landing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: var(--gap);
+      max-width: 680px; width: 100%; min-height: 370px;
+    }
+    .bento-anchor {
+      grid-column: 1; grid-row: 1 / 3;
+      background: var(--primary); color: white;
+      border-radius: var(--radius); padding: 2rem;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .ba-year {
+      font-size: 4rem; font-weight: 700; color: var(--accent);
+      line-height: 1; margin-bottom: 0.6rem;
+    }
+    .ba-title { font-size: 1.25rem; font-weight: 700; line-height: 1.4; margin-bottom: 0.5rem; }
+    .ba-sub { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.7; }
+    .bento-sel {
+      border-radius: var(--radius); padding: 1.4rem;
+      cursor: pointer; transition: transform 0.18s, filter 0.18s;
+      display: flex; flex-direction: column; justify-content: space-between;
+      user-select: none;
+    }
+    .bento-sel:hover, .bento-sel:focus { transform: scale(1.03); filter: brightness(1.05); outline: none; }
+    .bs-act { background: var(--coral); color: white; }
+    .bs-cls { background: var(--teal); color: var(--primary); }
+    .bs-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+    .bs-title { font-size: 0.97rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .bs-desc { font-size: 0.76rem; opacity: 0.75; line-height: 1.5; flex: 1; }
+    .bs-arrow { font-size: 1.1rem; font-weight: 700; align-self: flex-end; margin-top: 0.7rem; }
+
+    /* ── 폼 래퍼 ── */
+    .form-wrapper { display: none; }
+    .form-wrapper.active { display: block; padding-bottom: 6rem; }
+
+    /* ── 헤더 ── */
+    .page-header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--cell); border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 12px rgba(26,26,46,0.07);
+      padding: 0.65rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .page-header-left { display: flex; align-items: center; gap: 0.75rem; }
+    .page-title { font-size: 0.95rem; font-weight: 700; color: var(--primary); }
+    .page-badge {
+      font-size: 0.7rem; padding: 0.1rem 0.5rem; border-radius: 2rem;
+      background: var(--accent); color: var(--primary); font-weight: 700;
+    }
+    .btn-set {
+      background: #FFFBEB; border: 1px solid #FDE68A; color: #92400E;
+      padding: 0.35rem 0.7rem; border-radius: 8px; font-size: 0.88rem;
+      cursor: pointer; font-family: inherit;
+    }
+    .btn-set:hover { background: #FEF3C7; }
+
+    /* ── 설정 패널 ── */
+    .settings-panel {
+      background: #FFFBEB; border-bottom: 2px solid #FDE68A;
+      padding: 0.7rem 1.5rem; display: none;
+      align-items: center; gap: 0.8rem; flex-wrap: wrap;
+    }
+    .settings-panel.open { display: flex; }
+    .settings-panel label { font-size: 0.82rem; color: #92400E; font-weight: 600; white-space: nowrap; }
+    .settings-panel input[type="text"] {
+      flex: 1; min-width: 260px; font-size: 0.82rem;
+      background: #FFF; border: 1px solid #FCD34D; color: #111827;
+      padding: 0.4rem 0.7rem; border-radius: 6px;
+    }
+    .settings-label {
+      font-size: 0.78rem; color: #92400E; background: #FEF3C7;
+      padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid #FDE68A;
+    }
+
+    /* ── 메인 ── */
+    .main { max-width: 860px; margin: 0 auto; padding: 1.2rem 1rem 2rem; }
+
+    /* ── 폼 카드 ── */
+    .form-card {
+      background: var(--cell);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: var(--gap);
+      box-shadow: 0 2px 8px rgba(26,26,46,0.05);
+    }
+    .form-card-header {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.6rem 1.2rem;
+    }
+    .form-card-num {
+      font-size: 0.72rem; font-weight: 700;
+      border-radius: 50%; width: 1.5rem; height: 1.5rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      background: rgba(26,26,46,0.12); color: inherit;
+    }
+    .form-card-title { font-size: 0.92rem; font-weight: 700; }
+    .form-card-desc { font-size: 0.76rem; opacity: 0.6; margin-left: auto; }
+    .form-card-body {
+      padding: 1rem 1.2rem;
+      display: flex; flex-direction: column; gap: 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* 카드 색상 테마 */
+    .fc-navy .form-card-header { background: var(--primary); color: white; }
+    .fc-navy .form-card-num { background: rgba(255,255,255,0.15); }
+    .fc-teal .form-card-header { background: var(--teal); color: var(--primary); }
+    .fc-yellow .form-card-header { background: var(--accent); color: var(--primary); }
+    .fc-coral .form-card-header { background: var(--coral); color: white; }
+    .fc-coral .form-card-num { background: rgba(255,255,255,0.22); }
+    .fc-warm .form-card-header { background: var(--warm); color: var(--primary); }
+    .fc-gray .form-card-header { background: #EFEFEF; color: var(--primary); }
+
+    /* ── 필드 ── */
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    label.fl { font-size: 0.84rem; color: var(--sub); font-weight: 500; }
+    .req { color: var(--coral); }
+    .hint { font-size: 0.73rem; color: var(--hint); }
+    input[type="text"], textarea {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.55rem 0.8rem;
+      color: var(--text); font-family: inherit; font-size: 0.92rem;
+      width: 100%; transition: border-color 0.18s, background 0.18s;
+    }
+    input:focus, textarea:focus {
+      outline: none; border-color: var(--teal); background: #FFFFFF;
+    }
+    input.invalid, textarea.invalid { border-color: var(--coral) !important; }
+    textarea { resize: vertical; min-height: 76px; }
+    .fg { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+
+    /* ── 체크박스 칩 ── */
+    .chip-group { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    .chip {
+      display: inline-flex; align-items: center;
+      padding: 0.27rem 0.65rem; border-radius: 2rem;
+      border: 1px solid var(--border); background: var(--bg);
+      cursor: pointer; font-size: 0.81rem; color: var(--sub);
+      transition: all 0.15s; user-select: none;
+    }
+    .chip input[type="checkbox"] { display: none; }
+    .chip:has(input:checked) { background: var(--primary); border-color: var(--primary); color: white; }
+    .chip:hover { border-color: var(--primary); color: var(--primary); background: white; }
+    .chip.ca:has(input:checked) { background: var(--teal); border-color: var(--teal); color: var(--primary); }
+    .chip.ca:hover { border-color: var(--teal); color: var(--primary); background: white; }
+
+    /* ── 이미지 업로드 ── */
+    .img-area {
+      position: relative; border: 2px dashed rgba(26,26,46,0.18);
+      border-radius: 8px; overflow: hidden; cursor: pointer;
+      transition: border-color 0.2s; min-height: 100px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+    }
+    .img-area:hover { border-color: var(--teal); }
+    .img-area.drag-over { border-color: var(--teal); background: rgba(78,205,196,0.06); }
+    .img-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .img-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+      color: var(--hint); font-size: 0.81rem; padding: 1rem; pointer-events: none;
+    }
+    .img-placeholder svg { width: 2rem; height: 2rem; opacity: 0.35; }
+    .img-preview { display: none; width: 100%; max-height: 220px; object-fit: contain; padding: 0.4rem; }
+    .btn-rm-img {
+      display: none; font-size: 0.75rem; padding: 0.2rem 0.5rem; margin-top: 0.3rem;
+      background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3);
+      color: var(--coral); border-radius: 6px; cursor: pointer; font-family: inherit;
+      align-self: flex-start;
+    }
+    .img-info { font-size: 0.7rem; color: var(--hint); }
+    .img-slots { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.6rem; }
+    .img-slot { display: flex; flex-direction: column; gap: 0.2rem; }
+    .img-slot .img-preview { max-height: 140px; }
+    .img-slot-lbl { font-size: 0.72rem; font-weight: 600; color: var(--hint); }
+    @media(max-width:600px){ .img-slots { grid-template-columns: 1fr; } }
+
+    /* ── 액션 바 ── */
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: var(--cell); border-top: 1px solid var(--border);
+      box-shadow: 0 -2px 20px rgba(26,26,46,0.09);
+      padding: 0.7rem 1.5rem;
+      display: none; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .action-bar.show { display: flex; }
+    .abl, .abr { display: flex; align-items: center; gap: 0.5rem; }
+    .draft-lbl { font-size: 0.78rem; color: var(--hint); }
+
+    /* ── 버튼 ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 1rem; border-radius: 8px; border: 1px solid transparent;
+      font-size: 0.87rem; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: all 0.15s;
+    }
+    .btn svg { width: 1em; height: 1em; }
+    .btn-ok { background: var(--primary); color: var(--accent); border-color: var(--primary); }
+    .btn-ok:hover { background: #2d2d4e; }
+    .btn-ghost { background: transparent; border-color: var(--border); color: var(--sub); }
+    .btn-ghost:hover { background: var(--bg); color: var(--primary); border-color: rgba(26,26,46,0.3); }
+    .btn-del { background: var(--coral); color: white; border-color: var(--coral); }
+    .btn-del:hover { filter: brightness(0.92); }
+    .btn-draft { background: var(--teal); color: var(--primary); border-color: var(--teal); }
+    .btn-draft:hover { filter: brightness(0.94); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── 토스트 ── */
+    .toast-ct { position: fixed; bottom: 5rem; right: 1.5rem; z-index: 200; display: flex; flex-direction: column; gap: 0.5rem; }
+    .toast {
+      padding: 0.65rem 1rem; border-radius: 8px;
+      font-size: 0.86rem; font-weight: 500; max-width: 320px;
+      animation: sIn 0.2s ease; box-shadow: 0 4px 16px rgba(26,26,46,0.15);
+    }
+    .toast.s { background: var(--primary); color: var(--accent); }
+    .toast.e { background: var(--coral); color: white; }
+    .toast.i { background: var(--teal); color: var(--primary); }
+    @keyframes sIn { from { transform: translateX(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    @media print {
+      body { background: #fff; color: #111; }
+      .landing, .page-header, .action-bar, .settings-panel, .toast-ct { display: none !important; }
+      .main { max-width: 100%; padding: 0; }
+      .form-card { background: #fff; border: 1px solid #ccc; border-radius: 0; margin-bottom: 0.8rem; break-inside: avoid; box-shadow: none; }
+      .form-card-header { background: #eee !important; color: #111 !important; }
+      input, textarea { border: 1px solid #999; background: #fff; color: #111; }
+    }
+    @media (max-width: 580px) {
+      .fg { grid-template-columns: 1fr; }
+      .landing-grid { grid-template-columns: 1fr; grid-template-rows: auto; min-height: auto; }
+      .bento-anchor { grid-column: 1; grid-row: auto; }
+      .ba-year { font-size: 2.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════ 랜딩 ════════════ -->
+<div id="landingPage" class="landing">
+  <div class="landing-eyebrow">교육청 AI · 디지털 활용 예산 결과 보고</div>
+  <div class="landing-grid">
+
+    <div class="bento-anchor">
+      <div class="ba-year">2026</div>
+      <h1 class="ba-title">AI · 디지털 활용<br>결과 보고서</h1>
+      <p class="ba-sub">정보화부 / AI디지털<br>교육청 예산 결과 보고용 양식</p>
+    </div>
+
+    <div class="bento-sel bs-act" id="btnGoAct" role="button" tabindex="0">
+      <div>
+        <div class="bs-icon">📋</div>
+        <div class="bs-title">교육활동 결과 보고서</div>
+        <div class="bs-desc">수업 외 업무 · 평가 · 계획 · 행정 · 학생 기록 등</div>
+      </div>
+      <div class="bs-arrow">→</div>
+    </div>
+
+    <div class="bento-sel bs-cls" id="btnGoCls" role="button" tabindex="0">
+      <div>
+        <div class="bs-icon">🎓</div>
+        <div class="bs-title">수업활용 결과 보고서</div>
+        <div class="bs-desc">AI · 디지털 도구를 활용한 수업 활동 기록</div>
+      </div>
+      <div class="bs-arrow">→</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════ 교육활동 폼 ════════════ -->
+<div id="actForm" class="form-wrapper">
+  <header class="page-header">
+    <div class="page-header-left">
+      <button class="btn btn-ghost" id="actBack">← 뒤로</button>
+      <h1 class="page-title">교육활동 결과 보고서</h1>
+      <span class="page-badge">2026</span>
+    </div>
+    <button class="btn-set" id="actSetBtn" title="교사 설정">⚙</button>
+  </header>
+  <div class="settings-panel" id="actSetPanel">
+    <span class="settings-label">교사 전용</span>
+    <label for="actUrl">Apps Script URL</label>
+    <input type="text" id="actUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn" id="actUrlSave" style="background:#FEF3C7;border-color:#FCD34D;color:#92400E;white-space:nowrap;">저장</button>
+    <button class="btn" id="actUrlClear" style="background:#FEF2F2;border-color:#FCA5A5;color:#DC2626;white-space:nowrap;">초기화</button>
+  </div>
+
+  <main class="main">
+
+    <div class="form-card fc-navy">
+      <div class="form-card-header">
+        <span class="form-card-num">1</span>
+        <span class="form-card-title">기본 정보</span>
+        <span class="form-card-desc">Basic Information</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="aAuthor">작성자 <span class="req">*</span> <span class="hint">소속·직위 포함 — 예) ○○고 정보화부 교사 홍길동</span></label>
+          <input type="text" id="aAuthor" placeholder="○○고 정보화부 교사 홍길동">
+        </div>
+        <div class="field">
+          <label class="fl">업무 영역 <span class="hint">해당 항목 모두 선택</span></label>
+          <div class="chip-group">
+            <label class="chip"><input type="checkbox" name="aArea" value="평가"><span>평가</span></label>
+            <label class="chip"><input type="checkbox" name="aArea" value="교육과정·수업 계획"><span>교육과정·수업 계획</span></label>
+            <label class="chip"><input type="checkbox" name="aArea" value="학생 기록(생기부·세특)"><span>학생 기록(생기부·세특)</span></label>
+            <label class="chip"><input type="checkbox" name="aArea" value="행정 문서"><span>행정 문서</span></label>
+            <label class="chip"><input type="checkbox" name="aArea" value="상담·소통 자료"><span>상담·소통 자료</span></label>
+            <label class="chip"><input type="checkbox" name="aArea" value="연수·자료 개발"><span>연수·자료 개발</span></label>
+            <label class="chip"><input type="checkbox" name="aArea" value="기타"><span>기타</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="fl" for="aWorkName">업무명 <span class="req">*</span> <span class="hint">예) 1학기 기말고사 서답형 문항 출제</span></label>
+          <input type="text" id="aWorkName" placeholder="업무명을 입력하세요">
+        </div>
+        <div class="fg">
+          <div class="field">
+            <label class="fl" for="aPeriod">활용 시기 <span class="hint">예) 2026.05.01~05.10</span></label>
+            <input type="text" id="aPeriod" placeholder="2026.05.01~05.10">
+          </div>
+          <div class="field">
+            <label class="fl" for="aTarget">관련 대상 <span class="hint">예) 3학년 4반 24명</span></label>
+            <input type="text" id="aTarget" placeholder="해당 시 기재">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-teal">
+      <div class="form-card-header">
+        <span class="form-card-num">2</span>
+        <span class="form-card-title">활용 도구 및 예산 집행</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl">활용한 AI · 디지털 도구</label>
+          <div class="chip-group">
+            <label class="chip"><input type="checkbox" name="aTools" value="생성형 AI"><span>생성형 AI</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="문서·표 자동화"><span>문서·표 자동화</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="AI 검색·요약"><span>AI 검색·요약</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="번역·교정 AI"><span>번역·교정 AI</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="이미지·인포그래픽 AI"><span>이미지·인포그래픽 AI</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="음성·전사(STT) AI"><span>음성·전사(STT) AI</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="코드·데이터 분석"><span>코드·데이터 분석</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="학교 자체 시스템"><span>학교 자체 시스템</span></label>
+            <label class="chip"><input type="checkbox" name="aTools" value="기타"><span>기타</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="fl" for="aToolNames">구체 도구명 <span class="hint">예) Claude Pro, ChatGPT-4, NotebookLM</span></label>
+          <input type="text" id="aToolNames" placeholder="사용한 도구명 직접 입력">
+        </div>
+        <div class="field">
+          <label class="fl" for="aBudget">예산 집행 <span class="hint">예) 구독료 22,000원 / API 8,500원</span></label>
+          <input type="text" id="aBudget" placeholder="예산 내역">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-yellow">
+      <div class="form-card-header">
+        <span class="form-card-num">3</span>
+        <span class="form-card-title">업무 설계</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="aProblem">해결하려던 문제 <span class="req">*</span> <span class="hint">왜 이 업무에 AI가 필요했는가?</span></label>
+          <textarea id="aProblem" rows="3" placeholder="기존 방식의 한계와 AI 도입 이유를 간략히 서술"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aToolReason">도구를 선택한 이유 <span class="req">*</span> <span class="hint">시간 절감 / 품질 향상 / 일관성 / 접근성 등</span></label>
+          <textarea id="aToolReason" rows="3" placeholder="이 도구를 선택한 핵심 이유"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aMethod">활용 방식 <span class="hint">예) 프롬프트로 초안 생성 → 교사 검토·수정 → 최종 확정</span></label>
+          <textarea id="aMethod" rows="2" placeholder="단계별 활용 방식을 간략히 서술"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-coral">
+      <div class="form-card-header">
+        <span class="form-card-num">4</span>
+        <span class="form-card-title">업무 결과</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="aOutputs">산출물 <span class="req">*</span> <span class="hint">예) 서답형 문항 12개, 세특 초안 24건</span></label>
+          <textarea id="aOutputs" rows="2" placeholder="산출물과 수량을 기재"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aEffect">정량 효과 <span class="hint">예) 작성 시간 6시간 → 1.5시간 (75% 절감)</span></label>
+          <textarea id="aEffect" rows="2" placeholder="측정 가능한 효과를 수치로 기재"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aVerify">★ 검증·점검 절차 <span class="req">*</span> <span class="hint">AI 결과물의 정확성을 어떻게 확인했는가?</span></label>
+          <textarea id="aVerify" rows="3" placeholder="사실관계 교차 확인 / 동료 검토 / 원본 자료 대조 등"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-warm">
+      <div class="form-card-header">
+        <span class="form-card-num">5</span>
+        <span class="form-card-title">인사이트</span>
+        <span class="form-card-desc">★ 재활용 핵심</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="aGood">잘 된 점 <span class="hint">키워드 3개 — 예) 시간 절감↑, 표현 일관성, 누락 사례↓</span></label>
+          <textarea id="aGood" rows="2" placeholder="긍정적인 결과를 키워드로 정리"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aBad">아쉬운 점 <span class="hint">키워드 3개 — 예) 사실 오류 검토 부담, 개인정보 처리</span></label>
+          <textarea id="aBad" rows="2" placeholder="개선이 필요한 부분을 키워드로 정리"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aChange">다시 한다면 바꿀 1가지 <span class="hint">한 줄로</span></label>
+          <input type="text" id="aChange" placeholder="다음에 가장 먼저 손볼 것">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-teal">
+      <div class="form-card-header">
+        <span class="form-card-num">6</span>
+        <span class="form-card-title">재활용 메모</span>
+        <span class="form-card-desc">다른 선생님께 전달</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="aCtx">추천 활용 맥락 <span class="hint">어떤 업무·시기·규모에 가장 효과적인가</span></label>
+          <textarea id="aCtx" rows="2" placeholder="추천 상황을 간략히 서술"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aCaution">주의할 점 <span class="hint">개인정보 보호, 사실 검증, 저작권, 윤리 등</span></label>
+          <textarea id="aCaution" rows="2" placeholder="특히 학생·학부모 정보 처리 시 유의사항"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="aAssets">재활용 가능 자산 <span class="hint">프롬프트, 워크플로, 체크리스트, 양식 — 저장 위치와 함께</span></label>
+          <textarea id="aAssets" rows="2" placeholder="재활용 자산과 저장 위치 기재"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-gray">
+      <div class="form-card-header">
+        <span class="form-card-num">7</span>
+        <span class="form-card-title">활용 이미지 첨부</span>
+        <span class="form-card-desc">선택 · 최대 5MB · 자동 리사이즈</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl">AI 활용 화면 / 결과물 캡처 <span class="hint">JPG, PNG — 최대 3장 · 각 5MB</span></label>
+          <div class="img-slots">
+            <div class="img-slot">
+              <span class="img-slot-lbl">이미지 1</span>
+              <div class="img-area" id="aImgArea0"><input type="file" id="aImgInput0" accept="image/*">
+                <div class="img-placeholder" id="aImgPh0"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>클릭 또는 드래그</span></div>
+                <img class="img-preview" id="aImgPreview0" alt="첨부 이미지" onerror="this.style.display='none'">
+              </div>
+              <button type="button" class="btn-rm-img" id="aImgRm0">× 제거</button>
+              <span class="img-info" id="aImgInfo0"></span>
+            </div>
+            <div class="img-slot">
+              <span class="img-slot-lbl">이미지 2</span>
+              <div class="img-area" id="aImgArea1"><input type="file" id="aImgInput1" accept="image/*">
+                <div class="img-placeholder" id="aImgPh1"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>클릭 또는 드래그</span></div>
+                <img class="img-preview" id="aImgPreview1" alt="첨부 이미지" onerror="this.style.display='none'">
+              </div>
+              <button type="button" class="btn-rm-img" id="aImgRm1">× 제거</button>
+              <span class="img-info" id="aImgInfo1"></span>
+            </div>
+            <div class="img-slot">
+              <span class="img-slot-lbl">이미지 3</span>
+              <div class="img-area" id="aImgArea2"><input type="file" id="aImgInput2" accept="image/*">
+                <div class="img-placeholder" id="aImgPh2"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>클릭 또는 드래그</span></div>
+                <img class="img-preview" id="aImgPreview2" alt="첨부 이미지" onerror="this.style.display='none'">
+              </div>
+              <button type="button" class="btn-rm-img" id="aImgRm2">× 제거</button>
+              <span class="img-info" id="aImgInfo2"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="action-bar" id="actBar">
+    <div class="abl">
+      <button class="btn btn-ok" id="actSave">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+        저장하기
+      </button>
+      <button class="btn btn-draft" id="actDraftBtn">💾 임시저장</button>
+    </div>
+    <div class="abr">
+      <span class="draft-lbl" id="actDraftLbl">임시저장: 대기 중</span>
+      <button class="btn btn-del" id="actClear">초기화</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════ 수업활용 폼 ════════════ -->
+<div id="clsForm" class="form-wrapper">
+  <header class="page-header">
+    <div class="page-header-left">
+      <button class="btn btn-ghost" id="clsBack">← 뒤로</button>
+      <h1 class="page-title">수업활용 결과 보고서</h1>
+      <span class="page-badge">2026</span>
+    </div>
+    <button class="btn-set" id="clsSetBtn" title="교사 설정">⚙</button>
+  </header>
+  <div class="settings-panel" id="clsSetPanel">
+    <span class="settings-label">교사 전용</span>
+    <label for="clsUrl">Apps Script URL</label>
+    <input type="text" id="clsUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn" id="clsUrlSave" style="background:#FEF3C7;border-color:#FCD34D;color:#92400E;white-space:nowrap;">저장</button>
+    <button class="btn" id="clsUrlClear" style="background:#FEF2F2;border-color:#FCA5A5;color:#DC2626;white-space:nowrap;">초기화</button>
+  </div>
+
+  <main class="main">
+
+    <div class="form-card fc-navy">
+      <div class="form-card-header">
+        <span class="form-card-num">1</span>
+        <span class="form-card-title">기본 정보</span>
+        <span class="form-card-desc">Basic Information</span>
+      </div>
+      <div class="form-card-body">
+        <div class="fg">
+          <div class="field">
+            <label class="fl" for="cAuthor">작성자 <span class="req">*</span></label>
+            <input type="text" id="cAuthor" placeholder="교사 이름">
+          </div>
+          <div class="field">
+            <label class="fl" for="cSubject">교과명</label>
+            <input type="text" id="cSubject" placeholder="예) 정보, 수학">
+          </div>
+        </div>
+        <div class="fg">
+          <div class="field">
+            <label class="fl" for="cGrade">학년·반 <span class="hint">예) 3학년 4반</span></label>
+            <input type="text" id="cGrade" placeholder="학년·반">
+          </div>
+          <div class="field">
+            <label class="fl" for="cCount">학생 수</label>
+            <input type="text" id="cCount" placeholder="명">
+          </div>
+        </div>
+        <div class="fg">
+          <div class="field">
+            <label class="fl" for="cDate">활용 일자 <span class="hint">예) 2026.05.12 (3차시)</span></label>
+            <input type="text" id="cDate" placeholder="2026.05.12 (차시)">
+          </div>
+          <div class="field">
+            <label class="fl" for="cUnit">단원·주제</label>
+            <input type="text" id="cUnit" placeholder="단원명 또는 수업 주제">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-teal">
+      <div class="form-card-header">
+        <span class="form-card-num">2</span>
+        <span class="form-card-title">활용 도구 및 예산 집행</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl">활용한 AI · 디지털 도구</label>
+          <div class="chip-group">
+            <label class="chip ca"><input type="checkbox" name="cTools" value="생성형 AI"><span>생성형 AI</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="이미지 생성 AI"><span>이미지 생성 AI</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="음성·번역 AI"><span>음성·번역 AI</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="Teachable Machine"><span>Teachable Machine</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="피지컬 컴퓨팅 보드"><span>피지컬 컴퓨팅 보드</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="교육용 SW(코스페이시스·Padlet 등)"><span>교육용 SW</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="VR/AR 기기"><span>VR/AR 기기</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="태블릿·노트북"><span>태블릿·노트북</span></label>
+            <label class="chip ca"><input type="checkbox" name="cTools" value="기타"><span>기타</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="fl" for="cToolNames">구체 도구명 <span class="hint">예) ChatGPT-4, Arduino UNO, Teachable Machine</span></label>
+          <input type="text" id="cToolNames" placeholder="사용한 도구명 직접 입력">
+        </div>
+        <div class="field">
+          <label class="fl" for="cBudget">예산 집행 <span class="hint">예) 구독료 22,000원 / 소모품 45,000원</span></label>
+          <input type="text" id="cBudget" placeholder="예산 내역">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-yellow">
+      <div class="form-card-header">
+        <span class="form-card-num">3</span>
+        <span class="form-card-title">수업 설계</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="cGoal">수업 목표 <span class="req">*</span> <span class="hint">학생들이 무엇을 알게/할 수 있게 되는가?</span></label>
+          <textarea id="cGoal" rows="3" placeholder="1~2줄로 간략히 서술"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="cToolReason">도구를 선택한 이유 <span class="req">*</span> <span class="hint">왜 일반 수업 대신 이 도구를 썼는가?</span></label>
+          <textarea id="cToolReason" rows="3" placeholder="가장 중요한 이유를 서술"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl">활용 단계</label>
+          <div class="chip-group">
+            <label class="chip ca"><input type="checkbox" name="cStage" value="도입"><span>🚀 도입</span></label>
+            <label class="chip ca"><input type="checkbox" name="cStage" value="전개"><span>📖 전개</span></label>
+            <label class="chip ca"><input type="checkbox" name="cStage" value="정리"><span>✅ 정리</span></label>
+            <label class="chip ca"><input type="checkbox" name="cStage" value="평가"><span>📝 평가</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="fl" for="cStageDesc">활용 방식 <span class="hint">선택한 단계에서 어떻게 활용했는지</span></label>
+          <textarea id="cStageDesc" rows="2" placeholder="각 단계별 AI·디지털 도구 활용 내용"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-coral">
+      <div class="form-card-header">
+        <span class="form-card-num">4</span>
+        <span class="form-card-title">학생 활동 및 결과</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="cActivities">학생 활동 요약 <span class="hint">학생들이 실제로 한 활동을 3~5줄로</span></label>
+          <textarea id="cActivities" rows="4" placeholder="학생 활동 내용을 서술"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="cOutputs">산출물·결과 <span class="hint">예) 카드뉴스 24개, 코딩 프로젝트 12팀</span></label>
+          <textarea id="cOutputs" rows="2" placeholder="산출물과 수량 기재"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="cReaction">학생 반응 <span class="hint">인상적인 반응 또는 관찰 1~2가지</span></label>
+          <textarea id="cReaction" rows="2" placeholder="학생들의 반응이나 관찰 사항"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-warm">
+      <div class="form-card-header">
+        <span class="form-card-num">5</span>
+        <span class="form-card-title">인사이트</span>
+        <span class="form-card-desc">★ 재활용 핵심</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="cGood">잘 된 점 <span class="hint">키워드 3개 — 예) 몰입도↑, 자료수집 시간 절감</span></label>
+          <textarea id="cGood" rows="2" placeholder="긍정적인 결과를 키워드로 정리"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="cBad">아쉬운 점 <span class="hint">키워드 3개 — 예) 사실 검증 부담, 학생 흥미 편차</span></label>
+          <textarea id="cBad" rows="2" placeholder="개선이 필요한 부분을 키워드로 정리"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="cChange">다시 한다면 바꿀 1가지 <span class="hint">한 줄로</span></label>
+          <input type="text" id="cChange" placeholder="다음 활용 시 가장 먼저 손볼 것">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-teal">
+      <div class="form-card-header">
+        <span class="form-card-num">6</span>
+        <span class="form-card-title">재활용 메모</span>
+        <span class="form-card-desc">다른 선생님께 전달</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl" for="cCtx">추천 활용 맥락 <span class="hint">어떤 단원/학년/규모에 가장 적합한가</span></label>
+          <textarea id="cCtx" rows="2" placeholder="추천 상황 서술"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="cCaution">주의할 점 <span class="hint">저작권·개인정보·사실 검증·소외학생 등</span></label>
+          <textarea id="cCaution" rows="2" placeholder="챙길 사항 서술"></textarea>
+        </div>
+        <div class="field">
+          <label class="fl" for="cAssets">재활용 가능 자산 <span class="hint">프롬프트, 활동지, 평가 루브릭, 샘플 등 — 저장 위치와 함께</span></label>
+          <textarea id="cAssets" rows="2" placeholder="재활용 자산과 저장 위치 기재"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card fc-gray">
+      <div class="form-card-header">
+        <span class="form-card-num">7</span>
+        <span class="form-card-title">활용 이미지 첨부</span>
+        <span class="form-card-desc">선택 · 최대 5MB · 자동 리사이즈</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label class="fl">수업 활동 / 학생 산출물 사진 <span class="hint">JPG, PNG — 최대 3장 · 각 5MB</span></label>
+          <div class="img-slots">
+            <div class="img-slot">
+              <span class="img-slot-lbl">이미지 1</span>
+              <div class="img-area" id="cImgArea0"><input type="file" id="cImgInput0" accept="image/*" capture="environment">
+                <div class="img-placeholder" id="cImgPh0"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>클릭 또는 드래그</span></div>
+                <img class="img-preview" id="cImgPreview0" alt="첨부 이미지" onerror="this.style.display='none'">
+              </div>
+              <button type="button" class="btn-rm-img" id="cImgRm0">× 제거</button>
+              <span class="img-info" id="cImgInfo0"></span>
+            </div>
+            <div class="img-slot">
+              <span class="img-slot-lbl">이미지 2</span>
+              <div class="img-area" id="cImgArea1"><input type="file" id="cImgInput1" accept="image/*" capture="environment">
+                <div class="img-placeholder" id="cImgPh1"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>클릭 또는 드래그</span></div>
+                <img class="img-preview" id="cImgPreview1" alt="첨부 이미지" onerror="this.style.display='none'">
+              </div>
+              <button type="button" class="btn-rm-img" id="cImgRm1">× 제거</button>
+              <span class="img-info" id="cImgInfo1"></span>
+            </div>
+            <div class="img-slot">
+              <span class="img-slot-lbl">이미지 3</span>
+              <div class="img-area" id="cImgArea2"><input type="file" id="cImgInput2" accept="image/*" capture="environment">
+                <div class="img-placeholder" id="cImgPh2"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>클릭 또는 드래그</span></div>
+                <img class="img-preview" id="cImgPreview2" alt="첨부 이미지" onerror="this.style.display='none'">
+              </div>
+              <button type="button" class="btn-rm-img" id="cImgRm2">× 제거</button>
+              <span class="img-info" id="cImgInfo2"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="action-bar" id="clsBar">
+    <div class="abl">
+      <button class="btn btn-ok" id="clsSave">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+        저장하기
+      </button>
+      <button class="btn btn-draft" id="clsDraftBtn">💾 임시저장</button>
+    </div>
+    <div class="abr">
+      <span class="draft-lbl" id="clsDraftLbl">임시저장: 대기 중</span>
+      <button class="btn btn-del" id="clsClear">초기화</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="toast-ct" id="toastCt" aria-live="polite"></div>
+
+<script>
+var URL_KEY   = 'sheets_url_ai_digital';
+var DRAFT_A   = 'draft_ai_edu_act';
+var DRAFT_C   = 'draft_ai_cls_act';
+var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+
+var imgA = [null,null,null], imgC = [null,null,null];
+var timerA = null, timerC = null;
+var IMG_W = 1280, IMG_H = 960, IMG_Q = 0.82;
+
+/* ── 화면 전환 ── */
+function showLanding() {
+  document.getElementById('landingPage').style.display = 'flex';
+  document.getElementById('actForm').classList.remove('active');
+  document.getElementById('clsForm').classList.remove('active');
+  document.getElementById('actBar').classList.remove('show');
+  document.getElementById('clsBar').classList.remove('show');
+  window.scrollTo(0, 0);
+}
+function showAct() {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('actForm').classList.add('active');
+  document.getElementById('clsForm').classList.remove('active');
+  document.getElementById('actBar').classList.add('show');
+  document.getElementById('clsBar').classList.remove('show');
+  loadDraft('a'); window.scrollTo(0, 0);
+}
+function showCls() {
+  document.getElementById('landingPage').style.display = 'none';
+  document.getElementById('actForm').classList.remove('active');
+  document.getElementById('clsForm').classList.add('active');
+  document.getElementById('actBar').classList.remove('show');
+  document.getElementById('clsBar').classList.add('show');
+  loadDraft('c'); window.scrollTo(0, 0);
+}
+
+document.getElementById('btnGoAct').addEventListener('click', showAct);
+document.getElementById('btnGoAct').addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') showAct(); });
+document.getElementById('btnGoCls').addEventListener('click', showCls);
+document.getElementById('btnGoCls').addEventListener('keydown', function(e){ if(e.key==='Enter'||e.key===' ') showCls(); });
+document.getElementById('actBack').addEventListener('click', showLanding);
+document.getElementById('clsBack').addEventListener('click', showLanding);
+
+/* ── 토스트 ── */
+function toast(msg, type, ms) {
+  type = type||'i'; ms = ms||3000;
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  var ct = document.getElementById('toastCt');
+  ct.appendChild(t);
+  setTimeout(function(){ if(t.parentNode) t.parentNode.removeChild(t); }, ms+400);
+}
+
+/* ── 이미지 리사이즈 ── */
+function resize(file, cb) {
+  var img = new Image(), url = URL.createObjectURL(file);
+  img.onload = function() {
+    var sc = Math.min(IMG_W/img.width, IMG_H/img.height, 1);
+    var cv = document.createElement('canvas');
+    cv.width = Math.round(img.width*sc); cv.height = Math.round(img.height*sc);
+    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+    URL.revokeObjectURL(url);
+    var b64 = cv.toDataURL('image/jpeg', IMG_Q);
+    cb(b64, Math.round(b64.length*0.75/1024), cv.width, cv.height);
+  };
+  img.onerror = function(){ URL.revokeObjectURL(url); cb(null); };
+  img.src = url;
+}
+function handleImg(file, pfx, idx) {
+  if (!file.type.startsWith('image/')){ toast('이미지 파일만 가능합니다.','e'); return; }
+  if (file.size > 5*1024*1024){ toast('5MB 이하 파일만 가능합니다.','e'); return; }
+  var orig = Math.round(file.size/1024);
+  resize(file, function(b64, kb, w, h) {
+    if (!b64){ toast('이미지 처리 실패','e'); return; }
+    if (pfx==='a') imgA[idx]=b64; else imgC[idx]=b64;
+    document.getElementById(pfx+'ImgPreview'+idx).src = b64;
+    document.getElementById(pfx+'ImgPreview'+idx).style.display = 'block';
+    document.getElementById(pfx+'ImgPh'+idx).style.display = 'none';
+    document.getElementById(pfx+'ImgRm'+idx).style.display = 'inline-flex';
+    document.getElementById(pfx+'ImgInfo'+idx).textContent = orig+'KB → '+kb+'KB ('+w+'×'+h+')';
+    scheduleDraft(pfx);
+  });
+}
+function setupImg(pfx) {
+  [0,1,2].forEach(function(idx) {
+    document.getElementById(pfx+'ImgInput'+idx).addEventListener('change', function(e){
+      if(e.target.files[0]) handleImg(e.target.files[0], pfx, idx);
+    });
+    var area = document.getElementById(pfx+'ImgArea'+idx);
+    area.addEventListener('dragover', function(e){ e.preventDefault(); area.classList.add('drag-over'); });
+    area.addEventListener('dragleave', function(){ area.classList.remove('drag-over'); });
+    area.addEventListener('drop', function(e){
+      e.preventDefault(); area.classList.remove('drag-over');
+      var f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('image/')) handleImg(f, pfx, idx);
+    });
+    document.getElementById(pfx+'ImgRm'+idx).addEventListener('click', function(){
+      if(pfx==='a') imgA[idx]=null; else imgC[idx]=null;
+      document.getElementById(pfx+'ImgPreview'+idx).style.display = 'none';
+      document.getElementById(pfx+'ImgPh'+idx).style.display = 'flex';
+      document.getElementById(pfx+'ImgInput'+idx).value = '';
+      this.style.display = 'none';
+      document.getElementById(pfx+'ImgInfo'+idx).textContent = '';
+    });
+  });
+}
+setupImg('a'); setupImg('c');
+
+/* ── 유틸 ── */
+function v(id){ return (document.getElementById(id).value||'').trim(); }
+function sv(id, val){ document.getElementById(id).value = val||''; }
+function getChk(name){
+  return Array.from(document.querySelectorAll('input[name="'+name+'"]:checked'))
+    .map(function(c){ return c.value; }).join(', ');
+}
+function setChk(name, str){
+  var vals = (str||'').split(', ').map(function(s){ return s.trim(); });
+  document.querySelectorAll('input[name="'+name+'"]').forEach(function(c){
+    c.checked = vals.indexOf(c.value) !== -1;
+  });
+}
+
+/* ── 폼 데이터 ── */
+function getActData() {
+  return { source:'edu-activity',
+    author:v('aAuthor'), workArea:getChk('aArea'), workName:v('aWorkName'),
+    period:v('aPeriod'), target:v('aTarget'),
+    tools:getChk('aTools'), toolNames:v('aToolNames'), budget:v('aBudget'),
+    problem:v('aProblem'), toolReason:v('aToolReason'), method:v('aMethod'),
+    outputs:v('aOutputs'), effect:v('aEffect'), verify:v('aVerify'),
+    good:v('aGood'), bad:v('aBad'), change:v('aChange'),
+    ctx:v('aCtx'), caution:v('aCaution'), assets:v('aAssets'),
+    images: imgA.filter(Boolean) };
+}
+function setActData(d) {
+  if (!d) return;
+  sv('aAuthor',d.author); setChk('aArea',d.workArea); sv('aWorkName',d.workName);
+  sv('aPeriod',d.period); sv('aTarget',d.target);
+  setChk('aTools',d.tools); sv('aToolNames',d.toolNames); sv('aBudget',d.budget);
+  sv('aProblem',d.problem); sv('aToolReason',d.toolReason); sv('aMethod',d.method);
+  sv('aOutputs',d.outputs); sv('aEffect',d.effect); sv('aVerify',d.verify);
+  sv('aGood',d.good); sv('aBad',d.bad); sv('aChange',d.change);
+  sv('aCtx',d.ctx); sv('aCaution',d.caution); sv('aAssets',d.assets);
+}
+function getClsData() {
+  return { source:'class-activity',
+    author:v('cAuthor'), subject:v('cSubject'), grade:v('cGrade'),
+    count:v('cCount'), date:v('cDate'), unit:v('cUnit'),
+    tools:getChk('cTools'), toolNames:v('cToolNames'), budget:v('cBudget'),
+    goal:v('cGoal'), toolReason:v('cToolReason'),
+    stage:getChk('cStage'), stageDesc:v('cStageDesc'),
+    activities:v('cActivities'), outputs:v('cOutputs'), reaction:v('cReaction'),
+    good:v('cGood'), bad:v('cBad'), change:v('cChange'),
+    ctx:v('cCtx'), caution:v('cCaution'), assets:v('cAssets'),
+    images: imgC.filter(Boolean) };
+}
+function setClsData(d) {
+  if (!d) return;
+  sv('cAuthor',d.author); sv('cSubject',d.subject); sv('cGrade',d.grade);
+  sv('cCount',d.count); sv('cDate',d.date); sv('cUnit',d.unit);
+  setChk('cTools',d.tools); sv('cToolNames',d.toolNames); sv('cBudget',d.budget);
+  sv('cGoal',d.goal); sv('cToolReason',d.toolReason);
+  setChk('cStage',d.stage); sv('cStageDesc',d.stageDesc);
+  sv('cActivities',d.activities); sv('cOutputs',d.outputs); sv('cReaction',d.reaction);
+  sv('cGood',d.good); sv('cBad',d.bad); sv('cChange',d.change);
+  sv('cCtx',d.ctx); sv('cCaution',d.caution); sv('cAssets',d.assets);
+}
+
+/* ── 임시저장 ── */
+function scheduleDraft(pfx) {
+  if (pfx==='a'){ clearTimeout(timerA); timerA=setTimeout(function(){ saveDraft('a'); },1500); }
+  else { clearTimeout(timerC); timerC=setTimeout(function(){ saveDraft('c'); },1500); }
+}
+function saveDraft(pfx) {
+  try {
+    var d = pfx==='a' ? Object.assign({},getActData(),{images:[]})
+                      : Object.assign({},getClsData(),{images:[]});
+    localStorage.setItem(pfx==='a'?DRAFT_A:DRAFT_C, JSON.stringify(d));
+    var now = new Date();
+    var t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+    document.getElementById(pfx==='a'?'actDraftLbl':'clsDraftLbl').textContent = '임시저장: '+t;
+  } catch(e) {}
+}
+function loadDraft(pfx) {
+  try {
+    var raw = localStorage.getItem(pfx==='a'?DRAFT_A:DRAFT_C);
+    if (!raw) return;
+    var d = JSON.parse(raw);
+    if (pfx==='a') setActData(d); else setClsData(d);
+    toast('이전 작성 내용을 불러왔습니다.','i',3000);
+  } catch(e) {}
+}
+
+/* 자동저장 등록 */
+['aAuthor','aWorkName','aPeriod','aTarget','aToolNames','aBudget','aProblem','aToolReason','aMethod','aOutputs','aEffect','aVerify','aGood','aBad','aChange','aCtx','aCaution','aAssets'].forEach(function(id){
+  var el=document.getElementById(id); if(el) el.addEventListener('input',function(){ scheduleDraft('a'); });
+});
+document.querySelectorAll('input[name="aArea"],input[name="aTools"]').forEach(function(c){ c.addEventListener('change',function(){ scheduleDraft('a'); }); });
+
+['cAuthor','cSubject','cGrade','cCount','cDate','cUnit','cToolNames','cBudget','cGoal','cToolReason','cStageDesc','cActivities','cOutputs','cReaction','cGood','cBad','cChange','cCtx','cCaution','cAssets'].forEach(function(id){
+  var el=document.getElementById(id); if(el) el.addEventListener('input',function(){ scheduleDraft('c'); });
+});
+document.querySelectorAll('input[name="cTools"],input[name="cStage"]').forEach(function(c){ c.addEventListener('change',function(){ scheduleDraft('c'); }); });
+
+/* ── 유효성 검사 ── */
+function validateAct() {
+  var req=['aAuthor','aWorkName','aProblem','aToolReason','aOutputs','aVerify'];
+  req.forEach(function(id){ document.getElementById(id).classList.remove('invalid'); });
+  var ok=true;
+  req.forEach(function(id){ if(!v(id)){ document.getElementById(id).classList.add('invalid'); ok=false; } });
+  return ok;
+}
+function validateCls() {
+  var req=['cAuthor','cGoal','cToolReason'];
+  req.forEach(function(id){ document.getElementById(id).classList.remove('invalid'); });
+  var ok=true;
+  req.forEach(function(id){ if(!v(id)){ document.getElementById(id).classList.add('invalid'); ok=false; } });
+  return ok;
+}
+
+/* ── HTML 보고서 빌드 ── */
+function _rptHelpers() {
+  function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function nl(s){ var r=esc(s||''); return r?r.replace(/\n/g,'<br>'):'<span style="color:#c8c8c8">—</span>'; }
+  function tx(s){ return esc(s||'')||'<span style="color:#c8c8c8">—</span>'; }
+  function f(label,val,ml){
+    return '<div style="margin-bottom:0.75rem">'
+      +'<p style="font-size:0.72rem;font-weight:600;color:#666;margin-bottom:0.18rem">'+esc(label)+'</p>'
+      +'<div style="font-size:0.88rem;line-height:1.65;color:#1A1A2E">'+(ml?nl(val):tx(val))+'</div>'
+      +'</div>';
+  }
+  function chp(str, chipBg, chipTc){
+    chipBg=chipBg||'#1A1A2E'; chipTc=chipTc||'#fff';
+    if(!str) return '<span style="color:#bbb;font-size:0.83rem">미선택</span>';
+    return str.split(', ').filter(Boolean).map(function(v){
+      return '<span style="display:inline-block;background:'+chipBg+';color:'+chipTc+';border-radius:20px;padding:2px 10px;font-size:0.74rem;margin:2px 2px 2px 0">'+esc(v.trim())+'</span>';
+    }).join('');
+  }
+  function fc(label,val,bg,tc){
+    return '<div style="margin-bottom:0.75rem">'
+      +'<p style="font-size:0.72rem;font-weight:600;color:#666;margin-bottom:0.18rem">'+esc(label)+'</p>'
+      +'<div>'+chp(val,bg,tc)+'</div>'
+      +'</div>';
+  }
+  function s(bg,tc,n,title,desc,body){
+    var nb=tc==='white'?'rgba(255,255,255,0.18)':'rgba(26,26,46,0.12)';
+    return '<div style="background:#fff;border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06)">'
+      +'<div style="background:'+bg+';color:'+tc+';padding:0.55rem 1rem;display:flex;align-items:center;gap:0.5rem">'
+      +'<span style="background:'+nb+';border-radius:50%;width:1.4rem;height:1.4rem;display:inline-flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0">'+n+'</span>'
+      +'<span style="font-weight:700;font-size:0.9rem">'+esc(title)+'</span>'
+      +(desc?'<span style="font-size:0.73rem;opacity:0.6;margin-left:auto">'+esc(desc)+'</span>':'')
+      +'</div>'
+      +'<div style="padding:0.9rem 1rem">'+body+'</div>'
+      +'</div>';
+  }
+  function hdr(title, now){
+    return '<div style="background:#1A1A2E;color:#fff;border-radius:14px;padding:1.8rem 2rem;margin-bottom:8px">'
+      +'<div style="font-size:3rem;font-weight:700;color:#E8FF3B;line-height:1;margin-bottom:0.4rem">2026</div>'
+      +'<div style="font-size:1.1rem;font-weight:700;margin-bottom:0.25rem">'+esc(title)+'</div>'
+      +'<div style="font-size:0.76rem;color:rgba(255,255,255,0.45)">정보화부 / AI디지털 &nbsp;·&nbsp; 작성일시: '+esc(now)+'</div>'
+      +'</div>';
+  }
+  function wrap(title, now, body){
+    return '<!DOCTYPE html>\n<html lang="ko">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n'
+      +'<title>'+esc(title)+'</title>\n'
+      +'<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">\n'
+      +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:\'Noto Sans KR\',sans-serif;background:#F8F8F2;color:#1A1A2E;padding:1.5rem 1rem}.wrap{max-width:760px;margin:0 auto}@media print{body{background:#fff;padding:0}}</style>\n'
+      +'</head>\n<body>\n<div class="wrap">\n'
+      +hdr(title, now)
+      +body
+      +'<div style="text-align:center;font-size:0.71rem;color:#bbb;padding:1rem 0">본 보고서는 교육청 AI · 디지털 활용 예산 결과 보고용입니다.</div>\n'
+      +'</div>\n</body>\n</html>';
+  }
+  return {esc:esc,f:f,fc:fc,s:s,wrap:wrap};
+}
+
+function buildActHtml(d) {
+  var now=new Date().toLocaleString('ko-KR');
+  var h=_rptHelpers(), f=h.f, fc=h.fc, s=h.s;
+  var imgs = (d.images||[]).filter(Boolean);
+  var img = imgs.length
+    ?imgs.map(function(src,i){ return '<div style="margin-bottom:0.6rem"><p style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:0.3rem">이미지 '+(i+1)+'</p><img src="'+src+'" alt="첨부 이미지 '+(i+1)+'" style="max-width:100%;border-radius:8px;display:block"></div>'; }).join('')
+    :'<p style="color:#bbb;font-size:0.84rem">첨부 이미지 없음</p>';
+  return h.wrap('AI·디지털 활용 교육활동 결과 보고서', now,
+    s('#1A1A2E','white','1','기본 정보','Basic Information',
+      f('작성자',d.author)+fc('업무 영역',d.workArea)+f('업무명',d.workName)
+      +f('활용 시기',d.period)+f('관련 대상',d.target))
+    +s('#4ECDC4','#1A1A2E','2','활용 도구 및 예산 집행','',
+      fc('활용한 AI · 디지털 도구',d.tools)+f('구체 도구명',d.toolNames)+f('예산 집행',d.budget))
+    +s('#E8FF3B','#1A1A2E','3','업무 설계','',
+      f('해결하려던 문제',d.problem,true)+f('도구를 선택한 이유',d.toolReason,true)+f('활용 방식',d.method,true))
+    +s('#FF6B6B','white','4','업무 결과','',
+      f('산출물',d.outputs,true)+f('정량 효과',d.effect,true)+f('★ 검증·점검 절차',d.verify,true))
+    +s('#FFE66D','#1A1A2E','5','인사이트','★ 재활용 핵심',
+      f('잘 된 점',d.good,true)+f('아쉬운 점',d.bad,true)+f('다시 한다면 바꿀 1가지',d.change))
+    +s('#4ECDC4','#1A1A2E','6','재활용 메모','다른 선생님께 전달',
+      f('추천 활용 맥락',d.ctx,true)+f('주의할 점',d.caution,true)+f('재활용 가능 자산',d.assets,true))
+    +s('#EFEFEF','#1A1A2E','7','활용 이미지','',img)
+  );
+}
+
+function buildClsHtml(d) {
+  var now=new Date().toLocaleString('ko-KR');
+  var h=_rptHelpers(), f=h.f, s=h.s;
+  function fc(label,val){ return h.fc(label,val,'#4ECDC4','#1A1A2E'); }
+  var imgs = (d.images||[]).filter(Boolean);
+  var img = imgs.length
+    ?imgs.map(function(src,i){ return '<div style="margin-bottom:0.6rem"><p style="font-size:0.7rem;font-weight:600;color:#666;margin-bottom:0.3rem">이미지 '+(i+1)+'</p><img src="'+src+'" alt="첨부 이미지 '+(i+1)+'" style="max-width:100%;border-radius:8px;display:block"></div>'; }).join('')
+    :'<p style="color:#bbb;font-size:0.84rem">첨부 이미지 없음</p>';
+  return h.wrap('AI·디지털 활용 수업 결과 보고서', now,
+    s('#1A1A2E','white','1','기본 정보','Basic Information',
+      f('작성자',d.author)+f('교과명',d.subject)+f('학년·반',d.grade)
+      +f('학생 수',d.count)+f('활용 일자',d.date)+f('단원·주제',d.unit))
+    +s('#4ECDC4','#1A1A2E','2','활용 도구 및 예산 집행','',
+      fc('활용한 AI · 디지털 도구',d.tools)+f('구체 도구명',d.toolNames)+f('예산 집행',d.budget))
+    +s('#E8FF3B','#1A1A2E','3','수업 설계','',
+      f('수업 목표',d.goal,true)+f('도구를 선택한 이유',d.toolReason,true)
+      +fc('활용 단계',d.stage)+f('활용 방식',d.stageDesc,true))
+    +s('#FF6B6B','white','4','학생 활동 및 결과','',
+      f('학생 활동 요약',d.activities,true)+f('산출물·결과',d.outputs,true)+f('학생 반응',d.reaction,true))
+    +s('#FFE66D','#1A1A2E','5','인사이트','★ 재활용 핵심',
+      f('잘 된 점',d.good,true)+f('아쉬운 점',d.bad,true)+f('다시 한다면 바꿀 1가지',d.change))
+    +s('#4ECDC4','#1A1A2E','6','재활용 메모','다른 선생님께 전달',
+      f('추천 활용 맥락',d.ctx,true)+f('주의할 점',d.caution,true)+f('재활용 가능 자산',d.assets,true))
+    +s('#EFEFEF','#1A1A2E','7','활용 이미지','',img)
+  );
+}
+
+function dlHtml(content, name) {
+  var blob = new Blob([content],{type:'text/html;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name+'_'+new Date().toLocaleDateString('ko-KR').replace(/\./g,'').replace(/\s/g,'')+'.html';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+}
+
+/* ── 시트 전송 ── */
+function sendSheet(data) {
+  var url = localStorage.getItem(URL_KEY)||DEFAULT_URL;
+  if (!url) return;
+  fetch(url,{ method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) }).catch(function(){});
+}
+
+/* ── 저장 버튼 ── */
+document.getElementById('actSave').addEventListener('click', function(){
+  if (!validateAct()){ toast('필수 항목(*)을 모두 입력해 주세요.','e'); return; }
+  var d=getActData(); this.disabled=true;
+  dlHtml(buildActHtml(d), 'AI교육활동보고서_'+(d.author||''));
+  sendSheet(d); saveDraft('a');
+  var url=localStorage.getItem(URL_KEY)||DEFAULT_URL;
+  toast(url?'저장 완료! HTML + 구글 시트 전송':'HTML 보고서 저장 완료! (⚙ URL 설정 시 시트 연동)','s',4500);
+  var btn=this; setTimeout(function(){ btn.disabled=false; },2000);
+});
+document.getElementById('clsSave').addEventListener('click', function(){
+  if (!validateCls()){ toast('필수 항목(*)을 모두 입력해 주세요.','e'); return; }
+  var d=getClsData(); this.disabled=true;
+  dlHtml(buildClsHtml(d), 'AI수업활용보고서_'+(d.author||''));
+  sendSheet(d); saveDraft('c');
+  var url=localStorage.getItem(URL_KEY)||DEFAULT_URL;
+  toast(url?'저장 완료! HTML + 구글 시트 전송':'HTML 보고서 저장 완료! (⚙ URL 설정 시 시트 연동)','s',4500);
+  var btn=this; setTimeout(function(){ btn.disabled=false; },2000);
+});
+
+/* ── 임시저장 버튼 ── */
+document.getElementById('actDraftBtn').addEventListener('click', function(){ saveDraft('a'); toast('임시저장되었습니다.','i',2000); });
+document.getElementById('clsDraftBtn').addEventListener('click', function(){ saveDraft('c'); toast('임시저장되었습니다.','i',2000); });
+
+/* ── 초기화 ── */
+function resetImg(pfx) {
+  if(pfx==='a') imgA=[null,null,null]; else imgC=[null,null,null];
+  [0,1,2].forEach(function(idx){
+    document.getElementById(pfx+'ImgPreview'+idx).style.display='none';
+    document.getElementById(pfx+'ImgPh'+idx).style.display='flex';
+    document.getElementById(pfx+'ImgInput'+idx).value='';
+    document.getElementById(pfx+'ImgRm'+idx).style.display='none';
+    document.getElementById(pfx+'ImgInfo'+idx).textContent='';
+  });
+}
+document.getElementById('actClear').addEventListener('click', function(){
+  if (!confirm('모든 내용을 초기화하시겠습니까?')) return;
+  setActData({}); resetImg('a');
+  localStorage.removeItem(DRAFT_A);
+  document.getElementById('actDraftLbl').textContent='임시저장: 대기 중';
+  toast('초기화되었습니다.','i');
+});
+document.getElementById('clsClear').addEventListener('click', function(){
+  if (!confirm('모든 내용을 초기화하시겠습니까?')) return;
+  setClsData({}); resetImg('c');
+  localStorage.removeItem(DRAFT_C);
+  document.getElementById('clsDraftLbl').textContent='임시저장: 대기 중';
+  toast('초기화되었습니다.','i');
+});
+
+/* ── 설정 패널 ── */
+function setupPanel(btnId, panelId, inputId, saveId, clearId) {
+  document.getElementById(btnId).addEventListener('click', function(){
+    var p=document.getElementById(panelId); p.classList.toggle('open');
+    if(p.classList.contains('open')) document.getElementById(inputId).value=localStorage.getItem(URL_KEY)||'';
+  });
+  document.getElementById(saveId).addEventListener('click', function(){
+    var u=document.getElementById(inputId).value.trim();
+    if(u){ localStorage.setItem(URL_KEY,u); toast('URL 저장됨','s'); }
+    else toast('URL을 입력해 주세요','e');
+  });
+  document.getElementById(clearId).addEventListener('click', function(){
+    localStorage.removeItem(URL_KEY); document.getElementById(inputId).value=''; toast('URL 초기화됨','i');
+  });
+}
+setupPanel('actSetBtn','actSetPanel','actUrl','actUrlSave','actUrlClear');
+setupPanel('clsSetBtn','clsSetPanel','clsUrl','clsUrlSave','clsUrlClear');
+</script>
+</body>
+</html>

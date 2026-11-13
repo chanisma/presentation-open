@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 160" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 옆에서 본 전원 플러그(둥근 핀 두 개)와 왼쪽으로 늘어진 코드 꼬리. power-outlet.svg와 한 세트
+       (image-classifier-project S12 「플러그와 콘센트」 — 모델 꾸러미가 공유 링크 플러그를 달고 프로그램 콘센트에 꽂힌다).
+       콘센트와 같은 배율(viewBox 1 = 같은 px)로 띄워야 핀 간격 28이 콘센트 구멍 간격과 맞는다. 텍스트 없음.
+       팔레트: ink #22304a · body #fbf7ee · bodyShade #e3d9c6 · face #cfc4ae · pin #c9cdd6 · pinShade #9aa1b0 · cord #2b3a55
+       앵커: 코드 시작 (6,118) · 플러그 앞면 x=288 · 핀 중심선 y=66, y=94 · 핀 끝 x=338 -->
+  <path d="M6 118 C40 150 80 150 104 120 C120 100 130 84 150 82" stroke="#22304a" stroke-width="12"/>
+  <path d="M6 118 C40 150 80 150 104 120 C120 100 130 84 150 82" stroke="#2b3a55" stroke-width="7.4"/>
+  <path d="M30 136 C50 145 72 143 90 130" stroke="#ffffff" stroke-width="1.6" opacity=".3"/>
+  <path d="M146 70 L170 62 L170 102 L146 94 Z" fill="#e3d9c6" stroke="#22304a" stroke-width="2.2"/>
+  <path d="M154 69 L154 95 M162 66 L162 98" stroke="#22304a" stroke-width="1.3" opacity=".5"/>
+  <path d="M170 46 C170 38 176 34 184 34 L262 34 C274 34 284 44 284 56 L284 104 C284 116 274 126 262 126 L184 126 C176 126 170 122 170 114 Z" fill="#fbf7ee" stroke="#22304a" stroke-width="2.4"/>
+  <path d="M171.5 106 L282.5 106 C281 117 273 124.5 262 124.5 L184 124.5 C177 124.5 171.5 120 171.5 114 Z" fill="#e3d9c6"/>
+  <path d="M170 106 L284 106" stroke="#22304a" stroke-width="1.6"/>
+  <path d="M196 48 L196 94 M208 48 L208 94 M220 48 L220 94" stroke="#22304a" stroke-width="1.4" opacity=".45"/>
+  <path d="M182 42 L252 42" stroke="#ffffff" stroke-width="2" opacity=".7"/>
+  <rect x="276" y="40" width="12" height="80" rx="4" fill="#cfc4ae" stroke="#22304a" stroke-width="2.2"/>
+  <path d="M288 61 L333 61 A5 5 0 0 1 333 71 L288 71 Z" fill="#c9cdd6" stroke="#22304a" stroke-width="2"/>
+  <path d="M288 89 L333 89 A5 5 0 0 1 333 99 L288 99 Z" fill="#c9cdd6" stroke="#22304a" stroke-width="2"/>
+  <path d="M291 68.6 L330 68.6 M291 96.6 L330 96.6" stroke="#9aa1b0" stroke-width="2.4"/>
+  <path d="M293 63.6 L326 63.6 M293 91.6 L326 91.6" stroke="#ffffff" stroke-width="1.4" opacity=".7"/>
+</svg>

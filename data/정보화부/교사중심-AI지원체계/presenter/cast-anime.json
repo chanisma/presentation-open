@@ -1,0 +1,19 @@
+{
+ "_readme": "애니메이션 캐스트 — 차분한 젊은 여성, 웹툰풍. 원본 anime-b.png에서 배경만 웜그레이로 바꾼 것이 image(초록 카디건과 회녹색 배경이 섞여 매팅이 번지지 않게). 영상 폴더 <overlay.media>-anime, 덱은 ?cast=anime.",
+ "id": "anime",
+ "tag": "tcaa",
+ "image": "presenter-ref-anime.png",
+ "voice": {
+  "engine": "OmniVoice (k2-fsa, Apache-2.0)",
+  "instruct": "female, young adult, low pitch",
+  "seed": 14,
+  "language": "ko",
+  "ref": "voice-ref-anime.wav",
+  "ref_text": "안녕하십니까. 오늘은 교사 중심의 인공지능 지원 체계에 대해 말씀드리겠습니다."
+ },
+ "h3": {
+  "prompt": "The young woman from the reference image, a gentle Korean teacher drawn in a soft 2D anime / webtoon illustration style, stands against a plain light warm grey backdrop and presents to the camera in Korean. Keep exactly the art style of the reference: clean line art, smooth illustrated shading, not photorealistic, not 3D. Medium close-up, chest-up, static camera, soft even light. She speaks calmly and softly with small, slow hand gestures near her chest and gentle head movement, keeping eye contact with the lens. She says, in Korean: \"{text}\" Audio: one calm, soft young female voice speaking Korean at an unhurried pace, precise lip sync, no music, no other voices. {tail}",
+  "tail_end": "After the last word she closes her mouth and holds a calm, soft smile.",
+  "tail_mid": "She keeps talking naturally; this is the middle of a longer explanation, so she does not stop or smile to close."
+ }
+}

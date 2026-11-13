@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>딥러닝 기초 — 활동지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#1E2033;
+  --primary:#2DD4A8;
+  --primary-dark:#22a884;
+  --accent:#6C63FF;
+  --success:#34D399;
+  --warn:#FBBF24;
+  --error:#EF4444;
+  --text:#F5F5F7;
+  --text-sub:#A0A0B8;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.12);
+  --glass-strong:rgba(255,255,255,0.10);
+}
+body{
+  background:var(--bg);
+  background-image:
+    radial-gradient(ellipse 60% 50% at 15% 20%,rgba(45,212,168,0.08),transparent),
+    radial-gradient(ellipse 50% 40% at 85% 80%,rgba(108,99,255,0.06),transparent);
+  color:var(--text);
+  font-family:'Noto Sans KR',sans-serif;
+  min-height:100vh;
+  padding-bottom:5.5rem;
+}
+h1,h2,h3{font-family:'Black Han Sans','Noto Sans KR',sans-serif;font-weight:400;letter-spacing:-0.02em;}
+
+/* ===== Header ===== */
+.page-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(30,32,51,0.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--glass-border);
+  padding:0.7rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.page-header-left{display:flex;align-items:center;gap:0.6rem;}
+.page-title{font-size:1rem;font-weight:600;font-family:'Noto Sans KR',sans-serif;}
+.page-badge{
+  font-size:0.78rem;padding:0.15rem 0.6rem;border-radius:2rem;
+  background:rgba(45,212,168,0.2);color:var(--primary);
+  border:1px solid rgba(45,212,168,0.3);
+}
+
+/* ===== Settings Panel ===== */
+.settings-panel{
+  background:#FFFBEB;border-bottom:2px solid #FDE68A;
+  padding:0.7rem 1.5rem;display:none;
+  align-items:center;gap:0.8rem;flex-wrap:wrap;
+}
+.settings-panel.open{display:flex;}
+.settings-panel label{font-size:0.82rem;color:#92400E;font-weight:600;white-space:nowrap;}
+.settings-panel input[type="text"]{
+  flex:1;min-width:260px;font-size:0.82rem;
+  background:#FFFFFF;border:1px solid #FCD34D;color:#111827;
+  padding:0.4rem 0.7rem;border-radius:0.4rem;
+}
+.settings-label{
+  font-size:0.78rem;color:#92400E;background:#FEF3C7;
+  padding:0.15rem 0.5rem;border-radius:0.3rem;border:1px solid #FDE68A;
+}
+
+/* ===== Main ===== */
+.main{max-width:860px;margin:0 auto;padding:1.5rem 1rem;}
+
+/* ===== Form Card ===== */
+.form-card{
+  background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:1rem;overflow:hidden;margin-bottom:1rem;
+}
+.form-card-header{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.7rem 1.2rem;border-bottom:1px solid var(--glass-border);
+  background:var(--glass-strong);
+}
+.form-card-num{
+  font-size:0.78rem;font-weight:700;color:var(--primary);
+  background:rgba(45,212,168,0.15);border:1px solid rgba(45,212,168,0.25);
+  border-radius:50%;width:1.6rem;height:1.6rem;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.form-card-title{font-size:1rem;font-weight:600;}
+.form-card-desc{font-size:0.82rem;color:var(--text-sub);margin-left:auto;}
+.form-card-body{padding:1rem 1.2rem;display:flex;flex-direction:column;gap:0.8rem;}
+
+/* ===== Fields ===== */
+.field{display:flex;flex-direction:column;gap:0.3rem;}
+label{font-size:0.88rem;color:var(--text-sub);font-weight:500;}
+.required{color:var(--warn);}
+.field-hint{font-size:0.78rem;color:var(--text-sub);}
+input[type="text"],textarea,select{
+  background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);
+  border-radius:0.5rem;padding:0.55rem 0.8rem;
+  color:var(--text);font-family:inherit;font-size:0.95rem;
+  width:100%;transition:border-color 0.2s;
+}
+input:focus,textarea:focus,select:focus{
+  outline:none;border-color:var(--primary);
+  background:rgba(45,212,168,0.06);
+}
+input.invalid,textarea.invalid{border-color:var(--error);}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+textarea{resize:vertical;min-height:60px;}
+
+/* ===== Image Upload ===== */
+.image-uploads{display:flex;flex-direction:column;gap:0.8rem;}
+.image-upload-group{display:flex;flex-direction:column;gap:0.3rem;}
+.image-upload-label{font-size:0.88rem;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:0.3rem;}
+.image-upload-label .num{
+  background:var(--primary);color:var(--bg);width:1.3rem;height:1.3rem;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:0.7rem;font-weight:800;
+}
+.image-upload-area{
+  position:relative;border:2px dashed var(--glass-border);
+  border-radius:0.8rem;overflow:hidden;cursor:pointer;
+  transition:border-color 0.2s;
+  min-height:120px;display:flex;align-items:center;justify-content:center;
+}
+.image-upload-area:hover{border-color:var(--primary);}
+.image-upload-area.drag-over{border-color:var(--accent);background:rgba(108,99,255,0.06);}
+.image-upload-area input[type="file"]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.image-upload-placeholder{
+  display:flex;flex-direction:column;align-items:center;gap:0.3rem;
+  color:var(--text-sub);font-size:0.82rem;padding:1rem;
+  pointer-events:none;
+}
+.image-upload-placeholder svg{width:2rem;height:2rem;opacity:0.5;}
+.image-preview{
+  display:none;width:100%;max-height:240px;
+  object-fit:contain;padding:0.5rem;
+}
+.btn-remove-img{
+  display:none;font-size:0.78rem;padding:0.2rem 0.5rem;
+  background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);
+  color:#f87171;border-radius:0.3rem;cursor:pointer;
+  font-family:inherit;align-self:flex-start;transition:background 0.15s;
+}
+.btn-remove-img:hover{background:rgba(239,68,68,0.2);}
+
+/* ===== Buttons ===== */
+.btn{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  padding:0.45rem 1rem;border-radius:0.5rem;border:1px solid transparent;
+  font-size:0.9rem;font-weight:500;cursor:pointer;font-family:inherit;
+  transition:background 0.15s;
+}
+.btn svg{width:1em;height:1em;}
+.btn-success{background:rgba(45,212,168,0.15);border-color:rgba(45,212,168,0.4);color:var(--primary);}
+.btn-success:hover{background:rgba(45,212,168,0.25);}
+.btn-ghost{background:transparent;border-color:var(--glass-border);color:var(--text-sub);text-decoration:none;font-size:0.85rem;}
+.btn-ghost:hover{background:var(--glass);color:var(--text);}
+.btn-danger{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#f87171;}
+.btn-danger:hover{background:rgba(239,68,68,0.2);}
+.btn:disabled{opacity:0.45;cursor:not-allowed;}
+
+/* ===== Action Bar ===== */
+.action-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:rgba(30,32,51,0.95);backdrop-filter:blur(12px);
+  border-top:1px solid var(--glass-border);
+  padding:0.7rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.action-bar-left,.action-bar-right{display:flex;align-items:center;gap:0.5rem;}
+.draft-label{font-size:0.8rem;color:var(--text-sub);}
+
+/* ===== Toast ===== */
+.toast-container{position:fixed;bottom:5rem;right:1.5rem;z-index:200;display:flex;flex-direction:column;gap:0.5rem;}
+.toast{padding:0.6rem 1rem;border-radius:0.5rem;font-size:0.88rem;max-width:320px;animation:toastIn 0.2s ease;}
+.toast.success{background:rgba(45,212,168,0.9);color:#022c22;}
+.toast.error{background:rgba(239,68,68,0.9);color:#fff;}
+.toast.info{background:rgba(108,99,255,0.9);color:#fff;}
+@keyframes toastIn{from{transform:translateX(100%);opacity:0;}to{transform:none;opacity:1;}}
+
+/* ===== Print ===== */
+@media print{
+  body{background:#fff;color:#111;padding:0;}
+  .page-header,.action-bar,.settings-panel,.toast-container{display:none!important;}
+  .main{max-width:100%;padding:0;}
+  .form-card{background:#fff;border:1px solid #ccc;border-radius:0;margin-bottom:0.8rem;break-inside:avoid;}
+  input,textarea{border:1px solid #999;background:#fff;color:#111;}
+  .image-upload-area{border-color:#999;}
+  .image-preview{max-height:200px;}
+}
+
+/* ===== Responsive ===== */
+@media(max-width:640px){
+  .field-grid{grid-template-columns:1fr;}
+  .page-header{padding:0.5rem 1rem;}
+  .main{padding:1rem 0.6rem;}
+  .form-card-body{padding:0.8rem;}
+  .action-bar{padding:0.5rem 1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="page-header">
+  <div class="page-header-left">
+    <a href="index.html" class="btn btn-ghost" id="btnBack">&larr; 발표자료</a>
+    <h1 class="page-title">딥러닝 기초 활동지</h1>
+    <span class="page-badge">정보</span>
+  </div>
+  <button class="btn" id="btnSettings" title="교사 설정"
+    style="background:#FFFBEB;border-color:#FDE68A;color:#92400E;">&9881;</button>
+</header>
+
+<!-- ===== Settings Panel ===== -->
+<div class="settings-panel" id="settingsPanel">
+  <span class="settings-label">교사 전용</span>
+  <label for="scriptUrl">Apps Script URL</label>
+  <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+  <button class="btn" id="btnSaveUrl" style="background:#FEF3C7;border-color:#FCD34D;color:#92400E;white-space:nowrap;">URL 저장</button>
+  <button class="btn" id="btnClearUrl" style="background:#FEF2F2;border-color:#FCA5A5;color:#DC2626;white-space:nowrap;">URL 초기화</button>
+</div>
+
+<!-- ===== Main ===== -->
+<main class="main" id="main">
+
+  <!-- Section 1: 기본 정보 -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num">1</span>
+      <span class="form-card-title">기본 정보</span>
+    </div>
+    <div class="form-card-body">
+      <div class="field-grid">
+        <div class="field">
+          <label for="studentName">이름 <span class="required">*</span></label>
+          <input type="text" id="studentName" placeholder="홍길동">
+        </div>
+        <div class="field">
+          <label for="classInfo">반 / 번호 <span class="required">*</span></label>
+          <input type="text" id="classInfo" placeholder="1반 15번">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Teachable Machine 테스트 결과 -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num">2</span>
+      <span class="form-card-title">테스트 결과 캡처</span>
+      <span class="form-card-desc">인터넷에서 찾은 치와와 사진 3장의 테스트 결과</span>
+    </div>
+    <div class="form-card-body">
+      <p style="font-size:0.88rem;color:var(--text-sub);line-height:1.5;">
+        인터넷에서 <strong style="color:var(--primary);">치와와 사진 3장</strong>을 찾아 Teachable Machine에 테스트한 뒤, 결과 화면을 캡처하여 첨부하세요.
+      </p>
+      <div class="image-uploads">
+        <!-- Image 1 -->
+        <div class="image-upload-group" data-idx="0">
+          <div class="image-upload-label"><span class="num">1</span> 첫 번째 테스트 결과 <span class="required">*</span></div>
+          <div class="image-upload-area">
+            <input type="file" accept="image/*" capture="environment" class="img-input">
+            <div class="image-upload-placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              <span>클릭하거나 캡처 이미지를 끌어다 놓으세요</span>
+              <span class="field-hint">JPG, PNG — 최대 5MB</span>
+            </div>
+            <img class="image-preview" alt="테스트 결과 1 미리보기" onerror="this.style.display='none';">
+          </div>
+          <button type="button" class="btn-remove-img">&times; 이미지 제거</button>
+        </div>
+        <!-- Image 2 -->
+        <div class="image-upload-group" data-idx="1">
+          <div class="image-upload-label"><span class="num">2</span> 두 번째 테스트 결과 <span class="required">*</span></div>
+          <div class="image-upload-area">
+            <input type="file" accept="image/*" capture="environment" class="img-input">
+            <div class="image-upload-placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              <span>클릭하거나 캡처 이미지를 끌어다 놓으세요</span>
+              <span class="field-hint">JPG, PNG — 최대 5MB</span>
+            </div>
+            <img class="image-preview" alt="테스트 결과 2 미리보기" onerror="this.style.display='none';">
+          </div>
+          <button type="button" class="btn-remove-img">&times; 이미지 제거</button>
+        </div>
+        <!-- Image 3 -->
+        <div class="image-upload-group" data-idx="2">
+          <div class="image-upload-label"><span class="num">3</span> 세 번째 테스트 결과 <span class="required">*</span></div>
+          <div class="image-upload-area">
+            <input type="file" accept="image/*" capture="environment" class="img-input">
+            <div class="image-upload-placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              <span>클릭하거나 캡처 이미지를 끌어다 놓으세요</span>
+              <span class="field-hint">JPG, PNG — 최대 5MB</span>
+            </div>
+            <img class="image-preview" alt="테스트 결과 3 미리보기" onerror="this.style.display='none';">
+          </div>
+          <button type="button" class="btn-remove-img">&times; 이미지 제거</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: 성찰 -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num">3</span>
+      <span class="form-card-title">생각해 봅시다</span>
+      <span class="form-card-desc">실습 결과를 바탕으로 답해 보세요</span>
+    </div>
+    <div class="form-card-body">
+      <div class="field">
+        <label for="q1">Q1. 테스트한 3장 중 틀린 경우가 있었나요? 왜 틀렸을까요? <span class="required">*</span></label>
+        <textarea id="q1" rows="3" placeholder="예: 2번째 사진이 머핀으로 분류되었는데, 갈색 배경이 머핀과 비슷해서..."></textarea>
+      </div>
+      <div class="field">
+        <label for="q2">Q2. 학습 이미지를 더 많이 넣으면 결과가 달라질까요?</label>
+        <textarea id="q2" rows="2" placeholder="데이터 양과 정확도의 관계에 대해 생각해 보세요"></textarea>
+      </div>
+      <div class="field">
+        <label for="q3">Q3. 이 AI에게 고양이 사진을 보여주면 어떻게 될까요?</label>
+        <textarea id="q3" rows="2" placeholder="학습하지 않은 대상에 대해 AI가 어떻게 반응할지 예측해 보세요"></textarea>
+      </div>
+      <div class="field">
+        <label for="q4">Q4. 이미 학습된 모델(MobileNet)이 없었다면, 이미지 몇 장으로 학습이 가능했을까요?</label>
+        <textarea id="q4" rows="2" placeholder="전이학습의 가치에 대해 생각해 보세요"></textarea>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== Action Bar ===== -->
+<div class="action-bar">
+  <div class="action-bar-left">
+    <button class="btn btn-success" id="btnSave">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+      <span id="btnSaveText">저장하기</span>
+    </button>
+  </div>
+  <div class="action-bar-right">
+    <span class="draft-label" id="draftLabel">임시저장: 대기 중</span>
+    <button class="btn" id="btnDraft" style="background:#1E3A5F;border-color:rgba(45,212,168,0.3);color:var(--primary);">임시저장</button>
+    <button class="btn btn-danger" id="btnClear">초기화</button>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script>
+(function(){
+  /* ===== Constants ===== */
+  var DRAFT_KEY = 'draft_deeplearning';
+  var URL_KEY   = 'sheets_url_정보';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+
+  /* ===== Image State ===== */
+  var imageData = [null, null, null]; // base64 for 3 images
+
+  /* ===== Toast ===== */
+  function showToast(msg, type, duration) {
+    type = type || 'info'; duration = duration || 3000;
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.textContent = msg;
+    document.getElementById('toastContainer').appendChild(toast);
+    setTimeout(function(){ if(toast.parentNode) toast.parentNode.removeChild(toast); }, duration + 400);
+  }
+
+  /* ===== Helpers ===== */
+  function val(id){ return (document.getElementById(id) || {}).value || ''; }
+
+  /* ===== Image resize + encode ===== */
+  function resizeAndEncode(file, maxW, maxH, quality, cb) {
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function() {
+      var scale = Math.min(maxW / img.width, maxH / img.height, 1);
+      var canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      cb(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); cb(null); };
+    img.src = url;
+  }
+
+  /* ===== Image Upload Handler ===== */
+  function handleImageFile(file, group) {
+    var idx = parseInt(group.getAttribute('data-idx'));
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { showToast('이미지 파일만 첨부할 수 있습니다.', 'error'); return; }
+    if (file.size > 5 * 1024 * 1024) { showToast('파일 크기가 5MB를 초과합니다.', 'error'); return; }
+
+    resizeAndEncode(file, 1280, 960, 0.85, function(base64) {
+      if (!base64) { showToast('이미지 처리에 실패했습니다.', 'error'); return; }
+      imageData[idx] = base64;
+      var preview = group.querySelector('.image-preview');
+      preview.src = base64;
+      preview.style.display = 'block';
+      group.querySelector('.image-upload-placeholder').style.display = 'none';
+      group.querySelector('.btn-remove-img').style.display = 'inline-flex';
+      scheduleDraft();
+    });
+  }
+
+  /* Setup all 3 upload groups */
+  document.querySelectorAll('.image-upload-group').forEach(function(group) {
+    var area = group.querySelector('.image-upload-area');
+    var input = group.querySelector('.img-input');
+
+    input.addEventListener('change', function(e) {
+      handleImageFile(e.target.files[0], group);
+    });
+
+    area.addEventListener('dragover', function(e) {
+      e.preventDefault(); area.classList.add('drag-over');
+    });
+    area.addEventListener('dragleave', function() {
+      area.classList.remove('drag-over');
+    });
+    area.addEventListener('drop', function(e) {
+      e.preventDefault(); area.classList.remove('drag-over');
+      var file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) handleImageFile(file, group);
+    });
+
+    group.querySelector('.btn-remove-img').addEventListener('click', function() {
+      var idx = parseInt(group.getAttribute('data-idx'));
+      imageData[idx] = null;
+      group.querySelector('.image-preview').style.display = 'none';
+      group.querySelector('.image-upload-placeholder').style.display = 'flex';
+      group.querySelector('.img-input').value = '';
+      this.style.display = 'none';
+      scheduleDraft();
+    });
+  });
+
+  /* ===== Form Data ===== */
+  function getFormData() {
+    return {
+      source: 'deeplearning',
+      studentName: val('studentName'),
+      classInfo: val('classInfo'),
+      today: new Date().toLocaleDateString('ko-KR'),
+      image1: imageData[0] || null,
+      image2: imageData[1] || null,
+      image3: imageData[2] || null,
+      q1: val('q1'),
+      q2: val('q2'),
+      q3: val('q3'),
+      q4: val('q4')
+    };
+  }
+
+  function setFormData(data) {
+    if (!data) return;
+    if (data.studentName) document.getElementById('studentName').value = data.studentName;
+    if (data.classInfo) document.getElementById('classInfo').value = data.classInfo;
+    if (data.q1) document.getElementById('q1').value = data.q1;
+    if (data.q2) document.getElementById('q2').value = data.q2;
+    if (data.q3) document.getElementById('q3').value = data.q3;
+    if (data.q4) document.getElementById('q4').value = data.q4;
+    // Restore images
+    [data.image1, data.image2, data.image3].forEach(function(b64, i) {
+      if (b64) {
+        imageData[i] = b64;
+        var group = document.querySelector('.image-upload-group[data-idx="'+i+'"]');
+        var preview = group.querySelector('.image-preview');
+        preview.src = b64;
+        preview.style.display = 'block';
+        group.querySelector('.image-upload-placeholder').style.display = 'none';
+        group.querySelector('.btn-remove-img').style.display = 'inline-flex';
+      }
+    });
+  }
+
+  /* ===== Validation ===== */
+  function validate() {
+    var ok = true;
+    ['studentName','classInfo','q1'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
+      else el.classList.remove('invalid');
+    });
+    // At least image 1 is required
+    if (!imageData[0]) {
+      showToast('첫 번째 테스트 결과 캡처를 첨부해 주세요.', 'error');
+      ok = false;
+    }
+    if (!ok) showToast('필수 항목을 모두 입력해 주세요.', 'error');
+    return ok;
+  }
+
+  /* ===== Draft (localStorage) ===== */
+  var draftTimer = null;
+  function scheduleDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1500);
+  }
+  function saveDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(getFormData()));
+      var now = new Date();
+      document.getElementById('draftLabel').textContent =
+        '임시저장: ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+    } catch(e) {}
+  }
+  function loadDraft() {
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      setFormData(JSON.parse(raw));
+      showToast('이전 작성 내용을 불러왔습니다.', 'info', 3000);
+    } catch(e) {}
+  }
+
+  /* Auto-save on input */
+  document.querySelectorAll('input[type="text"], textarea').forEach(function(el) {
+    el.addEventListener('input', scheduleDraft);
+  });
+
+  /* ===== TXT Download ===== */
+  function buildTxt(data) {
+    var lines = [];
+    lines.push('============================================');
+    lines.push('  딥러닝 기초 — 활동지');
+    lines.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    lines.push('============================================');
+    lines.push('');
+    lines.push('[ 기본 정보 ]');
+    lines.push('이름: ' + (data.studentName || ''));
+    lines.push('반/번호: ' + (data.classInfo || ''));
+    lines.push('');
+    lines.push('[ 테스트 결과 ]');
+    lines.push('이미지 1: ' + (data.image1 ? '첨부됨 (구글 시트 확인)' : '미첨부'));
+    lines.push('이미지 2: ' + (data.image2 ? '첨부됨 (구글 시트 확인)' : '미첨부'));
+    lines.push('이미지 3: ' + (data.image3 ? '첨부됨 (구글 시트 확인)' : '미첨부'));
+    lines.push('');
+    lines.push('[ 성찰 ]');
+    lines.push('Q1. 틀린 이유: ' + (data.q1 || ''));
+    lines.push('Q2. 데이터 양: ' + (data.q2 || ''));
+    lines.push('Q3. 고양이 사진: ' + (data.q3 || ''));
+    lines.push('Q4. 전이학습: ' + (data.q4 || ''));
+    return lines.join('\n');
+  }
+
+  function downloadTxt(data) {
+    var blob = new Blob([buildTxt(data)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '딥러닝기초_' + (data.studentName || '') + '_' + (data.classInfo || '').replace(/\s/g,'') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ===== Send to Sheet ===== */
+  function sendToSheet(data) {
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) return;
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).catch(function() {});
+  }
+
+  /* ===== Save Button ===== */
+  document.getElementById('btnSave').addEventListener('click', function() {
+    if (!validate()) return;
+    var data = getFormData();
+    var btn = this;
+    btn.disabled = true;
+    document.getElementById('btnSaveText').textContent = '저장 중...';
+
+    downloadTxt(data);
+    sendToSheet(data);
+    saveDraft();
+
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    setTimeout(function() {
+      showToast(url ? '저장 완료! TXT + 구글 시트 전송' : '저장 완료! TXT 다운로드됨', 'success', 4000);
+      btn.disabled = false;
+      document.getElementById('btnSaveText').textContent = '저장하기';
+    }, 500);
+  });
+
+  /* ===== Draft Button ===== */
+  document.getElementById('btnDraft').addEventListener('click', function() {
+    saveDraft();
+    showToast('임시저장되었습니다.', 'info', 2500);
+  });
+
+  /* ===== Clear Button ===== */
+  document.getElementById('btnClear').addEventListener('click', function() {
+    if (!confirm('모든 내용을 초기화할까요?')) return;
+    document.querySelectorAll('input[type="text"], textarea').forEach(function(el){ el.value = ''; el.classList.remove('invalid'); });
+    imageData = [null, null, null];
+    document.querySelectorAll('.image-upload-group').forEach(function(group) {
+      group.querySelector('.image-preview').style.display = 'none';
+      group.querySelector('.image-upload-placeholder').style.display = 'flex';
+      group.querySelector('.img-input').value = '';
+      group.querySelector('.btn-remove-img').style.display = 'none';
+    });
+    localStorage.removeItem(DRAFT_KEY);
+    document.getElementById('draftLabel').textContent = '임시저장: 대기 중';
+    showToast('초기화되었습니다.', 'info');
+  });
+
+  /* ===== Settings Panel ===== */
+  document.getElementById('btnSettings').addEventListener('click', function() {
+    var panel = document.getElementById('settingsPanel');
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+      document.getElementById('scriptUrl').value = localStorage.getItem(URL_KEY) || '';
+    }
+  });
+  document.getElementById('btnSaveUrl').addEventListener('click', function() {
+    var url = document.getElementById('scriptUrl').value.trim();
+    if (url) { localStorage.setItem(URL_KEY, url); showToast('URL 저장됨', 'success'); }
+    else showToast('URL을 입력해 주세요', 'error');
+  });
+  document.getElementById('btnClearUrl').addEventListener('click', function() {
+    localStorage.removeItem(URL_KEY);
+    document.getElementById('scriptUrl').value = '';
+    showToast('URL 초기화됨', 'info');
+  });
+
+  /* ===== Remove invalid on input ===== */
+  document.querySelectorAll('input, textarea').forEach(function(el) {
+    el.addEventListener('input', function(){ this.classList.remove('invalid'); });
+  });
+
+  /* ===== Load Draft on Start ===== */
+  loadDraft();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>자녀 진로 탐색 안내 — 학부모 진로 설명회</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* ── 1. Reset & CSS Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --style-bg: #F4F1EC;
+      --style-primary: #3D3530;
+      --style-accent: #3D3530;
+      --style-text: #3D3530;
+      --style-text-secondary: #8A7A6A;
+
+      --blob-color: #D9CFC4;
+      --rule-color: #C5BBB0;
+      --card-bg: #EDE8E1;
+      --card-border: #D9CFC4;
+      --highlight-bg: #E8E2D9;
+      --highlight-border: #3D3530;
+      --dot1: #3D3530;
+      --dot2: #8A7A6A;
+      --dot3: #C5BBB0;
+
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'Pretendard Variable', 'Pretendard', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: var(--font-body);
+      background: #2A2420;
+      color: var(--style-text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── 2. Accessibility ── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--style-primary); color: var(--style-bg);
+      padding: 8px 16px; z-index: 9999; font-size: 14px;
+      border-radius: 0 0 4px 0; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-contrast: high) {
+      :root { --style-bg: #ffffff; --style-text: #000000; --style-primary: #000000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── 3. Progress Bar ── */
+    .progress-bar {
+      position: fixed; top: 0; left: 0;
+      height: 3px; background: var(--style-primary);
+      transition: width 0.3s ease; z-index: 100;
+      width: 0%;
+    }
+
+    /* ── 4. Presentation Container ── */
+    .presentation {
+      width: 100vw; height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .slide {
+      display: none;
+      width: 100%; height: 100%;
+      align-items: center; justify-content: center;
+      padding: 1.2rem;
+      background: #2A2420;
+    }
+    .slide.active { display: flex; }
+
+    /* ── 5. Browser Card ── */
+    .browser-card {
+      width: 100%; max-width: 1400px;
+      background: var(--style-bg);
+      border-radius: 1rem;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    .browser-topbar {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      background: #EDE8E1;
+      border-bottom: 1px solid var(--rule-color);
+      min-height: 42px;
+    }
+    .dot {
+      width: 0.43rem; height: 0.43rem;
+      border-radius: 50%;
+    }
+    .dot.red   { background: #FF5F57; }
+    .dot.yellow{ background: #FEBC2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title {
+      margin: 0 auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.06em;
+    }
+
+    .browser-content {
+      padding: 1.8rem 2.2rem;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── 6. Nordic Organic Blob ── */
+    .nordic-blob {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.55;
+      z-index: 0;
+    }
+    .nordic-blob svg { display: block; }
+    .browser-content > *:not(.nordic-blob) { position: relative; z-index: 1; }
+
+    /* ── 7. Nordic Dot Accent ── */
+    .nordic-dots {
+      display: flex; gap: 0.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .nordic-dots span {
+      width: 0.5rem; height: 0.5rem;
+      border-radius: 50%;
+    }
+
+    /* ── 8. Cover Slide ── */
+    .cover-slide {
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      min-height: 680px;
+    }
+    .cover-badge {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 1.1rem;
+    }
+    .cover-title {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 400;
+      color: var(--style-text);
+      line-height: 1.2;
+      margin-bottom: 0.7rem;
+      max-width: 700px;
+    }
+    .cover-title em {
+      font-style: italic;
+      color: var(--style-text-secondary);
+    }
+    .cover-subtitle {
+      font-size: 1rem;
+      color: var(--style-text-secondary);
+      margin-bottom: 2rem;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+    .cover-rule {
+      width: 3rem; height: 1px;
+      background: var(--rule-color);
+      margin-bottom: 1.2rem;
+    }
+    .cover-meta {
+      display: flex; gap: 1rem; align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.08em;
+    }
+    .cover-meta span + span::before {
+      content: '·';
+      margin-right: 1rem;
+    }
+
+    /* ── 9. Section Header ── */
+    .section-header {
+      margin-bottom: 0.9rem;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .section-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--style-text);
+      line-height: 1.3;
+    }
+    .section-rule {
+      width: 100%; height: 1px;
+      background: var(--rule-color);
+      margin-top: 0.55rem;
+    }
+
+    /* ── 10. TOC ── */
+    .toc-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .toc-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.7rem 0.9rem;
+      border-bottom: 1px solid var(--card-border);
+      cursor: pointer;
+      border-radius: 0.3rem;
+      transition: background 0.2s;
+    }
+    .toc-item:last-child { border-bottom: none; }
+    .toc-item:hover { background: var(--card-bg); }
+    .toc-num {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.05em;
+      min-width: 2rem;
+    }
+    .toc-text {
+      font-size: 0.95rem;
+      color: var(--style-text);
+      flex: 1;
+    }
+    .toc-arrow {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+    }
+
+    /* ── 11. Card Grid ── */
+    .card-grid {
+      display: grid;
+      gap: 0.6rem;
+    }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem 1rem;
+      display: flex; flex-direction: column; gap: 0.3rem;
+    }
+    .card-icon { font-size: 1.1rem; }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--style-text);
+    }
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── 12. Highlight Box ── */
+    .highlight-box {
+      background: var(--highlight-bg);
+      border-left: 3px solid var(--highlight-border);
+      border-radius: 0 0.5rem 0.5rem 0;
+      padding: 0.75rem 1rem;
+      margin: 0.6rem 0;
+    }
+    .highlight-box p {
+      font-size: 0.95rem;
+      color: var(--style-text);
+      line-height: 1.6;
+    }
+
+    /* ── 13. Activity List ── */
+    .activity-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0.55rem;
+    }
+    .activity-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem 1rem;
+    }
+    .activity-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .activity-body { flex: 1; }
+    .activity-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--style-text);
+      margin-bottom: 0.2rem;
+    }
+    .activity-desc {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── 14. Task List (Steps) ── */
+    .task-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+    }
+    .task-item {
+      display: flex; gap: 0.8rem; align-items: flex-start;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem 1rem;
+    }
+    .task-num {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--style-text-secondary);
+      flex-shrink: 0;
+      min-width: 2rem;
+    }
+    .task-body { flex: 1; }
+    .task-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--style-text);
+      margin-bottom: 0.2rem;
+    }
+    .task-desc {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── 15. Timeline ── */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+    .timeline-item {
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-marker {
+      width: 0.6rem; height: 0.6rem;
+      border-radius: 50%;
+      background: var(--style-text-secondary);
+      flex-shrink: 0;
+      margin-top: 0.45rem;
+    }
+    .timeline-marker.highlight-marker {
+      background: var(--style-primary);
+      box-shadow: 0 0 0 3px var(--rule-color);
+    }
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.05em;
+      min-width: 4.5rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .timeline-content { flex: 1; }
+    .timeline-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--style-text);
+      margin-bottom: 0.1rem;
+    }
+    .timeline-desc {
+      font-size: 0.82rem;
+      color: var(--style-text-secondary);
+      line-height: 1.5;
+    }
+    .timeline-item.highlight .timeline-title { color: var(--style-primary); }
+
+    /* ── 16. Badge ── */
+    .badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2rem;
+      background: var(--highlight-bg);
+      color: var(--style-text-secondary);
+      border: 1px solid var(--card-border);
+    }
+    .badge-important {
+      background: var(--style-primary);
+      color: var(--style-bg);
+      border-color: var(--style-primary);
+    }
+
+    /* ── 17. Closing Slide ── */
+    .closing-slide {
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      min-height: 680px;
+    }
+    .closing-quote {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1.8rem;
+      color: var(--style-text);
+      line-height: 1.45;
+      max-width: 600px;
+      margin-bottom: 1.5rem;
+    }
+    .closing-rule {
+      width: 2.5rem; height: 1px;
+      background: var(--rule-color);
+      margin-bottom: 1.2rem;
+    }
+    .closing-caption {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.1em;
+      line-height: 1.8;
+    }
+
+    /* ── 18. Navigation ── */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.8rem;
+      padding: 0.4rem 1rem;
+      background: rgba(42, 36, 32, 0.92);
+      backdrop-filter: blur(8px);
+      height: 42px;
+      z-index: 50;
+    }
+    .nav-btn {
+      background: none; border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      width: 1.8rem; height: 1.8rem;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: rgba(255,255,255,0.7);
+      transition: all 0.2s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn svg { width: 1rem; height: 1rem; fill: currentColor; }
+    .nav-counter {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.6);
+      display: flex; align-items: center; gap: 0.3rem;
+    }
+    .slide-input {
+      background: none; border: none;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.9);
+      width: 1.6rem; text-align: center;
+      padding: 0;
+    }
+    .slide-input:focus { outline: 1px solid rgba(255,255,255,0.4); border-radius: 2px; }
+
+    /* ── 19. Responsive ── */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .browser-content { padding: 1.4rem 1.6rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .task-list { grid-template-columns: 1fr; }
+      .cover-title { font-size: 2rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+    }
+  </style>
+</head>
+<body>
+
+<a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+<div class="progress-bar" id="progressBar" role="progressbar"
+     aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+     aria-label="프레젠테이션 진행률"></div>
+
+<div class="presentation" id="presentation" role="main">
+
+  <!-- ── Slide 1: Cover ── -->
+  <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">학부모 진로 설명회</span>
+      </div>
+      <div class="browser-content cover-slide">
+        <!-- Nordic organic blob -->
+        <div class="nordic-blob" style="right:-2rem;top:-2rem;width:38%;opacity:0.45;">
+          <svg viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg">
+            <path d="M320,50 C380,90 410,170 390,250 C370,330 290,380 200,370 C110,360 40,300 20,210 C0,120 50,30 140,15 C230,0 260,10 320,50Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <!-- 3 Nordic dots -->
+        <div class="nordic-dots" aria-hidden="true">
+          <span style="background:var(--dot1);"></span>
+          <span style="background:var(--dot2);"></span>
+          <span style="background:var(--dot3);"></span>
+        </div>
+        <div class="cover-badge">2026학년도 · 학부모 진로 설명회</div>
+        <h1 class="cover-title">자녀 진로 탐색<br><em>안내</em></h1>
+        <p class="cover-subtitle">우리 아이의 가능성을 함께 발견하는 시간<br>학부모님과 함께하는 진로 교육 이야기</p>
+        <div class="cover-rule" aria-hidden="true"></div>
+        <div class="cover-meta">
+          <span>진로 상담부</span>
+          <span><time datetime="2026-03">2026년 3월</time></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 2: TOC ── -->
+  <!-- height: 95 + 6×80 = 575px ✓ -->
+  <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 목차">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">목차</span>
+      </div>
+      <div class="browser-content">
+        <div class="nordic-blob" style="right:0;bottom:0;width:30%;opacity:0.3;">
+          <svg viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+            <path d="M230,20 C290,50 310,130 280,200 C250,270 170,300 90,270 C10,240 -10,160 20,90 C50,20 110,-5 170,5 C200,10 220,10 230,20Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <div class="section-header">
+          <div class="section-label">Contents</div>
+          <h2>오늘의 이야기</h2>
+          <div class="section-rule" aria-hidden="true"></div>
+        </div>
+        <nav aria-label="슬라이드 목차">
+          <ol class="toc-list">
+            <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0"
+                aria-label="3번 슬라이드로 이동: 진로 탐색이란?"
+                onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+              <span class="toc-num" aria-hidden="true">01</span>
+              <span class="toc-text">진로 탐색이란 무엇인가</span>
+              <span class="toc-arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                aria-label="4번 슬라이드로 이동: 학부모의 역할"
+                onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+              <span class="toc-num" aria-hidden="true">02</span>
+              <span class="toc-text">학부모의 역할과 지원 방법</span>
+              <span class="toc-arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                aria-label="5번 슬라이드로 이동: 진로 탐색 단계"
+                onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+              <span class="toc-num" aria-hidden="true">03</span>
+              <span class="toc-text">단계별 진로 탐색 과정</span>
+              <span class="toc-arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                aria-label="6번 슬라이드로 이동: 가정에서의 대화법"
+                onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+              <span class="toc-num" aria-hidden="true">04</span>
+              <span class="toc-text">가정에서의 진로 대화법</span>
+              <span class="toc-arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                aria-label="7번 슬라이드로 이동: 연간 진로 지도 일정"
+                onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+              <span class="toc-num" aria-hidden="true">05</span>
+              <span class="toc-text">연간 진로 지도 일정</span>
+              <span class="toc-arrow" aria-hidden="true">→</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0"
+                aria-label="8번 슬라이드로 이동: 마무리"
+                onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+              <span class="toc-num" aria-hidden="true">06</span>
+              <span class="toc-text">함께 만드는 진로 환경</span>
+              <span class="toc-arrow" aria-hidden="true">→</span>
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 3: 진로 탐색이란? ── -->
+  <!-- height: 95 + 2×(120+120) + 3×17gap = 95 + 480 = 575px ✓ -->
+  <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 진로 탐색이란 무엇인가">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">01 · 진로 탐색이란</span>
+      </div>
+      <div class="browser-content">
+        <div class="nordic-blob" style="left:-3rem;bottom:-1rem;width:28%;opacity:0.4;">
+          <svg viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
+            <path d="M200,30 C270,60 300,150 270,220 C240,290 150,310 80,280 C10,250 -20,160 20,90 C60,20 130,-10 200,30Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <div class="section-header">
+          <div class="section-label">01 / What is Career Exploration</div>
+          <h2>진로 탐색이란 무엇인가</h2>
+          <div class="section-rule" aria-hidden="true"></div>
+        </div>
+        <div class="grid-2 card-grid" role="list">
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">🌱</span>
+            <h3 class="card-title">자기 이해</h3>
+            <p class="card-desc">강점, 흥미, 가치관을 파악하여 자신만의 방향을 발견하는 과정입니다.</p>
+          </div>
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">🔍</span>
+            <h3 class="card-title">직업 세계 탐색</h3>
+            <p class="card-desc">다양한 직업과 학과를 직접 경험하며 미래의 가능성을 넓혀갑니다.</p>
+          </div>
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">🗺</span>
+            <h3 class="card-title">계획 수립</h3>
+            <p class="card-desc">탐색 결과를 바탕으로 구체적인 학업·활동 계획을 세웁니다.</p>
+          </div>
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">🤝</span>
+            <h3 class="card-title">실행과 반성</h3>
+            <p class="card-desc">계획을 실행하고 경험을 통해 방향을 조정하는 순환 과정입니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 4: 학부모의 역할 ── -->
+  <!-- height: 95 + 4×140 = 655px ✓ -->
+  <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 학부모의 역할과 지원 방법">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">02 · 학부모의 역할</span>
+      </div>
+      <div class="browser-content">
+        <div class="nordic-blob" style="right:0;top:0;width:32%;opacity:0.35;">
+          <svg viewBox="0 0 350 320" xmlns="http://www.w3.org/2000/svg">
+            <path d="M250,40 C320,80 350,170 320,240 C290,310 200,340 120,310 C40,280 10,190 40,110 C70,30 150,-10 220,10 C235,15 245,30 250,40Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <div class="section-header">
+          <div class="section-label">02 / Parent's Role</div>
+          <h2>학부모의 역할과 지원 방법</h2>
+          <div class="section-rule" aria-hidden="true"></div>
+        </div>
+        <ul class="activity-list" role="list">
+          <li class="activity-item" role="listitem">
+            <span class="activity-icon" aria-hidden="true">👂</span>
+            <div class="activity-body">
+              <h3 class="activity-title">경청과 공감</h3>
+              <p class="activity-desc">자녀의 꿈과 관심사를 판단 없이 들어주세요. 작은 이야기 속에 진로의 씨앗이 있습니다.</p>
+            </div>
+          </li>
+          <li class="activity-item" role="listitem">
+            <span class="activity-icon" aria-hidden="true">🌿</span>
+            <div class="activity-body">
+              <h3 class="activity-title">경험의 기회 제공</h3>
+              <p class="activity-desc">박물관, 직업 체험, 동아리 등 다양한 경험을 통해 흥미를 직접 확인할 수 있게 도와주세요.</p>
+            </div>
+          </li>
+          <li class="activity-item" role="listitem">
+            <span class="activity-icon" aria-hidden="true">📖</span>
+            <div class="activity-body">
+              <h3 class="activity-title">정보 제공과 함께 탐색</h3>
+              <p class="activity-desc">학과 정보, 직업 전망 등을 함께 조사하며 자녀가 스스로 선택하도록 안내해 주세요.</p>
+            </div>
+          </li>
+          <li class="activity-item" role="listitem">
+            <span class="activity-icon" aria-hidden="true">🧭</span>
+            <div class="activity-body">
+              <h3 class="activity-title">방향 설정의 조력자</h3>
+              <p class="activity-desc">결정을 대신해 주기보다 스스로 생각하고 선택할 수 있도록 곁에서 지지해 주세요.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 5: 진로 탐색 단계 ── -->
+  <!-- height: 95 + 2×(110+110) + 3×17gap = 95 + 491 = 586px ✓ -->
+  <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 단계별 진로 탐색 과정">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">03 · 단계별 진로 탐색</span>
+      </div>
+      <div class="browser-content">
+        <div class="nordic-blob" style="right:-1rem;bottom:-1rem;width:35%;opacity:0.35;">
+          <svg viewBox="0 0 360 340" xmlns="http://www.w3.org/2000/svg">
+            <path d="M270,30 C340,65 370,160 345,235 C320,310 230,350 145,330 C60,310 15,225 30,140 C45,55 130,5 210,10 C240,12 260,18 270,30Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <div class="section-header">
+          <div class="section-label">03 / Steps</div>
+          <h2>단계별 진로 탐색 과정</h2>
+          <div class="section-rule" aria-hidden="true"></div>
+        </div>
+        <ol class="task-list" role="list">
+          <li class="task-item" role="listitem">
+            <span class="task-num" aria-hidden="true">01</span>
+            <div class="task-body">
+              <h3 class="task-title">자기 이해 검사</h3>
+              <p class="task-desc">흥미, 적성, 가치관 검사를 통해 자신의 특성을 객관적으로 파악합니다.</p>
+            </div>
+          </li>
+          <li class="task-item" role="listitem">
+            <span class="task-num" aria-hidden="true">02</span>
+            <div class="task-body">
+              <h3 class="task-title">직업 정보 탐색</h3>
+              <p class="task-desc">커리어넷·워크넷 등 공인 플랫폼에서 직업별 특성과 전망을 조사합니다.</p>
+            </div>
+          </li>
+          <li class="task-item" role="listitem">
+            <span class="task-num" aria-hidden="true">03</span>
+            <div class="task-body">
+              <h3 class="task-title">체험 활동 참여</h3>
+              <p class="task-desc">직업 체험, 멘토링, 현장 견학 등 실제 경험으로 관심 분야를 확인합니다.</p>
+            </div>
+          </li>
+          <li class="task-item" role="listitem">
+            <span class="task-num" aria-hidden="true">04</span>
+            <div class="task-body">
+              <h3 class="task-title">진로 계획서 작성</h3>
+              <p class="task-desc">탐색 결과를 정리하여 단기·장기 목표와 실천 계획을 문서화합니다.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 6: 가정에서의 대화법 ── -->
+  <!-- height: 95 + 350(grid 2×2, 150px card) + 100(highlight) = 545px ✓ -->
+  <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 가정에서의 진로 대화법">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">04 · 가정에서의 대화법</span>
+      </div>
+      <div class="browser-content">
+        <div class="nordic-blob" style="left:-2rem;top:1rem;width:28%;opacity:0.35;">
+          <svg viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+            <path d="M210,25 C270,55 295,140 265,210 C235,280 155,305 80,275 C5,245 -15,160 20,90 C55,20 130,-10 195,15 C202,18 207,22 210,25Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <div class="section-header">
+          <div class="section-label">04 / Conversation at Home</div>
+          <h2>가정에서의 진로 대화법</h2>
+          <div class="section-rule" aria-hidden="true"></div>
+        </div>
+        <div class="grid-2 card-grid" role="list" style="margin-bottom:0.6rem;">
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">💬</span>
+            <h3 class="card-title">열린 질문으로 시작</h3>
+            <p class="card-desc">"요즘 어떤 게 재미있어?" 처럼 답이 정해지지 않은 질문을 건네보세요.</p>
+          </div>
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">🚫</span>
+            <h3 class="card-title">비교와 평가 금물</h3>
+            <p class="card-desc">다른 아이와의 비교나 직업 서열화는 자녀의 탐색 의지를 꺾을 수 있습니다.</p>
+          </div>
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">📅</span>
+            <h3 class="card-title">주 1회 진로 대화 시간</h3>
+            <p class="card-desc">짧더라도 정기적인 대화가 자녀의 진로 성숙도를 높이는 데 효과적입니다.</p>
+          </div>
+          <div class="card" role="listitem">
+            <span class="card-icon" aria-hidden="true">✍️</span>
+            <h3 class="card-title">대화 내용 함께 기록</h3>
+            <p class="card-desc">이야기한 꿈과 관심사를 간단히 메모해두면 변화 과정을 함께 볼 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="highlight-box" role="note">
+          <p>진로 대화의 목표는 '결정'이 아닌 '탐색'입니다. 정답을 찾는 자리가 아닌 가능성을 넓히는 시간으로 여겨 주세요.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 7: 연간 일정 ── -->
+  <!-- height: 95 + 6×55(tip-like timeline) = 425px ✓ -->
+  <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 연간 진로 지도 일정">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">05 · 연간 진로 지도 일정</span>
+      </div>
+      <div class="browser-content">
+        <div class="nordic-blob" style="right:0;top:0;width:30%;opacity:0.35;">
+          <svg viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
+            <path d="M230,20 C300,55 325,145 295,215 C265,285 175,315 100,285 C25,255 -5,165 30,90 C65,15 145,-15 215,10 C222,13 227,16 230,20Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <div class="section-header">
+          <div class="section-label">05 / Annual Schedule</div>
+          <h2>연간 진로 지도 일정</h2>
+          <div class="section-rule" aria-hidden="true"></div>
+        </div>
+        <div class="timeline" role="list" aria-label="연간 진로 지도 일정">
+          <div class="timeline-item" role="listitem">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <span class="timeline-date"><time datetime="2026-03">3월</time></span>
+            <div class="timeline-content">
+              <h3 class="timeline-title">진로 심리 검사 실시</h3>
+              <p class="timeline-desc">커리어넷 기반 흥미·적성·가치관 검사 진행 및 결과 해석 안내</p>
+            </div>
+          </div>
+          <div class="timeline-item highlight" role="listitem">
+            <div class="timeline-marker highlight-marker" aria-hidden="true"></div>
+            <span class="timeline-date"><time datetime="2026-05">5월</time></span>
+            <div class="timeline-content">
+              <h3 class="timeline-title">직업 체험 주간 <span class="badge badge-important">중요</span></h3>
+              <p class="timeline-desc">직업인 멘토 초청 강연 및 모의 직업 체험 활동 참여</p>
+            </div>
+          </div>
+          <div class="timeline-item" role="listitem">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <span class="timeline-date"><time datetime="2026-07">7월</time></span>
+            <div class="timeline-content">
+              <h3 class="timeline-title">1학기 진로 포트폴리오 정리</h3>
+              <p class="timeline-desc">탐색 활동 기록 정리, 담임 상담 진행</p>
+            </div>
+          </div>
+          <div class="timeline-item" role="listitem">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <span class="timeline-date"><time datetime="2026-09">9월</time></span>
+            <div class="timeline-content">
+              <h3 class="timeline-title">학과 탐방 및 대학 정보 탐색</h3>
+              <p class="timeline-desc">관심 학과 방문, 재학생 인터뷰, 입시 정보 공유</p>
+            </div>
+          </div>
+          <div class="timeline-item highlight" role="listitem">
+            <div class="timeline-marker highlight-marker" aria-hidden="true"></div>
+            <span class="timeline-date"><time datetime="2026-11">11월</time></span>
+            <div class="timeline-content">
+              <h3 class="timeline-title">학부모 진로 상담 주간 <span class="badge badge-important">중요</span></h3>
+              <p class="timeline-desc">개별 학부모 진로 상담, 연간 탐색 결과 공유 및 내년 계획 수립</p>
+            </div>
+          </div>
+          <div class="timeline-item" role="listitem">
+            <div class="timeline-marker" aria-hidden="true"></div>
+            <span class="timeline-date"><time datetime="2026-12">12월</time></span>
+            <div class="timeline-content">
+              <h3 class="timeline-title">진로 계획서 완성 및 발표</h3>
+              <p class="timeline-desc">1년간의 탐색을 정리한 나만의 진로 계획서 작성 완료</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide 8: Closing ── -->
+  <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 마무리">
+    <div class="browser-card">
+      <div class="browser-topbar" aria-hidden="true">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="topbar-title">함께 만드는 진로 환경</span>
+      </div>
+      <div class="browser-content closing-slide">
+        <div class="nordic-blob" style="right:-1rem;top:-1rem;width:42%;opacity:0.45;">
+          <svg viewBox="0 0 420 390" xmlns="http://www.w3.org/2000/svg">
+            <path d="M310,45 C385,88 415,180 392,258 C369,336 285,382 195,370 C105,358 32,295 18,205 C4,115 56,28 148,12 C180,6 210,8 240,18 C268,27 292,35 310,45Z" fill="#D9CFC4"/>
+          </svg>
+        </div>
+        <div class="nordic-dots" aria-hidden="true">
+          <span style="background:var(--dot1);"></span>
+          <span style="background:var(--dot2);"></span>
+          <span style="background:var(--dot3);"></span>
+        </div>
+        <blockquote class="closing-quote" aria-label="마무리 인용구">
+          "아이의 진로는<br>부모와 학교가<br><em>함께 걷는 길</em>입니다."
+        </blockquote>
+        <div class="closing-rule" aria-hidden="true"></div>
+        <div class="closing-caption">
+          <p>궁금한 점은 언제든 진로 상담부로 문의해 주세요.</p>
+          <p style="margin-top:0.4rem;">감사합니다 · 2026학년도 학부모 진로 설명회</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+<nav class="nav-bar" aria-label="슬라이드 네비게이션">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+    </svg>
+  </button>
+  <span class="nav-counter" aria-label="슬라이드 위치">
+    <input type="text" class="slide-input" id="slideInput" value="1"
+           aria-label="슬라이드 번호 입력 (Enter로 이동)"
+           inputmode="numeric" pattern="[0-9]*">
+    / <span id="totalSlides" aria-hidden="true">8</span>
+  </span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+    </svg>
+  </button>
+  <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+    <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+    </svg>
+    <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+      <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+    </svg>
+  </button>
+</nav>
+
+<script>
+  const TOTAL = 8;
+  let current = 0;
+
+  function updateSlide(n) {
+    const slides = document.querySelectorAll('.slide');
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(TOTAL - 1, n));
+    slides[current].classList.add('active');
+
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === TOTAL - 1;
+    document.getElementById('slideInput').value = current + 1;
+
+    const pct = ((current + 1) / TOTAL) * 100;
+    const bar = document.getElementById('progressBar');
+    bar.style.width = pct + '%';
+    bar.setAttribute('aria-valuenow', current + 1);
+
+    document.getElementById('slideAnnounce').textContent =
+      `슬라이드 ${current + 1} / ${TOTAL}`;
+  }
+
+  function nextSlide() { updateSlide(current + 1); }
+  function prevSlide() { updateSlide(current - 1); }
+  function goToSlide(n) { updateSlide(n); }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', e => {
+    if (e.target === document.getElementById('slideInput')) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault(); nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault(); prevSlide();
+    }
+  });
+
+  // Slide input
+  document.getElementById('slideInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const v = parseInt(e.target.value);
+      if (!isNaN(v) && v >= 1 && v <= TOTAL) goToSlide(v - 1);
+      else e.target.value = current + 1;
+    }
+  });
+
+  // Fullscreen
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      document.getElementById('fsExpand').style.display = 'none';
+      document.getElementById('fsCompress').style.display = 'block';
+    } else {
+      document.exitFullscreen();
+      document.getElementById('fsExpand').style.display = 'block';
+      document.getElementById('fsCompress').style.display = 'none';
+    }
+  }
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+      document.getElementById('fsExpand').style.display = 'block';
+      document.getElementById('fsCompress').style.display = 'none';
+    }
+  });
+
+  // Init
+  updateSlide(0);
+</script>
+</body>
+</html>

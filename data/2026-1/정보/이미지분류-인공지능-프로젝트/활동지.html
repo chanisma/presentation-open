@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teachable Machine 프로젝트 — 활동지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F8FAFC;
+  --primary:#4F46E5;
+  --primary-light:#EEF2FF;
+  --primary-border:#C7D2FE;
+  --accent:#06B6D4;
+  --accent-light:#ECFEFF;
+  --accent-border:#A5F3FC;
+  --success:#059669;
+  --success-light:#ECFDF5;
+  --success-border:#A7F3D0;
+  --warn:#D97706;
+  --warn-light:#FFFBEB;
+  --warn-border:#FDE68A;
+  --danger:#DC2626;
+  --danger-light:#FEF2F2;
+  --text:#1E293B;
+  --text-sub:#64748B;
+  --glass:#FFFFFF;
+  --glass-border:#E2E8F0;
+  --glass-strong:#F1F5F9;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans KR','Inter',sans-serif;
+  min-height:100vh;
+  padding-bottom:5.5rem;
+}
+
+/* ── Header ── */
+.page-header{
+  position:sticky;top:0;z-index:100;
+  background:var(--primary);
+  padding:0.65rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+}
+.page-header-left{display:flex;align-items:center;gap:0.8rem;}
+.page-title{font-size:0.98rem;font-weight:700;color:#fff;}
+.page-badge{
+  font-size:0.72rem;padding:0.12rem 0.55rem;border-radius:2rem;
+  background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.35);
+}
+
+/* ── Settings Panel ── */
+.settings-panel{
+  background:#FFFBEB;border-bottom:2px solid #FDE68A;
+  padding:0.7rem 1.5rem;display:none;
+  align-items:center;gap:0.8rem;flex-wrap:wrap;
+}
+.settings-panel.open{display:flex;}
+.settings-panel label{font-size:0.82rem;color:#92400E;font-weight:600;white-space:nowrap;}
+.settings-panel input[type="text"]{
+  flex:1;min-width:240px;font-size:0.82rem;
+  background:#fff;border:1px solid #FCD34D;color:#111827;
+  padding:0.4rem 0.7rem;border-radius:0.4rem;
+}
+.settings-label{font-size:0.75rem;color:#92400E;background:#FEF3C7;padding:0.12rem 0.5rem;border-radius:0.3rem;border:1px solid #FDE68A;}
+
+/* ── Progress ── */
+.progress-wrap{
+  background:var(--glass-strong);border-bottom:1px solid var(--glass-border);
+  padding:0.5rem 1.5rem;display:flex;align-items:center;gap:0.8rem;
+}
+.progress-bar{flex:1;height:6px;background:var(--glass-border);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--primary);border-radius:3px;transition:width 0.4s ease;}
+.progress-text{font-size:0.75rem;color:var(--text-sub);font-weight:600;white-space:nowrap;}
+
+/* ── Main ── */
+.main{max-width:880px;margin:0 auto;padding:1.2rem 1rem;display:flex;flex-direction:column;gap:1rem;}
+
+/* ── Intro Banner ── */
+.intro-banner{
+  background:var(--primary-light);border:1px solid var(--primary-border);
+  border-radius:0.8rem;padding:1rem 1.2rem;
+  display:flex;align-items:flex-start;gap:0.8rem;
+}
+.intro-icon{font-size:1.5rem;flex-shrink:0;}
+.intro-text h2{font-size:1rem;font-weight:700;color:var(--primary);margin-bottom:0.2rem;}
+.intro-text p{font-size:0.84rem;color:var(--text-sub);line-height:1.6;}
+
+/* ── Form Card ── */
+.form-card{
+  background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:0.8rem;overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}
+.form-card-header{
+  display:flex;align-items:center;gap:0.6rem;
+  padding:0.65rem 1.2rem;border-bottom:1px solid var(--glass-border);
+  background:var(--glass-strong);
+}
+.form-card-num{
+  font-size:0.72rem;font-weight:700;
+  border-radius:50%;width:1.5rem;height:1.5rem;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.num-indigo{color:var(--primary);background:var(--primary-light);border:1px solid var(--primary-border);}
+.num-cyan{color:#0891B2;background:var(--accent-light);border:1px solid var(--accent-border);}
+.num-amber{color:var(--warn);background:var(--warn-light);border:1px solid var(--warn-border);}
+.num-green{color:var(--success);background:var(--success-light);border:1px solid var(--success-border);}
+.form-card-title{font-size:0.95rem;font-weight:600;}
+.form-card-step{
+  margin-left:auto;font-size:0.72rem;font-weight:600;
+  padding:0.1rem 0.5rem;border-radius:0.3rem;
+}
+.step-1{background:var(--primary-light);color:var(--primary);border:1px solid var(--primary-border);}
+.step-2{background:var(--accent-light);color:#0891B2;border:1px solid var(--accent-border);}
+.step-3{background:var(--warn-light);color:var(--warn);border:1px solid var(--warn-border);}
+.step-4{background:var(--success-light);color:var(--success);border:1px solid var(--success-border);}
+.form-card-body{padding:1rem 1.2rem;display:flex;flex-direction:column;gap:0.8rem;}
+
+/* ── Fields ── */
+.field{display:flex;flex-direction:column;gap:0.25rem;}
+.field label{font-size:0.85rem;color:var(--text-sub);font-weight:500;}
+.required{color:var(--danger);}
+input[type="text"],input[type="number"],textarea,select{
+  background:#fff;border:1px solid var(--glass-border);
+  border-radius:0.5rem;padding:0.5rem 0.75rem;
+  color:var(--text);font-family:inherit;font-size:0.92rem;
+  width:100%;transition:border-color 0.2s,background 0.2s;
+}
+input:focus,textarea:focus,select:focus{
+  outline:none;border-color:var(--primary);background:var(--primary-light);
+}
+input.invalid,textarea.invalid{border-color:var(--danger);background:var(--danger-light);}
+textarea{resize:vertical;min-height:4.5rem;}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+.field-grid-4{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
+.hint{
+  font-size:0.79rem;color:var(--text-sub);padding:0.45rem 0.7rem;
+  background:var(--glass-strong);border-radius:0.4rem;
+  border-left:3px solid var(--glass-border);line-height:1.55;
+}
+.hint.indigo{border-left-color:var(--primary);background:var(--primary-light);}
+.hint.cyan{border-left-color:var(--accent);background:var(--accent-light);}
+.hint.amber{border-left-color:var(--warn);background:var(--warn-light);}
+.hint.green{border-left-color:var(--success);background:var(--success-light);}
+.char-count{font-size:0.72rem;color:var(--text-sub);text-align:right;margin-top:0.1rem;}
+
+/* ── Image Upload ── */
+.image-uploads{display:flex;flex-direction:column;gap:0.6rem;}
+.image-upload-group{display:flex;flex-direction:column;gap:0.25rem;}
+.image-upload-label{font-size:0.85rem;font-weight:600;color:#0891B2;display:flex;align-items:center;gap:0.3rem;}
+.image-upload-label .num{
+  background:var(--accent);color:#fff;width:1.2rem;height:1.2rem;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;font-weight:800;
+}
+.image-upload-area{
+  position:relative;border:2px dashed var(--glass-border);
+  border-radius:0.6rem;overflow:hidden;cursor:pointer;
+  transition:border-color 0.2s;min-height:100px;
+  display:flex;align-items:center;justify-content:center;
+}
+.image-upload-area:hover{border-color:var(--primary);}
+.image-upload-area.drag-over{border-color:var(--accent);background:var(--accent-light);}
+.image-upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.image-upload-placeholder{
+  display:flex;flex-direction:column;align-items:center;gap:0.2rem;
+  color:var(--text-sub);font-size:0.8rem;padding:0.8rem;pointer-events:none;
+}
+.image-upload-placeholder svg{width:1.8rem;height:1.8rem;opacity:0.4;}
+.image-preview{display:none;width:100%;max-height:220px;object-fit:contain;padding:0.4rem;}
+.btn-remove-img{
+  display:none;font-size:0.75rem;padding:0.15rem 0.45rem;
+  background:var(--danger-light);border:1px solid #FCA5A5;
+  color:var(--danger);border-radius:0.3rem;cursor:pointer;
+  font-family:inherit;align-self:flex-start;transition:background 0.15s;
+}
+.btn-remove-img:hover{background:#FEE2E2;}
+.img-size-info{font-size:0.7rem;color:var(--text-sub);align-self:flex-start;}
+
+/* ── Dynamic Test Table ── */
+.table-notice{
+  font-size:0.82rem;color:var(--warn);padding:0.5rem 0.7rem;
+  background:var(--warn-light);border:1px solid var(--warn-border);
+  border-radius:0.4rem;text-align:center;
+}
+.test-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.test-table{
+  width:100%;border-collapse:collapse;font-size:0.85rem;
+  min-width:500px;
+}
+.test-table th{
+  background:var(--primary);color:#fff;
+  padding:0.5rem 0.6rem;text-align:center;font-weight:600;
+  font-size:0.8rem;white-space:nowrap;
+}
+.test-table th.cat-col{background:#4338CA;}
+.test-table td{
+  padding:0.35rem 0.4rem;border:1px solid var(--glass-border);
+  text-align:center;vertical-align:middle;
+}
+.test-table tr:nth-child(even) td{background:var(--glass-strong);}
+.test-table input[type="text"],.test-table input[type="number"],.test-table select{
+  padding:0.3rem 0.4rem;font-size:0.82rem;border-radius:0.3rem;text-align:center;
+  min-width:0;
+}
+.test-table input[type="number"]{width:60px;}
+.test-table input[type="text"]{width:100%;min-width:80px;}
+.test-table select{width:100%;min-width:70px;}
+.td-num{font-weight:600;color:var(--primary);width:36px;}
+.td-verdict{font-weight:600;font-size:0.82rem;}
+.verdict-correct{color:var(--success);}
+.verdict-wrong{color:var(--danger);}
+.btn-add-row,.btn-remove-row{
+  font-size:0.8rem;padding:0.3rem 0.7rem;border-radius:0.4rem;
+  border:1px solid var(--glass-border);cursor:pointer;font-family:inherit;
+  transition:background 0.15s;background:var(--glass);
+}
+.btn-add-row{background:var(--primary-light);color:var(--primary);border-color:var(--primary-border);}
+.btn-add-row:hover{background:#DDD6FE;}
+.btn-remove-row{background:var(--danger-light);color:var(--danger);border-color:#FCA5A5;}
+.btn-remove-row:hover{background:#FEE2E2;}
+.table-actions{display:flex;gap:0.5rem;margin-top:0.3rem;}
+.accuracy-summary{
+  font-size:0.85rem;padding:0.5rem 0.8rem;border-radius:0.5rem;
+  background:var(--glass-strong);border:1px solid var(--glass-border);
+  display:flex;align-items:center;gap:0.6rem;
+}
+.accuracy-num{font-size:1.1rem;font-weight:700;color:var(--primary);}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:0.35rem;
+  padding:0.42rem 0.9rem;border-radius:0.5rem;border:1px solid transparent;
+  font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit;
+  transition:background 0.15s;
+}
+.btn svg{width:1em;height:1em;}
+.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary);}
+.btn-primary:hover{background:#4338CA;}
+.btn-ghost{background:transparent;border-color:rgba(255,255,255,0.35);color:#fff;text-decoration:none;font-size:0.84rem;}
+.btn-ghost:hover{background:rgba(255,255,255,0.1);}
+.btn-danger-outline{background:var(--danger-light);border-color:#FCA5A5;color:var(--danger);}
+.btn-danger-outline:hover{background:#FEE2E2;}
+.btn-print{background:var(--accent-light);border-color:var(--accent-border);color:#0891B2;}
+.btn-print:hover{background:#CFFAFE;}
+.btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* ── Action Bar ── */
+.action-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:#fff;border-top:2px solid var(--glass-border);
+  padding:0.6rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;gap:0.8rem;
+}
+.action-bar-left,.action-bar-right{display:flex;align-items:center;gap:0.4rem;}
+.draft-label{font-size:0.75rem;color:var(--text-sub);}
+
+/* ── Toast ── */
+.toast-container{position:fixed;bottom:5rem;right:1.5rem;z-index:200;display:flex;flex-direction:column;gap:0.4rem;pointer-events:none;}
+.toast{padding:0.55rem 0.9rem;border-radius:0.5rem;font-size:0.84rem;max-width:300px;animation:toastIn 0.25s ease;}
+.toast.success{background:var(--success);color:#fff;}
+.toast.error{background:var(--danger);color:#fff;}
+.toast.info{background:var(--primary);color:#fff;}
+@keyframes toastIn{from{transform:translateX(110%);opacity:0;}to{transform:none;opacity:1;}}
+
+/* ── Print ── */
+@media print{
+  body{background:#fff;color:#111;padding:0;}
+  .page-header,.action-bar,.settings-panel,.toast-container,.progress-wrap{display:none!important;}
+  .main{max-width:100%;padding:0.5rem;}
+  .form-card{background:#fff;border:1px solid #ccc;border-radius:0;margin-bottom:0.6rem;break-inside:avoid;box-shadow:none;}
+  input,textarea,select{background:#fff!important;color:#111!important;border:1px solid #999!important;}
+  .test-table th{background:#333!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .image-preview{max-height:150px;}
+  .btn-remove-img,.btn-add-row,.btn-remove-row,.image-upload-placeholder{display:none!important;}
+}
+
+/* ── Responsive ── */
+@media(max-width:640px){
+  .field-grid,.field-grid-4{grid-template-columns:1fr;}
+  .page-header{padding:0.5rem 1rem;}
+  .main{padding:0.8rem 0.6rem;}
+  .form-card-body{padding:0.8rem;}
+  .action-bar{padding:0.5rem 0.8rem;}
+  .test-table{font-size:0.78rem;}
+  .test-table input[type="number"]{width:50px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="page-header">
+  <div class="page-header-left">
+    <a href="../../../../index.html" class="btn btn-ghost" aria-label="대시보드로 돌아가기">&larr; 대시보드</a>
+    <span class="page-title">Teachable Machine 프로젝트</span>
+    <span class="page-badge">활동지</span>
+  </div>
+  <div style="display:flex;gap:0.4rem;">
+    <button class="btn btn-print" id="btnPrint" title="인쇄">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+    </button>
+    <button class="btn" id="btnSettings" title="교사 설정" style="background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.35);color:#fff;">&#9881;</button>
+  </div>
+</header>
+
+<!-- ── Settings Panel ── -->
+<div class="settings-panel" id="settingsPanel">
+  <span class="settings-label">교사 전용</span>
+  <label for="scriptUrl">Apps Script URL</label>
+  <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+  <button class="btn" id="btnSaveUrl" style="background:#FEF3C7;border-color:#FCD34D;color:#92400E;white-space:nowrap;">URL 저장</button>
+  <button class="btn" id="btnClearUrl" style="background:#FEF2F2;border-color:#FCA5A5;color:#DC2626;white-space:nowrap;">초기화</button>
+</div>
+
+<!-- ── Progress ── -->
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <span class="progress-text" id="progressText">0 / 0</span>
+</div>
+
+<!-- ── Main ── -->
+<main class="main" id="main">
+
+  <!-- Intro -->
+  <div class="intro-banner">
+    <div class="intro-icon">&#129302;</div>
+    <div class="intro-text">
+      <h2>Teachable Machine 이미지 분류 프로젝트</h2>
+      <p>Google Teachable Machine으로 나만의 이미지 분류 AI를 학습시키고, 테스트한 결과를 기록합니다. 4단계를 순서대로 작성하세요.</p>
+    </div>
+  </div>
+
+  <!-- ── 기본 정보 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num num-indigo">&#9733;</span>
+      <span class="form-card-title">기본 정보</span>
+    </div>
+    <div class="form-card-body">
+      <div class="field-grid">
+        <div class="field">
+          <label for="studentName">이름 <span class="required">*</span></label>
+          <input type="text" id="studentName" placeholder="홍길동" data-track>
+        </div>
+        <div class="field">
+          <label for="classInfo">반 / 번호 <span class="required">*</span></label>
+          <input type="text" id="classInfo" placeholder="1반 15번" data-track>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 1: 주제 선정 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num num-indigo">1</span>
+      <span class="form-card-title">주제 선정</span>
+      <span class="form-card-step step-1">STEP 1</span>
+    </div>
+    <div class="form-card-body">
+      <div class="field">
+        <label for="topic">프로젝트 주제 <span class="required">*</span></label>
+        <input type="text" id="topic" placeholder="예: 재활용 쓰레기 분류 AI" data-track>
+      </div>
+      <div class="field">
+        <label for="topicReason">주제 선정 배경 및 동기 <span class="required">*</span></label>
+        <textarea id="topicReason" rows="3" placeholder="이 주제를 선택한 이유와 해결하고 싶은 문제를 작성하세요." data-track></textarea>
+        <div class="char-count" data-for="topicReason">0자</div>
+      </div>
+      <div class="hint indigo">왜 이 주제가 의미 있는지, 실생활에서 어떤 문제를 해결할 수 있는지 생각해 보세요.</div>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: 학습 설계 및 준비 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num num-cyan">2</span>
+      <span class="form-card-title">학습 설계 및 준비</span>
+      <span class="form-card-step step-2">STEP 2</span>
+    </div>
+    <div class="form-card-body">
+      <!-- 분류 대상 -->
+      <div class="field">
+        <label for="categories">분류하고자 하는 대상 <span class="required">*</span></label>
+        <input type="text" id="categories" placeholder="예: 고양이, 강아지 (쉼표로 구분)" data-track>
+        <div style="font-size:0.75rem;color:var(--text-sub);">쉼표(,)로 구분하여 입력하면 STEP 3 테스트 결과 표에 자동 반영됩니다.</div>
+      </div>
+
+      <!-- 데이터 선정 시 고려한 요소 -->
+      <div class="field">
+        <label>데이터를 선정할 때 고려한 요소 <span class="required">*</span></label>
+        <div class="hint cyan">어떤 요소가 인공지능의 분류에 영향을 줄지 생각해 봅니다.<br>예) 치와와의 경우 털의 색, 나이, 종, 포즈 등</div>
+        <div class="field-grid-4">
+          <div class="field"><input type="text" id="factor1" placeholder="1. 예: 색상" data-track></div>
+          <div class="field"><input type="text" id="factor2" placeholder="2. 예: 크기" data-track></div>
+          <div class="field"><input type="text" id="factor3" placeholder="3. 예: 배경" data-track></div>
+          <div class="field"><input type="text" id="factor4" placeholder="4. 예: 각도" data-track></div>
+        </div>
+      </div>
+
+      <!-- 학습과 테스트에 사용할 데이터 -->
+      <div class="field">
+        <label>학습과 테스트에 사용할 데이터 <span class="required">*</span></label>
+        <div class="hint cyan">학습시킬 데이터가 있는 폴더를 캡처하여 첨부하세요. 이미지는 자동으로 리사이즈됩니다.</div>
+        <div class="image-uploads" id="dataImages"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: 결과와 분석 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num num-amber">3</span>
+      <span class="form-card-title">결과와 분석</span>
+      <span class="form-card-step step-3">STEP 3</span>
+    </div>
+    <div class="form-card-body">
+      <!-- Dynamic Test Table -->
+      <div class="field">
+        <label>테스트 결과 (최소 6건) <span class="required">*</span></label>
+        <div class="hint amber">다양한 사진을 테스트한 결과를 기록하세요. 분류 결과가 정확하지 않아도 괜찮습니다 — 왜 그런 결과가 나왔는지가 중요합니다.</div>
+        <div id="tableArea"></div>
+        <div class="table-actions" id="tableActions" style="display:none;">
+          <button type="button" class="btn-add-row" id="btnAddRow">+ 행 추가</button>
+          <button type="button" class="btn-remove-row" id="btnRemoveRow">- 마지막 행 삭제</button>
+        </div>
+        <div class="accuracy-summary" id="accuracySummary" style="display:none;">
+          정확도: <span class="accuracy-num" id="accuracyNum">-</span>
+          <span style="font-size:0.78rem;color:var(--text-sub);" id="accuracyDetail"></span>
+        </div>
+      </div>
+
+      <!-- 테스트 분석 -->
+      <div class="field">
+        <label for="analysis">테스트 분석 <span class="required">*</span></label>
+        <div class="hint amber">아래 질문들을 참고하여 분석을 작성하세요:</div>
+        <div style="font-size:0.82rem;color:var(--text-sub);line-height:1.7;padding:0.3rem 0;">
+          &#8226; 테스트 결과와 같은 결과가 나올 수 있었던 이유는?<br>
+          &#8226; 인공지능이 특정 이미지를 잘못 분류한 이유는? (학습 데이터와 연결하여 생각)<br>
+          &#8226; 어떤 조건에서 모델이 잘 작동하고, 어떤 조건에서 어려움을 겪는가?<br>
+          &#8226; 모델의 한계점은 무엇이라고 생각하는가?
+        </div>
+        <textarea id="analysis" rows="5" placeholder="테스트 결과를 분석하고, 성공/실패 원인을 구체적으로 작성하세요." data-track></textarea>
+        <div class="char-count" data-for="analysis">0자</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: 결론 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num num-green">4</span>
+      <span class="form-card-title">결론</span>
+      <span class="form-card-step step-4">STEP 4</span>
+    </div>
+    <div class="form-card-body">
+      <div class="field">
+        <label for="reflection">배운 점 및 느낀 점 <span class="required">*</span></label>
+        <textarea id="reflection" rows="3" placeholder="프로젝트를 통해 배운 점과 느낀 점을 작성하세요." data-track></textarea>
+        <div class="char-count" data-for="reflection">0자</div>
+      </div>
+      <div class="field">
+        <label for="improvement">인공지능 성능 개선 방안 <span class="required">*</span></label>
+        <div class="hint green">결과 및 분석을 토대로, 어떤 부분을 개선하면 인공지능의 성능을 향상시킬 수 있을까요? (구체적으로)</div>
+        <textarea id="improvement" rows="3" placeholder="예: 학습 데이터의 다양성을 높이기 위해 다양한 각도, 조명, 배경에서 촬영한 이미지를 추가한다." data-track></textarea>
+        <div class="char-count" data-for="improvement">0자</div>
+      </div>
+      <div class="field">
+        <label for="extension">연구 / 확장 / 활용 아이디어</label>
+        <div class="hint green">주제 선정 단계에서 생각했던 것들을 할 수 있을지? 제작한 이미지 분류 AI가 어떻게 사람들에게 도움이 될 수 있을지?</div>
+        <textarea id="extension" rows="3" placeholder="예: 이 분류 모델을 모바일 앱에 적용하면 현장에서 바로 분류할 수 있을 것이다." data-track></textarea>
+        <div class="char-count" data-for="extension">0자</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Action Bar ── -->
+<div class="action-bar">
+  <div class="action-bar-left">
+    <button class="btn btn-primary" id="btnSubmit">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      <span id="btnSubmitText">제출하기</span>
+    </button>
+    <button class="btn" id="btnDownload" style="background:var(--glass-strong);border-color:var(--glass-border);color:var(--text);">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      TXT
+    </button>
+  </div>
+  <div class="action-bar-right">
+    <span class="draft-label" id="draftLabel">임시저장: 대기 중</span>
+    <button class="btn" id="btnDraft" style="background:var(--primary-light);border-color:var(--primary-border);color:var(--primary);font-size:0.8rem;">임시저장</button>
+    <button class="btn btn-danger-outline" id="btnClear" style="font-size:0.8rem;">초기화</button>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<!--
+============================================================
+  Apps Script 설정 가이드 (교사용)
+============================================================
+1. Google Sheets에서 [확장 프로그램] > [Apps Script] 열기
+2. 아래 코드를 Code.gs에 붙여넣기
+3. [배포] > [새 배포] > 유형: 웹 앱
+   실행 주체: 나  /  액세스: 모든 사용자
+4. 배포 URL을 활동지 설정(⚙)에 입력
+
+=== Code.gs ===
+
+function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('이미지분류프로젝트')
+            || ss.insertSheet('이미지분류프로젝트');
+
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow([
+      '제출시간','이름','반/번호','프로젝트 주제','주제 선정 배경',
+      '분류 대상','고려 요소','데이터 이미지 URL',
+      '테스트 결과(JSON)','테스트 분석',
+      '배운 점','성능 개선 방안','활용 아이디어','정확도'
+    ]);
+    sheet.getRange(1,1,1,14)
+         .setFontWeight('bold')
+         .setBackground('#4F46E5')
+         .setFontColor('#FFFFFF');
+  }
+
+  var folder = getOrCreateFolder('2026-1 이미지 분류 프로젝트');
+  var imageUrls = [];
+
+  if (data.images) {
+    for (var i = 0; i < data.images.length; i++) {
+      if (!data.images[i]) continue;
+      try {
+        var b64 = data.images[i].split(',')[1];
+        var blob = Utilities.newBlob(
+          Utilities.base64Decode(b64), 'image/jpeg',
+          (data.studentName||'학생') + '_'
+          + (data.classInfo||'').replace(/\s/g,'')
+          + '_img' + (i+1) + '.jpg'
+        );
+        var file = folder.createFile(blob);
+        file.setSharing(
+          DriveApp.Access.ANYONE_WITH_LINK,
+          DriveApp.Permission.VIEW
+        );
+        imageUrls.push(file.getUrl());
+      } catch(err) {
+        imageUrls.push('오류: ' + err.message);
+      }
+    }
+  }
+
+  sheet.appendRow([
+    new Date(),
+    data.studentName || '',
+    data.classInfo || '',
+    data.topic || '',
+    data.topicReason || '',
+    data.categories || '',
+    [data.factor1,data.factor2,data.factor3,data.factor4]
+      .filter(Boolean).join(', '),
+    imageUrls.join('\n'),
+    JSON.stringify(data.testResults || []),
+    data.analysis || '',
+    data.reflection || '',
+    data.improvement || '',
+    data.extension || '',
+    data.accuracy || ''
+  ]);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({
+      status:'ok', imageUrls: imageUrls
+    }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getOrCreateFolder(name) {
+  var it = DriveApp.getFoldersByName(name);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(name);
+}
+
+============================================================
+-->
+
+<script>
+(function(){
+  'use strict';
+
+  /* ===== Constants ===== */
+  var DRAFT_KEY = 'draft_tm_project';
+  var URL_KEY = 'sheets_url_인공지능';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+  var MIN_TEST_ROWS = 6;
+  var IMG_MAX_W = 1280;
+  var IMG_MAX_H = 960;
+  var IMG_QUALITY = 0.82;
+
+  /* ===== State ===== */
+  var imageData = [];
+  var currentCategories = [];
+  var testRowCount = MIN_TEST_ROWS;
+
+  /* ===== Helpers ===== */
+  function $(id) { return document.getElementById(id); }
+  function val(id) { var e = $(id); return e ? e.value.trim() : ''; }
+  function setVal(id, v) { var e = $(id); if (e && v) e.value = v; }
+  function escHtml(s) { var d = document.createElement('span'); d.textContent = s; return d.innerHTML; }
+  function escAttr(s) { return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+  /* ===== Toast ===== */
+  function toast(msg, type, ms) {
+    type = type || 'info'; ms = ms || 3000;
+    var el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = msg;
+    $('toastContainer').appendChild(el);
+    setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, ms + 400);
+  }
+
+  /* ===== Progress ===== */
+  var trackedFields = ['studentName','classInfo','topic','topicReason','categories','factor1','analysis','reflection','improvement'];
+  function updateProgress() {
+    var filled = 0;
+    trackedFields.forEach(function(id) { if (val(id)) filled++; });
+    if (imageData.some(Boolean)) filled++;
+    var rows = document.querySelectorAll('.test-row');
+    var hasTest = false;
+    for (var i = 0; i < rows.length; i++) {
+      var first = rows[i].querySelector('input[type="text"]');
+      if (first && first.value.trim()) { hasTest = true; break; }
+    }
+    if (hasTest) filled++;
+    var total = trackedFields.length + 2;
+    var pct = Math.round((filled / total) * 100);
+    $('progressFill').style.width = pct + '%';
+    $('progressText').textContent = filled + ' / ' + total;
+  }
+
+  /* ===== Image Resize + Base64 ===== */
+  function resizeAndEncode(file, cb) {
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function() {
+      var scale = Math.min(IMG_MAX_W / img.width, IMG_MAX_H / img.height, 1);
+      var canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      var b64 = canvas.toDataURL('image/jpeg', IMG_QUALITY);
+      var sizeKB = Math.round(b64.length * 0.75 / 1024);
+      cb(b64, sizeKB, canvas.width, canvas.height);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); cb(null); };
+    img.src = url;
+  }
+
+  /* ===== Image Upload Groups (dynamic) ===== */
+  function createImageGroup(idx, labelText, isRequired) {
+    var group = document.createElement('div');
+    group.className = 'image-upload-group';
+    group.setAttribute('data-idx', idx);
+
+    var lbl = document.createElement('div');
+    lbl.className = 'image-upload-label';
+    var numSpan = document.createElement('span');
+    numSpan.className = 'num';
+    numSpan.textContent = idx + 1;
+    lbl.appendChild(numSpan);
+    lbl.appendChild(document.createTextNode(' ' + labelText + ' '));
+    if (isRequired) {
+      var req = document.createElement('span');
+      req.className = 'required';
+      req.textContent = '*';
+      lbl.appendChild(req);
+    }
+    group.appendChild(lbl);
+
+    var area = document.createElement('div');
+    area.className = 'image-upload-area';
+
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.className = 'img-input';
+    area.appendChild(fileInput);
+
+    var placeholder = document.createElement('div');
+    placeholder.className = 'image-upload-placeholder';
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('fill', 'currentColor');
+    var path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z');
+    svg.appendChild(path);
+    placeholder.appendChild(svg);
+    var span1 = document.createElement('span');
+    span1.textContent = '클릭하거나 이미지를 끌어다 놓으세요';
+    placeholder.appendChild(span1);
+    var span2 = document.createElement('span');
+    span2.style.fontSize = '0.72rem';
+    span2.style.opacity = '0.7';
+    span2.textContent = 'JPG, PNG — 최대 5MB (자동 리사이즈)';
+    placeholder.appendChild(span2);
+    area.appendChild(placeholder);
+
+    var preview = document.createElement('img');
+    preview.className = 'image-preview';
+    preview.alt = labelText;
+    area.appendChild(preview);
+    group.appendChild(area);
+
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn-remove-img';
+    removeBtn.textContent = '\u00d7 제거';
+    group.appendChild(removeBtn);
+
+    var sizeInfo = document.createElement('span');
+    sizeInfo.className = 'img-size-info';
+    group.appendChild(sizeInfo);
+
+    /* Events */
+    fileInput.addEventListener('change', function(e) {
+      handleImageFile(e.target.files[0], group);
+    });
+    area.addEventListener('dragover', function(e) { e.preventDefault(); area.classList.add('drag-over'); });
+    area.addEventListener('dragleave', function() { area.classList.remove('drag-over'); });
+    area.addEventListener('drop', function(e) {
+      e.preventDefault(); area.classList.remove('drag-over');
+      var f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('image/')) handleImageFile(f, group);
+    });
+    removeBtn.addEventListener('click', function() {
+      var i = parseInt(group.getAttribute('data-idx'));
+      imageData[i] = null;
+      preview.style.display = 'none';
+      placeholder.style.display = 'flex';
+      fileInput.value = '';
+      removeBtn.style.display = 'none';
+      sizeInfo.textContent = '';
+      scheduleDraft(); updateProgress();
+    });
+
+    return group;
+  }
+
+  function handleImageFile(file, group) {
+    var idx = parseInt(group.getAttribute('data-idx'));
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast('이미지 파일만 첨부 가능합니다.', 'error'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast('5MB 이하 파일만 가능합니다.', 'error'); return; }
+    var origKB = Math.round(file.size / 1024);
+
+    resizeAndEncode(file, function(b64, sizeKB, w, h) {
+      if (!b64) { toast('이미지 처리 실패', 'error'); return; }
+      while (imageData.length <= idx) imageData.push(null);
+      imageData[idx] = b64;
+      var preview = group.querySelector('.image-preview');
+      preview.src = b64;
+      preview.style.display = 'block';
+      group.querySelector('.image-upload-placeholder').style.display = 'none';
+      group.querySelector('.btn-remove-img').style.display = 'inline-flex';
+      group.querySelector('.img-size-info').textContent = origKB + 'KB \u2192 ' + sizeKB + 'KB (' + w + '\u00d7' + h + ')';
+      scheduleDraft(); updateProgress();
+    });
+  }
+
+  function initImageUploads() {
+    var container = $('dataImages');
+    container.appendChild(createImageGroup(0, '학습 데이터 폴더 캡처', true));
+    container.appendChild(createImageGroup(1, '테스트 데이터 폴더 캡처 (선택)', false));
+  }
+  initImageUploads();
+
+  /* ===== Dynamic Categories -> Test Table ===== */
+  function parseCategories(str) {
+    return str.split(/[,，、]+/).map(function(s) { return s.trim(); }).filter(Boolean);
+  }
+
+  function buildTestTable(cats) {
+    var area = $('tableArea');
+    // Clear existing content safely
+    while (area.firstChild) area.removeChild(area.firstChild);
+
+    if (!cats.length) {
+      var notice = document.createElement('div');
+      notice.className = 'table-notice';
+      notice.textContent = '\u261d STEP 2\uc5d0\uc11c \ubd84\ub958\ud558\uace0\uc790 \ud558\ub294 \ub300\uc0c1\uc744 \uc785\ub825\ud558\uba74 \ud14c\uc2a4\ud2b8 \uacb0\uacfc \ud45c\uac00 \uc790\ub3d9 \uc0dd\uc131\ub429\ub2c8\ub2e4.';
+      area.appendChild(notice);
+      $('tableActions').style.display = 'none';
+      $('accuracySummary').style.display = 'none';
+      return;
+    }
+
+    var existingData = collectTestData();
+
+    var wrap = document.createElement('div');
+    wrap.className = 'test-table-wrap';
+    var table = document.createElement('table');
+    table.className = 'test-table';
+
+    // thead
+    var thead = document.createElement('thead');
+    var headerRow = document.createElement('tr');
+
+    var thNo = document.createElement('th');
+    thNo.style.width = '36px';
+    thNo.textContent = 'No.';
+    headerRow.appendChild(thNo);
+
+    var thDesc = document.createElement('th');
+    thDesc.textContent = '\ud14c\uc2a4\ud2b8 \uc774\ubbf8\uc9c0 \uc124\uba85';
+    headerRow.appendChild(thDesc);
+
+    cats.forEach(function(c) {
+      var th = document.createElement('th');
+      th.className = 'cat-col';
+      th.textContent = c + ' (%)';
+      headerRow.appendChild(th);
+    });
+
+    var thActual = document.createElement('th');
+    thActual.textContent = '\uc2e4\uc81c \ubd84\ub958';
+    headerRow.appendChild(thActual);
+
+    var thVerdict = document.createElement('th');
+    thVerdict.style.width = '56px';
+    thVerdict.textContent = '\ud310\uc815';
+    headerRow.appendChild(thVerdict);
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // tbody
+    var tbody = document.createElement('tbody');
+    for (var i = 0; i < testRowCount; i++) {
+      tbody.appendChild(buildTestRow(i, cats, existingData[i]));
+    }
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    area.appendChild(wrap);
+
+    $('tableActions').style.display = 'flex';
+    $('accuracySummary').style.display = 'flex';
+    attachTableEvents();
+    updateAccuracy();
+  }
+
+  function buildTestRow(idx, cats, data) {
+    data = data || {};
+    var tr = document.createElement('tr');
+    tr.className = 'test-row';
+
+    // Row number
+    var tdNum = document.createElement('td');
+    tdNum.className = 'td-num';
+    tdNum.textContent = idx + 1;
+    tr.appendChild(tdNum);
+
+    // Description
+    var tdDesc = document.createElement('td');
+    var descInput = document.createElement('input');
+    descInput.type = 'text';
+    descInput.placeholder = '\uc608: \uc778\ud130\ub137 \uace0\uc591\uc774 \uc0ac\uc9c4';
+    descInput.value = data.desc || '';
+    tdDesc.appendChild(descInput);
+    tr.appendChild(tdDesc);
+
+    // Percentage inputs for each category
+    cats.forEach(function(c) {
+      var td = document.createElement('td');
+      var numInput = document.createElement('input');
+      numInput.type = 'number';
+      numInput.min = '0';
+      numInput.max = '100';
+      numInput.step = '1';
+      numInput.placeholder = '%';
+      numInput.value = (data.pcts && data.pcts[c]) || '';
+      td.appendChild(numInput);
+      tr.appendChild(td);
+    });
+
+    // Actual category select
+    var tdActual = document.createElement('td');
+    var select = document.createElement('select');
+    var optDefault = document.createElement('option');
+    optDefault.value = '';
+    optDefault.textContent = '\uc120\ud0dd';
+    select.appendChild(optDefault);
+    cats.forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      if (data.actual === c) opt.selected = true;
+      select.appendChild(opt);
+    });
+    tdActual.appendChild(select);
+    tr.appendChild(tdActual);
+
+    // Verdict
+    var tdVerdict = document.createElement('td');
+    tdVerdict.className = 'td-verdict';
+    tdVerdict.textContent = '-';
+    tr.appendChild(tdVerdict);
+
+    return tr;
+  }
+
+  function attachTableEvents() {
+    document.querySelectorAll('.test-table input, .test-table select').forEach(function(el) {
+      el.addEventListener('input', function() { updateAccuracy(); scheduleDraft(); updateProgress(); });
+      el.addEventListener('change', function() { updateAccuracy(); scheduleDraft(); });
+    });
+  }
+
+  function updateAccuracy() {
+    var rows = document.querySelectorAll('.test-row');
+    var total = 0, correct = 0;
+    var headers = document.querySelectorAll('.test-table th.cat-col');
+
+    for (var r = 0; r < rows.length; r++) {
+      var row = rows[r];
+      var select = row.querySelector('select');
+      var actual = select ? select.value : '';
+      var verdictEl = row.querySelector('.td-verdict');
+
+      if (!actual) {
+        verdictEl.textContent = '-';
+        verdictEl.className = 'td-verdict';
+        continue;
+      }
+
+      var nums = row.querySelectorAll('input[type="number"]');
+      var maxPct = -1, maxCat = '';
+      for (var n = 0; n < nums.length; n++) {
+        var p = parseFloat(nums[n].value) || 0;
+        if (p > maxPct) {
+          maxPct = p;
+          maxCat = headers[n] ? headers[n].textContent.replace(/ \(%\)$/, '') : '';
+        }
+      }
+
+      total++;
+      var isCorrect = maxCat === actual;
+      if (isCorrect) correct++;
+      verdictEl.textContent = isCorrect ? '\u2713' : '\u2717';
+      verdictEl.className = 'td-verdict ' + (isCorrect ? 'verdict-correct' : 'verdict-wrong');
+    }
+
+    var accEl = $('accuracyNum');
+    var detEl = $('accuracyDetail');
+    if (total > 0) {
+      accEl.textContent = Math.round(correct / total * 100) + '%';
+      detEl.textContent = '(' + correct + '/' + total + '\uac74 \uc815\ud655)';
+    } else {
+      accEl.textContent = '-';
+      detEl.textContent = '\uc2e4\uc81c \ubd84\ub958\ub97c \uc120\ud0dd\ud558\uba74 \uc790\ub3d9 \uacc4\uc0b0\ub429\ub2c8\ub2e4';
+    }
+  }
+
+  function collectTestData() {
+    var data = [];
+    var rows = document.querySelectorAll('.test-row');
+    var headers = document.querySelectorAll('.test-table th.cat-col');
+
+    for (var r = 0; r < rows.length; r++) {
+      var inputs = rows[r].querySelectorAll('input');
+      var desc = inputs[0] ? inputs[0].value : '';
+      var pcts = {};
+      for (var i = 1; i < inputs.length; i++) {
+        if (headers[i - 1]) {
+          var catName = headers[i - 1].textContent.replace(/ \(%\)$/, '');
+          pcts[catName] = inputs[i].value;
+        }
+      }
+      var select = rows[r].querySelector('select');
+      data.push({ desc: desc, pcts: pcts, actual: select ? select.value : '' });
+    }
+    return data;
+  }
+
+  /* Category input watcher */
+  var catTimer = null;
+  $('categories').addEventListener('input', function() {
+    clearTimeout(catTimer);
+    catTimer = setTimeout(function() {
+      var newCats = parseCategories(val('categories'));
+      if (JSON.stringify(newCats) !== JSON.stringify(currentCategories)) {
+        currentCategories = newCats;
+        testRowCount = Math.max(testRowCount, MIN_TEST_ROWS);
+        buildTestTable(currentCategories);
+      }
+    }, 600);
+  });
+
+  /* Add/Remove rows */
+  $('btnAddRow').addEventListener('click', function() {
+    testRowCount++;
+    buildTestTable(currentCategories);
+  });
+  $('btnRemoveRow').addEventListener('click', function() {
+    if (testRowCount <= 1) return;
+    testRowCount--;
+    buildTestTable(currentCategories);
+  });
+
+  /* Initial table state */
+  buildTestTable([]);
+
+  /* ===== Char Count ===== */
+  document.querySelectorAll('.char-count').forEach(function(el) {
+    var id = el.getAttribute('data-for');
+    var target = $(id);
+    if (!target) return;
+    function upd() { el.textContent = target.value.length + '\uc790'; }
+    target.addEventListener('input', upd);
+    upd();
+  });
+
+  /* ===== Form Data ===== */
+  function getFormData() {
+    return {
+      source: 'tm_project',
+      studentName: val('studentName'),
+      classInfo: val('classInfo'),
+      topic: val('topic'),
+      topicReason: val('topicReason'),
+      categories: val('categories'),
+      factor1: val('factor1'), factor2: val('factor2'),
+      factor3: val('factor3'), factor4: val('factor4'),
+      images: imageData.slice(),
+      testResults: collectTestData(),
+      analysis: val('analysis'),
+      reflection: val('reflection'),
+      improvement: val('improvement'),
+      extension: val('extension'),
+      accuracy: $('accuracyNum').textContent,
+      today: new Date().toLocaleDateString('ko-KR')
+    };
+  }
+
+  function setFormData(d) {
+    if (!d) return;
+    ['studentName','classInfo','topic','topicReason','categories',
+     'factor1','factor2','factor3','factor4','analysis','reflection','improvement','extension'
+    ].forEach(function(id) { setVal(id, d[id]); });
+
+    // Restore images
+    if (d.images) {
+      d.images.forEach(function(b64, i) {
+        if (!b64) return;
+        while (imageData.length <= i) imageData.push(null);
+        imageData[i] = b64;
+        var group = document.querySelector('.image-upload-group[data-idx="' + i + '"]');
+        if (!group) return;
+        var preview = group.querySelector('.image-preview');
+        preview.src = b64;
+        preview.style.display = 'block';
+        group.querySelector('.image-upload-placeholder').style.display = 'none';
+        group.querySelector('.btn-remove-img').style.display = 'inline-flex';
+      });
+    }
+
+    // Rebuild table
+    if (d.categories) {
+      currentCategories = parseCategories(d.categories);
+      if (d.testResults && d.testResults.length) testRowCount = Math.max(d.testResults.length, MIN_TEST_ROWS);
+      buildTestTable(currentCategories);
+      if (d.testResults) {
+        var rows = document.querySelectorAll('.test-row');
+        d.testResults.forEach(function(td, i) {
+          if (!rows[i]) return;
+          var inputs = rows[i].querySelectorAll('input');
+          if (inputs[0]) inputs[0].value = td.desc || '';
+          var headers = document.querySelectorAll('.test-table th.cat-col');
+          for (var j = 1; j < inputs.length; j++) {
+            if (headers[j - 1]) {
+              var catName = headers[j - 1].textContent.replace(/ \(%\)$/, '');
+              if (td.pcts && td.pcts[catName]) inputs[j].value = td.pcts[catName];
+            }
+          }
+          var sel = rows[i].querySelector('select');
+          if (sel && td.actual) sel.value = td.actual;
+        });
+        updateAccuracy();
+      }
+    }
+
+    // Update char counts
+    document.querySelectorAll('.char-count').forEach(function(el) {
+      var id = el.getAttribute('data-for');
+      var target = $(id);
+      if (target) el.textContent = target.value.length + '\uc790';
+    });
+  }
+
+  /* ===== Validation ===== */
+  function validate() {
+    var ok = true;
+    var required = ['studentName','classInfo','topic','topicReason','categories','factor1','analysis','reflection','improvement'];
+    required.forEach(function(id) {
+      var el = $(id);
+      if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
+      else el.classList.remove('invalid');
+    });
+    if (!imageData[0]) { toast('\ud559\uc2b5 \ub370\uc774\ud130 \ud3f4\ub354 \uce90\ucc98\ub97c \ucca8\ubd80\ud574 \uc8fc\uc138\uc694.', 'error'); ok = false; }
+    var testData = collectTestData().filter(function(r) { return r.desc.trim(); });
+    if (testData.length < 1) { toast('\ud14c\uc2a4\ud2b8 \uacb0\uacfc\ub97c \ucd5c\uc18c 1\uac74 \uc774\uc0c1 \uc785\ub825\ud574 \uc8fc\uc138\uc694.', 'error'); ok = false; }
+    if (!ok) toast('\ud544\uc218 \ud56d\ubaa9\uc744 \ubaa8\ub450 \uc785\ub825\ud574 \uc8fc\uc138\uc694.', 'error');
+    return ok;
+  }
+
+  /* ===== Draft ===== */
+  var draftTimer = null;
+  function scheduleDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1500);
+  }
+  function saveDraft() {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(getFormData()));
+      var now = new Date();
+      $('draftLabel').textContent = '\uc784\uc2dc\uc800\uc7a5: ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+    } catch (e) { /* quota exceeded */ }
+  }
+  function loadDraft() {
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      setFormData(JSON.parse(raw));
+      toast('\uc774\uc804 \uc791\uc131 \ub0b4\uc6a9\uc744 \ubd88\ub7ec\uc654\uc2b5\ub2c8\ub2e4.', 'info');
+    } catch (e) { /* parse error */ }
+  }
+
+  /* Auto-save on input */
+  document.querySelectorAll('[data-track]').forEach(function(el) {
+    el.addEventListener('input', function() { scheduleDraft(); updateProgress(); });
+  });
+
+  /* ===== TXT Download ===== */
+  function buildTxt(d) {
+    var L = [];
+    L.push('\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550');
+    L.push('  Teachable Machine \ud504\ub85c\uc81d\ud2b8 \u2014 \ud65c\ub3d9\uc9c0');
+    L.push('  \uc791\uc131: ' + new Date().toLocaleString('ko-KR'));
+    L.push('\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550');
+    L.push('');
+    L.push('[ \uae30\ubcf8 \uc815\ubcf4 ]');
+    L.push('\uc774\ub984: ' + d.studentName);
+    L.push('\ubc18/\ubc88\ud638: ' + d.classInfo);
+    L.push('');
+    L.push('[ STEP 1: \uc8fc\uc81c \uc120\uc815 ]');
+    L.push('\ud504\ub85c\uc81d\ud2b8 \uc8fc\uc81c: ' + d.topic);
+    L.push('\uc8fc\uc81c \uc120\uc815 \ubc30\uacbd: ' + d.topicReason);
+    L.push('');
+    L.push('[ STEP 2: \ud559\uc2b5 \uc124\uacc4 \ubc0f \uc900\ube44 ]');
+    L.push('\ubd84\ub958 \ub300\uc0c1: ' + d.categories);
+    L.push('\uace0\ub824 \uc694\uc18c: ' + [d.factor1, d.factor2, d.factor3, d.factor4].filter(Boolean).join(', '));
+    L.push('\ub370\uc774\ud130 \uc774\ubbf8\uc9c0: ' + (d.images ? d.images.filter(Boolean).length : 0) + '\uc7a5 \ucca8\ubd80 (\uad6c\uae00 \uc2dc\ud2b8 \ud655\uc778)');
+    L.push('');
+    L.push('[ STEP 3: \uacb0\uacfc\uc640 \ubd84\uc11d ]');
+    L.push('\uc815\ud655\ub3c4: ' + d.accuracy);
+    if (d.testResults) {
+      d.testResults.forEach(function(r, i) {
+        if (!r.desc) return;
+        var pctStr = Object.keys(r.pcts).map(function(k) { return k + ':' + (r.pcts[k] || '-') + '%'; }).join(' / ');
+        L.push('  \ud14c\uc2a4\ud2b8 ' + (i + 1) + ': ' + r.desc + ' \u2192 ' + pctStr + ' [\uc2e4\uc81c: ' + (r.actual || '-') + ']');
+      });
+    }
+    L.push('');
+    L.push('\ubd84\uc11d: ' + d.analysis);
+    L.push('');
+    L.push('[ STEP 4: \uacb0\ub860 ]');
+    L.push('\ubc30\uc6b4 \uc810: ' + d.reflection);
+    L.push('\uac1c\uc120 \ubc29\uc548: ' + d.improvement);
+    L.push('\ud65c\uc6a9 \uc544\uc774\ub514\uc5b4: ' + (d.extension || '(\ubbf8\uc791\uc131)'));
+    return L.join('\n');
+  }
+
+  function downloadTxt(d) {
+    var blob = new Blob([buildTxt(d)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'TM\ud504\ub85c\uc81d\ud2b8_' + d.studentName + '_' + d.classInfo.replace(/\s/g, '') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ===== Send to Sheet ===== */
+  function sendToSheet(data) {
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) {
+      toast('Apps Script URL\uc774 \uc124\uc815\ub418\uc9c0 \uc54a\uc558\uc2b5\ub2c8\ub2e4. TXT\ub9cc \uc800\uc7a5\ub429\ub2c8\ub2e4.', 'info', 4000);
+      return;
+    }
+    var btn = $('btnSubmit');
+    $('btnSubmitText').textContent = '\uc804\uc1a1 \uc911...';
+    btn.disabled = true;
+
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function() {
+      toast('\uad6c\uae00 \uc2dc\ud2b8 \uc804\uc1a1 \uc644\ub8cc!', 'success', 4000);
+    }).catch(function() {
+      toast('\uc2dc\ud2b8 \uc804\uc1a1 \uc2e4\ud328 \u2014 TXT\ub294 \uc815\uc0c1 \uc800\uc7a5\ub428', 'error', 4000);
+    }).finally(function() {
+      btn.disabled = false;
+      $('btnSubmitText').textContent = '\uc81c\ucd9c\ud558\uae30';
+    });
+  }
+
+  /* ===== Submit ===== */
+  $('btnSubmit').addEventListener('click', function() {
+    if (!validate()) return;
+    var d = getFormData();
+    downloadTxt(d);
+    sendToSheet(d);
+    saveDraft();
+  });
+
+  /* ===== Download only ===== */
+  $('btnDownload').addEventListener('click', function() {
+    var d = getFormData();
+    if (!d.studentName) { toast('\uc774\ub984\uc744 \uc785\ub825\ud574 \uc8fc\uc138\uc694.', 'error'); return; }
+    downloadTxt(d);
+    toast('TXT \ud30c\uc77c \ub2e4\uc6b4\ub85c\ub4dc\ub428', 'success');
+  });
+
+  /* ===== Draft Button ===== */
+  $('btnDraft').addEventListener('click', function() {
+    saveDraft();
+    toast('\uc784\uc2dc\uc800\uc7a5 \uc644\ub8cc', 'info', 2000);
+  });
+
+  /* ===== Clear ===== */
+  $('btnClear').addEventListener('click', function() {
+    if (!confirm('\ubaa8\ub4e0 \ub0b4\uc6a9\uc744 \ucd08\uae30\ud654\ud560\uae4c\uc694?')) return;
+    document.querySelectorAll('input[type="text"],input[type="number"],textarea,select').forEach(function(el) {
+      if (el.id === 'scriptUrl') return;
+      el.value = '';
+      el.classList.remove('invalid');
+    });
+    imageData = [];
+    document.querySelectorAll('.image-upload-group').forEach(function(g) {
+      g.querySelector('.image-preview').style.display = 'none';
+      g.querySelector('.image-upload-placeholder').style.display = 'flex';
+      g.querySelector('.img-input').value = '';
+      g.querySelector('.btn-remove-img').style.display = 'none';
+      g.querySelector('.img-size-info').textContent = '';
+    });
+    currentCategories = [];
+    testRowCount = MIN_TEST_ROWS;
+    buildTestTable([]);
+    localStorage.removeItem(DRAFT_KEY);
+    $('draftLabel').textContent = '\uc784\uc2dc\uc800\uc7a5: \ub300\uae30 \uc911';
+    document.querySelectorAll('.char-count').forEach(function(el) { el.textContent = '0\uc790'; });
+    updateProgress();
+    toast('\ucd08\uae30\ud654 \uc644\ub8cc', 'info');
+  });
+
+  /* ===== Settings ===== */
+  $('btnSettings').addEventListener('click', function() {
+    var p = $('settingsPanel');
+    p.classList.toggle('open');
+    if (p.classList.contains('open')) $('scriptUrl').value = localStorage.getItem(URL_KEY) || '';
+  });
+  $('btnSaveUrl').addEventListener('click', function() {
+    var url = $('scriptUrl').value.trim();
+    if (url) { localStorage.setItem(URL_KEY, url); toast('URL \uc800\uc7a5\ub428', 'success'); }
+    else toast('URL\uc744 \uc785\ub825\ud574 \uc8fc\uc138\uc694', 'error');
+  });
+  $('btnClearUrl').addEventListener('click', function() {
+    localStorage.removeItem(URL_KEY);
+    $('scriptUrl').value = '';
+    toast('URL \ucd08\uae30\ud654\ub428', 'info');
+  });
+
+  /* ===== Print ===== */
+  $('btnPrint').addEventListener('click', function() { window.print(); });
+
+  /* ===== Init ===== */
+  loadDraft();
+  updateProgress();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>셰익스피어와 르네상스 문학의 세계</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* 1. Reset & CSS Variables */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #1A1208;
+      --style-primary: #C9A84C;
+      --style-accent: #8A7340;
+      --style-text: #D4BF9A;
+      --style-text-secondary: #8A7340;
+      --border-ornament: #3D2E10;
+      --main: #C9A84C;
+      --dark: #8A7340;
+      --light: #2A1F10;
+      --white: #D4BF9A;
+      --gray-200: #3D2E10;
+      --gray-600: #8A7340;
+      --gray-700: #D4BF9A;
+    }
+
+    /* 2. Base Typography */
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'EB Garamond', Georgia, serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    h1, h2, h3 { font-family: 'Playfair Display', Georgia, serif; color: var(--style-primary); }
+    h1 { font-size: 2.4rem; font-weight: 700; font-style: italic; letter-spacing: 0.08em; }
+    h2 { font-size: 1.5rem; font-weight: 700; }
+    h3 { font-size: 1.15rem; font-weight: 600; }
+    p { font-size: 1rem; line-height: 1.7; }
+
+    /* Accessibility */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-primary); color: var(--style-bg); padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-contrast: high) {
+      :root { --style-primary: #FFD700; --style-text: #FFFFFF; --style-bg: #000000; }
+      .browser-card { border: 2px solid #FFD700; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* 3. Slide Container & Navigation */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--style-accent), var(--style-primary));
+      z-index: 1000; transition: width 0.3s ease;
+      will-change: width; transform: translateZ(0);
+    }
+
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transform: translateZ(0); backface-visibility: hidden;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* 4. Browser Card Chrome (minimal style for Dark Academia) */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: rgba(26, 18, 8, 0.85);
+      border: 1px solid var(--border-ornament);
+      border-radius: 0.5rem;
+      position: relative;
+    }
+    .browser-card::before {
+      content: '';
+      position: absolute; inset: 6px;
+      border: 1px solid rgba(201, 168, 76, 0.15);
+      border-radius: 0.3rem;
+      pointer-events: none;
+    }
+
+    .browser-topbar {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--border-ornament);
+      background: rgba(26, 18, 8, 0.95);
+    }
+    .topbar-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--style-accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 0 auto;
+    }
+
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    .browser-card--frameless {
+      background: transparent;
+      border: none;
+    }
+    .browser-card--frameless::before { display: none; }
+    .browser-card--frameless .browser-topbar { display: none; }
+
+    /* 5. Components */
+
+    /* Gold decorative rule */
+    .gold-rule { height: 1px; background: linear-gradient(90deg, transparent, var(--style-primary), transparent); margin: 0.6rem 0; }
+
+    /* Badge */
+    .badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: 0.08em; }
+    .main-badge { background: var(--style-primary); color: var(--style-bg); }
+    .badge-accent { background: rgba(138, 115, 64, 0.2); color: var(--style-primary); border: 1px solid var(--style-accent); }
+
+    /* Cover */
+    .cover-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 60vh; }
+    .cover-title { margin: 0.6rem 0 0.3rem; line-height: 1.3; }
+    .cover-subtitle { font-size: 1rem; color: var(--style-text-secondary); font-style: italic; }
+    .cover-divider { width: 60px; height: 2px; background: var(--style-primary); margin: 0.8rem auto; }
+    .cover-meta { display: flex; gap: 0.5rem; font-size: 0.88rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; letter-spacing: 0.05em; }
+
+    /* Section header (inline icon pattern) */
+    .section-header h2 { margin-bottom: 0.3rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text-secondary); font-style: italic; margin-bottom: 0.5rem; }
+
+    /* Highlight box */
+    .highlight-box {
+      background: rgba(201, 168, 76, 0.08);
+      border-left: 3px solid var(--style-primary);
+      padding: 0.6rem 1rem;
+      border-radius: 0 0.3rem 0.3rem 0;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* Card grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .card {
+      background: rgba(61, 46, 16, 0.3);
+      border: 1px solid var(--border-ornament);
+      border-radius: 0.4rem;
+      padding: 0.8rem 1rem;
+    }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 1.15rem; margin-bottom: 0.2rem; }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* Stat highlight */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin: 0.5rem 0; }
+    .stat-item { text-align: center; padding: 0.6rem; background: rgba(61, 46, 16, 0.3); border: 1px solid var(--border-ornament); border-radius: 0.4rem; }
+    .stat-number { display: block; font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--style-primary); }
+    .stat-label { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* Two column */
+    .two-col { display: flex; gap: 1rem; align-items: flex-start; }
+    .col-left, .col-right { flex: 1; }
+    .col-title { font-size: 1.15rem; margin-bottom: 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px solid var(--border-ornament); }
+    .col-divider { width: 1px; background: var(--border-ornament); align-self: stretch; }
+    .col-list { list-style: none; padding: 0; }
+    .col-list li { padding: 0.25rem 0; font-size: 0.95rem; border-bottom: 1px solid rgba(61, 46, 16, 0.3); }
+    .col-list li::before { content: '❧ '; color: var(--style-accent); }
+
+    /* Activity list */
+    .activity-list { list-style: none; padding: 0; }
+    .activity-item { display: flex; gap: 0.6rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(61, 46, 16, 0.3); }
+    .activity-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .activity-body { flex: 1; }
+    .activity-title { font-size: 1.05rem; margin-bottom: 0.15rem; }
+    .activity-desc { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* Quote */
+    .quote-slide { display: flex; align-items: center; justify-content: center; }
+    .quote-figure { text-align: center; max-width: 80%; }
+    .quote-mark { font-family: 'Playfair Display', serif; font-size: 4rem; color: var(--style-primary); line-height: 1; display: block; }
+    .quote-text { font-size: 1.1rem; font-style: italic; line-height: 1.8; margin: 0.4rem 0; }
+    .quote-text-en { font-family: 'EB Garamond', serif; font-size: 1rem; color: var(--style-text-secondary); font-style: italic; margin-bottom: 0.5rem; display: block; }
+    .quote-source { font-size: 0.88rem; color: var(--style-accent); font-family: 'Space Mono', monospace; letter-spacing: 0.05em; }
+
+    /* Showcase grid */
+    .showcase-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; }
+    .showcase-item { text-align: center; padding: 0.5rem; background: rgba(61, 46, 16, 0.3); border: 1px solid var(--border-ornament); border-radius: 0.4rem; }
+    .showcase-icon { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
+    .showcase-name { font-size: 0.95rem; margin-bottom: 0.1rem; }
+    .showcase-desc { font-size: 0.82rem; color: var(--style-text-secondary); }
+
+    /* Task list */
+    .task-list { list-style: none; padding: 0; }
+    .task-item { display: flex; gap: 0.6rem; padding: 0.5rem 0; border-bottom: 1px solid rgba(61, 46, 16, 0.3); }
+    .task-num { font-family: 'Space Mono', monospace; font-size: 0.95rem; color: var(--style-primary); font-weight: 700; flex-shrink: 0; min-width: 2rem; }
+    .task-body { flex: 1; }
+    .task-title { font-size: 1.05rem; margin-bottom: 0.15rem; }
+    .task-desc { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* End slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .end-header { margin-bottom: 0.8rem; }
+    .end-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .end-title { font-size: 1.8rem; }
+    .end-subtitle { font-size: 0.95rem; color: var(--style-text-secondary); font-style: italic; }
+    .end-summary { text-align: left; max-width: 600px; width: 100%; }
+    .summary-title { font-size: 1.15rem; margin-bottom: 0.3rem; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 0.2rem 0; font-size: 0.95rem; }
+
+    /* 7. Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .slide { padding: 1.5rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; height: 1px; }
+      .showcase-grid { grid-template-columns: repeat(3, 1fr); }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .showcase-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+    }
+
+    /* 8. Nav bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: rgba(26, 18, 8, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-ornament);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--border-ornament);
+      border-radius: 50%; background: transparent;
+      cursor: pointer; font-size: 0;
+      color: var(--style-text); transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: var(--style-primary); color: var(--style-bg); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--style-bg); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700; color: var(--style-accent);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+      font-family: inherit; padding: 0; outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-primary); background: var(--light); border-radius: 4px; }
+
+    /* 9. Animation */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide.active { animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="12" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <div class="badge main-badge">2026학년도</div>
+          <h1 class="cover-title">셰익스피어와<br>르네상스 문학의 세계</h1>
+          <p class="cover-subtitle">국어·영어 융합 수업자료</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>고등학교 2학년</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-03">2026년 3월</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 학습 목표 (stat-highlight) -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 학습 목표">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Lesson Objectives</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 학습 목표</h2>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="목표 1">01</span>
+              <span class="stat-label">르네상스 시대 배경과 문학적 특징을 이해한다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="목표 2">02</span>
+              <span class="stat-label">셰익스피어 주요 작품의 줄거리와 주제를 분석한다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="목표 3">03</span>
+              <span class="stat-label">셰익스피어 문학의 현대적 의의를 탐구한다</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 시대 배경 (section-overview) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 르네상스 시대 배경">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Renaissance</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 르네상스란 무엇인가</h2>
+            <p class="section-subtitle">14~17세기 유럽의 문화적 부흥 운동</p>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>'다시 태어남'이라는 뜻의 르네상스는 고대 그리스·로마 문화를 재발견하고, 인간 중심의 세계관을 확립한 시대입니다.</p>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <h3 class="card-title">시대적 배경</h3>
+              <p class="card-desc">십자군 전쟁 이후 동방 문화 유입, 도시 상업의 발달, 인쇄술의 보급</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">문학적 변화</h3>
+              <p class="card-desc">라틴어에서 자국어로의 전환, 개인 감정과 경험의 표현 확대</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 르네상스 문학 특징 (card-grid 2x2) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 르네상스 문학 특징">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Literary Features</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">※</span> 르네상스 문학의 4대 특징</h2>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">✦</span>
+              <h3 class="card-title">인문주의</h3>
+              <p class="card-desc">신 중심에서 인간 중심으로의 사고 전환</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">◆</span>
+              <h3 class="card-title">개인의 발견</h3>
+              <p class="card-desc">내면 심리와 개인적 감정의 문학적 표현</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">❧</span>
+              <h3 class="card-title">자국어 문학</h3>
+              <p class="card-desc">라틴어 대신 영어·이탈리아어로 창작</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">고전의 부활</h3>
+              <p class="card-desc">그리스·로마 신화와 문학 형식의 재해석</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 셰익스피어 소개 (two-column) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 셰익스피어 소개">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">William Shakespeare</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 윌리엄 셰익스피어</h2>
+            <p class="section-subtitle">1564–1616, 영국 문학의 거장</p>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">생애</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">1564년 스트래트퍼드어폰에이번 출생</li>
+                <li role="listitem">런던 글로브 극장에서 활동</li>
+                <li role="listitem">37편의 희곡과 154편의 소네트 집필</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">주요 작품</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">4대 비극: 햄릿, 오셀로, 리어왕, 맥베스</li>
+                <li role="listitem">희극: 한여름 밤의 꿈, 베니스의 상인</li>
+                <li role="listitem">역사극: 헨리 5세, 리처드 3세</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 4대 비극 (card-grid 2x2) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 셰익스피어 4대 비극">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Four Great Tragedies</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 셰익스피어 4대 비극</h2>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">✦</span>
+              <h3 class="card-title">햄릿 <span class="badge badge-accent">1601</span></h3>
+              <p class="card-desc">복수와 우유부단함, "사느냐 죽느냐"</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">◆</span>
+              <h3 class="card-title">오셀로 <span class="badge badge-accent">1604</span></h3>
+              <p class="card-desc">질투와 의심이 부른 파멸의 비극</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">❧</span>
+              <h3 class="card-title">리어왕 <span class="badge badge-accent">1606</span></h3>
+              <p class="card-desc">권력과 효심, 노왕의 비극적 몰락</p>
+            </div>
+            <div class="card" role="listitem">
+              <h3 class="card-title">맥베스 <span class="badge badge-accent">1606</span></h3>
+              <p class="card-desc">야망과 양심, 왕위를 향한 살인의 대가</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 로미오와 줄리엣 분석 (activity-list) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 로미오와 줄리엣 분석">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Romeo and Juliet</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">❧</span> 로미오와 줄리엣 핵심 장면</h2>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">✦</span>
+              <div class="activity-body">
+                <h3 class="activity-title">발코니 장면 (2막 2장)</h3>
+                <p class="activity-desc">가문의 적대를 초월한 사랑의 고백. "이름이 뭐가 중요하나요?"라는 대사 속에 르네상스 개인주의가 담겨 있다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">◆</span>
+              <div class="activity-body">
+                <h3 class="activity-title">비밀 결혼 (2막 6장)</h3>
+                <p class="activity-desc">로렌스 수사의 중재로 이루어진 비밀 결혼. 운명과 자유의지의 갈등이 시작된다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">※</span>
+              <div class="activity-body">
+                <h3 class="activity-title">비극적 결말 (5막 3장)</h3>
+                <p class="activity-desc">엇갈린 편지와 독약. 두 연인의 죽음이 결국 두 가문의 화해를 이끈다.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 소네트 감상 (quote) -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 소네트 18번 감상">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Sonnet XVIII</span></div>
+        <div class="browser-content quote-slide">
+          <figure class="quote-figure">
+            <span class="quote-mark" aria-hidden="true">"</span>
+            <blockquote class="quote-text">
+              <span class="quote-text-en">Shall I compare thee to a summer's day?<br>Thou art more lovely and more temperate.</span>
+              <p>그대를 여름날에 비유할까요?<br>그대는 더 아름답고 더 온화합니다.</p>
+            </blockquote>
+            <figcaption class="quote-source">
+              — <cite>William Shakespeare, Sonnet 18</cite>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: 현대 속 셰익스피어 (showcase-grid) -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 현대 속 셰익스피어">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Shakespeare Today</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>현대 속 셰익스피어</h2>
+            <p class="section-subtitle">다양한 매체로 재탄생한 고전</p>
+          </div>
+          <div class="showcase-grid" role="list">
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <span class="showcase-icon" aria-hidden="true">✦</span>
+              <h3 class="showcase-name">영화</h3>
+              <p class="showcase-desc">로미오+줄리엣 (1996)</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <span class="showcase-icon" aria-hidden="true">◆</span>
+              <h3 class="showcase-name">뮤지컬</h3>
+              <p class="showcase-desc">웨스트사이드 스토리</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <span class="showcase-icon" aria-hidden="true">❧</span>
+              <h3 class="showcase-name">웹툰</h3>
+              <p class="showcase-desc">셰익스피어 원작 각색</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <h3 class="showcase-name">드라마</h3>
+              <p class="showcase-desc">BBC 셰익스피어 시리즈</p>
+            </div>
+            <div class="showcase-item" role="listitem" tabindex="0">
+              <h3 class="showcase-name">게임</h3>
+              <p class="showcase-desc">문학 기반 인터랙티브 픽션</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: 토론 활동 (task-list) -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 토론 활동">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Discussion</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 토론 주제</h2>
+            <p class="section-subtitle">모둠별로 하나의 주제를 선택하여 토론하세요</p>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">01</span>
+              <div class="task-body">
+                <h3 class="task-title">운명인가, 선택인가</h3>
+                <p class="task-desc">로미오와 줄리엣의 비극은 운명 때문인가, 아니면 개인의 선택 때문인가?</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">02</span>
+              <div class="task-body">
+                <h3 class="task-title">시대를 초월한 보편성</h3>
+                <p class="task-desc">400년 전 작품이 오늘날에도 감동을 주는 이유는 무엇인가?</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">03</span>
+              <div class="task-body">
+                <h3 class="task-title">번역과 원작</h3>
+                <p class="task-desc">셰익스피어를 한국어로 번역할 때 어떤 요소가 가장 중요한가?</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: 정리 & 요약 (stat-highlight) -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 정리 및 요약">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">Summary</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 오늘의 핵심 정리</h2>
+          </div>
+          <div class="gold-rule" aria-hidden="true"></div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">01</span>
+              <span class="stat-label">르네상스는 인간 중심 사고의 시작이다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">02</span>
+              <span class="stat-label">셰익스피어는 인간 본성의 탐구자이다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">03</span>
+              <span class="stat-label">고전의 가치는 시대를 초월한다</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>셰익스피어의 작품 속 인간의 사랑, 질투, 야망, 양심은 400년이 지난 오늘날에도 우리 삶에 깊은 울림을 줍니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 12: 마무리 (end) -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <span class="end-icon" aria-hidden="true">❧</span>
+            <h2 class="end-title">감사합니다</h2>
+            <p class="end-subtitle">"All the world's a stage." — Shakespeare</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="다음 시간 안내">
+            <h3 class="summary-title">다음 시간 예고</h3>
+            <ul class="summary-list" role="list">
+              <li>✦ 셰익스피어 소네트 깊이 읽기</li>
+              <li>✦ 모둠별 작품 발표 준비</li>
+            </ul>
+          </div>
+          <div class="cover-meta" style="margin-top: 0.8rem;">
+            <span>참고: 네이버 지식백과 '셰익스피어'</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">12</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = `슬라이드 ${current + 1} / ${total}`;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { diff < 0 ? nextSlide() : prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => {
+      const n = parseInt(slideInput.value);
+      if (n >= 1 && n <= totalSlides) goToSlide(n - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    updateNav();
+  </script>
+</body>
+</html>

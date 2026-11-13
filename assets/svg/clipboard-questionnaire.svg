@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 560" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 정면에서 본 병원 문진표 클립보드. 종이에 빈 체크 칸 네 줄(칸 + 밑줄).
+       에이전트가 한 질문씩 묻고 학생이 고를 때마다 칸이 채워지는 장면의 소품
+       (바이브코딩 「웹의 구조와 설계도」 16장). 체크 표시·칸 이름은 덱이 덮어 그린다. 텍스트 없음.
+       어두운 청사진 배경 위 — 판·종이를 밝게, 잉크는 짙은 남색.
+       팔레트: ink #0b1a30 · board #b98a5a · boardEdge #8f6638 · paper #f6efe0 · line #9aa6b8 · clip #c7d0dc · clipDark #8c97a6 · accent #ff7a6b
+       앵커: 체크 칸 왼쪽 위 (64, 196/284/372/460), 칸 크기 40 · 밑줄 x 124~360, 각 줄 y = 칸 y + 34 -->
+
+  <!-- 바닥 그림자 -->
+  <path d="M40 548 L392 548" stroke="#0b1a30" stroke-width="10" opacity=".08" />
+
+  <!-- 판 -->
+  <path d="M28 52 C28 44 34 38 42 38 L378 38 C386 38 392 44 392 52 L392 530 C392 538 386 544 378 544 L42 544 C34 544 28 538 28 530 Z"
+        fill="#b98a5a" stroke="#0b1a30" stroke-width="2.4" />
+  <path d="M28 520 L28 530 C28 538 34 544 42 544 L378 544 C386 544 392 538 392 530 L392 520" fill="#8f6638" stroke="#0b1a30" stroke-width="2" />
+  <path d="M44 60 L44 200" stroke="#ffffff" stroke-width="3" opacity=".18" />
+
+  <!-- 종이 -->
+  <path d="M48 86 L372 86 L372 516 L48 516 Z" fill="#f6efe0" stroke="#0b1a30" stroke-width="2" />
+  <!-- 종이 머리 (제목 자리 — 굵은 막대 두 줄) -->
+  <path d="M84 134 L250 134" stroke="#0b1a30" stroke-width="6" opacity=".7" />
+  <path d="M84 158 L320 158" stroke="#9aa6b8" stroke-width="3" />
+  <!-- 체크 칸 네 줄 -->
+  <path d="M64 196 L104 196 L104 236 L64 236 Z" fill="#ffffff" stroke="#0b1a30" stroke-width="2" />
+  <path d="M124 230 L360 230" stroke="#9aa6b8" stroke-width="2.2" />
+  <path d="M64 284 L104 284 L104 324 L64 324 Z" fill="#ffffff" stroke="#0b1a30" stroke-width="2" />
+  <path d="M124 318 L360 318" stroke="#9aa6b8" stroke-width="2.2" />
+  <path d="M64 372 L104 372 L104 412 L64 412 Z" fill="#ffffff" stroke="#0b1a30" stroke-width="2" />
+  <path d="M124 406 L360 406" stroke="#9aa6b8" stroke-width="2.2" />
+  <path d="M64 460 L104 460 L104 500 L64 500 Z" fill="#ffffff" stroke="#0b1a30" stroke-width="2" />
+  <path d="M124 494 L360 494" stroke="#9aa6b8" stroke-width="2.2" />
+  <!-- 종이 접힌 자국 -->
+  <path d="M372 470 L340 516" stroke="#0b1a30" stroke-width="1.2" opacity=".18" />
+
+  <!-- 집게 -->
+  <path d="M130 26 C130 18 136 14 144 14 L276 14 C284 14 290 18 290 26 L300 74 C301 80 297 84 291 84 L129 84 C123 84 119 80 120 74 Z"
+        fill="#c7d0dc" stroke="#0b1a30" stroke-width="2.4" />
+  <path d="M120 74 L300 74 L298 92 C298 96 294 100 288 100 L132 100 C126 100 122 96 122 92 Z" fill="#8c97a6" stroke="#0b1a30" stroke-width="2.2" />
+  <!-- 집게 구멍 -->
+  <path d="M188 30 C188 24 194 22 210 22 C226 22 232 24 232 30 C232 36 226 38 210 38 C194 38 188 36 188 30 Z" fill="#b98a5a" stroke="#0b1a30" stroke-width="1.8" />
+  <path d="M146 34 L170 34 M250 34 L274 34" stroke="#ffffff" stroke-width="2.6" opacity=".45" />
+  <!-- 리벳 -->
+  <circle cx="150" cy="88" r="3.4" fill="#0b1a30" />
+  <circle cx="270" cy="88" r="3.4" fill="#0b1a30" />
+</svg>

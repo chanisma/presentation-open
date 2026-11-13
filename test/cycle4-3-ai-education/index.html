@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>인공지능의 이해와 교육적 활용</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #F8F8F2;
+      --style-primary: #1A1A2E;
+      --style-accent: #E8FF3B;
+      --style-text: #1A1A2E;
+      --style-text-secondary: #555555;
+      --cell-dark: #1A1A2E;
+      --cell-coral: #FF6B6B;
+      --cell-teal: #4ECDC4;
+      --cell-yellow: #FFE66D;
+      --white: #FFFFFF;
+      --gray-200: #E0E0E0;
+      --gray-600: #666666;
+      --gray-700: #444444;
+      --main: #1A1A2E;
+      --light: #F0F0F0;
+    }
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Inter', 'Noto Sans KR', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden;
+      height: 100%;
+    }
+    h1, h2, h3 { font-family: 'Inter', 'Noto Sans KR', sans-serif; color: var(--style-text); }
+    h1 { font-size: 2.4rem; font-weight: 800; }
+    h2 { font-size: 1.5rem; font-weight: 700; }
+    h3 { font-size: 1.15rem; font-weight: 600; }
+    p { font-size: 1rem; line-height: 1.7; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-primary); color: #fff; padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; border-radius: 0 0 4px 0; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-contrast: high) {
+      :root { --style-primary: #0000ff; --style-text: #000; --style-bg: #fff; }
+      .browser-card { border: 2px solid #000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--style-primary); z-index: 1000; transition: width 0.3s ease; will-change: width; }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0.8rem 1.2rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .browser-content { animation: slideIn 0.35s ease both; }
+
+    /* Bento Grid Browser Card */
+    .browser-card {
+      width: 100%; max-width: 1200px; max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--white); border-radius: 1.2rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .browser-topbar { display: flex; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--gray-200); position: relative; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title { font-family: 'Inter', sans-serif; font-size: 0.82rem; color: var(--style-text-secondary); font-weight: 500; letter-spacing: 0.05em; position: absolute; left: 50%; transform: translateX(-50%); }
+    .browser-content { flex: 1; overflow-y: auto; padding: 1.2rem 2rem 1rem; }
+
+    /* Cover */
+    .cover-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 60vh; position: relative; }
+    .cover-bg { position: absolute; inset: 0; z-index: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .cover-bg img { max-height: 60%; opacity: 0.12; }
+    .cover-content { position: relative; z-index: 1; }
+    .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 700; }
+    .main-badge { background: var(--cell-dark); color: var(--style-accent); margin-bottom: 0.8rem; }
+    .cover-title { margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+    .cover-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-bottom: 1rem; }
+    .cover-divider { width: 60px; height: 4px; background: var(--cell-dark); margin: 0.8rem auto; border-radius: 2px; }
+    .cover-meta { font-size: 0.88rem; color: var(--style-text-secondary); display: flex; gap: 0.5rem; justify-content: center; font-weight: 500; }
+
+    /* Section header */
+    .section-header { margin-bottom: 0.6rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text-secondary); margin-top: 0.2rem; }
+
+    /* Highlight box */
+    .highlight-box { background: #F0F0F0; border-left: 4px solid var(--cell-dark); padding: 0.6rem 1rem; border-radius: 0 0.5rem 0.5rem 0; margin: 0.6rem 0; font-size: 0.95rem; }
+
+    /* Key points as bento cells */
+    .key-points { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .key-points li { padding: 0.6rem 0.8rem; border-radius: 0.7rem; font-size: 0.95rem; font-weight: 500; }
+    .key-points li:nth-child(1) { background: var(--cell-dark); color: #fff; grid-column: span 2; }
+    .key-points li:nth-child(2) { background: var(--cell-teal); color: var(--cell-dark); }
+    .key-points li:nth-child(3) { background: var(--cell-yellow); color: var(--cell-dark); }
+    .key-points li:nth-child(4) { background: var(--cell-coral); color: #fff; grid-column: span 2; }
+
+    /* Definition Card - Bento style */
+    .definition-card { background: var(--cell-dark); color: #fff; border-radius: 1rem; padding: 1.2rem 1.5rem; margin: 0.6rem 0; }
+    .definition-term { font-size: 1.3rem; font-weight: 800; color: var(--style-accent); margin-bottom: 0.5rem; }
+    .definition-text { font-size: 1rem; line-height: 1.8; color: #E0E0E0; }
+
+    /* Timeline as bento */
+    .timeline { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.6rem; }
+    .timeline-item { border-radius: 0.7rem; padding: 0.6rem 0.8rem; }
+    .timeline-item:nth-child(1) { background: var(--cell-dark); color: #fff; }
+    .timeline-item:nth-child(2) { background: var(--cell-teal); color: var(--cell-dark); }
+    .timeline-item:nth-child(3) { background: var(--cell-yellow); color: var(--cell-dark); }
+    .timeline-item:nth-child(4) { background: var(--cell-coral); color: #fff; }
+    .timeline-date { font-size: 0.82rem; font-weight: 700; opacity: 0.8; }
+    .timeline-title { font-size: 0.95rem; font-weight: 700; }
+    .timeline-desc { font-size: 0.85rem; opacity: 0.85; }
+
+    /* Comparison Table */
+    .table-wrapper { overflow-x: auto; margin: 0.6rem 0; border-radius: 0.8rem; overflow: hidden; }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .comparison-table th, .comparison-table td { padding: 0.5rem 0.7rem; text-align: left; }
+    .comparison-table thead th { background: var(--cell-dark); color: #fff; font-weight: 700; border: none; }
+    .comparison-table tbody tr { border-bottom: 1px solid var(--gray-200); }
+    .comparison-table tbody th { color: var(--style-primary); font-weight: 600; }
+
+    /* Two Column */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: start; margin-top: 0.5rem; }
+    .col-image { width: 100%; max-height: 320px; object-fit: cover; border-radius: 0.8rem; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    .col-list { list-style: none; padding: 0; }
+    .col-list li { font-size: 0.95rem; padding: 0.35rem 0; border-bottom: 1px solid var(--gray-200); padding-left: 1.2em; position: relative; }
+    .col-list li::before { content: ''; position: absolute; left: 0; top: 50%; width: 8px; height: 8px; background: var(--cell-teal); border-radius: 2px; transform: translateY(-50%); }
+
+    /* Image */
+    .image-placeholder { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; background: #f5f5f5; border: 2px dashed var(--gray-200); border-radius: 0.5rem; color: var(--style-text-secondary); }
+    .placeholder-icon { font-size: 2rem; }
+    .placeholder-text { font-size: 0.85rem; margin-top: 0.3rem; }
+
+    /* Card Grid - Bento style */
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.6rem; }
+    .card { border-radius: 0.8rem; padding: 0.7rem; }
+    .card:nth-child(1) { background: var(--cell-dark); color: #fff; }
+    .card:nth-child(1) .card-title { color: var(--style-accent); }
+    .card:nth-child(1) .card-desc { color: #ccc; }
+    .card:nth-child(2) { background: var(--cell-teal); color: var(--cell-dark); }
+    .card:nth-child(3) { background: var(--cell-coral); color: #fff; }
+    .card:nth-child(3) .card-desc { color: rgba(255,255,255,0.85); }
+    .card:nth-child(4) { background: var(--cell-yellow); color: var(--cell-dark); }
+    .card-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.15rem; }
+    .card-desc { font-size: 0.88rem; }
+
+    /* Process Steps - Bento */
+    .process-steps { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .process-steps li { border-radius: 0.7rem; padding: 0.6rem 0.8rem; font-size: 0.95rem; font-weight: 500; }
+    .process-steps li:nth-child(1) { background: var(--cell-dark); color: #fff; }
+    .process-steps li:nth-child(2) { background: var(--cell-teal); color: var(--cell-dark); }
+    .process-steps li:nth-child(3) { background: var(--cell-yellow); color: var(--cell-dark); }
+    .process-steps li:nth-child(4) { background: var(--cell-coral); color: #fff; }
+    .step-num { font-size: 1.5rem; font-weight: 800; display: block; margin-bottom: 0.1rem; opacity: 0.6; }
+
+    /* End Slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 55vh; }
+    .end-title { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .end-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-top: 0.8rem; }
+    .end-summary { text-align: left; max-width: 500px; margin-top: 1rem; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 0.25rem 0; font-size: 0.95rem; }
+
+    /* Animations */
+    @keyframes popUp { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .key-points li { animation: popUp 0.4s ease-out both; }
+    .slide.active .key-points li:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .key-points li:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .key-points li:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .timeline-item { animation: popUp 0.4s ease-out both; }
+    .slide.active .timeline-item:nth-child(2) { animation-delay: 0.1s; }
+    .slide.active .timeline-item:nth-child(3) { animation-delay: 0.2s; }
+    .slide.active .timeline-item:nth-child(4) { animation-delay: 0.3s; }
+    .slide.active .process-steps li { animation: popUp 0.4s ease-out both; }
+    .slide.active .process-steps li:nth-child(2) { animation-delay: 0.1s; }
+    .slide.active .process-steps li:nth-child(3) { animation-delay: 0.2s; }
+    .slide.active .process-steps li:nth-child(4) { animation-delay: 0.3s; }
+
+    /* Nav Bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.35rem 1.5rem; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--gray-200); z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--gray-200); border-radius: 50%; background: var(--white);
+      cursor: pointer; font-size: 0; color: var(--gray-700); transition: all 0.2s; padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: var(--style-primary); }
+    .nav-btn:hover:not(:disabled) svg { fill: #fff; }
+    .nav-btn:focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter { font-size: 13px; font-weight: 700; color: var(--gray-600); min-width: 3rem; text-align: center; display: flex; align-items: center; gap: 0.15rem; line-height: 1; }
+    .slide-input { width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent; background: transparent; font-size: 13px; font-weight: 700; color: inherit; font-family: inherit; padding: 0; outline: none; cursor: pointer; transition: border-color 0.2s; line-height: 1; }
+    .slide-input:hover { border-bottom-color: var(--main); }
+    .slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px; }
+
+    /* Responsive */
+    @media (max-width: 1024px) { html, body { font-size: clamp(15px, 2vw, 22px); } .slide { padding: 1.5rem; } .browser-card { border-radius: 0.8rem; } }
+    @media (max-width: 768px) { html, body { font-size: clamp(14px, 3vw, 20px); } .card-grid, .two-col, .key-points, .timeline, .process-steps { grid-template-columns: 1fr; } .key-points li:nth-child(1), .key-points li:nth-child(4) { grid-column: span 1; } h1 { font-size: 2rem; } h2 { font-size: 1.3rem; } }
+    @media (max-width: 480px) { html, body { font-size: clamp(14px, 3.5vw, 18px); } .nav-btn { width: 1.5rem; height: 1.5rem; } .nav-bar { padding: 0.25rem 0.75rem; } h1 { font-size: 1.7rem; } h2 { font-size: 1.2rem; } .browser-content { padding: 0.8rem; } }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="12" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 인공지능의 이해와 교육적 활용">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI IN EDUCATION</span>
+        </div>
+        <div class="browser-content cover-slide" style="overflow:hidden;">
+          <div class="cover-bg">
+            <img src="../cycle4-images/img-3-1-ai-cover.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="image-placeholder"><span class="placeholder-icon">🤖</span></div>
+          </div>
+          <div class="cover-content">
+            <div class="badge main-badge">교사 연수 워크숍</div>
+            <h1 class="cover-title">인공지능의 이해와<br>교육적 활용</h1>
+            <p class="cover-subtitle">AI 시대, 교실의 변화를 이끄는 교사</p>
+            <div class="cover-divider" aria-hidden="true"></div>
+            <div class="cover-meta">
+              <span>교원 직무연수</span>
+              <span aria-hidden="true">&middot;</span>
+              <span><time datetime="2026-03">2026년 3월</time></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 연수 목표 및 일정 (key-points) -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 연수 목표 및 일정">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">목표</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🎯</span> 연수 목표 및 일정</h2>
+          </div>
+          <ul class="key-points" role="list">
+            <li role="listitem">AI의 기본 개념과 작동 원리를 이해하고 교육적 맥락에서 설명할 수 있다</li>
+            <li role="listitem">생성형 AI 도구를 수업에 활용하는 방법을 실습한다</li>
+            <li role="listitem">AI 윤리와 저작권 이슈를 파악한다</li>
+            <li role="listitem">AI 기반 수업 자료를 직접 제작하여 현장에 적용할 수 있다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: AI란 무엇인가? (definition-card) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: AI란 무엇인가?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">정의</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🧠</span> AI란 무엇인가?</h2>
+          </div>
+          <div class="definition-card">
+            <p class="definition-term">Artificial Intelligence</p>
+            <p class="definition-text">인간의 학습, 추론, 인지, 판단 능력을 컴퓨터 시스템으로 구현한 기술. 데이터에서 패턴을 학습하고, 이를 바탕으로 예측과 의사결정을 수행합니다.</p>
+          </div>
+          <div class="highlight-box" role="note">
+            AI는 약한 AI(특정 작업 수행)와 강한 AI(범용 지능)로 구분됩니다. 현재 우리가 사용하는 모든 AI는 약한 AI에 해당합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: AI의 발전 역사 (timeline) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: AI의 발전 역사">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">역사</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📅</span> AI의 발전 역사</h2>
+          </div>
+          <div class="timeline" role="list" aria-label="AI 발전 타임라인">
+            <div class="timeline-item" role="listitem">
+              <span class="timeline-date"><time datetime="1956">1956</time></span>
+              <h3 class="timeline-title">AI 탄생</h3>
+              <p class="timeline-desc">다트머스 회의에서 'AI' 용어 최초 사용</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <span class="timeline-date"><time datetime="1997">1997</time></span>
+              <h3 class="timeline-title">딥 블루</h3>
+              <p class="timeline-desc">IBM 딥 블루가 체스 세계 챔피언을 이김</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <span class="timeline-date"><time datetime="2016">2016</time></span>
+              <h3 class="timeline-title">알파고</h3>
+              <p class="timeline-desc">구글 딥마인드의 바둑 AI가 이세돌 9단에 승리</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <span class="timeline-date"><time datetime="2022">2022~</time></span>
+              <h3 class="timeline-title">생성형 AI</h3>
+              <p class="timeline-desc">ChatGPT, Claude 등 대화형 AI 대중화</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 머신러닝과 딥러닝의 차이 (comparison) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 머신러닝과 딥러닝의 차이">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">비교</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⚖</span> 머신러닝과 딥러닝의 차이</h2>
+          </div>
+          <div class="table-wrapper" role="region" aria-label="머신러닝 딥러닝 비교 표" tabindex="0">
+            <table class="comparison-table">
+              <caption class="sr-only">머신러닝과 딥러닝 비교</caption>
+              <thead>
+                <tr>
+                  <th scope="col">구분</th>
+                  <th scope="col">머신러닝 (ML)</th>
+                  <th scope="col">딥러닝 (DL)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">데이터량</th>
+                  <td>소~중규모 데이터로도 학습 가능</td>
+                  <td>대규모 데이터 필수</td>
+                </tr>
+                <tr>
+                  <th scope="row">특성 추출</th>
+                  <td>사람이 직접 특성을 설계</td>
+                  <td>스스로 특성을 학습</td>
+                </tr>
+                <tr>
+                  <th scope="row">구조</th>
+                  <td>결정트리, SVM, 회귀분석 등</td>
+                  <td>인공신경망(CNN, RNN, Transformer)</td>
+                </tr>
+                <tr>
+                  <th scope="row">활용</th>
+                  <td>스팸 필터, 추천 시스템</td>
+                  <td>이미지 인식, 자연어 처리, 생성 AI</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 생성형 AI (two-column) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 생성형 AI">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">생성형 AI</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">💬</span> 생성형 AI: ChatGPT와 Claude</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <img src="../cycle4-images/img-3-6-generative-ai.png" alt="AI, 머신러닝, 딥러닝의 관계를 보여주는 다이어그램" class="col-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder"><span class="placeholder-icon">🤖</span><span class="placeholder-text">AI 다이어그램</span></div>
+            </div>
+            <div class="col-right">
+              <h3>교육에서의 활용</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">학생 맞춤형 학습 자료 생성</li>
+                <li role="listitem">수업 지도안 및 평가 문항 작성 보조</li>
+                <li role="listitem">학생 질문에 대한 즉각적 피드백 제공</li>
+                <li role="listitem">다국어 학습 자료 번역 및 변환</li>
+                <li role="listitem">창의적 글쓰기 및 토론 주제 생성</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 교실에서의 AI 활용 사례 (grid-cards) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 교실에서의 AI 활용 사례">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">활용 사례</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🏫</span> 교실에서의 AI 활용 사례</h2>
+          </div>
+          <div class="card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">📝</span>
+              <h3 class="card-title">수업 자료 생성</h3>
+              <p class="card-desc">AI로 학년별 맞춤 학습지, 퀴즈, 시험 문항을 빠르게 제작</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🎨</span>
+              <h3 class="card-title">창의 수업</h3>
+              <p class="card-desc">AI 이미지 생성, 음악 작곡 등을 활용한 융합 예술 수업</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">📊</span>
+              <h3 class="card-title">학습 분석</h3>
+              <p class="card-desc">학생별 학습 패턴 분석 및 개별화 학습 경로 설계</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🌐</span>
+              <h3 class="card-title">언어 학습</h3>
+              <p class="card-desc">AI 대화 파트너를 활용한 외국어 회화 연습</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: AI 활용 수업 설계 방법 (process-steps) -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: AI 활용 수업 설계 방법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">수업 설계</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📐</span> AI 활용 수업 설계 방법</h2>
+            <p class="section-subtitle">4단계 수업 설계 프레임워크</p>
+          </div>
+          <ol class="process-steps" role="list">
+            <li role="listitem">
+              <span class="step-num">01</span>
+              <strong>목표 설정</strong><br>교육과정 성취기준과 AI 활용 목적을 명확히 연결
+            </li>
+            <li role="listitem">
+              <span class="step-num">02</span>
+              <strong>도구 선택</strong><br>수업 목표에 적합한 AI 도구를 선정하고 사전 테스트
+            </li>
+            <li role="listitem">
+              <span class="step-num">03</span>
+              <strong>활동 설계</strong><br>AI는 보조 도구로, 학생의 사고력이 중심이 되도록 구성
+            </li>
+            <li role="listitem">
+              <span class="step-num">04</span>
+              <strong>성찰/평가</strong><br>AI 결과물에 대한 비판적 검토와 학습 성찰 포함
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: AI 윤리와 저작권 (key-points) -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: AI 윤리와 저작권">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">윤리</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⚖</span> AI 윤리와 저작권</h2>
+          </div>
+          <ul class="key-points" role="list">
+            <li role="listitem">AI 생성물의 저작권은 아직 법적으로 명확하지 않으며, 교육 현장에서 주의가 필요합니다</li>
+            <li role="listitem">학생 개인정보를 AI 서비스에 입력하지 않도록 지도해야 합니다</li>
+            <li role="listitem">AI의 편향성(Bias)을 인식하고 비판적으로 결과를 검토하는 습관이 중요합니다</li>
+            <li role="listitem">AI는 도구일 뿐, 최종 판단과 책임은 교사와 학습자에게 있음을 강조합니다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: 주요 AI 도구 비교 (comparison) -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 주요 AI 도구 비교">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">도구 비교</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🔧</span> 주요 AI 도구 비교</h2>
+          </div>
+          <div class="table-wrapper" role="region" aria-label="AI 도구 비교 표" tabindex="0">
+            <table class="comparison-table">
+              <caption class="sr-only">교육용 AI 도구 비교</caption>
+              <thead>
+                <tr>
+                  <th scope="col">도구</th>
+                  <th scope="col">강점</th>
+                  <th scope="col">교육 활용</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">ChatGPT</th>
+                  <td>범용 대화, 코드 생성</td>
+                  <td>글쓰기 보조, 토론 상대</td>
+                </tr>
+                <tr>
+                  <th scope="row">Claude</th>
+                  <td>긴 문서 분석, 안전성</td>
+                  <td>자료 요약, 수업 설계</td>
+                </tr>
+                <tr>
+                  <th scope="row">Gemini</th>
+                  <td>멀티모달, 검색 연동</td>
+                  <td>이미지 분석, 연구 보조</td>
+                </tr>
+                <tr>
+                  <th scope="row">Canva AI</th>
+                  <td>디자인 자동화</td>
+                  <td>프레젠테이션, 포스터 제작</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: 실습 (two-column) -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 실습 AI로 수업 자료 만들기">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">실습</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">💻</span> 실습: AI로 수업 자료 만들기</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <img src="../cycle4-images/img-3-11-teacher-workshop.jpg" alt="교사가 노트북으로 AI 도구를 활용하는 워크숍 장면" class="col-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder"><span class="placeholder-icon">💻</span><span class="placeholder-text">워크숍 실습</span></div>
+            </div>
+            <div class="col-right">
+              <h3>실습 과제</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">담당 과목의 단원 1개를 선택합니다</li>
+                <li role="listitem">AI 도구로 학습 활동지를 생성합니다</li>
+                <li role="listitem">생성 결과를 검토하고 수정합니다</li>
+                <li role="listitem">동료 교사와 결과물을 공유하고 피드백합니다</li>
+              </ul>
+              <div class="highlight-box" role="note" style="margin-top:0.5rem;">
+                실습 시간: 30분 | 개인 또는 2인 1조
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 12: Q&A 및 마무리 (closing) -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: Q&A 및 마무리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">마무리</span>
+        </div>
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <span style="font-size:2.5rem;" aria-hidden="true">🎓</span>
+            <h1 class="end-title">Q&A 및 마무리</h1>
+            <p class="end-subtitle">AI는 교사를 대체하는 것이 아니라, 교사의 전문성을 확장하는 도구입니다</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="핵심 요약">
+            <h2 style="font-size:1.1rem; margin-bottom:0.3rem;">오늘의 핵심</h2>
+            <ul class="summary-list" role="list">
+              <li role="listitem">AI의 기본 원리를 이해하고 교육적 활용 방안을 탐색했습니다</li>
+              <li role="listitem">윤리적 사용과 비판적 검토의 중요성을 확인했습니다</li>
+              <li role="listitem">실습을 통해 AI 도구 활용 역량을 키웠습니다</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력 (Enter로 이동)" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">12</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '\uC2AC\uB77C\uC774\uB4DC ' + (current + 1) + ' / ' + total;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      const current = slides[currentSlide];
+      const next = slides[index];
+      current.classList.add('will-animate');
+      next.classList.add('will-animate');
+      current.classList.remove('active');
+      currentSlide = index;
+      next.classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      setTimeout(() => { current.classList.remove('will-animate'); next.classList.remove('will-animate'); }, 400);
+      const content = next.querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { if (diff < 0) nextSlide(); else prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); else slideInput.value = currentSlide + 1; });
+
+    updateNav();
+  </script>
+</body>
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로그래밍 4차시 - HTML 태그의 활용</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --main: #2196f3;
+  --dark: #1565c0;
+  --light: #e3f2fd;
+  --accent: #42a5f5;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --red-dot: #ff5f57;
+  --yellow-dot: #ffbd2e;
+  --green-dot: #28c840;
+  --blue-accent: #2196f3;
+  --orange-accent: #ff9800;
+  --purple-accent: #9c27b0;
+  --green-accent: #43b867;
+  --red-accent: #e53935;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--main);
+  overflow: hidden;
+  color: var(--gray-900);
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+
+.presentation { width: 100%; height: 100%; position: relative; }
+
+.slide {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2.2vh 3vw;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+.browser-card {
+  background: var(--white);
+  border-radius: 1rem;
+  width: 100%; max-width: 1600px;
+  height: 100%; max-height: calc(100vh - 4.4vh);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.browser-topbar {
+  background: var(--gray-100);
+  padding: 0.6rem 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
+.dot.red { background: var(--red-dot); }
+.dot.yellow { background: var(--yellow-dot); }
+.dot.green { background: var(--green-dot); }
+
+.browser-topbar .title {
+  flex: 1; text-align: center;
+  font-size: 0.8rem; color: var(--gray-600);
+  font-weight: 500; margin-right: 2.5rem;
+}
+
+.browser-content {
+  padding: 2.5rem 3.5rem;
+  overflow-y: auto; flex: 1;
+}
+
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; margin-bottom: 0.5rem; }
+h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 1rem; color: var(--dark); }
+h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.6rem; }
+p  { font-size: 1.05rem; line-height: 1.7; color: var(--gray-800); }
+
+.subtitle { font-size: 1.2rem; color: var(--gray-600); font-weight: 400; margin-bottom: 0.3rem; }
+
+.badge {
+  display: inline-block; padding: 0.25rem 0.75rem;
+  border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+  margin-right: 0.4rem; margin-bottom: 0.4rem;
+}
+.badge.blue { background: var(--light); color: var(--dark); }
+.badge.green { background: #e8f5e9; color: #2d8a49; }
+.badge.orange { background: #fff3e0; color: #e65100; }
+.badge.purple { background: #f3e5f5; color: #7b1fa2; }
+.badge.red { background: #fce4ec; color: #c62828; }
+
+.info-box {
+  background: var(--light);
+  border-left: 4px solid var(--accent);
+  padding: 1rem 1.3rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 1rem 0; font-size: 1rem; line-height: 1.6;
+}
+.info-box.green { background: #e8f5e9; border-left-color: var(--green-accent); }
+.info-box.orange { background: #fff3e0; border-left-color: var(--orange-accent); }
+.info-box.purple { background: #f3e5f5; border-left-color: var(--purple-accent); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+
+.card-item {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.7rem; padding: 1.2rem;
+}
+.card-item .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.card-item h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; }
+.card-item p { font-size: 0.95rem; color: var(--gray-600); line-height: 1.5; }
+
+.section-divider { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.3rem; }
+.section-divider .section-icon {
+  width: 2.8rem; height: 2.8rem; border-radius: 0.6rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; background: var(--light);
+}
+.section-divider .section-text h2 { margin-bottom: 0; }
+.section-divider .section-text .section-sub { font-size: 0.9rem; color: var(--gray-600); font-weight: 400; }
+
+.cover-content { text-align: center; padding: 2rem 1.5rem; }
+.cover-content h1 { font-size: 2.8rem; margin-bottom: 0.8rem; color: var(--dark); }
+.cover-content .year-badge {
+  display: inline-block; background: var(--dark); color: var(--white);
+  padding: 0.4rem 1.5rem; border-radius: 1.5rem;
+  font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem;
+}
+
+.highlight-box {
+  background: linear-gradient(135deg, var(--light), #bbdefb);
+  border-radius: 0.8rem; padding: 1.5rem; margin: 1rem 0; text-align: center;
+}
+.highlight-box .big-text { font-size: 1.5rem; font-weight: 800; color: var(--dark); margin-bottom: 0.3rem; }
+.highlight-box .small-text { font-size: 0.95rem; color: var(--gray-600); }
+
+.code-block {
+  background: #1e1e1e; color: #d4d4d4;
+  border-radius: 0.6rem; padding: 1rem 1.3rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.95rem; line-height: 1.7;
+  overflow-x: auto; margin: 0.8rem 0;
+  white-space: pre-wrap;
+}
+.code-block .tag { color: #569cd6; }
+.code-block .attr { color: #9cdcfe; }
+.code-block .value { color: #ce9178; }
+.code-block .comment { color: #6a9955; }
+
+.toc-list { list-style: none; padding: 0; margin: 1rem 0; }
+.toc-item {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.8rem 1rem; border-radius: 0.6rem;
+  cursor: pointer; transition: all 0.2s;
+  margin-bottom: 0.4rem;
+}
+.toc-item:hover { background: var(--light); transform: translateX(5px); }
+.toc-num {
+  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+}
+.toc-text h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.1rem; }
+.toc-text p { font-size: 0.85rem; color: var(--gray-600); margin: 0; }
+
+.tag-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  border-radius: 0.6rem; overflow: hidden; margin: 0.8rem 0;
+}
+.tag-table th {
+  background: var(--dark); color: var(--white);
+  padding: 0.7rem 1rem; text-align: left;
+  font-size: 0.95rem; font-weight: 600;
+}
+.tag-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: 0.95rem; line-height: 1.5;
+}
+.tag-table tr:nth-child(even) td { background: var(--gray-50); }
+.tag-table code {
+  font-family: 'Consolas', monospace;
+  background: #f0f4f8; padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem; font-size: 0.9rem;
+  color: var(--dark); font-weight: 600;
+}
+
+.compare-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0;
+}
+.compare-card {
+  border-radius: 0.8rem; padding: 1.5rem;
+  border: 2px solid var(--gray-200);
+}
+.compare-card h3 { margin-bottom: 0.8rem; }
+.compare-card ul { list-style: none; padding: 0; }
+.compare-card ul li {
+  padding: 0.4rem 0; font-size: 0.95rem;
+  color: var(--gray-800); line-height: 1.6;
+  padding-left: 1.5rem; position: relative;
+}
+.compare-card ul li::before {
+  content: '●'; position: absolute; left: 0;
+  color: var(--accent); font-size: 0.6rem; top: 0.55rem;
+}
+.compare-card.block { border-color: #1565c0; background: #f5f9ff; }
+.compare-card.block h3 { color: #1565c0; }
+.compare-card.inline { border-color: #e65100; background: #fff9f5; }
+.compare-card.inline h3 { color: #e65100; }
+
+.goal-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0;
+}
+.goal-card {
+  background: var(--white); border: 2px solid var(--gray-200);
+  border-radius: 0.8rem; padding: 1.5rem; text-align: center;
+  transition: all 0.2s;
+}
+.goal-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.goal-card .goal-flag { font-size: 2rem; margin-bottom: 0.5rem; }
+.goal-card h4 { font-size: 1.05rem; font-weight: 600; color: var(--dark); line-height: 1.4; }
+
+.attr-visual {
+  font-family: 'Consolas', monospace;
+  font-size: 1.15rem; line-height: 2;
+  background: #f8f9fa; padding: 1.2rem 1.5rem;
+  border-radius: 0.6rem; border: 1px solid var(--gray-200);
+  margin: 0.8rem 0;
+}
+.attr-visual .tag-name { color: #569cd6; font-weight: 700; }
+.attr-visual .attr-name { color: #9cdcfe; }
+.attr-visual .attr-val { color: #ce9178; }
+.attr-visual .bracket { color: var(--gray-600); }
+
+.link-btn {
+  display: inline-block; padding: 0.6rem 1.5rem;
+  background: var(--dark); color: var(--white);
+  border-radius: 0.5rem; text-decoration: none;
+  font-weight: 600; font-size: 0.95rem;
+  transition: all 0.2s; margin-top: 0.5rem;
+}
+.link-btn:hover { background: var(--accent); transform: translateY(-2px); }
+
+.code-result-split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;
+}
+.split-label {
+  font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 0.4rem;
+  padding: 0.2rem 0.6rem; border-radius: 0.3rem; display: inline-block;
+}
+.split-label.code-label { background: #1e1e1e; color: #d4d4d4; }
+.split-label.result-label { background: var(--green-accent); color: var(--white); }
+.result-preview {
+  background: var(--white); border: 2px solid var(--gray-200);
+  border-radius: 0.6rem; padding: 1.2rem;
+  min-height: 100px;
+}
+
+.task-box {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 1.2rem; margin-bottom: 0.6rem;
+  border-radius: 0.6rem; border-left: 4px solid var(--accent);
+  background: var(--gray-50);
+}
+.task-num {
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+}
+.task-text h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.2rem; }
+.task-text p { font-size: 0.9rem; color: var(--gray-600); margin: 0; }
+
+/* Block vs Inline demo */
+.demo-block {
+  background: #bbdefb; border: 2px solid #1565c0;
+  padding: 0.5rem 1rem; margin: 0.3rem 0;
+  border-radius: 0.3rem; font-family: 'Consolas', monospace;
+  font-size: 0.85rem; color: #0d47a1; font-weight: 600;
+  text-align: center;
+}
+.demo-inline {
+  background: #ffe0b2; border: 2px solid #e65100;
+  padding: 0.2rem 0.6rem; margin: 0 0.2rem;
+  border-radius: 0.3rem; font-family: 'Consolas', monospace;
+  font-size: 0.85rem; color: #bf360c; font-weight: 600;
+  display: inline;
+}
+
+/* CSS preview for class/id */
+.css-preview {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;
+}
+.css-before, .css-after {
+  border-radius: 0.6rem; padding: 1.2rem; border: 2px solid var(--gray-200);
+}
+.css-before { background: #fafafa; }
+.css-after { background: #f5f9ff; border-color: var(--accent); }
+.css-before-label, .css-after-label {
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 0.6rem;
+  padding: 0.15rem 0.5rem; border-radius: 0.3rem; display: inline-block;
+}
+.css-before-label { background: var(--gray-200); color: var(--gray-700); }
+.css-after-label { background: var(--accent); color: var(--white); }
+
+/* Practice preview */
+.practice-preview {
+  background: var(--white); border: 2px solid var(--green-accent);
+  border-radius: 0.8rem; padding: 1.5rem; position: relative;
+}
+.practice-preview::before {
+  content: '완성 미리보기'; position: absolute; top: -0.6rem; left: 1rem;
+  background: var(--green-accent); color: var(--white);
+  padding: 0.1rem 0.6rem; border-radius: 0.3rem;
+  font-size: 0.75rem; font-weight: 700;
+}
+
+/* Toggle hint */
+.hint-toggle {
+  background: none; border: 1px dashed var(--accent);
+  border-radius: 0.4rem; padding: 0.4rem 0.8rem;
+  font-size: 0.85rem; color: var(--accent); cursor: pointer;
+  font-weight: 600; font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s; margin-top: 0.3rem;
+}
+.hint-toggle:hover { background: var(--light); }
+.hint-content {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+}
+.hint-content.open { max-height: 300px; }
+
+/* Code editor template */
+.editor-template {
+  background: #1e1e1e; border-radius: 0.8rem; overflow: hidden;
+  font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem;
+}
+.editor-topbar {
+  background: #2d2d2d; padding: 0.4rem 0.8rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid #3a3a3a;
+}
+.editor-topbar .tab {
+  background: #1e1e1e; color: #ccc; padding: 0.25rem 0.8rem;
+  border-radius: 0.3rem 0.3rem 0 0; font-size: 0.75rem; font-weight: 600;
+}
+.editor-body {
+  padding: 1rem 0.5rem; color: #d4d4d4; line-height: 1.8;
+  display: flex; min-height: 200px;
+}
+.editor-lines {
+  color: #858585; text-align: right; padding-right: 0.8rem;
+  border-right: 1px solid #3a3a3a; margin-right: 0.8rem;
+  user-select: none; min-width: 2rem; font-size: 0.85rem;
+}
+.editor-code { flex: 1; }
+.editor-code .tag { color: #569cd6; }
+.editor-code .attr { color: #9cdcfe; }
+.editor-code .value { color: #ce9178; }
+.editor-code .comment { color: #6a9955; }
+.editor-code .text { color: #d4d4d4; }
+
+/* Challenge box */
+.challenge-box {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 2px solid #ffb74d; border-radius: 0.6rem;
+  padding: 0.8rem 1rem; margin-top: 0.8rem;
+}
+.challenge-box h4 { color: #e65100; font-size: 0.9rem; margin-bottom: 0.3rem; }
+.challenge-box p { font-size: 0.85rem; color: #bf360c; margin: 0; }
+
+/* Step card */
+.step-card {
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: 0.5rem; padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem; transition: all 0.2s;
+}
+.step-card:hover { border-color: var(--accent); background: #f8fbff; }
+.step-card .step-header {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.step-card .step-num {
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.7rem; flex-shrink: 0;
+}
+.step-card .step-title { font-weight: 600; font-size: 0.9rem; }
+.step-card .step-desc { font-size: 0.8rem; color: var(--gray-600); margin: 0.2rem 0 0 2rem; }
+.step-card .step-code {
+  margin: 0.3rem 0 0 2rem; font-family: Consolas, monospace;
+  font-size: 0.8rem; background: #f0f4f8; padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem; color: var(--dark); display: inline-block;
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), #64b5f6);
+  z-index: 1000; transition: width 0.3s ease;
+}
+
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 0.5rem; padding: 0.35rem 1.5rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--gray-200); z-index: 999;
+  font-size: 14px;
+}
+.nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 1.8rem; height: 1.8rem;
+  border: 1.5px solid var(--gray-200); border-radius: 50%;
+  background: var(--white); cursor: pointer;
+  font-size: 0; color: var(--gray-700); transition: all 0.2s;
+  padding: 0; line-height: 1;
+}
+.nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+.nav-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main); }
+.nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.nav-counter {
+  font-size: 13px; font-weight: 700; color: var(--gray-600);
+  min-width: 3rem; text-align: center;
+  display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+}
+.slide-input {
+  width: 1.4rem; text-align: center; border: none;
+  border-bottom: 1.5px solid transparent;
+  background: transparent; font-size: 13px; font-weight: 700;
+  color: inherit; font-family: inherit; padding: 0; outline: none;
+  cursor: pointer; transition: border-color 0.2s; line-height: 1;
+}
+.slide-input:hover { border-bottom-color: var(--main); }
+.slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px; }
+
+@media (max-width: 1024px) {
+  html, body { font-size: clamp(13px, 1.8vw, 18px); }
+  .browser-content { padding: 1.8rem 2rem; }
+}
+@media (max-width: 768px) {
+  html, body { font-size: clamp(13px, 2.8vw, 17px); }
+  .grid-2, .grid-3, .compare-grid, .goal-grid, .code-result-split, .css-preview { grid-template-columns: 1fr; }
+  .browser-content { padding: 1.2rem 1.3rem; }
+  .cover-content h1 { font-size: 2rem; }
+}
+@media (max-width: 480px) {
+  html, body { font-size: clamp(13px, 3.5vw, 16px); }
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="presentation" id="presentation">
+
+<!-- Slide 1: Cover -->
+<div class="slide active" data-slide="0">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">프로그래밍 4차시</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div class="cover-content">
+        <div class="year-badge">#4</div>
+        <h1>HTML 태그의 활용</h1>
+        <p class="subtitle" style="font-size:1.3rem; margin-top:1rem;">속성, 이미지, 링크, 구조화</p>
+        <div style="margin-top:2rem;">
+          <span class="badge blue">HTML</span>
+          <span class="badge purple">속성</span>
+          <span class="badge orange">이미지·링크</span>
+          <span class="badge green">실습</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 2: 오늘의 목표 -->
+<div class="slide" data-slide="1">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">오늘의 목표</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div style="width:100%;max-width:900px;">
+        <div class="section-divider">
+          <div class="section-icon">🎯</div>
+          <div class="section-text">
+            <h2>오늘의 목표</h2>
+            <span class="section-sub">이 수업이 끝나면 할 수 있는 것들</span>
+          </div>
+        </div>
+        <div class="goal-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="goal-card">
+            <div class="goal-flag">🚩</div>
+            <h4>태그의 속성을<br>이해하고 활용하기</h4>
+          </div>
+          <div class="goal-card">
+            <div class="goal-flag">🚩</div>
+            <h4>이미지·링크·div로<br>페이지 구조화하기</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 3: 목차 -->
+<div class="slide" data-slide="2">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">목차</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">📋</div>
+        <div class="section-text">
+          <h2>학습 순서</h2>
+          <span class="section-sub">오늘 배울 내용을 살펴봅시다</span>
+        </div>
+      </div>
+      <ul class="toc-list">
+        <li class="toc-item" onclick="goToSlide(3)">
+          <div class="toc-num">1</div>
+          <div class="toc-text"><h4>태그의 속성</h4><p>속성의 개념과 사용법</p></div>
+        </li>
+        <li class="toc-item" onclick="goToSlide(4)">
+          <div class="toc-num">2</div>
+          <div class="toc-text"><h4>이미지, 링크, div 태그</h4><p>멀티미디어와 구조화 태그</p></div>
+        </li>
+        <li class="toc-item" onclick="goToSlide(7)">
+          <div class="toc-num">3</div>
+          <div class="toc-text"><h4>실습: 프로필 페이지 확장</h4><p>이미지, 링크, div 추가하기</p></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: 태그의 속성 -->
+<div class="slide" data-slide="3">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그의 속성</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge orange">태그의 속성</span>
+      </div>
+      <h2>태그의 속성 (Attribute)</h2>
+      <p style="margin-bottom:1.5rem;">태그에 따라, 부가적인 정보 혹은 설정이 필요한 경우 태그를 작성할 때 <strong>속성을 추가</strong>하여 사용할 수 있습니다.</p>
+      <div class="attr-visual" style="text-align:center;font-size:1.3rem;">
+        <span class="bracket">&lt;</span><span class="tag-name">태그명</span> <span class="attr-name">속성명</span>=<span class="attr-val">"값"</span> <span class="attr-name">속성명</span>=<span class="attr-val">"값"</span><span class="bracket">&gt;</span><br>
+        내용<br>
+        <span class="bracket">&lt;/</span><span class="tag-name">태그명</span><span class="bracket">&gt;</span>
+      </div>
+      <div class="code-result-split" style="margin-top:1.5rem;">
+        <div>
+          <div class="split-label code-label">코드</div>
+          <div class="code-block" style="margin-top:0;font-size:1.05rem;">
+<span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="value">"test.jpg"</span> <span class="attr">alt</span>=<span class="value">"테스트"</span><span class="tag">&gt;</span>
+          </div>
+        </div>
+        <div>
+          <div class="split-label result-label">의미</div>
+          <div class="result-preview" style="margin-top:0;">
+            <p style="margin:0;"><strong>src</strong> → 이미지 파일 경로<br><strong>alt</strong> → 대체 텍스트</p>
+          </div>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:0.8rem;">
+        이미지 태그의 경우, 이미지 파일의 경로(<code style="font-family:Consolas,monospace;background:#f0f4f8;padding:0.1rem 0.3rem;border-radius:0.2rem;">src</code>), 대체 텍스트(<code style="font-family:Consolas,monospace;background:#f0f4f8;padding:0.1rem 0.3rem;border-radius:0.2rem;">alt</code>), 크기(<code style="font-family:Consolas,monospace;background:#f0f4f8;padding:0.1rem 0.3rem;border-radius:0.2rem;">width</code>) 등의 설정을 할 수 있습니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5: 이미지 태그 -->
+<div class="slide" data-slide="4">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그의 종류</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge purple">태그의 종류</span><span class="badge orange">이미지</span>
+      </div>
+      <h2>&lt;img&gt; 이미지 태그</h2>
+      <p style="margin-bottom:0.5rem;">이미지 삽입을 위한 태그 — <strong>종료 태그가 없음!</strong></p>
+      <table class="tag-table" style="margin-top:0.5rem;">
+        <thead><tr><th style="width:15%;">속성</th><th style="width:22%;">이름</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td><code>src</code></td><td>Source</td><td>이미지 파일 경로 또는 URL</td></tr>
+          <tr><td><code>alt</code></td><td>Alternative</td><td>이미지 표시가 안될 때 대체할 텍스트</td></tr>
+          <tr><td><code>width</code></td><td>가로 길이</td><td>px 단위 혹은 % 지정</td></tr>
+          <tr><td><code>height</code></td><td>세로 길이</td><td>px 단위 혹은 % 지정</td></tr>
+        </tbody>
+      </table>
+      <div class="code-result-split" style="margin-top:0.8rem;">
+        <div>
+          <div class="split-label code-label">코드</div>
+          <div class="code-block" style="margin-top:0;font-size:0.9rem;">
+<span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="value">"https://picsum.photos/200/150"</span>
+     <span class="attr">alt</span>=<span class="value">"랜덤 이미지"</span>
+     <span class="attr">width</span>=<span class="value">"200"</span><span class="tag">&gt;</span>
+          </div>
+        </div>
+        <div>
+          <div class="split-label result-label">결과</div>
+          <div class="result-preview" style="margin-top:0;text-align:center;">
+            <img src="https://picsum.photos/200/150" alt="랜덤 이미지" width="200" style="border-radius:0.4rem;border:1px solid var(--gray-200);">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 6: 링크 태그 -->
+<div class="slide" data-slide="5">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그의 종류</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge purple">태그의 종류</span><span class="badge green">링크</span>
+      </div>
+      <h2>&lt;a&gt; 링크 태그</h2>
+      <p style="margin-bottom:1rem;">다른 페이지나 웹사이트로 이동하는 <strong>링크</strong>를 생성합니다.</p>
+      <table class="tag-table">
+        <thead><tr><th style="width:15%;">속성</th><th style="width:28%;">이름</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td><code>href</code></td><td>Hypertext Reference</td><td>이동할 페이지 주소 (URL)</td></tr>
+          <tr><td><code>target</code></td><td>Target (대상)</td><td><code>"_blank"</code>로 넣으면 새 탭에서 열림</td></tr>
+        </tbody>
+      </table>
+      <div class="code-result-split" style="margin-top:1rem;">
+        <div>
+          <div class="split-label code-label">코드</div>
+          <div class="code-block" style="margin-top:0;font-size:0.95rem;">
+<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="value">"https://google.com"</span>
+   <span class="attr">target</span>=<span class="value">"_blank"</span><span class="tag">&gt;</span>
+  구글로 이동
+<span class="tag">&lt;/a&gt;</span>
+          </div>
+        </div>
+        <div>
+          <div class="split-label result-label">결과 (클릭해 보세요!)</div>
+          <div class="result-preview" style="margin-top:0;display:flex;align-items:center;justify-content:center;min-height:80px;">
+            <a href="https://google.com" target="_blank" style="color:var(--dark);text-decoration:underline;font-size:1.1rem;font-weight:600;">구글로 이동 ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:0.8rem;">
+        💡 <code style="font-family:Consolas,monospace;background:#f0f4f8;padding:0.1rem 0.3rem;border-radius:0.2rem;">target="_blank"</code>를 넣으면 새 탭에서 열리고, 빼면 같은 탭에서 이동합니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7: div 태그 -->
+<div class="slide" data-slide="6">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그의 종류</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge purple">태그의 종류</span><span class="badge orange">구조</span>
+      </div>
+      <h2>&lt;div&gt; 구조 구분 태그</h2>
+      <p style="margin-bottom:1rem;"><strong>Division</strong> — HTML의 구획을 구분하는 태그</p>
+      <div class="grid-2">
+        <div>
+          <div class="card-item" style="padding:1.2rem;">
+            <div class="icon">📦</div>
+            <h4>구획 나누기</h4>
+            <p>특별한 스타일은 없고, 순수하게 구획을 나누기 위해 사용</p>
+          </div>
+          <div class="card-item" style="padding:1.2rem;margin-top:0.6rem;">
+            <div class="icon">🔗</div>
+            <h4>요소 묶기</h4>
+            <p>큰 틀에서 구획을 나누거나, 여러 요소를 묶을 때 사용</p>
+          </div>
+        </div>
+        <div>
+          <div class="code-block" style="font-size:0.9rem;line-height:1.8;">
+<span class="tag">&lt;div&gt;</span>
+  <span class="tag">&lt;h1&gt;</span>프로필<span class="tag">&lt;/h1&gt;</span>
+  <span class="tag">&lt;p&gt;</span>안녕하세요!<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;div&gt;</span>
+  <span class="tag">&lt;h2&gt;</span>취미<span class="tag">&lt;/h2&gt;</span>
+  <span class="tag">&lt;ul&gt;</span>
+    <span class="tag">&lt;li&gt;</span>독서<span class="tag">&lt;/li&gt;</span>
+    <span class="tag">&lt;li&gt;</span>게임<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;/ul&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 8: 실습 -->
+<div class="slide" data-slide="7">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">실습</div>
+    </div>
+    <div class="browser-content" style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="section-divider">
+        <div class="section-icon">🔨</div>
+        <div class="section-text">
+          <h2>실습: 프로필 페이지 업그레이드!</h2>
+          <span class="section-sub">지난 시간에 만든 페이지에 이미지, 링크, 구조를 추가합시다</span>
+        </div>
+      </div>
+      <div class="compare-grid" style="margin-bottom:1rem;">
+        <div style="display:flex;flex-direction:column;gap:0.6rem;">
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">1</div><span class="step-title">&lt;div&gt;로 구획 나누기</span></div>
+            <div class="step-desc">소개, 특징, 링크 등 섹션별로 &lt;div&gt;로 감싸서 구분하기</div>
+          </div>
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">2</div><span class="step-title">&lt;img&gt;로 이미지 넣기</span></div>
+            <div class="step-code">&lt;img src="사진.jpg" alt="설명" width="200"&gt;</div>
+          </div>
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">3</div><span class="step-title">&lt;a&gt;로 링크 연결하기</span></div>
+            <div class="step-code">&lt;a href="주소" target="_blank"&gt;이름&lt;/a&gt;</div>
+          </div>
+          <div class="challenge-box">
+            <h4>🏆 도전 과제</h4>
+            <p>&lt;a&gt; 안에 &lt;img&gt;를 넣어 이미지를 클릭하면 다른 사이트로 이동하도록 만들어보세요!</p>
+          </div>
+        </div>
+        <div>
+          <div class="practice-preview">
+            <div style="margin-top:0.5rem;">
+              <div style="border-bottom:1px solid var(--gray-200);padding-bottom:0.5rem;margin-bottom:0.5rem;">
+                <h1 style="font-size:1.2rem;font-weight:800;">내가 좋아하는 게임</h1>
+                <div style="background:#e3f2fd;width:120px;height:80px;border-radius:0.4rem;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0.3rem 0;">🎮</div>
+                <p style="font-size:0.8rem;">저는 OOO 게임을 좋아합니다.</p>
+              </div>
+              <div style="border-bottom:1px solid var(--gray-200);padding-bottom:0.5rem;margin-bottom:0.5rem;">
+                <h2 style="font-size:1rem;font-weight:700;">게임 특징</h2>
+                <ul style="padding-left:1.2rem;font-size:0.8rem;"><li>오픈 월드</li><li>멀티플레이</li></ul>
+              </div>
+              <div>
+                <h2 style="font-size:1rem;font-weight:700;">관련 링크</h2>
+                <p style="font-size:0.8rem;"><a href="#" style="color:var(--dark);text-decoration:underline;">공식 홈페이지 ↗</a></p>
+                <p style="font-size:0.8rem;"><a href="#" style="color:var(--dark);text-decoration:underline;">게임 영상 보기 ↗</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:0.8rem;">
+        <a href="https://forms.gle/YOUR_FORM_ID" target="_blank" class="link-btn" style="font-size:0.95rem;">📝 코드 제출하기</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 9: 작성한 코드 -->
+<div class="slide" data-slide="8">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">작성한 코드</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">💻</div>
+        <div class="section-text">
+          <h2>작성한 코드 (예시)</h2>
+          <span class="section-sub">실습 결과물을 확인해 보세요</span>
+        </div>
+      </div>
+      <div class="editor-template">
+        <div class="editor-topbar">
+          <div class="tab">index.html</div>
+        </div>
+        <div class="editor-body">
+          <div class="editor-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25<br>26<br>27</div>
+          <div class="editor-code">
+<span class="tag">&lt;html&gt;</span><br>
+<span class="tag">&lt;head&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;title&gt;</span><span class="text">내가 좋아하는 게임</span><span class="tag">&lt;/title&gt;</span><br>
+<span class="tag">&lt;/head&gt;</span><br>
+<span class="tag">&lt;body&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span><span class="text">내가 좋아하는 게임</span><span class="tag">&lt;/h1&gt;</span><br>
+<br>
+&nbsp;&nbsp;<span class="tag">&lt;div&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;h2&gt;</span><span class="text">소개</span><span class="tag">&lt;/h2&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;img</span> <span class="attr">src</span>=<span class="value">"game.jpg"</span> <span class="attr">alt</span>=<span class="value">"게임 이미지"</span> <span class="attr">width</span>=<span class="value">"200"</span><span class="tag">&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span><span class="text">저는 OOO 게임을 좋아합니다.</span><span class="tag">&lt;/p&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
+<br>
+&nbsp;&nbsp;<span class="tag">&lt;div&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;h2&gt;</span><span class="text">게임 특징</span><span class="tag">&lt;/h2&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;ul&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span><span class="text">오픈 월드</span><span class="tag">&lt;/li&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span><span class="text">멀티플레이</span><span class="tag">&lt;/li&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;/ul&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
+<br>
+&nbsp;&nbsp;<span class="tag">&lt;div&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;h2&gt;</span><span class="text">관련 링크</span><span class="tag">&lt;/h2&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;a</span> <span class="attr">href</span>=<span class="value">"https://example.com"</span> <span class="attr">target</span>=<span class="value">"_blank"</span><span class="tag">&gt;</span><span class="text">공식 홈페이지</span><span class="tag">&lt;/a&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;/div&gt;</span><br>
+<span class="tag">&lt;/body&gt;</span><br>
+<span class="tag">&lt;/html&gt;</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:0.8rem;">
+        🔑 <strong>핵심 포인트:</strong> &lt;div&gt;로 <strong>소개 / 특징 / 링크</strong> 세 구획이 나뉘어져 있고, 각 구획 안에 적절한 태그들이 들어있습니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 10: 마무리 -->
+<div class="slide" data-slide="9">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">마무리</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div class="cover-content">
+        <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+        <h1 style="font-size:2.5rem;">수고하셨습니다!</h1>
+        <p class="subtitle" style="font-size:1.2rem;margin-top:1rem;margin-bottom:2rem;">오늘 배운 내용을 정리해 봅시다</p>
+        <div class="grid-2" style="max-width:500px;margin:0 auto;">
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">⚙️</div>
+            <h4>속성 = 설정</h4>
+          </div>
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">🖼️</div>
+            <h4>img, a, div</h4>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top:1.5rem;max-width:600px;margin-left:auto;margin-right:auto;">
+          <div class="big-text">다음 시간 예고</div>
+          <div class="small-text">CSS로 디자인 입히기</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전">
+    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+  </button>
+  <span class="nav-counter">
+    <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력"> / <span id="totalSlides">10</span>
+  </span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음">
+    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+  </button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+
+const slideInput = document.getElementById('slideInput');
+document.getElementById('totalSlides').textContent = totalSlides;
+
+function updateSlide() {
+  slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+  slideInput.value = currentSlide + 1;
+  document.getElementById('prevBtn').disabled = currentSlide === 0;
+  document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+  document.getElementById('progressBar').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+}
+
+function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+function goToSlide(index) { if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); } }
+
+// 슬라이드 번호 직접 입력
+slideInput.addEventListener('focus', function() { this.select(); });
+slideInput.addEventListener('keydown', function(e) {
+  e.stopPropagation();
+  if (e.key === 'Enter') { const n = parseInt(this.value) - 1; goToSlide(isNaN(n) ? currentSlide : Math.max(0, Math.min(n, totalSlides - 1))); this.blur(); }
+  if (e.key === 'Escape') { this.value = currentSlide + 1; this.blur(); }
+});
+slideInput.addEventListener('blur', function() {
+  const n = parseInt(this.value) - 1;
+  goToSlide(isNaN(n) ? currentSlide : Math.max(0, Math.min(n, totalSlides - 1)));
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+  if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', function(e) {
+  const diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+});
+
+// Hint toggle
+function toggleHint(btn) {
+  const content = btn.nextElementSibling;
+  content.classList.toggle('open');
+  btn.textContent = content.classList.contains('open') ? '🔽 힌트 접기' : '💡 힌트 보기';
+}
+
+updateSlide();
+</script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

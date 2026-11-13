@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>수업 자료 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f0f2f5;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --blue: #2196f3;
+  --blue-dark: #1565c0;
+  --blue-light: #e3f2fd;
+  --green: #3aaa5c;
+  --green-dark: #2d8a49;
+  --green-light: #e8f5e9;
+  --purple: #7c4dff;
+  --purple-light: #ede7f6;
+  --orange: #ff9800;
+  --orange-light: #fff3e0;
+}
+
+html, body {
+  width: 100%; min-height: 100vh;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  font-size: clamp(14px, 1.2vw, 18px);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem;
+}
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 0.4rem;
+}
+.header p {
+  font-size: 1.05rem;
+  color: var(--gray-600);
+}
+.header .badge-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.header .badge-row .stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.8rem;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+.header .badge-row .stat .num {
+  color: var(--blue-dark);
+}
+
+.subject-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin: 0 0 2rem;
+}
+
+.subject-tab {
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  color: var(--gray-800);
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subject-tab:hover {
+  border-color: var(--blue);
+  color: var(--blue-dark);
+  transform: translateY(-1px);
+}
+
+.subject-tab.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: var(--white);
+  box-shadow: 0 6px 18px rgba(33,150,243,0.18);
+}
+
+.subject-tab:focus-visible,
+.card:focus-visible {
+  outline: 3px solid rgba(33,150,243,0.28);
+  outline-offset: 3px;
+}
+
+/* Subject section */
+.subject-section {
+  margin-bottom: 2rem;
+}
+.subject-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--gray-200);
+}
+.subject-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.subject-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.subject-header .count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  background: var(--gray-100);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+}
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 4px 20px rgba(33,150,243,0.12);
+  transform: translateY(-2px);
+}
+.card-color {
+  height: 4px;
+}
+.card-body {
+  padding: 1.2rem 1.3rem;
+}
+.card-body .card-emoji {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.card-body h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+.card-body .card-desc {
+  font-size: 0.9rem;
+  color: var(--gray-600);
+  line-height: 1.5;
+  margin-bottom: 0.8rem;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.card-tag {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.card-tag.blue { background: var(--blue-light); color: var(--blue-dark); }
+.card-tag.green { background: var(--green-light); color: var(--green-dark); }
+.card-tag.purple { background: var(--purple-light); color: #6200ea; }
+.card-tag.orange { background: var(--orange-light); color: #e65100; }
+
+.card-arrow {
+  margin-left: auto;
+  font-size: 1.1rem;
+  color: var(--gray-300);
+  transition: all 0.2s;
+}
+.card:hover .card-arrow {
+  color: var(--blue);
+  transform: translateX(3px);
+}
+
+/* Search + tool links */
+.toolbar { display: flex; justify-content: center; margin: 0 0 1.4rem; }
+.toolbar input { width: min(460px, 100%); padding: 0.7rem 1.2rem; border: 1px solid var(--gray-200);
+  border-radius: 999px; font: inherit; font-size: 0.95rem; background: var(--white); outline: none;
+  transition: all 0.2s; }
+.toolbar input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(33,150,243,0.12); }
+.tool-links { display: flex; justify-content: center; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+.tool-links a { font-size: 0.8rem; color: var(--gray-600); text-decoration: none;
+  padding: 0.25rem 0.75rem; border: 1px dashed var(--gray-300); border-radius: 1rem; transition: all 0.2s; }
+.tool-links a:hover { color: var(--blue-dark); border-color: var(--blue); }
+.badge-live { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.15rem 0.55rem;
+  border-radius: 0.8rem; font-size: 0.72rem; font-weight: 800; background: var(--green-light); color: var(--green-dark); }
+.badge-live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.card-go-live { margin-left: auto; font-size: 0.78rem; font-weight: 700; color: var(--green-dark);
+  background: var(--green-light); border-radius: 0.8rem; padding: 0.25rem 0.7rem; text-decoration: none;
+  white-space: nowrap; transition: all 0.2s; }
+.card-go-live:hover { background: #d3edd8; transform: translateY(-1px); }
+.card { cursor: pointer; }
+.empty-result { text-align: center; color: var(--gray-600); padding: 3rem 0; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--gray-600);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--gray-200);
+  margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container { padding: 1.5rem 1rem 3rem; }
+  .header h1 { font-size: 1.7rem; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header" id="header"></div>
+  <div class="toolbar">
+    <input id="searchInput" type="search" placeholder="수업 자료 검색 — 제목·설명·태그" aria-label="수업 자료 검색">
+  </div>
+  <div class="subject-tabs" id="subjectTabs" aria-label="과목 필터"></div>
+  <div id="content"></div>
+  <div class="footer" id="footer"></div>
+
+<script>
+const COLOR_MAP = {
+  blue:   { bg: 'var(--blue-light)',   text: 'var(--blue-dark)' },
+  green:  { bg: 'var(--green-light)',  text: 'var(--green-dark)' },
+  purple: { bg: 'var(--purple-light)', text: '#6200ea' },
+  orange: { bg: 'var(--orange-light)', text: '#e65100' },
+};
+
+function renderHeader(data) {
+  const totalPages = data.subjects.reduce((sum, s) => sum + s.pages.length, 0);
+  const liveCount = data.subjects.reduce((sum, s) => sum + s.pages.filter((p) => p.live).length, 0);
+  return `
+    <h1>${data.title}</h1>
+    <p>${data.description}</p>
+    <div class="badge-row">
+      <span class="stat">과목 <span class="num">${data.subjects.length}</span></span>
+      <span class="stat">자료 <span class="num">${totalPages}</span></span>
+      ${liveCount ? `<span class="stat">라이브 지원 <span class="num">${liveCount}</span></span>` : ''}
+      <span class="stat">${data.year}</span>
+    </div>
+    <div class="tool-links">
+      <a href="live/join/">학생 참여 — 세션 코드 입력</a>
+      <a href="live/host/">교사 콘솔 — 라이브 세션</a>
+    </div>
+  `;
+}
+
+function pageMatches(page, q) {
+  if (!q) return true;
+  const hay = (page.title + ' ' + (page.description || '') + ' '
+    + (page.tags || []).map((t) => t.label).join(' ')).toLowerCase();
+  return q.toLowerCase().split(/\s+/).every((w) => hay.includes(w));
+}
+
+function slugifySubject(name) {
+  return name
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\u3131-\uD79D-]/g, '');
+}
+
+function renderTabs(subjects, activeSubject) {
+  const tabs = [
+    { key: 'all', label: '전체', count: subjects.length },
+    ...subjects.map(subject => ({
+      key: subject.name,
+      label: subject.name,
+      count: subject.pages.length,
+    })),
+  ];
+
+  return tabs.map(tab => `
+    <button
+      type="button"
+      class="subject-tab${tab.key === activeSubject ? ' active' : ''}"
+      data-subject="${tab.key}"
+      aria-pressed="${tab.key === activeSubject ? 'true' : 'false'}"
+    >
+      ${tab.label} (${tab.count})
+    </button>
+  `).join('');
+}
+
+function renderCard(page) {
+  const tags = page.tags.map(t =>
+    `<span class="card-tag" style="background:${COLOR_MAP[t.color]?.bg};color:${COLOR_MAP[t.color]?.text}">${t.label}</span>`
+  ).join('');
+  const liveBadge = page.live ? '<span class="badge-live">LIVE</span>' : '';
+  const rightSlot = page.live
+    ? `<a class="card-go-live" href="live/host/?deck=${encodeURIComponent(page.path)}" title="이 수업으로 라이브 세션 만들기">▶ 발표 시작</a>`
+    : '<span class="card-arrow">→</span>';
+
+  return `
+    <div class="card" role="link" tabindex="0" data-href="${page.path}">
+      <div class="card-color" style="background:${page.gradient}"></div>
+      <div class="card-body">
+        <div class="card-emoji">${page.emoji}</div>
+        <h3>${page.title}</h3>
+        <p class="card-desc">${page.description}</p>
+        <div class="card-meta">
+          ${liveBadge}${tags}
+          ${rightSlot}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderSubject(subject, query) {
+  const pages = subject.pages.filter((p) => pageMatches(p, query));
+  if (!pages.length) return '';
+  const iconBg = COLOR_MAP[subject.color]?.bg || 'var(--gray-100)';
+  const cards = pages.map(renderCard).join('');
+  const subjectId = slugifySubject(subject.name);
+
+  return `
+    <div class="subject-section" id="subject-${subjectId}">
+      <div class="subject-header">
+        <div class="subject-icon" style="background:${iconBg}">${subject.icon}</div>
+        <h2>${subject.name}</h2>
+        <span class="count">${pages.length}개 자료</span>
+      </div>
+      <div class="card-grid">${cards}</div>
+    </div>
+  `;
+}
+
+function renderContent(subjects, activeSubject, query) {
+  const filteredSubjects = activeSubject === 'all'
+    ? subjects
+    : subjects.filter(subject => subject.name === activeSubject);
+
+  const html = filteredSubjects.map((s) => renderSubject(s, query)).join('');
+  return html || `<p class="empty-result">"${query}"에 해당하는 자료가 없습니다.</p>`;
+}
+
+function bindCards(root) {
+  root.querySelectorAll('.card').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.card-go-live')) return; // 발표 시작 링크는 자체 이동
+      location.href = card.dataset.href;
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') location.href = card.dataset.href;
+    });
+  });
+}
+
+function bindTabs(data, activeSubject, renderPage) {
+  const tabsEl = document.getElementById('subjectTabs');
+  tabsEl.innerHTML = renderTabs(data.subjects, activeSubject);
+
+  tabsEl.querySelectorAll('.subject-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const nextSubject = tab.dataset.subject || 'all';
+      if (nextSubject !== activeSubject) {
+        renderPage(nextSubject);
+      }
+    });
+  });
+}
+
+async function init() {
+  try {
+    const res = await fetch('pages.json');
+    const data = await res.json();
+    const contentEl = document.getElementById('content');
+    const footerEl = document.getElementById('footer');
+
+    const searchEl = document.getElementById('searchInput');
+    let activeSubject = 'all';
+
+    const renderPage = (subject = activeSubject) => {
+      activeSubject = subject;
+      bindTabs(data, activeSubject, renderPage);
+      contentEl.innerHTML = renderContent(data.subjects, activeSubject, searchEl.value.trim());
+      bindCards(contentEl);
+      footerEl.textContent = `${data.school} · ${data.year} 수업 자료`;
+    };
+
+    searchEl.addEventListener('input', () => renderPage());
+    document.getElementById('header').innerHTML = renderHeader(data);
+    document.title = data.title;
+    renderPage();
+  } catch (e) {
+    document.getElementById('content').innerHTML =
+      '<p style="text-align:center;color:#757575;padding:3rem;">pages.json을 불러올 수 없습니다.</p>';
+  }
+}
+
+init();
+</script>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1444 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이미지 분류 AI 프로젝트 활동지</title>
+<style>
+  :root {
+    --bg: #f3eee3; --card: #fbf8f1; --line: #ddd3c0; --ink: #fffdf8;
+    --fg: #2b3a55; --faint: #6c7486;
+    --primary: #9c3d6e; --primary-soft: #f4e3ec; --navy: #2b3a55; --navy-soft: #e3e8f1;
+    --amber: #b87503; --amber-soft: #fbefd6; --green: #2e7d4f; --green-soft: #e1f1e6;
+    --rose: #b4232f; --rose-soft: #fbe3e5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    line-height: 1.65; padding: 24px 14px 132px;
+  }
+  main { max-width: 780px; margin: 0 auto; display: grid; gap: 18px; }
+  h1 { font-size: 1.55rem; letter-spacing: -0.02em; color: var(--navy); }
+  .sub { color: var(--faint); margin-top: 6px; font-size: 0.93rem; }
+  .flow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; font-size: 0.8rem; }
+  .flow span { padding: 3px 10px; border-radius: 999px; font-weight: 700; }
+  .flow .m { background: var(--primary-soft); color: var(--primary); }
+  .flow .p { background: var(--navy-soft); color: var(--navy); }
+  .rules {
+    background: var(--amber-soft); border: 1px solid #e9cf96; border-radius: 12px;
+    padding: 12px 14px; font-size: 0.88rem; color: #6b4a07;
+  }
+  section.card {
+    background: var(--card); border: 1px solid var(--line);
+    border-left: 6px solid var(--sec, var(--primary));
+    border-radius: 14px; padding: 18px;
+  }
+  section.card.m { --sec: var(--primary); }
+  section.card.p { --sec: var(--navy); }
+  section.card h2 { font-size: 1.08rem; margin-bottom: 4px; color: var(--sec); }
+  section.card .desc { color: var(--faint); font-size: 0.88rem; margin-bottom: 10px; }
+  section.card .desc b { color: var(--fg); }
+  label { display: block; font-weight: 700; font-size: 0.92rem; margin-top: 14px; }
+  label .opt, .opt { color: var(--faint); font-weight: 400; font-size: 0.82rem; }
+  .term { display: inline-block; font-weight: 400; font-size: 0.78rem; color: var(--primary);
+    background: var(--primary-soft); border-radius: 6px; padding: 0 6px; margin-left: 4px; }
+  input[type=text], input[type=password], input[type=date], input[type=number], textarea, select {
+    width: 100%; margin-top: 5px; padding: 9px 11px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--ink); color: var(--fg);
+    font: inherit; font-size: 0.92rem;
+  }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--primary); outline-offset: 0; }
+  textarea { min-height: 74px; overflow-y: hidden; resize: none; }
+  textarea.grow { min-height: 42px; }
+  #fCode { overflow-y: auto; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .row4 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  /* 그리드 칸은 기본이 stretch라, 자동 확장이 height를 auto로 되돌려 재는 순간
+     이웃 칸의 높이만큼 늘어난 값이 scrollHeight로 잡힌다. 각 칸이 제 내용만큼만 갖게 한다. */
+  .row2 > *, .row3 > *, .row4 > * { align-self: start; }
+  .row4 label { margin-top: 6px; }
+  @media (max-width: 560px) { .row2, .row3, .row4 { grid-template-columns: 1fr; } }
+  .hint { font-size: 0.8rem; color: var(--faint); margin-top: 4px; }
+  .hint.err { color: var(--rose); font-weight: 600; }
+  .hint.ok { color: var(--green); font-weight: 600; }
+  .hint.warn { color: var(--amber); font-weight: 600; }
+  .radios { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+  .radios label {
+    display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 500;
+    border: 1px solid var(--line); border-radius: 9px; padding: 8px 12px;
+    cursor: pointer; background: var(--ink); font-size: 0.88rem;
+  }
+  .radios input { accent-color: var(--primary); }
+  .check { display: flex; gap: 9px; align-items: flex-start; font-weight: 600; font-size: 0.88rem; cursor: pointer; }
+  .check input { width: auto; margin-top: 5px; accent-color: var(--primary); }
+  details { margin-top: 12px; border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; background: var(--ink); }
+  details summary { cursor: pointer; font-weight: 700; font-size: 0.88rem; color: var(--primary); }
+  details .ex { font-size: 0.85rem; color: var(--faint); margin-top: 8px; line-height: 1.75; }
+  .seeds { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  @media (max-width: 560px) { .seeds { grid-template-columns: 1fr; } }
+  .seeds button {
+    text-align: left; padding: 9px 11px; border-radius: 9px; cursor: pointer;
+    border: 1px dashed var(--line); background: var(--card); color: var(--fg); font: inherit; font-size: 0.85rem;
+  }
+  .seeds button:hover { border-color: var(--primary); }
+  .seeds button .s { color: var(--faint); }
+  .notice { font-size: 0.85rem; color: var(--faint); background: var(--ink); border: 1px dashed var(--line);
+    border-radius: 10px; padding: 12px; margin-top: 8px; }
+
+  /* B5 사진 수 표 · D4 응답 표 · C2 시험 결과 — 줄(row) 단위 그리드 */
+  .grid-rows { margin-top: 8px; display: grid; gap: 6px; }
+  .grow-row { display: grid; gap: 8px; align-items: center; background: var(--ink);
+    border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+  .grow-row input, .grow-row select, .grow-row textarea { margin-top: 0; }
+  .grow-head { font-size: 0.78rem; color: var(--faint); font-weight: 700; background: none; border: 0; padding: 0 10px; }
+  .cls { font-weight: 800; color: var(--primary); word-break: keep-all; }
+  .b5-row { grid-template-columns: 1.4fr 1fr 1fr; }
+  .c2-row { grid-template-columns: 34px 1fr 2fr 1.3fr 0.9fr 64px; }
+  .d4-row { grid-template-columns: 1fr; }
+  .d4-row .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .d4-row .sel { display: grid; grid-template-columns: 90px 1fr; gap: 8px; }
+  .num { font-size: 0.8rem; color: var(--faint); text-align: center; }
+  .verdict { font-weight: 800; text-align: center; font-size: 0.85rem; }
+  .verdict.ok { color: var(--green); }
+  .verdict.no { color: var(--rose); }
+  .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: middle; }
+  @media (max-width: 560px) {
+    .b5-row { grid-template-columns: 1fr 1fr; }
+    .b5-row .cls { grid-column: 1 / -1; }
+    .grow-head.b5-row { display: none; }
+    .c2-row { grid-template-columns: 26px 1.3fr 1fr 44px; gap: 6px; }
+    .c2-row .num { grid-row: 1; grid-column: 1; }
+    .c2-row .c2-cls { grid-row: 1; grid-column: 2 / -1; }
+    .c2-row .c2-desc { grid-row: 2; grid-column: 2 / -1; }
+    .c2-row .c2-pred { grid-row: 3; grid-column: 2; }
+    .c2-row .c2-conf { grid-row: 3; grid-column: 3; }
+    .c2-row .verdict { grid-row: 3; grid-column: 4; }
+    .grow-head.c2-row { display: none; }
+  }
+  .summary { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--primary-soft);
+    font-size: 0.9rem; }
+  .summary b { font-size: 1.15rem; color: var(--primary); }
+  ul.warns { list-style: none; margin-top: 8px; display: grid; gap: 4px; }
+  ul.warns li { font-size: 0.84rem; padding: 6px 10px; border-radius: 8px; background: var(--amber-soft); color: #6b4a07; }
+  ul.warns li.ok { background: var(--green-soft); color: var(--green); }
+
+  /* B6 캡처 첨부 */
+  .uploads { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+  @media (max-width: 560px) { .uploads { grid-template-columns: 1fr; } }
+  .up { border: 2px dashed var(--line); border-radius: 12px; background: var(--ink); padding: 10px; position: relative; min-height: 120px; }
+  .up.drag { border-color: var(--primary); background: var(--primary-soft); }
+  .up .t { font-size: 0.84rem; font-weight: 700; }
+  .up input[type=file] { margin-top: 6px; font-size: 0.8rem; width: 100%; }
+  .up img { display: none; width: 100%; max-height: 200px; object-fit: contain; margin-top: 8px; border-radius: 8px; }
+  .up .meta { font-size: 0.76rem; color: var(--faint); margin-top: 4px; }
+  .up .meta a { color: var(--primary); }
+  .up .rm { display: none; margin-top: 6px; }
+
+  /* D6 미리보기 — 내가 쓴 부분과 제공된 부분을 색으로 가른다 */
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; margin-top: 8px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+  #dPreview {
+    white-space: pre-wrap; word-break: break-word; background: var(--ink);
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+    font-size: 0.8rem; color: var(--faint); max-height: 360px; overflow-y: auto;
+    margin-top: 8px; font-family: Consolas, "Courier New", monospace; line-height: 1.6;
+  }
+  #dPreview .mine { color: var(--primary); background: var(--primary-soft); font-weight: 700; border-radius: 3px; }
+  #dPreview .empty { color: var(--rose); background: var(--rose-soft); border-radius: 3px; }
+
+  .btn { display: inline-block; border: 0; border-radius: 10px; cursor: pointer; font: inherit; font-weight: 800; padding: 12px 18px; }
+  .btn-copy { background: var(--primary); color: #fff; width: 100%; margin-top: 12px; font-size: 1rem; }
+  .btn-copy:disabled { background: #d4c9ce; color: #8c8287; cursor: not-allowed; }
+  .btn-submit { background: var(--navy); color: #fff; font-size: 0.95rem; padding: 11px 22px; }
+  .btn-submit:disabled { background: #a7afbf; cursor: not-allowed; }
+  .btn-ghost { background: var(--ink); border: 1px solid var(--line); color: var(--fg); font-weight: 600; padding: 8px 12px; font-size: 0.85rem; }
+  .btn-small { padding: 5px 10px; font-size: 0.8rem; }
+  #codeMeta { display: flex; justify-content: flex-end; font-size: 0.8rem; margin-top: 4px; color: var(--faint); }
+  #codeCount.warn { color: var(--amber); font-weight: 700; }
+  #codeCount.over { color: var(--rose); font-weight: 800; }
+  #toast {
+    position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%);
+    background: var(--navy); color: #fff; border-radius: 12px; padding: 12px 18px; font-size: 0.9rem;
+    display: none; max-width: 90vw; z-index: 70; box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  }
+  #toast.err { background: var(--rose); }
+  #settingsPanel { display: none; background: var(--ink); border: 1px dashed var(--line); border-radius: 10px; padding: 12px; font-size: 0.85rem; }
+  footer { text-align: center; color: var(--faint); font-size: 0.78rem; }
+  a { color: var(--primary); }
+
+  /* 하단 액션 바 — 어디까지 작성했든 여기서 제출한다 */
+  .actionbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: rgba(251, 248, 241, 0.96); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line); padding: 11px 14px;
+  }
+  .actionbar .inner { max-width: 780px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+  #draftStatus { font-size: 0.78rem; color: var(--faint); }
+  #draftStatus.pending { color: var(--amber); }
+  #draftStatus.saved { color: var(--green); }
+  #draftStatus.failed { color: var(--rose); font-weight: 700; }
+  .draft-note { font-size: 0.72rem; color: var(--faint); opacity: 0.85; }
+  .actionbar .btn-ghost { white-space: nowrap; text-decoration: none; }
+  @media (max-width: 560px) {
+    .actionbar .inner { flex-wrap: wrap; }
+    .draft-wrap { flex: 1 1 100%; }
+    .draft-note { display: none; }
+    .actionbar .btn-ghost, .actionbar .btn-submit { flex: 1 1 auto; text-align: center; }
+  }
+  .gear { float: right; background: none; border: 0; color: var(--faint); cursor: pointer; font-size: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <button class="gear" id="btnGear" type="button" title="교사 설정">⚙</button>
+    <h1>📷 이미지 분류 AI 프로젝트</h1>
+    <p class="sub">내가 고른 사진으로 모델을 만들고, 그 모델을 쓰는 웹 프로그램까지 완성합니다.
+    입력할 때마다 이 브라우저에 임시저장되고, 제출하면 선생님의 Google Sheets에 기록됩니다.</p>
+    <div class="flow">
+      <span class="m">A 주제</span><span class="m">B 데이터 설계</span><span class="m">C 학습·시험·분석</span>
+      <span class="p">D 프로그램 설계</span><span class="p">E 테스트·개선</span><span class="p">F 제출</span>
+    </div>
+  </header>
+
+  <div class="rules">
+    <b>설계 원칙 세 가지</b><br>
+    ① 사람 얼굴을 분류하거나, 사람을 평가·비교하는 주제는 하지 않습니다.<br>
+    ② 사진에 다른 사람의 얼굴·이름·차량 번호판이 나오면 그 사진은 쓰지 않습니다.<br>
+    ③ 주제가 고민되면 B로 넘어가기 전에 선생님께 확인받습니다.
+  </div>
+
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정: Apps Script 배포 URL</strong><br>
+    <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button" style="margin-top:6px;">URL 저장</button>
+    <span id="urlStatus"></span>
+  </div>
+
+  <!-- 나의 정보 -->
+  <section class="card" style="--sec:#6c7486;">
+    <h2>나의 정보</h2>
+    <p class="desc">암호는 나중에 내 제출을 다시 열어 이어 쓸 때 필요합니다. 기억할 수 있는 것으로 정하세요.
+    학교 계정이나 다른 사이트의 비밀번호는 절대 쓰지 말고, 이 활동에서만 쓸 새 암호를 정합니다.</p>
+    <div class="row3">
+      <label>이름 *<input type="text" id="studentName" autocomplete="off"></label>
+      <label>학번 * <span class="opt">(5자리)</span><input type="text" id="studentId" maxlength="12" inputmode="numeric" placeholder="예: 20315"></label>
+      <label>날짜<input type="date" id="today"></label>
+    </div>
+    <p class="hint" id="sidHint">학번은 학년 1자리, 반 2자리, 번호 2자리입니다.</p>
+    <label>제출 암호 *<input type="password" id="password" autocomplete="off"></label>
+    <p class="hint">이름·학번·암호를 채운 뒤 화면 맨 아래 <b>[이전 제출 불러오기]</b>를 누르면 지난 제출본을 열어 이어 쓸 수 있어요.</p>
+  </section>
+
+  <!-- A 주제 선정 -->
+  <section class="card m">
+    <h2>A. 주제 선정</h2>
+    <p class="desc">좋은 주제는 <b>누군가의 문제</b>에서 시작하고, <b>내가 사진을 모을 수 있는 대상</b>이어야 합니다.
+    클래스마다 학습 사진이 20장 이상 필요하니, 교실·학교·집에 있는 것을 떠올려 보세요.</p>
+
+    <label>A1. 누가, 언제, 어떤 문제를 겪나요? *
+      <textarea rows="1" class="grow" id="a1Problem" placeholder="예: 분리수거장 앞에서 이 쓰레기가 어디로 가는지 헷갈리는 친구"></textarea>
+    </label>
+    <label>A2. 프로젝트 주제 한 문장 *
+      <textarea rows="1" class="grow" id="a2Topic" placeholder="예: 쓰레기 사진을 보고 플라스틱·캔·종이를 구별해 버리는 법을 알려 주는 AI"></textarea>
+    </label>
+    <label>A3. 분류할 클래스 * <span class="term">클래스: 모델이 골라낼 이름표 하나</span>
+      <input type="text" id="a3Classes" placeholder="예: 플라스틱, 캔, 종이">
+    </label>
+    <p class="hint" id="a3Hint">쉼표(,)로 나눠 2개 이상 적습니다. Teachable Machine에서 붙일 클래스 이름과 글자 하나까지 똑같이 적으세요. 여기 적은 클래스가 B5·C2·D4 칸에 자동으로 들어갑니다.</p>
+
+    <label>A4. 이 클래스들의 사진을 직접 찍거나 구할 수 있나요? *</label>
+    <div class="radios">
+      <label><input type="radio" name="a4Can" value="예">예</label>
+      <label><input type="radio" name="a4Can" value="아니오">아니오 (주제를 다시 생각해 봅니다)</label>
+    </div>
+    <label>어떻게 모을 건가요? <span class="opt">(한 줄)</span>
+      <textarea rows="1" class="grow" id="a4How" placeholder="예: 집과 급식실 분리수거함에서 스마트폰으로 찍는다"></textarea>
+    </label>
+
+    <details id="seedBox">
+      <summary>주제가 떠오르지 않으면, 주제 씨앗 카드 열기 <span class="opt">(골라서 시작하되 두 가지 이상 바꿔야 합니다)</span></summary>
+      <div class="seeds" id="seeds"></div>
+      <label>참고한 카드와 바꾼 것 <span class="opt">(카드를 고르면 앞부분이 자동으로 적힙니다)</span>
+        <textarea rows="1" class="grow" id="aSeed" placeholder="예: '분리배출 도우미' 참고, 바꾼 것: 대상을 급식실 잔반으로, 클래스를 국물/건더기로"></textarea>
+      </label>
+    </details>
+  </section>
+
+  <!-- B 학습 설계 및 준비 -->
+  <section class="card m">
+    <h2>B. 학습 설계 및 준비</h2>
+    <p class="desc">사진을 모으기 전에 <b>무엇을 어떻게 찍을지</b> 먼저 정합니다.
+    모델은 <b>학습 데이터</b>(모델에게 보여 주며 가르치는 사진)가 보여 준 것만 압니다.</p>
+
+    <label>B1. 사진을 구하는 방법 *</label>
+    <div class="radios">
+      <label><input type="radio" name="b1Source" value="직접 촬영">직접 촬영</label>
+      <label><input type="radio" name="b1Source" value="Openverse (CC0·퍼블릭 도메인)">Openverse (CC0·퍼블릭 도메인)</label>
+      <label><input type="radio" name="b1Source" value="둘 다">둘 다</label>
+    </div>
+    <p class="hint">Openverse(<a href="https://openverse.org" target="_blank" rel="noopener">openverse.org</a>)에서는 CC0나 퍼블릭 도메인 표시가 붙은 사진만 씁니다. 검색해서 나온 아무 사진은 저작권을 확인할 수 없으므로 쓰지 않습니다.</p>
+
+    <label>B2. 다양성 계획: 네 가지 조건을 어떻게 바꿔 찍을까요? *</label>
+    <p class="hint">한 모습만 보여 주면 모델은 그 모습만 압니다. 같은 클래스 안에서도 조건을 섞어야 처음 보는 사진도 알아봅니다.</p>
+    <div class="row4">
+      <label>각도<textarea rows="1" class="grow" id="b2Angle" placeholder="예: 위에서, 옆에서, 비스듬히"></textarea></label>
+      <label>조명<textarea rows="1" class="grow" id="b2Light" placeholder="예: 교실 형광등, 창가 햇빛, 조금 어둡게"></textarea></label>
+      <label>배경<textarea rows="1" class="grow" id="b2Back" placeholder="예: 책상 위, 바닥, 분리수거함 앞"></textarea></label>
+      <label>종류 <span class="opt">(색·모양·크기)</span><textarea rows="1" class="grow" id="b2Kind" placeholder="예: 투명 페트병, 색깔 페트병, 찌그러진 병"></textarea></label>
+    </div>
+
+    <label>B3. 지름길 학습 점검 <span class="term">지름길 학습: 대상 대신 배경처럼 우연히 함께 찍힌 특징으로 구별하는 일</span></label>
+    <label class="check" style="margin-top:8px;"><input type="checkbox" id="b3Mixed">
+      <span>클래스마다 배경이 섞이게 찍었습니다(또는 그렇게 찍을 계획입니다). 한 클래스만 같은 책상·같은 바닥에서 찍지 않았습니다.</span></label>
+    <textarea rows="1" class="grow" id="b3Note" placeholder="어떻게 섞었는지 한 줄 (예: 세 클래스 모두 책상·바닥·창틀에서 나눠 찍음)"></textarea>
+
+    <label>B4. 「그 외」 클래스를 만들까요? *</label>
+    <p class="hint">모델은 모르는 것을 넣어도 아는 클래스 중 하나로 답합니다. 「그 외」 클래스를 만들어 빈 책상·손·상관없는 물건 사진을 가르치면, 그런 사진을 「그 외」로 보냅니다.</p>
+    <div class="radios">
+      <label><input type="radio" name="b4Other" value="예">예, 만든다</label>
+      <label><input type="radio" name="b4Other" value="아니오">아니오, 기준값으로만 막는다</label>
+    </div>
+    <p class="hint" id="b4Hint"></p>
+    <textarea rows="1" class="grow" id="b4Why" placeholder="그렇게 정한 이유 한 줄"></textarea>
+
+    <label>B5. 클래스별 사진 수 * <span class="term">시험 데이터: 학습에 쓰지 않고 남겨 둔 확인용 사진</span></label>
+    <p class="hint">사진을 다 모으면 학습시키기 전에 클래스마다 5장 이상을 먼저 빼서 시험 데이터로 따로 둡니다. 학습 사진은 클래스마다 20장 이상, 가능하면 30장 이상 모읍니다.</p>
+    <div id="b5Area" class="grid-rows"></div>
+    <ul class="warns" id="b5Warns"></ul>
+
+    <label>B6. 데이터 폴더 캡처 첨부</label>
+    <p class="hint">학습 사진과 시험 사진을 클래스별 폴더로 나눠 둔 화면을 캡처해 올립니다. 사진은 자동으로 줄여서 보냅니다. 캡처에 사람 얼굴이 보이지 않는지 확인하세요.</p>
+    <div class="uploads">
+      <div class="up" id="up1" data-idx="1">
+        <div class="t">학습 데이터 폴더 캡처 *</div>
+        <input type="file" accept="image/*">
+        <img alt="학습 데이터 폴더 캡처 미리보기">
+        <div class="meta"></div>
+        <button class="btn btn-ghost btn-small rm" type="button">지우기</button>
+      </div>
+      <div class="up" id="up2" data-idx="2">
+        <div class="t">시험 데이터 폴더 캡처 <span class="opt">(선택)</span></div>
+        <input type="file" accept="image/*">
+        <img alt="시험 데이터 폴더 캡처 미리보기">
+        <div class="meta"></div>
+        <button class="btn btn-ghost btn-small rm" type="button">지우기</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- C 결과와 분석 -->
+  <section class="card m">
+    <h2>C. 학습·시험·분석</h2>
+    <p class="desc"><a href="https://teachablemachine.withgoogle.com/train" target="_blank" rel="noopener">Teachable Machine</a>에서
+    학습 사진만 넣어 학습시키고 「모델 내보내기 → 모델 업로드」를 누릅니다. 그다음 따로 둔 시험 사진을 하나씩 넣어 아래 표에 기록합니다.</p>
+
+    <label>C1. 공유 링크 * <span class="term">공유 링크: 다른 프로그램이 내 모델을 불러오는 주소</span>
+      <input type="text" id="c1Link" placeholder="https://teachablemachine.withgoogle.com/models/XXXXXXXX/">
+    </label>
+    <p class="hint" id="c1Hint">「모델 업로드」 뒤에 나오는 링크를 끝까지 복사해 붙여넣으세요.</p>
+
+    <label>C2. 시험 결과 표 * <span class="term">신뢰도: 모델이 각 클래스에 매긴 확률 (모두 더하면 100%)</span></label>
+    <p class="hint">B5에 적은 시험 사진 수만큼 줄이 생깁니다(적지 않으면 클래스마다 5줄). 모델 답과 그 신뢰도를 적으면 맞음·틀림과 정확도가 자동으로 계산됩니다.</p>
+    <div id="c2Area" class="grid-rows"></div>
+    <div class="summary" id="c2Summary" style="display:none;"></div>
+
+    <label>C3. 틀린 사진 분석 *</label>
+    <p class="hint">틀린 사진이 없으면 신뢰도가 가장 낮았던 사진으로 씁니다. 그 사진이 왜 그렇게 나왔는지 학습 데이터와 연결해 생각해 보세요.</p>
+    <textarea rows="1" class="grow" id="c3Photo" placeholder="어떤 사진이었나요? (예: 3번, 흰 플라스틱 컵을 종이 61%로 답함)"></textarea>
+    <p class="hint" style="margin-top:8px;">어느 데이터 기준과 관계있나요? <span class="opt">(여러 개 고를 수 있어요)</span></p>
+    <div class="radios" id="c3Criteria">
+      <label><input type="checkbox" value="명확성">명확성 (대상이 주인공인가)</label>
+      <label><input type="checkbox" value="품질">품질 (흐림·어두움)</label>
+      <label><input type="checkbox" value="다양성">다양성 (각도·조명·배경·종류)</label>
+      <label><input type="checkbox" value="양과 균형">양과 균형 (개수·쏠림)</label>
+      <label><input type="checkbox" value="윤리">윤리 (개인정보·저작권·편향)</label>
+    </div>
+    <textarea rows="1" class="grow" id="c3Why" placeholder="그렇게 생각한 이유 (예: 학습 데이터의 플라스틱이 전부 투명 페트병이라 흰 컵을 본 적이 없다)"></textarea>
+
+    <label>C4. 데이터 개선 계획 또는 실행 기록
+      <textarea rows="1" class="grow" id="c4Plan" placeholder="예: 흰색·불투명 플라스틱 사진 10장을 더 찍어 다시 학습시킨다"></textarea>
+    </label>
+  </section>
+
+  <!-- D 프로그램 설계 -->
+  <section class="card p">
+    <h2>D. 프로그램 설계와 코드 생성 프롬프트</h2>
+    <p class="desc">내 모델을 쓰는 웹 프로그램을 설계합니다. 여러분은 <b>설계만</b> 쓰고, 웹 기술 명세는 이 활동지가 붙여서
+    한 장의 <b>코드 생성 프롬프트</b>(내 설계와 기술 명세를 합쳐 ChatGPT에 넣는 제작 의뢰문)로 조립합니다.</p>
+
+    <label>D1. 프로그램 이름 *
+      <textarea rows="1" class="grow" id="d1Name" placeholder="예: 분리배출 도우미"></textarea>
+    </label>
+    <label>D2. 한 줄 소개 *
+      <textarea rows="1" class="grow" id="d2Intro" placeholder="예: 쓰레기를 찍어 올리면 어디에 어떻게 버리는지 알려 줘요"></textarea>
+    </label>
+
+    <label>D3. 입력 방식</label>
+    <label class="check" style="margin-top:6px; font-weight:500;"><input type="checkbox" checked disabled> <span>사진 올리기 (기본, 항상 들어갑니다)</span></label>
+    <label class="check" style="margin-top:6px;"><input type="checkbox" id="d3Webcam"> <span>웹캠도 넣기 (선택)</span></label>
+    <p class="hint">웹캠은 ChatGPT 미리보기 안에서 카메라 권한이 막힐 수 있어요. 막혀도 사진 올리기는 그대로 됩니다.</p>
+
+    <label>D4. 클래스별 응답 * <span class="term">클래스별 응답: 결과 클래스마다 프로그램이 보여 줄 문장</span></label>
+    <p class="hint">좋은 응답은 이름이 아니라 <b>할 일</b>을 알려 줍니다. 「캔입니다」보다 「캔: 내용물을 비우고 찌그러뜨려 캔 수거함에 넣어요」가 도움이 됩니다.</p>
+    <div id="d4Area" class="grid-rows"></div>
+
+    <label>D5. 기준값 * <span class="term">기준값: 이 신뢰도보다 낮으면 답을 내지 않기로 정한 값</span></label>
+    <div class="radios" id="d5Radios">
+      <label><input type="radio" name="d5Threshold" value="50">50%</label>
+      <label><input type="radio" name="d5Threshold" value="60">60%</label>
+      <label><input type="radio" name="d5Threshold" value="70" checked>70%</label>
+      <label><input type="radio" name="d5Threshold" value="80">80%</label>
+      <label><input type="radio" name="d5Threshold" value="90">90%</label>
+    </div>
+    <p class="hint">기준값을 높이면 틀린 답은 줄지만 「잘 모르겠어요」가 늘어납니다.</p>
+    <label>가장 높은 신뢰도가 기준값보다 낮을 때 보여 줄 문장 *
+      <textarea rows="1" class="grow" id="d5Unknown" placeholder="예: 🤔 잘 모르겠어요. 물건이 크게 나오게 다시 찍어 주세요."></textarea>
+    </label>
+
+    <label>D6. 코드 생성 프롬프트 (자동 조립)</label>
+    <div class="legend">
+      <span><i style="background:var(--primary-soft); border:1px solid var(--primary);"></i>내가 쓴 부분</span>
+      <span><i style="background:var(--ink); border:1px solid var(--line);"></i>활동지가 붙인 기술 명세</span>
+      <span><i style="background:var(--rose-soft); border:1px solid var(--rose);"></i>아직 비어 있는 칸</span>
+    </div>
+    <div id="dPreview"></div>
+    <button class="btn btn-copy" id="btnCopy" type="button" disabled>📋 전체 복사</button>
+    <p class="hint" id="dHint"></p>
+    <p class="desc" style="margin-top:10px;">복사한 뒤 <a href="https://chatgpt.com" target="_blank" rel="noopener">chatgpt.com</a>에 <b>로그인한 상태</b>로 붙여넣고 보냅니다.
+    코드가 다 나오면 ① 코드 맨 위 <b>MODEL_URL</b> 줄에 내 공유 링크가 들어 있는지 눈으로 확인하고 ② 코드 블록 위 재생 버튼 <b>[▶]</b>을 눌러
+    ③ 따로 둔 시험 사진을 한 장 올려 봅니다.</p>
+    <details>
+      <summary>받은 코드가 이상할 때, 자주 막히는 문제 네 가지</summary>
+      <div class="ex">
+        · <b>코드가 중간에 끊기거나 여러 조각으로 나뉨</b>: 같은 대화에 "완전한 HTML 전체를 처음부터 끝까지 하나의 코드 블록으로 다시 출력해 주세요"라고 요청합니다. 마지막 줄이 &lt;/html&gt;인지 확인하세요.<br>
+        · <b>재생 버튼 [▶]이 안 보임</b>: 먼저 로그인 상태인지 확인합니다. 그래도 없으면 [다운로드]로 .html 파일을 받아 더블클릭해서 엽니다.<br>
+        · <b>「모델을 불러오지 못했어요」가 뜸</b>: C1의 공유 링크를 끝까지 복사했는지, Teachable Machine에서 「모델 업로드」를 눌렀는지, 인터넷이 연결되어 있는지 확인합니다. 미리보기 안에서만 안 되면 다운로드해서 더블클릭으로 열어 봅니다.<br>
+        · <b>「클래스 이름이 Teachable Machine과 달라요」가 뜸</b>: A3의 클래스 이름을 Teachable Machine과 글자 하나까지 똑같이 고친 뒤 다시 복사해 새로 요청하거나, 같은 대화에 바른 이름으로 고쳐 달라고 요청합니다.
+      </div>
+    </details>
+  </section>
+
+  <!-- E 테스트·개선 -->
+  <section class="card p">
+    <h2>E. 테스트·개선 기록</h2>
+    <p class="desc">이상한 점을 찾으면 먼저 <b>어느 쪽 문제인지</b> 가릅니다. 판정 자체가 틀리면 <b>데이터 문제</b>입니다.
+    사진을 보강해 다시 학습시키고 다시 「모델 업로드」를 합니다. 판정은 맞는데 보여 주는 것이 이상하면 <b>프로그램 문제</b>입니다.
+    같은 ChatGPT 대화에 <b>증상 · 고칠 곳 · 원하는 결과</b>를 말하고 전체 코드를 다시 받습니다.
+    고칠 때마다 코드가 새로 나오니 <b>제출은 마지막에 받은 코드로</b> 합니다.</p>
+
+    <label>E1. 시험 사진 테스트 <span class="opt">(따로 둔 시험 사진 한 장)</span></label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="e1In" placeholder="넣은 사진"></textarea>
+      <textarea rows="1" class="grow" id="e1Hope" placeholder="기대한 결과"></textarea>
+      <textarea rows="1" class="grow" id="e1Real" placeholder="실제 결과"></textarea>
+    </div>
+    <label>E2. 학습하지 않은 것 테스트 <span class="opt">(상관없는 사진, 기준값이 일하는가)</span></label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="e2In" placeholder="넣은 상관없는 사진"></textarea>
+      <textarea rows="1" class="grow" id="e2Hope" placeholder="기대한 결과"></textarea>
+      <textarea rows="1" class="grow" id="e2Real" placeholder="실제 결과"></textarea>
+    </div>
+
+    <label>발견한 문제 한 가지
+      <textarea rows="1" class="grow" id="eProblem" placeholder="예: 흰 플라스틱 컵을 자꾸 종이라고 한다"></textarea>
+    </label>
+    <label>어느 쪽 문제인가요?</label>
+    <div class="radios">
+      <label><input type="radio" name="eWhich" value="데이터 문제">데이터 문제 (판정이 틀림)</label>
+      <label><input type="radio" name="eWhich" value="프로그램 문제">프로그램 문제 (판정은 맞는데 보여 주는 것이 이상함)</label>
+    </div>
+    <label>고친 내용 (전 → 후)
+      <textarea rows="1" class="grow" id="eFix" placeholder="예: 플라스틱 학습 사진 30장 → 흰 컵 10장을 더해 40장으로 다시 학습·업로드"></textarea>
+    </label>
+    <label>개선 효과: 고친 뒤 같은 사진으로 다시 시험한 기록</label>
+    <div class="row3">
+      <textarea rows="1" class="grow" id="eSameInput" placeholder="넣은 사진"></textarea>
+      <textarea rows="1" class="grow" id="eAfterOut" placeholder="실제 결과"></textarea>
+      <textarea rows="1" class="grow" id="eJudge" placeholder="나아졌다고 판단한 근거"></textarea>
+    </div>
+  </section>
+
+  <!-- F 제출 -->
+  <section class="card p">
+    <h2>F. 제출</h2>
+    <p class="desc"><b>마지막에 받은 코드</b>를 냅니다. ChatGPT의 [다운로드]로 받은 HTML 파일을 올리면 코드가 자동으로 채워집니다.
+    파일이 없으면 코드 블록 위의 [복사]를 눌러 아래 칸에 붙여넣으세요.
+    미완성이어도 수업 안에 일단 제출하세요. 몇 번이든 다시 제출할 수 있고, 마지막에 낸 것이 최종 제출본이 됩니다.</p>
+
+    <label>최종 HTML 코드 전체 *
+      <input type="file" id="fFile" accept=".html,.htm,text/html" style="margin-top:6px; padding:8px; border:1px dashed var(--line); border-radius:9px; width:100%; background:var(--ink); color:var(--faint); font-size:0.85rem;">
+      <textarea id="fCode" style="min-height:180px; font-family:Consolas,monospace; font-size:0.78rem;" placeholder="파일을 위에서 올리거나, 여기로 끌어다 놓거나, 코드를 붙여넣으세요 (<!doctype html>부터 </html>까지)"></textarea>
+    </label>
+    <div id="codeMeta"><span id="codeCount">0자</span></div>
+
+    <label>결론 ① 배운 점 *
+      <textarea rows="2" class="grow" id="fLearned" placeholder="예: 모델은 내가 보여 준 사진만 안다는 것을 직접 확인했다. 투명 페트병만 넣었더니 흰 컵을 몰랐다."></textarea>
+    </label>
+    <label>결론 ② 성능 개선 방안 * <span class="opt">(시험 결과와 연결해 구체적으로)</span>
+      <textarea rows="2" class="grow" id="fImprove" placeholder="예: 틀린 사진 2장이 모두 어두운 곳에서 찍은 것이라, 클래스마다 어두운 사진을 10장씩 더 넣겠다."></textarea>
+    </label>
+    <label>결론 ③ 활용·확장 아이디어
+      <textarea rows="1" class="grow" id="fExtend" placeholder="예: 급식실 앞에 태블릿으로 두고 잔반 분류에도 쓰기"></textarea>
+    </label>
+    <label>한 줄 소감
+      <textarea rows="1" class="grow" id="fNote" placeholder="데이터를 고르고 프로그램을 만들어 본 소감"></textarea>
+    </label>
+
+    <p class="hint" id="submitHint" style="text-align:center; margin-top:12px;">다 썼으면 화면 맨 아래 <b>[제출하기]</b>를 누르세요.</p>
+    <p class="hint" style="text-align:center;">제출 후 <a href="../제출현황.html" target="_blank" rel="noopener">제출 현황</a>에서 확인할 수 있어요.</p>
+  </section>
+
+  <footer>인공지능 기초 (2026-2) · 이미지 분류 AI 프로젝트</footer>
+</main>
+
+<!-- 액션 바 — 제출·초기화·임시저장 상태 -->
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <button class="btn btn-ghost" id="btnLookup" type="button" title="이름·학번·암호로 지난 제출본을 불러옵니다">이전 제출 불러오기</button>
+    <a class="btn btn-ghost" href="../제출현황.html" target="_blank" rel="noopener">제출 현황</a>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-submit" id="btnSubmit" type="button">제출하기</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SOURCE = 'image_classifier_project';
+  var DRAFT_KEY = 'draft_image_classifier_project';
+  var URL_KEY = 'gas_url_ai_basics_2026_2'; // 과목 공용 — 다른 활동지와 같은 키
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+
+  /* 수업 현장에서 조정하는 기준 (plan.md 사실 관계 원칙 — 한 곳에서 바꾼다) */
+  var MIN_TRAIN = 20, MIN_TEST = 5, DEFAULT_TEST_ROWS = 5, MAX_TEST_ROWS = 15;
+  var IMG_MAX_W = 1280, IMG_MAX_H = 960, IMG_QUALITY = 0.82;
+  var WARN_LEN = 45000, MAX_LEN = 50000; // Google Sheets 셀 한도 50,000자
+  var SID_RE = /^\d{5}$/;
+  var LINK_RE = /^https:\/\/teachablemachine\.withgoogle\.com\/models\/[A-Za-z0-9_-]+\/?$/;
+  var FORBIDDEN = /`|\$\{/; // 백틱·${ 는 생성 코드의 문자열을 깨뜨린다
+  var OTHER = '그 외';
+
+  var COLORS = [
+    ['초록', '#2e9e5b'], ['빨강', '#d64545'], ['주황', '#e08a00'],
+    ['파랑', '#2f6fd6'], ['보라', '#8a4fd0'], ['회색', '#6b7280']
+  ];
+
+  /* 오늘 날짜(현지 기준) — toISOString()은 UTC라서 한국 시간 0~9시에 열면 하루 전 날짜가 채워진다 */
+  function todayLocal() {
+    var d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  }
+
+  var $ = function (id) { return document.getElementById(id); };
+  var v = function (id) { return $(id).value.trim(); };
+  function radio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function setRadio(name, val) {
+    var els = document.querySelectorAll('input[name="' + name + '"]');
+    for (var i = 0; i < els.length; i++) els[i].checked = (els[i].value === val);
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  /* ── 토스트 ── */
+  var toastTimer = null;
+  function showToast(msg, kind, ms) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = kind === 'err' ? 'err' : '';
+    t.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.style.display = 'none'; }, ms || 3200);
+  }
+
+  /* ── 학번 힌트 ── */
+  function sidHint() {
+    var raw = $('studentId').value, digits = raw.replace(/\D/g, '').slice(0, 5);
+    if (digits !== raw) $('studentId').value = digits;
+    var h = $('sidHint');
+    if (SID_RE.test(digits)) {
+      h.className = 'hint ok';
+      h.textContent = '✓ ' + digits[0] + '학년 ' + Number(digits.slice(1, 3)) + '반 ' + Number(digits.slice(3)) + '번';
+    } else {
+      h.className = 'hint';
+      h.textContent = '학번은 학년 1자리, 반 2자리, 번호 2자리입니다. (예: 20315는 2학년 3반 15번)';
+    }
+  }
+
+  /* ── 주제 씨앗 카드 6종 ── */
+  var SEEDS = [
+    { name: '분리배출 도우미', a1: '분리수거장 앞에서 이 쓰레기가 어디로 가는지 헷갈리는 친구',
+      a2: '쓰레기 사진을 보고 종류를 구별해 버리는 법을 알려 주는 AI', a3: '플라스틱, 캔, 종이' },
+    { name: '교실 화분 물주기 알리미', a1: '교실 화분 당번인데 언제 물을 줘야 할지 모르는 친구',
+      a2: '잎 사진을 보고 물을 줄 때인지 알려 주는 AI', a3: '싱싱함, 시듦' },
+    { name: '바나나 먹을 때 알리미', a1: '집에 있는 바나나를 언제 먹어야 맛있을지 모르는 가족',
+      a2: '바나나 사진을 보고 먹기 좋은 때인지 알려 주는 AI', a3: '덜 익음, 잘 익음, 너무 익음' },
+    { name: '실내화 확인 도우미', a1: '현관에서 실내화로 갈아 신었는지 자주 잊는 후배',
+      a2: '신발 사진을 보고 실내화인지 운동화인지 알려 주는 AI', a3: '실내화, 운동화' },
+    { name: '메이커실 공구 이름표', a1: '메이커실에서 공구 이름을 몰라 정리를 못 하는 친구',
+      a2: '공구 사진을 보고 이름과 정리할 자리를 알려 주는 AI', a3: '드라이버, 펜치, 니퍼' },
+    { name: '가위바위보 심판', a1: '쉬는 시간 가위바위보에서 늦게 내기로 다투는 친구들',
+      a2: '손 모양 사진을 보고 가위·바위·보를 판정하는 AI', a3: '가위, 바위, 보' }
+  ];
+  (function buildSeeds() {
+    var wrap = $('seeds');
+    SEEDS.forEach(function (s) {
+      var b = el('button');
+      b.type = 'button';
+      b.appendChild(el('b', '', s.name));
+      b.appendChild(document.createElement('br'));
+      b.appendChild(el('span', 's', s.a2 + ' (' + s.a3 + ')'));
+      b.addEventListener('click', function () {
+        $('a1Problem').value = s.a1;
+        $('a2Topic').value = s.a2;
+        $('a3Classes').value = s.a3;
+        $('aSeed').value = "'" + s.name + "' 참고, 바꾼 것: ";
+        $('seedBox').open = true;
+        showToast('씨앗 카드를 담았어요. 그대로 내면 안 됩니다. 두 가지 이상 바꾸세요!', 'err', 4200);
+        onClassesChanged();
+        refreshAll(); saveDraft();
+        $('aSeed').focus();
+        $('aSeed').setSelectionRange($('aSeed').value.length, $('aSeed').value.length);
+      });
+      wrap.appendChild(b);
+    });
+  })();
+
+  /* ── A3 클래스 ── */
+  function parseClasses() {
+    return v('a3Classes').split(/[,，、]+/).map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+  var classes = [];
+  function checkClasses() {
+    var h = $('a3Hint'), list = parseClasses();
+    var base = '쉼표(,)로 나눠 2개 이상 적습니다. Teachable Machine에서 붙일 클래스 이름과 글자 하나까지 똑같이 적으세요.';
+    if (!v('a3Classes')) { h.className = 'hint'; h.textContent = base + ' 여기 적은 클래스가 B5·C2·D4 칸에 자동으로 들어갑니다.'; return false; }
+    if (FORBIDDEN.test(v('a3Classes')) || /["'\\]/.test(v('a3Classes'))) {
+      h.className = 'hint err'; h.textContent = '⚠ 클래스 이름에는 따옴표·백틱(`)·역슬래시·${ 기호를 쓸 수 없습니다.'; return false;
+    }
+    var seen = {}, dup = list.filter(function (c) { var k = c.toLowerCase(); if (seen[k]) return true; seen[k] = 1; return false; });
+    if (dup.length) { h.className = 'hint err'; h.textContent = '⚠ 같은 클래스가 두 번 적혀 있어요: ' + dup.join(', '); return false; }
+    if (list.length < 2) { h.className = 'hint err'; h.textContent = '⚠ 클래스는 2개 이상이어야 합니다. 쉼표로 나눠 적으세요.'; return false; }
+    h.className = 'hint ok';
+    h.textContent = '✓ 클래스 ' + list.length + '개: ' + list.join(' · ') + '. B5·C2·D4에 반영됐어요.';
+    return true;
+  }
+
+  /* 클래스가 바뀌면 B5·C2·D4를 다시 그린다. 이미 쓴 값은 클래스 이름을 열쇠로 보존한다. */
+  var store = { b5: {}, c2: {}, d4: {} };
+  function onClassesChanged() {
+    var next = parseClasses();
+    if (JSON.stringify(next) === JSON.stringify(classes)) return;
+    collectDynamic();
+    classes = next;
+    buildB5(); buildC2(); buildD4();
+  }
+
+  /* ── B5 사진 수 표 ── */
+  function buildB5() {
+    var area = $('b5Area');
+    while (area.firstChild) area.removeChild(area.firstChild);
+    if (!classes.length) {
+      area.appendChild(el('div', 'notice', 'A3에 클래스를 적으면 클래스마다 사진 수를 적는 줄이 생깁니다.'));
+      renderB5Warns(); return;
+    }
+    var head = el('div', 'grow-row grow-head b5-row');
+    head.appendChild(el('span', '', '클래스'));
+    head.appendChild(el('span', '', '학습 데이터 (장)'));
+    head.appendChild(el('span', '', '시험 데이터 (장)'));
+    area.appendChild(head);
+    classes.forEach(function (c) {
+      var saved = store.b5[c] || {};
+      var row = el('div', 'grow-row b5-row');
+      row.dataset.cls = c;
+      row.appendChild(el('span', 'cls', c));
+      var tr = el('input'); tr.type = 'number'; tr.min = '0'; tr.max = '9999'; tr.placeholder = '학습 수'; tr.className = 'b5-train';
+      tr.value = saved.train || '';
+      var te = el('input'); te.type = 'number'; te.min = '0'; te.max = '999'; te.placeholder = '시험 수'; te.className = 'b5-test';
+      te.value = saved.test || '';
+      tr.setAttribute('aria-label', c + ' 학습 데이터 수');
+      te.setAttribute('aria-label', c + ' 시험 데이터 수');
+      row.appendChild(tr); row.appendChild(te);
+      area.appendChild(row);
+    });
+    renderB5Warns();
+  }
+  function readB5() {
+    var out = {};
+    document.querySelectorAll('#b5Area .b5-row[data-cls]').forEach(function (r) {
+      out[r.dataset.cls] = { train: r.querySelector('.b5-train').value.trim(), test: r.querySelector('.b5-test').value.trim() };
+    });
+    return out;
+  }
+  function renderB5Warns() {
+    var ul = $('b5Warns');
+    while (ul.firstChild) ul.removeChild(ul.firstChild);
+    if (!classes.length) return;
+    var b5 = readB5(), warns = [], trains = [];
+    classes.forEach(function (c) {
+      var r = b5[c] || {};
+      var tr = r.train === '' || r.train === undefined ? null : Number(r.train);
+      var te = r.test === '' || r.test === undefined ? null : Number(r.test);
+      if (tr !== null) {
+        trains.push({ c: c, n: tr });
+        if (tr < MIN_TRAIN) warns.push('「' + c + '」 학습 사진이 ' + tr + '장이에요. 클래스마다 ' + MIN_TRAIN + '장 이상 모아 주세요.');
+      }
+      if (te !== null) {
+        if (te === 0) warns.push('「' + c + '」 시험 사진이 0장이에요. 학습에 넣지 않은 사진을 따로 떼어 두어야 모델을 확인할 수 있어요.');
+        else if (te < MIN_TEST) warns.push('「' + c + '」 시험 사진이 ' + te + '장이에요. ' + MIN_TEST + '장 이상이면 결과를 더 믿을 수 있어요.');
+      }
+    });
+    if (trains.length >= 2) {
+      var max = trains.reduce(function (a, b) { return b.n > a.n ? b : a; });
+      var min = trains.reduce(function (a, b) { return b.n < a.n ? b : a; });
+      if (min.n > 0 && max.n / min.n > 2) {
+        warns.push('균형 경고: 「' + max.c + '」 ' + max.n + '장, 「' + min.c + '」 ' + min.n + '장으로 2배 넘게 차이 나요. 사진이 많은 쪽으로 답이 쏠릴 수 있어요(데이터 편향). 적은 쪽을 더 찍어 채우세요.');
+      } else if (min.n === 0 && max.n > 0) {
+        warns.push('균형 경고: 「' + min.c + '」의 학습 사진이 없어요.');
+      }
+    }
+    if (!warns.length && trains.length === classes.length) {
+      var li = el('li', 'ok', '✓ 양과 균형 기준을 지켰어요.'); ul.appendChild(li); return;
+    }
+    warns.forEach(function (w) { ul.appendChild(el('li', '', '⚠ ' + w)); });
+  }
+
+  /* ── C2 시험 결과 표 ── */
+  function testRowsFor(c) {
+    var b5 = readB5();
+    var n = b5[c] && b5[c].test !== '' ? parseInt(b5[c].test, 10) : NaN;
+    if (!(n > 0)) n = DEFAULT_TEST_ROWS;
+    return Math.min(n, MAX_TEST_ROWS);
+  }
+  function buildC2() {
+    var area = $('c2Area');
+    while (area.firstChild) area.removeChild(area.firstChild);
+    if (!classes.length) {
+      area.appendChild(el('div', 'notice', 'A3에 클래스를 적으면 시험 결과 표가 자동으로 생깁니다.'));
+      $('c2Summary').style.display = 'none';
+      return;
+    }
+    var head = el('div', 'grow-row grow-head c2-row');
+    ['번호', '정답 클래스', '사진 설명', '모델 답', '신뢰도 %', '판정'].forEach(function (t) { head.appendChild(el('span', '', t)); });
+    area.appendChild(head);
+    var no = 0;
+    classes.forEach(function (c) {
+      var saved = store.c2[c] || [];
+      var n = Math.max(testRowsFor(c), 1);
+      for (var i = 0; i < n; i++) {
+        var s = saved[i] || {};
+        no++;
+        var row = el('div', 'grow-row c2-row');
+        row.dataset.cls = c;
+        row.appendChild(el('span', 'num', String(no)));
+        row.appendChild(el('span', 'cls c2-cls', c));
+        var d = el('input', 'c2-desc'); d.type = 'text'; d.placeholder = '사진 설명 (예: 어두운 곳의 캔)'; d.value = s.desc || '';
+        var sel = el('select', 'c2-pred');
+        sel.appendChild(el('option', '', '모델 답'));
+        sel.firstChild.value = '';
+        classes.forEach(function (k) { var o = el('option', '', k); o.value = k; sel.appendChild(o); });
+        sel.value = classes.indexOf(s.pred) >= 0 ? s.pred : '';
+        var cf = el('input', 'c2-conf'); cf.type = 'number'; cf.min = '0'; cf.max = '100'; cf.placeholder = '%'; cf.value = s.conf || '';
+        d.setAttribute('aria-label', no + '번 사진 설명');
+        sel.setAttribute('aria-label', no + '번 모델 답');
+        cf.setAttribute('aria-label', no + '번 신뢰도');
+        row.appendChild(d); row.appendChild(sel); row.appendChild(cf);
+        row.appendChild(el('span', 'verdict', '-'));
+        area.appendChild(row);
+      }
+    });
+    updateC2();
+  }
+  function readC2() {
+    var out = {};
+    document.querySelectorAll('#c2Area .c2-row[data-cls]').forEach(function (r) {
+      var c = r.dataset.cls;
+      (out[c] = out[c] || []).push({
+        desc: r.querySelector('.c2-desc').value.trim(),
+        pred: r.querySelector('.c2-pred').value,
+        conf: r.querySelector('.c2-conf').value.trim()
+      });
+    });
+    return out;
+  }
+  var c2Stats = { total: 0, correct: 0, text: '' };
+  function updateC2() {
+    var total = 0, correct = 0, per = {};
+    document.querySelectorAll('#c2Area .c2-row[data-cls]').forEach(function (r) {
+      var c = r.dataset.cls, pred = r.querySelector('.c2-pred').value, vd = r.querySelector('.verdict');
+      if (!pred) { vd.textContent = '-'; vd.className = 'verdict'; return; }
+      var ok = pred === c;
+      total++; if (ok) correct++;
+      per[c] = per[c] || [0, 0]; per[c][1]++; if (ok) per[c][0]++;
+      vd.textContent = ok ? '맞음' : '틀림';
+      vd.className = 'verdict ' + (ok ? 'ok' : 'no');
+    });
+    var box = $('c2Summary');
+    if (!classes.length) { box.style.display = 'none'; c2Stats = { total: 0, correct: 0, text: '' }; return; }
+    box.style.display = 'block';
+    while (box.firstChild) box.removeChild(box.firstChild);
+    if (!total) {
+      box.appendChild(document.createTextNode('모델 답을 고르면 정확도가 자동으로 계산됩니다.'));
+      c2Stats = { total: 0, correct: 0, text: '' };
+      return;
+    }
+    var pct = Math.round(correct / total * 100);
+    box.appendChild(document.createTextNode('정확도 '));
+    box.appendChild(el('b', '', pct + '%'));
+    var perTxt = classes.filter(function (c) { return per[c]; }).map(function (c) { return c + ' ' + per[c][0] + '/' + per[c][1]; }).join(' · ');
+    box.appendChild(document.createTextNode('  (' + correct + '/' + total + '장 맞음 · 클래스별 ' + perTxt + ')'));
+    c2Stats = { total: total, correct: correct, text: pct + '% (' + correct + '/' + total + ') · ' + perTxt };
+  }
+
+  /* ── D4 클래스별 응답 ── */
+  function buildD4() {
+    var area = $('d4Area');
+    while (area.firstChild) area.removeChild(area.firstChild);
+    if (!classes.length) {
+      area.appendChild(el('div', 'notice', 'A3에 클래스를 적으면 클래스마다 응답을 적는 칸이 생깁니다.'));
+      return;
+    }
+    classes.forEach(function (c, i) {
+      var s = store.d4[c] || {};
+      var row = el('div', 'grow-row d4-row');
+      row.dataset.cls = c;
+      var top = el('div', 'top');
+      top.appendChild(el('span', 'cls', '「' + c + '」일 때'));
+      row.appendChild(top);
+      var msg = el('textarea', 'grow d4-msg'); msg.rows = 1;
+      msg.placeholder = c === OTHER ? '예: 분리배출할 물건이 아니에요. 물건을 화면 가운데에 크게 찍어 주세요.' : '예: ' + c + '이에요. (이 결과를 본 사람이 다음에 할 일)';
+      msg.value = s.msg || '';
+      msg.setAttribute('aria-label', c + ' 응답 문장');
+      row.appendChild(msg);
+      var sel = el('div', 'sel');
+      var emo = el('input', 'd4-emoji'); emo.type = 'text'; emo.maxLength = 8; emo.placeholder = '이모지'; emo.value = s.emoji || '';
+      emo.setAttribute('aria-label', c + ' 표시 이모지');
+      var col = el('select', 'd4-color');
+      COLORS.forEach(function (k) { var o = el('option', '', '■ ' + k + ' (' + k[1] + ')'); o.value = k[1]; o.textContent = '■ ' + k[0]; o.style.color = k[1]; col.appendChild(o); });
+      col.value = s.color || COLORS[i % COLORS.length][1];
+      col.style.color = col.value;
+      col.setAttribute('aria-label', c + ' 표시 색');
+      col.addEventListener('change', function () { col.style.color = col.value; });
+      sel.appendChild(emo); sel.appendChild(col);
+      row.appendChild(sel);
+      area.appendChild(row);
+    });
+    autoGrowAll();
+  }
+  function readD4() {
+    var out = {};
+    document.querySelectorAll('#d4Area .d4-row[data-cls]').forEach(function (r) {
+      out[r.dataset.cls] = {
+        msg: r.querySelector('.d4-msg').value.trim(),
+        emoji: r.querySelector('.d4-emoji').value.trim(),
+        color: r.querySelector('.d4-color').value
+      };
+    });
+    return out;
+  }
+  function colorName(hex) {
+    for (var i = 0; i < COLORS.length; i++) if (COLORS[i][1] === hex) return COLORS[i][0];
+    return hex;
+  }
+
+  /* 화면에 있는 동적 칸의 값을 store에 옮겨 둔다 (다시 그리기 전에) */
+  function collectDynamic() {
+    var b5 = readB5(), c2 = readC2(), d4 = readD4(), k;
+    for (k in b5) store.b5[k] = b5[k];
+    for (k in c2) store.c2[k] = c2[k];
+    for (k in d4) store.d4[k] = d4[k];
+  }
+
+  /* ── B4 「그 외」 안내 ── */
+  function checkB4() {
+    var h = $('b4Hint');
+    if (radio('b4Other') === '예' && classes.indexOf(OTHER) < 0) {
+      h.className = 'hint warn';
+      h.textContent = '⚠ A3 클래스 목록에 「그 외」를 추가하세요. Teachable Machine에서도 클래스 이름을 「그 외」로 똑같이 붙입니다.';
+    } else if (radio('b4Other') === '아니오' && classes.indexOf(OTHER) >= 0) {
+      h.className = 'hint warn';
+      h.textContent = '⚠ A3에 「그 외」가 들어 있어요. 만들지 않을 거면 A3에서 지우세요.';
+    } else { h.className = 'hint'; h.textContent = ''; }
+  }
+
+  /* ── C1 공유 링크 ── */
+  function normLink(s) { s = s.trim(); return s && s.charAt(s.length - 1) !== '/' ? s + '/' : s; }
+  function checkLink() {
+    var h = $('c1Hint'), s = v('c1Link');
+    if (!s) { h.className = 'hint'; h.textContent = '「모델 업로드」 뒤에 나오는 링크를 끝까지 복사해 붙여넣으세요.'; return false; }
+    if (!LINK_RE.test(s)) {
+      h.className = 'hint err';
+      h.textContent = '⚠ 공유 링크는 https://teachablemachine.withgoogle.com/models/모델ID/ 모양이어야 해요. 「모델 업로드」 뒤에 나오는 링크를 다시 복사하세요.';
+      return false;
+    }
+    h.className = 'hint ok'; h.textContent = '✓ 공유 링크 모양이 맞아요.';
+    return true;
+  }
+
+  /* ── D6 코드 생성 프롬프트 조립 ──
+     조각 배열 [텍스트, 종류]로 만들고, 미리보기는 종류별 색, 복사는 텍스트만 잇는다.
+     종류: 0 = 기술 명세(제공), 1 = 내가 쓴 부분, 2 = 아직 빈 칸 */
+  function buildSegments() {
+    var S = [];
+    function t(s) { S.push([s, 0]); }
+    function m(val, emptyLabel) {
+      if (val) S.push([val, 1]); else S.push(['(' + emptyLabel + ')', 2]);
+    }
+    var webcam = $('d3Webcam').checked;
+    var thr = Number(radio('d5Threshold') || 70);
+    var d4 = readD4();
+    var link = LINK_RE.test(v('c1Link')) ? normLink(v('c1Link')) : '';
+
+    t('당신은 웹 프로그램을 만드는 개발자입니다. 아래 [프로그램 설계]와 [기술 명세]를 그대로 지켜, 완전한 단일 HTML 파일 하나를 만들어 주세요.\n\n');
+    t('[프로그램 설계: 이 프로그램의 핵심]\n');
+    t('프로그램 이름: '); m(v('d1Name'), 'D1 프로그램 이름'); t('\n');
+    t('한 줄 소개: '); m(v('d2Intro'), 'D2 한 줄 소개'); t('\n');
+    t('이 프로그램이 돕는 사람과 문제: '); m(v('a1Problem'), 'A1 문제'); t('\n');
+    t('공유 링크(모델 URL): '); m(link, 'C1 공유 링크'); t('\n');
+    t('입력 방식: '); S.push([webcam ? '사진 올리기 + 웹캠' : '사진 올리기', 1]); t('\n');
+    t('클래스와 클래스별 응답 (클래스 이름은 Teachable Machine의 클래스 이름과 글자 하나까지 같아야 하므로 바꾸지 말 것):\n');
+    if (!classes.length) { t('- '); m('', 'A3 클래스'); t('\n'); }
+    classes.forEach(function (c) {
+      var r = d4[c] || {};
+      t('- 「'); S.push([c, 1]); t('」 → 문장: "'); m(r.msg, c + ' 응답 문장'); t('"');
+      t(' / 이모지: '); S.push([r.emoji || '(없음)', 1]);
+      t(' / 색: '); S.push([colorName(r.color) + '(' + r.color + ')', 1]); t('\n');
+    });
+    t('기준값: '); S.push([thr + '%', 1]); t(' (THRESHOLD = ' + (thr / 100).toFixed(2).replace(/0$/, '') + '). 가장 높은 신뢰도가 이 값보다 낮으면 답 대신 아래 문장을 보여 준다.\n');
+    t('모르겠어요 문장: "'); m(v('d5Unknown'), 'D5 문장'); t('"\n\n');
+
+    t('[기술 명세: 그대로 지킬 것]\n');
+    t('1. 결과물은 완전한 단일 HTML 파일 하나다. <head>에 <meta charset="UTF-8">와 viewport 메타 태그를 넣는다. 외부 스크립트는 아래 두 줄만 이 순서로 쓰고, 버전을 바꾸거나 @latest로 바꾸지 않는다. 그 밖의 라이브러리·CSS 프레임워크·웹 폰트는 쓰지 않는다. 이 프로그램에는 API 키가 없다. 모델 계산은 사용자의 브라우저 안에서 일어난다.\n');
+    t('   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"><\/script>\n');
+    t('   <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.3/dist/teachablemachine-image.min.js"><\/script>\n');
+    t('2. 되묻지 말고 합리적으로 정해서 바로 완성 코드를 출력한다. 설명 없이 코드 블록 하나만 출력하고, 마지막 줄은 </html>로 끝난다.\n');
+    t('3. 두 외부 스크립트 다음에 오는 내 <script>의 맨 첫머리에 ★ 5개로 눈에 띄는 주석 배너를 만들고, 배너에 「이 파일의 주인이 나중에 이 값들만 고칩니다」라고 적는다. 배너 바로 아래에 다음 네 상수를 둔다. 위 [프로그램 설계]의 문장은 의미를 바꾸지 않고, 문자열에 필요한 이스케이프만 적용한다.\n');
+    t('   const MODEL_URL = "(위 공유 링크)";   // 끝에 /가 없으면 코드에서 붙여 쓴다\n');
+    t('   const CLASS_RESPONSES = { "클래스 이름": { message: "응답 문장", emoji: "이모지", color: "#색" }, ... };   // 위 클래스별 응답 전부\n');
+    t('   const THRESHOLD = (위 기준값을 0~1 사이 값으로);\n');
+    t('   const UNKNOWN_MESSAGE = "(위 모르겠어요 문장)";\n');
+    t('4. 모델은 tmImage.load(MODEL_URL + "model.json", MODEL_URL + "metadata.json")로 불러온다. 불러오는 동안 「모델을 불러오는 중…」을 보여 주고 입력을 잠근다. 불러오기에 실패하면 오류 안내 영역에 「모델을 불러오지 못했어요. 공유 링크와 인터넷 연결을 확인하세요.」를 보여 준다.\n');
+    t('5. 모델을 불러온 뒤 model.getClassLabels()로 받은 클래스 이름과 CLASS_RESPONSES의 키를 비교한다. 응답이 없는 클래스나 모델에 없는 키가 있으면 그 이름을 적어 「클래스 이름이 Teachable Machine과 달라요: …」라고 화면에 경고한다. 경고가 있어도 프로그램은 계속 동작하고, 응답이 없는 클래스가 결과로 나오면 클래스 이름만 보여 준다.\n');
+    t('6. 입력은 사진 올리기가 기본이다. 파일 선택 버튼(accept="image/*")과 끌어다 놓기 영역을 함께 둔다. 고른 사진을 미리보기 <img>에 띄우고, 그 이미지가 다 불러와진 뒤(onload)에 model.predict(그 img 요소)를 호출한다. ');
+    if (webcam) {
+      t('「웹캠 시작」 버튼을 추가한다. 누르면 new tmImage.Webcam(224, 224, true)를 만들어 await webcam.setup()과 await webcam.play()를 실행하고, webcam.canvas를 화면에 붙인 뒤 requestAnimationFrame으로 webcam.update()와 model.predict(webcam.canvas)를 반복한다. 카메라를 쓸 수 없으면 「카메라를 쓸 수 없어요. 사진 올리기를 이용하세요.」라고 안내하고 사진 올리기는 그대로 쓸 수 있게 둔다.\n');
+    } else {
+      t('웹캠 기능은 넣지 않는다.\n');
+    }
+    t('7. 결과 영역에는 모든 클래스의 신뢰도 막대를 클래스 이름과 정수 %(Math.round(probability * 100))로 보여 준다. 가장 높은 신뢰도가 THRESHOLD 이상이면 그 클래스의 응답 카드(이모지 + 문장, 그 클래스의 색)를 크게 보여 주고, 그렇지 않으면 UNKNOWN_MESSAGE 카드를 보여 준다.\n');
+    t('8. 화면에 글자를 넣을 때는 반드시 textContent를 쓰고 innerHTML은 쓰지 않는다. 클래스 이름과 응답 문장도 textContent로만 넣는다.\n');
+    t('9. 화면(UI)은 프로그램 이름 제목, 한 줄 소개, 입력 영역, 결과 영역, 오류 안내 영역으로 짠다. 휴대전화 화면에서도 쓸 수 있게 반응형으로 만들고, 사진은 화면 폭을 넘지 않게 줄여 보여 준다. 색·모양·분위기는 프로그램 성격에 어울리게 자유롭게 디자인한다.');
+    return S;
+  }
+  function promptText() { return buildSegments().map(function (s) { return s[0]; }).join(''); }
+
+  function d6Missing() {
+    var miss = [];
+    if (!checkClasses()) miss.push('A3 클래스');
+    if (!v('a1Problem')) miss.push('A1 문제');
+    if (!checkLink()) miss.push('C1 공유 링크');
+    if (!v('d1Name')) miss.push('D1 프로그램 이름');
+    if (!v('d2Intro')) miss.push('D2 한 줄 소개');
+    var d4 = readD4();
+    var noMsg = classes.filter(function (c) { return !(d4[c] && d4[c].msg); });
+    if (noMsg.length) miss.push('D4 응답(' + noMsg.join(', ') + ')');
+    if (!v('d5Unknown')) miss.push('D5 문장');
+    return miss;
+  }
+  function forbiddenIn() {
+    var bad = [];
+    [['a1Problem', 'A1'], ['d1Name', 'D1'], ['d2Intro', 'D2'], ['d5Unknown', 'D5 문장']].forEach(function (p) {
+      if (FORBIDDEN.test($(p[0]).value)) bad.push(p[1]);
+    });
+    var d4 = readD4();
+    classes.forEach(function (c) {
+      var r = d4[c] || {};
+      if (FORBIDDEN.test(r.msg || '') || FORBIDDEN.test(r.emoji || '')) bad.push('D4 「' + c + '」');
+    });
+    return bad;
+  }
+  function refreshD() {
+    var miss = d6Missing(), bad = forbiddenIn();
+    var ready = !miss.length && !bad.length;
+    $('btnCopy').disabled = !ready;
+    var h = $('dHint');
+    if (bad.length) {
+      h.className = 'hint err';
+      h.textContent = '⚠ 백틱(`)과 ${ 기호는 코드가 깨질 수 있어 쓸 수 없습니다. 다른 표현으로 바꿔 주세요: ' + bad.join(', ');
+    } else if (miss.length) {
+      h.className = 'hint err';
+      h.textContent = '아직 비어 있거나 고칠 칸이 있어요: ' + miss.join(', ');
+    } else {
+      h.className = 'hint ok';
+      h.textContent = '✓ 조립 완료. 복사해서 chatgpt.com에 붙여넣으세요.';
+    }
+    var box = $('dPreview');
+    while (box.firstChild) box.removeChild(box.firstChild);
+    buildSegments().forEach(function (s) {
+      if (s[1] === 0) box.appendChild(document.createTextNode(s[0]));
+      else box.appendChild(el('span', s[1] === 1 ? 'mine' : 'empty', s[0]));
+    });
+  }
+  $('btnCopy').addEventListener('click', function () {
+    var text = promptText();
+    function done() { showToast('복사됐어요! chatgpt.com에 붙여넣으세요.', 'ok', 3600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+    } else { fallbackCopy(text); done(); }
+  });
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }
+
+  /* ── B6 캡처 첨부 (자동 리사이즈) ── */
+  var images = { 1: '', 2: '' };   // 새로 고른 캡처 (base64)
+  var imageUrls = { 1: '', 2: '' }; // 지난 제출본에 이미 저장된 캡처 링크
+  function resizeAndEncode(file, cb) {
+    var img = new Image(), url = URL.createObjectURL(file);
+    img.onload = function () {
+      var scale = Math.min(IMG_MAX_W / img.width, IMG_MAX_H / img.height, 1);
+      var cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * scale); cv.height = Math.round(img.height * scale);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      URL.revokeObjectURL(url);
+      var b64 = cv.toDataURL('image/jpeg', IMG_QUALITY);
+      cb(b64, Math.round(b64.length * 0.75 / 1024), cv.width, cv.height);
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+    img.src = url;
+  }
+  function renderUpload(idx, info) {
+    var box = $('up' + idx), img = box.querySelector('img'), meta = box.querySelector('.meta'), rm = box.querySelector('.rm');
+    while (meta.firstChild) meta.removeChild(meta.firstChild);
+    if (images[idx]) {
+      img.src = images[idx]; img.style.display = 'block'; rm.style.display = 'inline-block';
+      meta.textContent = info || '첨부됨 (제출할 때 함께 보냅니다)';
+    } else {
+      img.removeAttribute('src'); img.style.display = 'none'; rm.style.display = 'none';
+      if (imageUrls[idx]) {
+        meta.appendChild(document.createTextNode('지난 제출본의 캡처가 저장되어 있어요: '));
+        var a = el('a', '', '열어 보기'); a.href = imageUrls[idx]; a.target = '_blank'; a.rel = 'noopener';
+        meta.appendChild(a);
+        meta.appendChild(document.createTextNode(' (새로 올리면 바뀝니다)'));
+      } else {
+        meta.textContent = '이미지 파일을 고르거나 이 칸에 끌어다 놓으세요.';
+      }
+    }
+  }
+  function handleImage(idx, file) {
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { showToast('이미지 파일만 첨부할 수 있어요.', 'err'); return; }
+    resizeAndEncode(file, function (b64, kb, w, h) {
+      if (!b64) { showToast('이미지를 읽지 못했어요. 다른 파일로 해 보세요.', 'err'); return; }
+      images[idx] = b64;
+      renderUpload(idx, '첨부됨 · ' + w + '×' + h + ' · 약 ' + kb + 'KB (제출할 때 함께 보냅니다)');
+      saveDraft(); refreshAll();
+    });
+  }
+  [1, 2].forEach(function (idx) {
+    var box = $('up' + idx), input = box.querySelector('input[type=file]');
+    input.addEventListener('change', function () { handleImage(idx, this.files && this.files[0]); this.value = ''; });
+    box.addEventListener('dragover', function (e) { e.preventDefault(); box.classList.add('drag'); });
+    box.addEventListener('dragleave', function () { box.classList.remove('drag'); });
+    box.addEventListener('drop', function (e) {
+      e.preventDefault(); box.classList.remove('drag');
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      handleImage(idx, f);
+    });
+    box.querySelector('.rm').addEventListener('click', function () { images[idx] = ''; renderUpload(idx); saveDraft(); });
+    renderUpload(idx);
+  });
+
+  /* ── F 코드 칸 — 글자 수 ── */
+  function countCode() {
+    var n = $('fCode').value.length, c = $('codeCount');
+    c.textContent = n.toLocaleString('ko-KR') + '자';
+    c.className = n >= MAX_LEN ? 'over' : n >= WARN_LEN ? 'warn' : '';
+    if (n >= MAX_LEN) c.textContent += ' (50,000자 이상은 제출할 수 없어요)';
+    else if (n >= WARN_LEN) c.textContent += ' (한도 50,000자에 가까워요)';
+  }
+  $('fCode').addEventListener('input', countCode);
+  function loadCodeFile(file) {
+    if (!file) return;
+    if (!/\.html?$/i.test(file.name) && file.type !== 'text/html') { showToast('HTML 파일(.html)만 올릴 수 있어요.', 'err', 3600); return; }
+    var reader = new FileReader();
+    reader.onload = function () {
+      $('fCode').value = String(reader.result || '');
+      countCode(); saveDraft(); refreshAll();
+      showToast("'" + file.name + "' 파일에서 코드를 불러왔어요 (" + $('fCode').value.length.toLocaleString('ko-KR') + '자).', 'ok', 4200);
+    };
+    reader.onerror = function () { showToast('파일을 읽지 못했어요. 메모장에서 복사해 붙여넣어 보세요.', 'err', 4200); };
+    reader.readAsText(file, 'utf-8');
+  }
+  $('fFile').addEventListener('change', function () { loadCodeFile(this.files && this.files[0]); this.value = ''; });
+  $('fCode').addEventListener('dragover', function (e) { e.preventDefault(); });
+  $('fCode').addEventListener('drop', function (e) {
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) { e.preventDefault(); loadCodeFile(f); }
+  });
+
+  /* ── 폼 데이터 ──
+     시트에는 사람이 읽는 표(B5·C2·D4)를 글로 보내고, 이어쓰기용 구조는 restoreJson 한 칸에 담는다. */
+  var FIELD_IDS = [
+    'studentName', 'studentId', 'today',
+    'a1Problem', 'a2Topic', 'a3Classes', 'a4How', 'aSeed',
+    'b2Angle', 'b2Light', 'b2Back', 'b2Kind', 'b3Note', 'b4Why',
+    'c1Link', 'c3Photo', 'c3Why', 'c4Plan',
+    'd1Name', 'd2Intro', 'd5Unknown',
+    'e1In', 'e1Hope', 'e1Real', 'e2In', 'e2Hope', 'e2Real',
+    'eProblem', 'eFix', 'eSameInput', 'eAfterOut', 'eJudge',
+    'fCode', 'fLearned', 'fImprove', 'fExtend', 'fNote'
+  ];
+  function c3Criteria() {
+    return Array.prototype.map.call(document.querySelectorAll('#c3Criteria input:checked'), function (x) { return x.value; }).join(', ');
+  }
+  function b5Text(b5) {
+    return classes.map(function (c) { var r = b5[c] || {}; return c + ': 학습 ' + (r.train || '-') + ' · 시험 ' + (r.test || '-'); }).join('\n');
+  }
+  function c2Text(c2) {
+    var lines = [], no = 0;
+    classes.forEach(function (c) {
+      (c2[c] || []).forEach(function (r) {
+        no++;
+        if (!r.desc && !r.pred && !r.conf) return;
+        lines.push(no + '. [정답 ' + c + '] ' + (r.desc || '-') + ' → 모델 답 ' + (r.pred || '-') + ' ' + (r.conf ? r.conf + '%' : '-') +
+          (r.pred ? (r.pred === c ? ' 맞음' : ' 틀림') : ''));
+      });
+    });
+    return lines.join('\n');
+  }
+  function d4Text(d4) {
+    return classes.map(function (c) { var r = d4[c] || {}; return c + ' → ' + (r.emoji ? r.emoji + ' ' : '') + (r.msg || '-') + ' [' + colorName(r.color) + ']'; }).join('\n');
+  }
+  function getFormData(withImages) {
+    collectDynamic();
+    var b5 = readB5(), c2 = readC2(), d4 = readD4();
+    var d = { source: SOURCE, password: v('password') };
+    FIELD_IDS.forEach(function (id) { d[id] = v(id); });
+    d.c1Link = d.c1Link && LINK_RE.test(d.c1Link) ? normLink(d.c1Link) : d.c1Link;
+    d.a4Can = radio('a4Can');
+    d.b1Source = radio('b1Source');
+    d.b3Mixed = $('b3Mixed').checked ? '예' : '';
+    d.b4Other = radio('b4Other');
+    d.b5Counts = b5Text(b5);
+    d.c2Table = c2Text(c2);
+    d.c2Accuracy = c2Stats.text;
+    d.c3Criteria = c3Criteria();
+    d.d3Input = $('d3Webcam').checked ? '사진 올리기 + 웹캠' : '사진 올리기';
+    d.d4Table = d4Text(d4);
+    d.d5Threshold = radio('d5Threshold');
+    d.eWhich = radio('eWhich');
+    d.b6Url1 = imageUrls[1];
+    d.b6Url2 = imageUrls[2];
+    d.restoreJson = JSON.stringify({ v: 1, b5: store.b5, c2: store.c2, d4: store.d4, webcam: $('d3Webcam').checked });
+    if (withImages) {
+      if (images[1]) d.b6Image1 = images[1];
+      if (images[2]) d.b6Image2 = images[2];
+    }
+    return d;
+  }
+  function setFormData(d) {
+    FIELD_IDS.forEach(function (id) { if (d[id] !== undefined) $(id).value = d[id]; });
+    if (d.a4Can !== undefined) setRadio('a4Can', d.a4Can);
+    if (d.b1Source !== undefined) setRadio('b1Source', d.b1Source);
+    $('b3Mixed').checked = d.b3Mixed === '예';
+    if (d.b4Other !== undefined) setRadio('b4Other', d.b4Other);
+    if (d.d5Threshold) setRadio('d5Threshold', d.d5Threshold);
+    if (d.eWhich !== undefined) setRadio('eWhich', d.eWhich);
+    var crit = String(d.c3Criteria || '').split(/,\s*/);
+    document.querySelectorAll('#c3Criteria input').forEach(function (x) { x.checked = crit.indexOf(x.value) >= 0; });
+    var r = {};
+    try { r = JSON.parse(d.restoreJson || '{}') || {}; } catch (e) { r = {}; }
+    store = { b5: r.b5 || {}, c2: r.c2 || {}, d4: r.d4 || {} };
+    $('d3Webcam').checked = r.webcam !== undefined ? !!r.webcam : /웹캠/.test(d.d3Input || '');
+    imageUrls[1] = /^https?:\/\//.test(d.b6Url1 || '') ? d.b6Url1 : '';
+    imageUrls[2] = /^https?:\/\//.test(d.b6Url2 || '') ? d.b6Url2 : '';
+    images[1] = /^data:image\//.test(d.b6Image1 || '') ? d.b6Image1 : '';
+    images[2] = /^data:image\//.test(d.b6Image2 || '') ? d.b6Image2 : '';
+    renderUpload(1); renderUpload(2);
+    if (v('aSeed')) $('seedBox').open = true;   // 적어 둔 씨앗 기록이 서랍에 숨지 않게
+    classes = parseClasses();
+    buildB5(); buildC2(); buildD4();
+    sidHint(); countCode(); refreshAll();
+  }
+
+  /* ── 임시저장 ── */
+  var draftTimer = null;
+  /* 제출 결과·경고가 떠 있는 동안에는 임시저장 메시지가 그 위를 덮지 않게 잠근다.
+     마지막 칸을 채우고 곧바로 제출을 누르면 blur가 change를 일으켜 임시저장이 한 번 더 돌고,
+     그 결과가 "비어 있는 칸" 안내를 0.5초 만에 지워 버린다. */
+  var draftLocked = false;
+  function draftMsg(text, cls, lock) {
+    var s = $('draftStatus');
+    s.textContent = text; s.className = cls || ''; draftLocked = !!lock;
+  }
+  function saveDraft() {
+    clearTimeout(draftTimer);
+    /* 입력이 시작되면 곧바로 '대기 중' — 앞서 뜬 '임시저장됨'이 남아 있으면 학생이 저장된 줄 알고 창을 닫는다 */
+    if (!draftLocked) draftMsg('입력 중… 잠시 멈추면 임시저장됩니다', 'pending');
+    draftTimer = setTimeout(function () {
+      var d = getFormData(true); delete d.password;
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+        if (!draftLocked) draftMsg('임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR'), 'saved');
+      } catch (e) {
+        /* 캡처 이미지 때문에 저장 공간이 모자랄 수 있다 — 이미지를 빼고 한 번 더 */
+        try {
+          delete d.b6Image1; delete d.b6Image2;
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+          if (!draftLocked) draftMsg('임시저장됨 (캡처 이미지는 저장 공간이 모자라 빠졌어요) · ' + new Date().toLocaleTimeString('ko-KR'), 'pending');
+        } catch (e2) {
+          draftMsg('임시저장 실패: 이 기기에 저장 공간이 부족해요', 'failed');
+        }
+      }
+    }, 600);
+  }
+  function loadDraft() {
+    try {
+      var raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) setFormData(JSON.parse(raw));
+    } catch (e) {}
+  }
+
+  /* ── 서술형 칸 자동 확장 (fCode 제외) ── */
+  function autoGrow(ta) {
+    /* 닫힌 <details> 안의 칸은 렌더되지 않아 scrollHeight가 0이다 — 열릴 때 다시 잰다 */
+    if (!ta.offsetParent && ta.offsetHeight === 0) return;
+    ta.style.height = 'auto';
+    ta.style.height = (ta.scrollHeight + 2) + 'px';
+  }
+  function autoGrowAll() {
+    var tas = document.querySelectorAll('textarea');
+    for (var i = 0; i < tas.length; i++) if (tas[i].id !== 'fCode') autoGrow(tas[i]);
+  }
+  document.querySelectorAll('details').forEach(function (d) {
+    d.addEventListener('toggle', function () {
+      if (d.open) d.querySelectorAll('textarea').forEach(function (ta) { if (ta.id !== 'fCode') autoGrow(ta); });
+    });
+  });
+
+  function refreshAll() {
+    checkClasses(); checkLink(); checkB4(); renderB5Warns(); updateC2(); refreshD();
+  }
+
+  /* B5 시험 수가 바뀌면 C2 줄 수를 맞춘다 (값은 보존) */
+  var c2Timer = null;
+  function scheduleC2Rebuild() {
+    clearTimeout(c2Timer);
+    c2Timer = setTimeout(function () { collectDynamic(); buildC2(); }, 500);
+  }
+  var classTimer = null;
+  document.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'TEXTAREA' && t.id !== 'fCode') autoGrow(t);
+    if (t && t.id === 'studentId') sidHint();
+    if (t && t.id === 'a3Classes') {
+      clearTimeout(classTimer);
+      classTimer = setTimeout(function () { onClassesChanged(); refreshAll(); }, 500);
+    }
+    if (t && t.classList && t.classList.contains('b5-test')) scheduleC2Rebuild();
+    draftLocked = false;
+    saveDraft(); refreshAll();
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'a3Classes') onClassesChanged();
+    saveDraft(); refreshAll();
+  });
+
+  /* ── 초기화 ── */
+  $('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요? 되돌릴 수 없어요.')) return;
+    document.querySelectorAll('input[type="text"], input[type="password"], input[type="number"], textarea').forEach(function (x) { x.value = ''; });
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]:not([disabled])').forEach(function (x) { x.checked = false; });
+    setRadio('d5Threshold', '70');
+    $('today').value = todayLocal();
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    store = { b5: {}, c2: {}, d4: {} };
+    images = { 1: '', 2: '' }; imageUrls = { 1: '', 2: '' };
+    renderUpload(1); renderUpload(2);
+    $('seedBox').open = false;
+    classes = []; buildB5(); buildC2(); buildD4();
+    $('submitHint').className = 'hint';
+    $('submitHint').textContent = '다 썼으면 화면 맨 아래 [제출하기]를 누르세요.';
+    sidHint(); countCode(); autoGrowAll(); refreshAll();
+    draftMsg('초기화됨', '');
+    showToast('모든 입력을 지웠어요.', 'ok', 3200);
+  });
+
+  /* ── 교사 설정 패널 (⚙ 세 번) ── */
+  var gearCount = 0;
+  $('btnGear').addEventListener('click', function () {
+    gearCount++;
+    if (gearCount >= 3) $('settingsPanel').style.display = 'block';
+  });
+  $('btnSaveUrl').addEventListener('click', function () {
+    var u = v('scriptUrl');
+    try {
+      if (u) { localStorage.setItem(URL_KEY, u); $('urlStatus').textContent = ' 저장됨 ✓'; }
+      else { localStorage.removeItem(URL_KEY); $('urlStatus').textContent = ' 기본값 사용'; }
+    } catch (e) { $('urlStatus').textContent = ' 저장 실패'; }
+  });
+  function gasUrl() {
+    try { return localStorage.getItem(URL_KEY) || DEFAULT_URL; } catch (e) { return DEFAULT_URL; }
+  }
+
+  /* ── 이어쓰기 (lookup — JSONP) ── */
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'cb_' + Math.random().toString(36).slice(2);
+      var script = document.createElement('script');
+      window[cb] = function (data) { delete window[cb]; script.remove(); resolve(data); };
+      script.src = url + '&callback=' + cb;
+      script.onerror = function () { delete window[cb]; script.remove(); reject(new Error('불러오기 실패')); };
+      document.head.appendChild(script);
+    });
+  }
+  $('btnLookup').addEventListener('click', function () {
+    var sid = v('studentId'), name = v('studentName'), pw = v('password');
+    if (!SID_RE.test(sid) || !name || !pw) {
+      draftMsg('맨 위의 이름·학번(5자리)·암호를 먼저 채워 주세요', 'failed', true);
+      showToast('맨 위의 이름·학번·암호를 먼저 채워 주세요.', 'err', 4000);
+      return;
+    }
+    draftMsg('지난 제출본을 불러오는 중…', 'pending', true);
+    var qs = 'action=lookup&source=' + SOURCE +
+      '&studentId=' + encodeURIComponent(sid) +
+      '&studentName=' + encodeURIComponent(name) +
+      '&password=' + encodeURIComponent(pw);
+    jsonp(gasUrl() + '?' + qs).then(function (res) {
+      if (res.status === 'ok') {
+        setFormData(res.data || {});
+        draftMsg('✓ ' + (res.submittedAt || '') + ' 제출본을 불러왔어요', 'saved', true);
+        showToast('지난 제출본을 불러왔어요. 이어서 쓰면 됩니다.', 'ok', 4200);
+      } else if (res.status === 'denied') {
+        draftMsg('암호가 달라요. 제출할 때 정한 암호를 확인하세요', 'failed', true);
+        showToast('암호가 달라요.', 'err', 3600);
+      } else {
+        draftMsg('제출 기록이 없어요. 처음이라면 그냥 작성하면 됩니다', 'failed', true);
+        showToast('제출 기록이 없어요.', 'err', 3600);
+      }
+    }).catch(function (e) {
+      draftMsg('불러오지 못했어요: ' + e.message, 'failed', true);
+      showToast('불러오지 못했어요: ' + e.message, 'err', 4200);
+    });
+  });
+
+  /* ── 제출 ── */
+  $('btnSubmit').addEventListener('click', function () {
+    var hint = $('submitHint');
+    var required = [
+      ['studentName', '이름'], ['studentId', '학번'], ['password', '제출 암호'],
+      ['a1Problem', 'A1'], ['a2Topic', 'A2'], ['a3Classes', 'A3'],
+      ['c1Link', 'C1 공유 링크'], ['c3Photo', 'C3 틀린 사진'], ['c3Why', 'C3 이유'],
+      ['d1Name', 'D1'], ['fCode', 'F 최종 코드'], ['fLearned', 'F 배운 점'], ['fImprove', 'F 성능 개선 방안']
+    ];
+    var missing = required.filter(function (r) { return !v(r[0]); }).map(function (r) { return r[1]; });
+    if (missing.length) {
+      hint.className = 'hint err';
+      hint.textContent = '비어 있어요: ' + missing.join(', ');
+      showToast('아직 비어 있는 칸이 있어요: ' + missing.join(', '), 'err', 4200);
+      draftMsg('비어 있는 칸: ' + missing.join(', '), 'failed', true);
+      return;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      hint.className = 'hint err'; hint.textContent = '학번은 숫자 5자리입니다.';
+      draftMsg('학번은 숫자 5자리입니다', 'failed', true);
+      return;
+    }
+    if ($('fCode').value.length >= MAX_LEN) {
+      hint.className = 'hint err';
+      hint.textContent = '코드가 50,000자를 넘어 제출할 수 없어요. 선생님께 말씀해 주세요.';
+      draftMsg('코드가 너무 길어 제출할 수 없어요', 'failed', true);
+      return;
+    }
+
+    var btn = $('btnSubmit');
+    btn.disabled = true;
+    hint.className = 'hint'; hint.textContent = '제출하는 중…';
+    draftMsg('제출하는 중…', 'pending', true);
+
+    fetch(gasUrl(), {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(getFormData(true))
+    }).then(function () {
+      hint.className = 'hint ok';
+      hint.textContent = '✓ 제출 완료. 제출 현황에서 확인하세요.';
+      draftMsg('✓ 제출 완료 · ' + new Date().toLocaleTimeString('ko-KR'), 'saved', true);
+      showToast('제출 완료! 내 모델로 만든 첫 프로그램을 축하해요 🎉', 'ok', 4600);
+      btn.disabled = false;
+    }).catch(function () {
+      hint.className = 'hint err';
+      hint.textContent = '전송에 실패했어요. 잠시 후 다시 눌러 주세요.';
+      draftMsg('제출 실패: 다시 눌러 주세요', 'failed', true);
+      btn.disabled = false;
+    });
+  });
+
+  /* ── 시작 ── */
+  $('today').value = todayLocal();
+  try { $('scriptUrl').value = localStorage.getItem(URL_KEY) || ''; } catch (e) {}
+  buildB5(); buildC2(); buildD4();
+  loadDraft();
+  /* 제출 현황에서 넘어오면 학번을 채워 둔다 (?sid=20315) */
+  var qsid = new URLSearchParams(location.search).get('sid');
+  if (qsid && SID_RE.test(qsid) && !v('studentId')) $('studentId').value = qsid;
+  sidHint(); countCode(); autoGrowAll(); refreshAll();
+})();
+</script>
+<!-- 제출 마감 — apps-script.js SOURCES의 deadline과 같은 값 (생성일 + 45일).
+     서버도 마감 뒤 제출을 받지 않는다. 제출 확인(조회)은 마감 뒤에도 쓸 수 있다. -->
+<script>
+(function () {
+  var DEADLINE = '2026-12-04';
+  var end = new Date(DEADLINE + 'T23:59:59+09:00');
+  var closed = Date.now() > end.getTime();
+  var p = DEADLINE.split('-');
+  var label = Number(p[1]) + '월 ' + Number(p[2]) + '일';
+  var lookupBtn = document.getElementById('btnLookup');
+  var lookupName = lookupBtn ? lookupBtn.textContent.trim() : '제출 확인';
+  var box = document.createElement('div');
+  box.id = 'deadlineNotice';
+  box.setAttribute('role', 'status');
+  box.style.cssText = 'margin:14px 0 4px; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; line-height:1.5;' +
+    (closed ? 'background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5;'
+            : 'background:#eef4ff; color:#1e3a8a; border:1px solid #c7d7fe;');
+  box.textContent = closed
+    ? '⏰ 제출이 마감되었습니다 (' + label + ' 23:59까지). 이미 낸 내용은 [' + lookupName + ']에서 볼 수 있습니다.'
+    : '⏰ 제출 마감: ' + label + ' 23:59까지';
+  var hero = document.querySelector('header');
+  if (hero) hero.appendChild(box);
+  if (!closed) return;
+  var btn = document.getElementById('btnSubmit') || document.getElementById('btnSave');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '제출 마감';
+  btn.style.opacity = '0.5';
+  btn.style.cursor = 'not-allowed';
+  btn.title = label + '에 마감되었습니다.';
+  btn.addEventListener('click', function (e) { e.stopImmediatePropagation(); e.preventDefault(); }, true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNN 시각화 - 이미지가 처리되는 과정</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.17.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --main: #2196f3; --dark: #1565c0; --light: #e3f2fd;
+  --accent: #42a5f5; --white: #fff;
+  --g50: #fafafa; --g100: #f5f5f5; --g200: #eee; --g300: #e0e0e0;
+  --g500: #9e9e9e; --g600: #757575; --g700: #616161; --g800: #424242; --g900: #212121;
+  --orange: #ff9800; --purple: #7c4dff; --green: #43a047;
+  --red: #e53935; --teal: #00897b; --pink: #e91e63;
+  --pipeline-bg: #f8faff;
+}
+html, body {
+  width: 100%; min-height: 100vh;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--g100); color: var(--g900); font-size: 15px;
+}
+/* ── Header ── */
+.header {
+  background: linear-gradient(135deg, #0d47a1, var(--main), var(--purple));
+  color: white; padding: 1.4rem 2rem; text-align: center;
+  box-shadow: 0 4px 24px rgba(13,71,161,0.3); position: relative; z-index: 10;
+  overflow: hidden;
+}
+.header-nn-bg {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; opacity: 0.12;
+}
+.header-content { position: relative; z-index: 2; }
+.header h1 { font-size: 1.7rem; font-weight: 900; letter-spacing: -0.5px; }
+.header p { font-size: 0.88rem; opacity: 0.85; margin-top: 0.2rem; }
+.header-badges { display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.6rem; flex-wrap: wrap; }
+.badge {
+  padding: 0.2rem 0.7rem; border-radius: 1rem; font-size: 0.72rem; font-weight: 600;
+  background: rgba(255,255,255,0.2); backdrop-filter: blur(4px);
+}
+@keyframes nn-pulse { 0%,100%{opacity:0.08;} 50%{opacity:0.18;} }
+.nn-node-anim { animation: nn-pulse 3s ease-in-out infinite; }
+@keyframes nn-flow {
+  0% { stroke-dashoffset: 20; }
+  100% { stroke-dashoffset: 0; }
+}
+.nn-edge-anim { stroke-dasharray: 4 4; animation: nn-flow 1.5s linear infinite; }
+
+/* ── Controls ── */
+.controls {
+  max-width: 1300px; margin: 1.2rem auto 0; padding: 0 1rem;
+  display: flex; gap: 1rem; flex-wrap: wrap; align-items: stretch;
+}
+.ctrl-card {
+  background: white; border-radius: 0.8rem; padding: 1rem 1.2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06); flex: 1; min-width: 250px;
+}
+.ctrl-card h3 {
+  font-size: 0.85rem; font-weight: 700; color: var(--dark);
+  margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.4rem;
+}
+.samples { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.samp {
+  width: 60px; height: 60px; border-radius: 0.5rem; cursor: pointer;
+  border: 2.5px solid transparent; transition: all 0.2s;
+  image-rendering: pixelated; background: var(--g100);
+}
+.samp:hover { border-color: var(--accent); transform: scale(1.05); }
+.samp.sel { border-color: var(--main); box-shadow: 0 0 0 3px rgba(33,150,243,0.25); }
+.upload-area {
+  width: 60px; height: 60px; border-radius: 0.5rem;
+  border: 2px dashed var(--g300); background: var(--g50);
+  cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; font-size: 0.65rem;
+  color: var(--g600); transition: all 0.2s; gap: 0.1rem;
+}
+.upload-area:hover { border-color: var(--main); color: var(--main); }
+.upload-area span { font-size: 1.3rem; }
+.go-btn {
+  padding: 0.6rem 1.8rem; border: none; border-radius: 0.5rem;
+  background: linear-gradient(135deg, var(--main), var(--dark)); color: white;
+  font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  box-shadow: 0 3px 12px rgba(33,150,243,0.3); transition: all 0.2s;
+  display: none; margin-top: 0.5rem;
+}
+.go-btn.show { display: inline-flex; align-items: center; gap: 0.4rem; }
+.go-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 18px rgba(33,150,243,0.4); }
+.mode-toggle {
+  display: flex; gap: 0; border-radius: 0.5rem; overflow: hidden;
+  border: 2px solid var(--g200); margin-top: 0.5rem;
+}
+.mode-btn {
+  flex: 1; padding: 0.5rem 0.8rem; border: none; background: white;
+  font-family: inherit; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; color: var(--g600); transition: all 0.2s;
+}
+.mode-btn.active { background: var(--main); color: white; }
+.mode-btn:hover:not(.active) { background: var(--light); }
+
+/* ── Pipeline ── */
+.pipeline-wrap {
+  max-width: 1300px; margin: 1rem auto; padding: 0 1rem;
+}
+.pipeline-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 0.6rem;
+}
+.pipeline-header h2 { font-size: 1rem; font-weight: 700; color: var(--dark); }
+.pipeline-info { font-size: 0.75rem; color: var(--g500); }
+
+.pipeline-container {
+  background: linear-gradient(180deg, #fafcff 0%, white 100%);
+  border-radius: 1rem; padding: 1.2rem;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+  overflow-x: auto; position: relative;
+  border: 1px solid rgba(33,150,243,0.08);
+}
+.pipeline {
+  display: flex; align-items: center; gap: 0; min-width: max-content;
+  padding: 0.5rem 0;
+}
+.layer-group {
+  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+}
+.layer-label {
+  font-size: 0.68rem; font-weight: 700; color: var(--g700);
+  margin-bottom: 0.3rem; text-align: center; white-space: nowrap;
+}
+.layer-sublabel {
+  font-size: 0.6rem; color: var(--g500); font-family: monospace;
+  margin-top: 0.2rem;
+}
+.layer-maps {
+  display: grid; position: relative;
+}
+.layer-maps.stacked {
+  /* Stacked cards showing depth/channels */
+}
+.layer-maps.stacked .fmap {
+  grid-area: 1 / 1;
+  transition: all 0.25s;
+}
+.layer-maps.stacked .fmap:nth-child(1) { transform: translate(-4px, -4px); z-index: 3; }
+.layer-maps.stacked .fmap:nth-child(2) { transform: translate(0px, 0px); z-index: 2; opacity: 0.85; }
+.layer-maps.stacked .fmap:nth-child(3) { transform: translate(4px, 4px); z-index: 1; opacity: 0.7; }
+.layer-maps.stacked:hover .fmap:nth-child(1) { transform: translate(-10px, -8px); opacity: 1; }
+.layer-maps.stacked:hover .fmap:nth-child(2) { transform: translate(0px, 0px); opacity: 1; }
+.layer-maps.stacked:hover .fmap:nth-child(3) { transform: translate(10px, 8px); opacity: 1; }
+.layer-maps.single {
+  display: flex; justify-content: center;
+}
+.fmap {
+  border-radius: 0.3rem; cursor: pointer; transition: all 0.2s;
+  image-rendering: pixelated; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.fmap:hover { transform: scale(1.15); box-shadow: 0 3px 12px rgba(33,150,243,0.35), 0 0 20px rgba(33,150,243,0.15); z-index: 5; }
+.fmap.active-node { box-shadow: 0 0 8px rgba(33,150,243,0.3); }
+.fmap-single {
+  width: 64px; height: 64px;
+}
+.fmap-multi {
+  width: 44px; height: 44px;
+}
+.fmap-small {
+  width: 32px; height: 32px;
+}
+.fmap-tiny {
+  width: 24px; height: 24px;
+}
+
+.conn {
+  width: 36px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; position: relative;
+}
+.conn svg { width: 36px; height: 80px; overflow: visible; }
+.nn-wire { fill: none; stroke: rgba(180,180,180,0.25); stroke-width: 1.2; }
+.conn.active .nn-wire { stroke: rgba(33,150,243,0.3); }
+.nn-wire-main { fill: none; stroke: var(--g300); stroke-width: 1.8; }
+.conn.active .nn-wire-main { stroke: var(--main); stroke-width: 2; }
+.nn-wire-flow { fill: none; stroke: rgba(33,150,243,0); stroke-width: 1.5; stroke-dasharray: 3 5; }
+.conn.active .nn-wire-flow { stroke: rgba(33,150,243,0.6); animation: nn-flow 1s linear infinite; }
+.nn-synapse { fill: var(--g300); }
+.conn.active .nn-synapse { fill: var(--main); filter: drop-shadow(0 0 3px rgba(33,150,243,0.5)); }
+
+/* layer click highlight */
+.layer-group.clickable { cursor: pointer; padding: 0.4rem; border-radius: 0.6rem; transition: background 0.2s; }
+.layer-group.clickable:hover { background: var(--light); }
+
+/* ── Detail Panel ── */
+.detail-panel {
+  max-width: 1300px; margin: 0.8rem auto; padding: 0 1rem;
+  display: none;
+}
+.detail-panel.open { display: block; }
+.detail-card {
+  background: white; border-radius: 1rem; overflow: hidden;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.detail-header {
+  padding: 1rem 1.5rem; display: flex; align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--g200);
+  background: linear-gradient(135deg, var(--light), white);
+}
+.detail-header h3 {
+  font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;
+}
+.detail-close {
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: var(--g100); cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.detail-close:hover { background: var(--g300); }
+.detail-body { padding: 1.2rem 1.5rem; }
+.detail-explain {
+  background: var(--light); border-radius: 0.6rem; padding: 0.8rem 1rem;
+  margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.7;
+  border-left: 4px solid var(--main);
+}
+.detail-visual {
+  display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+}
+.vis-box { text-align: center; }
+.vis-box h4 { font-size: 0.78rem; font-weight: 600; color: var(--g700); margin-bottom: 0.4rem; }
+.vis-canvas {
+  border-radius: 0.4rem; image-rendering: pixelated;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.kernel-grid { display: inline-grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.kcell {
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; font-family: monospace; border-radius: 0.2rem;
+}
+.compare { display: flex; align-items: center; gap: 0.8rem; justify-content: center; flex-wrap: wrap; margin: 0.8rem 0; }
+.compare-arr { font-size: 1.4rem; color: var(--main); font-weight: 700; }
+
+.detail-nav {
+  display: flex; justify-content: space-between; padding: 0.8rem 1.5rem;
+  border-top: 1px solid var(--g200);
+}
+.dnav-btn {
+  padding: 0.4rem 1rem; border: 2px solid var(--main); background: white;
+  color: var(--main); border-radius: 0.4rem; cursor: pointer;
+  font-family: inherit; font-weight: 600; font-size: 0.8rem; transition: all 0.2s;
+}
+.dnav-btn:hover { background: var(--main); color: white; }
+.dnav-btn:disabled { opacity: 0.3; pointer-events: none; }
+
+/* ── Backprop Section ── */
+.backprop-section {
+  max-width: 1300px; margin: 0.8rem auto; padding: 0 1rem;
+  display: none;
+}
+.backprop-section.open { display: block; }
+.bp-card {
+  background: white; border-radius: 1rem; padding: 1.5rem;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.bp-card h2 {
+  font-size: 1.1rem; font-weight: 800; color: var(--red);
+  margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.bp-flow {
+  display: flex; align-items: center; gap: 0; overflow-x: auto; padding: 0.8rem 0;
+}
+.bp-node {
+  flex-shrink: 0; padding: 0.6rem 0.8rem; border-radius: 0.5rem;
+  text-align: center; font-size: 0.75rem; font-weight: 600; min-width: 80px;
+  transition: all 0.3s;
+}
+.bp-node.active { transform: scale(1.05); }
+.bp-arrow {
+  flex-shrink: 0; width: 30px; text-align: center;
+  font-size: 1rem; color: var(--g300); transition: color 0.3s;
+}
+.bp-arrow.active { color: var(--red); }
+.bp-explain {
+  margin-top: 1rem; padding: 1rem; background: #fff3e0; border-radius: 0.6rem;
+  font-size: 0.85rem; line-height: 1.7; border-left: 4px solid var(--orange);
+}
+.bp-controls {
+  display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;
+}
+.bp-btn {
+  padding: 0.5rem 1.2rem; border: none; border-radius: 0.5rem;
+  font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.bp-btn.primary { background: var(--red); color: white; }
+.bp-btn.primary:hover { background: #c62828; }
+.bp-btn.secondary { background: var(--g200); color: var(--g800); }
+.bp-btn.secondary:hover { background: var(--g300); }
+.filter-compare {
+  display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+.filter-item { text-align: center; }
+.filter-item p { font-size: 0.75rem; font-weight: 600; margin-top: 0.3rem; }
+
+/* ── MobileNet Results ── */
+.mobilenet-section {
+  max-width: 1300px; margin: 0.8rem auto 2rem; padding: 0 1rem;
+  display: none;
+}
+.mobilenet-section.open { display: block; }
+.mn-card {
+  background: white; border-radius: 1rem; padding: 1.5rem;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.mn-card h2 { font-size: 1.1rem; font-weight: 800; color: var(--teal); margin-bottom: 0.3rem; }
+.mn-sub { font-size: 0.8rem; color: var(--g600); margin-bottom: 1rem; }
+.mn-results { display: flex; flex-direction: column; gap: 0.4rem; }
+.mn-row { display: flex; align-items: center; gap: 0.5rem; }
+.mn-label { width: 200px; font-size: 0.8rem; font-weight: 600; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mn-bar-bg { flex: 1; height: 26px; background: var(--g100); border-radius: 13px; overflow: hidden; }
+.mn-bar-fill {
+  height: 100%; border-radius: 13px; transition: width 1s ease;
+  display: flex; align-items: center; padding-left: 10px;
+  font-size: 0.72rem; font-weight: 700; color: white; min-width: fit-content;
+}
+.mn-loading { text-align: center; padding: 2rem; color: var(--g500); }
+.mn-loading .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid var(--g200); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Output bars (simulated) ── */
+.output-bars { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.5rem; }
+.out-row { display: flex; align-items: center; gap: 0.5rem; }
+.out-label { width: 70px; font-size: 0.75rem; font-weight: 600; text-align: right; }
+.out-bar-bg { flex: 1; height: 22px; background: var(--g100); border-radius: 11px; overflow: hidden; }
+.out-bar-fill { height: 100%; border-radius: 11px; transition: width 0.8s; display: flex; align-items: center; padding-left: 8px; font-size: 0.68rem; font-weight: 700; color: white; }
+
+/* ── Computation Visualization ── */
+.calc-box {
+  background: var(--g50); border: 1px solid var(--g200); border-radius: 0.6rem;
+  padding: 0.8rem; margin-top: 0.8rem;
+}
+.calc-box h4 { font-size: 0.82rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem; }
+.calc-grid {
+  display: inline-grid; gap: 1px; margin: 0.3rem;
+  vertical-align: middle;
+}
+.calc-cell {
+  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 600; font-family: monospace; border-radius: 0.2rem;
+}
+.calc-cell.highlight { outline: 2px solid var(--main); outline-offset: -1px; }
+.calc-op {
+  display: inline-flex; align-items: center; font-size: 1.1rem; font-weight: 700;
+  color: var(--g600); margin: 0 0.3rem; vertical-align: middle;
+}
+.calc-result {
+  display: inline-flex; align-items: center; padding: 0.3rem 0.7rem;
+  background: var(--light); border-radius: 0.4rem; font-family: monospace;
+  font-size: 0.8rem; font-weight: 700; color: var(--dark); vertical-align: middle;
+}
+.calc-step {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+  justify-content: center; padding: 0.5rem 0;
+}
+.calc-formula {
+  background: white; border: 1px solid var(--g200); border-radius: 0.4rem;
+  padding: 0.5rem 0.8rem; font-family: monospace; font-size: 0.78rem;
+  line-height: 1.6; margin-top: 0.4rem; overflow-x: auto;
+}
+.calc-formula .pos { color: #1565c0; font-weight: 700; }
+.calc-formula .neg { color: #c62828; font-weight: 700; }
+.calc-formula .res { color: #2e7d32; font-weight: 700; font-size: 0.9rem; }
+.calc-anim-btn {
+  padding: 0.35rem 0.8rem; border: 2px solid var(--main); background: white;
+  color: var(--main); border-radius: 0.4rem; cursor: pointer;
+  font-family: inherit; font-weight: 600; font-size: 0.75rem; transition: all 0.2s;
+  margin-top: 0.4rem;
+}
+.calc-anim-btn:hover { background: var(--main); color: white; }
+.relu-table { border-collapse: collapse; margin: 0.5rem auto; }
+.relu-table td {
+  padding: 0.3rem 0.5rem; font-family: monospace; font-size: 0.78rem;
+  border: 1px solid var(--g200); text-align: center;
+}
+.relu-table .neg-val { background: #ffebee; color: #c62828; }
+.relu-table .pos-val { background: #e8f5e9; color: #2e7d32; }
+.relu-table .zero-val { background: #fff3e0; color: #e65100; font-weight: 700; }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .header h1 { font-size: 1.2rem; }
+  .controls { flex-direction: column; }
+  .fmap-single { width: 48px; height: 48px; }
+  .fmap-multi { width: 32px; height: 32px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <canvas class="header-nn-bg" id="headerNN"></canvas>
+  <div class="header-content">
+    <h1>CNN 시각화 - 이미지가 처리되는 과정</h1>
+    <p>Convolutional Neural Network가 이미지를 분석하는 각 단계를 직접 확인해 보세요</p>
+    <div class="header-badges">
+      <span class="badge">Conv2D</span>
+      <span class="badge">ReLU</span>
+      <span class="badge">MaxPool</span>
+      <span class="badge">Flatten</span>
+      <span class="badge">Dense</span>
+      <span class="badge">Softmax</span>
+      <span class="badge">Backprop</span>
+    </div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <div class="ctrl-card">
+    <h3>🖼️ 이미지 선택</h3>
+    <div class="samples" id="samplesArea">
+      <canvas class="samp" id="s0" width="60" height="60" title="원"></canvas>
+      <canvas class="samp" id="s1" width="60" height="60" title="사각형"></canvas>
+      <canvas class="samp" id="s2" width="60" height="60" title="줄무늬"></canvas>
+      <canvas class="samp" id="s3" width="60" height="60" title="체크"></canvas>
+      <canvas class="samp" id="s4" width="60" height="60" title="별"></canvas>
+      <label class="upload-area" for="fileIn"><span>+</span>업로드</label>
+      <input type="file" id="fileIn" accept="image/*" style="display:none;">
+    </div>
+    <button class="go-btn" id="goBtn" onclick="runAll()">▶ CNN 처리 시작</button>
+  </div>
+  <div class="ctrl-card">
+    <h3>⚙️ 모드</h3>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="forward" onclick="setMode('forward')">순전파 (Forward)</button>
+      <button class="mode-btn" data-mode="backprop" onclick="setMode('backprop')">역전파 (Backprop)</button>
+    </div>
+    <div style="margin-top:0.6rem;font-size:0.78rem;color:var(--g600);line-height:1.5;" id="modeDesc">
+      이미지가 CNN을 통과하며 처리되는 <strong>순전파</strong> 과정을 시각화합니다.
+    </div>
+  </div>
+  <div class="ctrl-card" style="max-width:220px;">
+    <h3>📊 상태</h3>
+    <div id="statusInfo" style="font-size:0.8rem;color:var(--g600);line-height:1.6;">
+      이미지를 선택하세요.
+    </div>
+  </div>
+</div>
+
+<!-- Pipeline -->
+<div class="pipeline-wrap">
+  <div class="pipeline-header">
+    <h2>🔬 CNN 파이프라인</h2>
+    <span class="pipeline-info">각 Feature Map을 클릭하면 상세 설명을 볼 수 있어요</span>
+  </div>
+  <div class="pipeline-container">
+    <div class="pipeline" id="pipeline"></div>
+  </div>
+</div>
+
+<!-- Detail Panel -->
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-card">
+    <div class="detail-header">
+      <h3 id="detailTitle"></h3>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+    <div class="detail-nav">
+      <button class="dnav-btn" id="dPrev" onclick="navDetail(-1)">◀ 이전</button>
+      <button class="dnav-btn" id="dNext" onclick="navDetail(1)">다음 ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- Backprop Section -->
+<div class="backprop-section" id="bpSection">
+  <div class="bp-card">
+    <h2>🔄 역전파 (Backpropagation) - 학습 과정</h2>
+    <div class="detail-explain" style="border-left-color:var(--red);">
+      역전파는 CNN이 <strong>스스로 학습</strong>하는 핵심 알고리즘입니다.<br>
+      ① 순전파로 예측 → ② 정답과 비교(손실 계산) → ③ 손실을 줄이는 방향으로 <strong>필터 가중치를 수정</strong> → 반복!
+    </div>
+    <div class="bp-flow" id="bpFlow"></div>
+    <div id="bpDetail"></div>
+    <div style="margin-top:0.6rem;font-size:0.78rem;color:var(--g500);text-align:center;">↑ 각 단계를 클릭하면 계산 과정을 확인할 수 있습니다</div>
+  </div>
+</div>
+
+<!-- MobileNet Section -->
+<div class="mobilenet-section" id="mnSection">
+  <div class="mn-card">
+    <h2>🤖 MobileNet 실제 분류 결과</h2>
+    <div class="mn-sub">Google이 학습시킨 실제 CNN 모델(MobileNet v2)이 이미지를 분류한 결과입니다. ImageNet 1000개 카테고리 중 상위 5개를 보여줍니다.</div>
+    <div id="mnResults"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// Constants & State
+// ══════════════════════════════════════
+const SZ = 64;
+let inputGray = null, inputImg = null;
+let P = {};
+let currentDetail = -1;
+let mode = 'forward';
+let mnModel = null;
+
+const LAYERS = [
+  { id: 'input', label: '입력', sub: '64×64×1', icon: '🖼️' },
+  { id: 'conv1', label: 'Conv2D', sub: '62×62×3', icon: '🔍' },
+  { id: 'relu1', label: 'ReLU', sub: '62×62×3', icon: '⚡' },
+  { id: 'pool1', label: 'MaxPool', sub: '31×31×3', icon: '📐' },
+  { id: 'conv2', label: 'Conv2D', sub: '29×29×3', icon: '🔍' },
+  { id: 'relu2', label: 'ReLU', sub: '29×29×3', icon: '⚡' },
+  { id: 'pool2', label: 'MaxPool', sub: '14×14×3', icon: '📐' },
+  { id: 'flat',  label: 'Flatten', sub: '588', icon: '📏' },
+  { id: 'fc',    label: 'Dense', sub: '128', icon: '🔗' },
+  { id: 'out',   label: '출력', sub: '5 classes', icon: '🎯' },
+];
+
+const K1 = [
+  { name: '수평 엣지', v: [[-1,-1,-1],[0,0,0],[1,1,1]], c: '#e53935' },
+  { name: '수직 엣지', v: [[-1,0,1],[-1,0,1],[-1,0,1]], c: '#2196f3' },
+  { name: '대각 엣지', v: [[0,-1,-1],[1,0,-1],[1,1,0]], c: '#43a047' },
+];
+const K2 = [
+  { name: '블러', v: [[1,1,1],[1,1,1],[1,1,1]].map(r=>r.map(x=>x/9)), c: '#ff9800' },
+  { name: '엠보스', v: [[-2,-1,0],[-1,1,1],[0,1,2]], c: '#7c4dff' },
+  { name: '샤프닝', v: [[0,-1,0],[-1,5,-1],[0,-1,0]], c: '#00897b' },
+];
+
+// ══════════════════════════════════════
+// CNN Operations
+// ══════════════════════════════════════
+function conv(inp, w, h, k) {
+  const ow = w-2, oh = h-2, out = new Float32Array(ow*oh);
+  for (let y=0;y<oh;y++) for (let x=0;x<ow;x++) {
+    let s=0;
+    for (let ky=0;ky<3;ky++) for (let kx=0;kx<3;kx++)
+      s += inp[(y+ky)*w+(x+kx)] * k[ky][kx];
+    out[y*ow+x]=s;
+  }
+  return {d:out,w:ow,h:oh};
+}
+function reluOp(d) { const o=new Float32Array(d.length); for(let i=0;i<d.length;i++) o[i]=Math.max(0,d[i]); return o; }
+function pool(d,w,h) {
+  const ow=Math.floor(w/2),oh=Math.floor(h/2),o=new Float32Array(ow*oh);
+  for(let y=0;y<oh;y++) for(let x=0;x<ow;x++){
+    const i=y*2*w+x*2;
+    o[y*ow+x]=Math.max(d[i],d[i+1],d[i+w],d[i+w+1]);
+  }
+  return {d:o,w:ow,h:oh};
+}
+function norm(d){let mn=Infinity,mx=-Infinity;for(let i=0;i<d.length;i++){if(d[i]<mn)mn=d[i];if(d[i]>mx)mx=d[i];}const r=mx-mn||1;const o=new Float32Array(d.length);for(let i=0;i<d.length;i++)o[i]=(d[i]-mn)/r;return o;}
+
+// ── Drawing ──
+function drawGray(cv,d,w,h){cv.width=w;cv.height=h;const ctx=cv.getContext('2d'),img=ctx.createImageData(w,h),n=norm(d);for(let i=0;i<n.length;i++){const v=Math.floor(n[i]*255);img.data[i*4]=v;img.data[i*4+1]=v;img.data[i*4+2]=v;img.data[i*4+3]=255;}ctx.putImageData(img,0,0);}
+
+function drawHeat(cv,d,w,h){
+  cv.width=w;cv.height=h;const ctx=cv.getContext('2d'),img=ctx.createImageData(w,h),n=norm(d);
+  for(let i=0;i<n.length;i++){
+    const v=n[i];
+    let r,g,b;
+    if(v<0.25){r=0;g=Math.floor(v*4*255);b=255;}
+    else if(v<0.5){r=0;g=255;b=Math.floor((1-(v-0.25)*4)*255);}
+    else if(v<0.75){r=Math.floor((v-0.5)*4*255);g=255;b=0;}
+    else{r=255;g=Math.floor((1-(v-0.75)*4)*255);b=0;}
+    img.data[i*4]=r;img.data[i*4+1]=g;img.data[i*4+2]=b;img.data[i*4+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+
+function drawColor(cv,d,w,h,hex){
+  cv.width=w;cv.height=h;const ctx=cv.getContext('2d'),img=ctx.createImageData(w,h),n=norm(d);
+  const cr=parseInt(hex.slice(1,3),16),cg=parseInt(hex.slice(3,5),16),cb=parseInt(hex.slice(5,7),16);
+  for(let i=0;i<n.length;i++){
+    const v=n[i];
+    img.data[i*4]=Math.floor(v*cr);img.data[i*4+1]=Math.floor(v*cg);img.data[i*4+2]=Math.floor(v*cb);img.data[i*4+3]=255;
+  }
+  ctx.putImageData(img,0,0);
+}
+
+// ══════════════════════════════════════
+// Pipeline Building
+// ══════════════════════════════════════
+function buildPipeline() {
+  const el = document.getElementById('pipeline');
+  el.innerHTML = '';
+  LAYERS.forEach((l, i) => {
+    if (i > 0) {
+      const prevCount = (i-1===0||i-1===7||i-1===8||i-1===9) ? 1 : 3;
+      const curCount = (i===0||i===7||i===8||i===9) ? 1 : 3;
+      const cn = document.createElement('div');
+      cn.className = 'conn'; cn.id = 'conn'+i;
+      // Build neural network multi-wire SVG
+      const svgH = 80;
+      let paths = '';
+      // Secondary wires (thin, many)
+      for (let a = 0; a < prevCount; a++) {
+        for (let b = 0; b < curCount; b++) {
+          const y1 = prevCount===1 ? svgH/2 : (a/(prevCount-1))*(svgH*0.6)+svgH*0.2;
+          const y2 = curCount===1 ? svgH/2 : (b/(curCount-1))*(svgH*0.6)+svgH*0.2;
+          const cp1x = 12, cp2x = 24;
+          paths += `<path d="M2,${y1} C${cp1x},${y1} ${cp2x},${y2} 34,${y2}" class="nn-wire"/>`;
+        }
+      }
+      // Main center wire
+      paths += `<path d="M2,${svgH/2} L34,${svgH/2}" class="nn-wire-main"/>`;
+      // Flow animation wire
+      paths += `<path d="M2,${svgH/2} L34,${svgH/2}" class="nn-wire-flow"/>`;
+      // Synapse dots
+      paths += `<circle cx="2" cy="${svgH/2}" r="2.5" class="nn-synapse"/>`;
+      paths += `<circle cx="34" cy="${svgH/2}" r="2.5" class="nn-synapse"/>`;
+      cn.innerHTML = `<svg viewBox="0 0 36 ${svgH}">${paths}</svg>`;
+      el.appendChild(cn);
+    }
+    const g = document.createElement('div');
+    g.className = 'layer-group clickable';
+    g.onclick = () => openDetail(i);
+    g.id = 'layer' + i;
+
+    let label = `<div class="layer-label">${l.icon} ${l.label}</div>`;
+    const count = (i===0||i===7||i===8||i===9) ? 1 : 3;
+    const stackClass = count > 1 ? 'stacked' : 'single';
+    let maps = '<div class="layer-maps '+stackClass+'" id="lmaps'+i+'">';
+    const cls = i===0 ? 'fmap fmap-single' : (i<=3?'fmap fmap-multi':(i<=6?'fmap fmap-small':'fmap fmap-tiny'));
+    for (let j=0; j<count; j++) {
+      maps += `<canvas class="${cls}" id="fm${i}_${j}" width="64" height="64"></canvas>`;
+    }
+    maps += '</div>';
+    const chLabel = count > 1 ? `<div class="layer-sublabel" style="font-size:0.55rem;color:var(--accent);margin-top:0.1rem;">×${count} channels</div>` : '';
+    let sub = `<div class="layer-sublabel">${l.sub}</div>`;
+    g.innerHTML = label + maps + chLabel + sub;
+    el.appendChild(g);
+  });
+}
+
+// ── Header Neural Network Background ──
+function drawHeaderNN() {
+  const cv = document.getElementById('headerNN');
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = rect.width * 2; cv.height = rect.height * 2;
+  cv.style.width = rect.width + 'px'; cv.style.height = rect.height + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.scale(2, 2);
+  const W = rect.width, H = rect.height;
+  const padX = W * 0.05, padY = H * 0.15;
+
+  // Actual CNN architecture: node counts per layer match pipeline
+  // Input(1) → Conv1(3) → ReLU(3) → Pool(3) → Conv2(3) → ReLU(3) → Pool(3) → Flat(8) → FC(6) → Out(5)
+  const layerDef = [
+    { n: 1, label: 'Input', color: [255,255,255] },
+    { n: 3, label: 'Conv', color: [255,200,200] },
+    { n: 3, label: 'ReLU', color: [255,255,180] },
+    { n: 3, label: 'Pool', color: [200,220,255] },
+    { n: 3, label: 'Conv2', color: [255,200,200] },
+    { n: 3, label: 'ReLU2', color: [255,255,180] },
+    { n: 3, label: 'Pool2', color: [200,220,255] },
+    { n: 8, label: 'Flat', color: [220,200,255] },
+    { n: 6, label: 'Dense', color: [200,255,220] },
+    { n: 5, label: 'Out', color: [255,220,200] },
+  ];
+
+  const layerX = layerDef.map((_, i) => padX + i / (layerDef.length - 1) * (W - padX * 2));
+  const nodes = layerDef.map((ld, li) => {
+    const arr = [];
+    for (let i = 0; i < ld.n; i++) {
+      const y = ld.n === 1 ? H / 2 : padY + i / (ld.n - 1) * (H - padY * 2);
+      arr.push({ x: layerX[li], y });
+    }
+    return arr;
+  });
+
+  // Draw edges (connect adjacent layers)
+  for (let l = 0; l < nodes.length - 1; l++) {
+    nodes[l].forEach(a => {
+      nodes[l + 1].forEach(b => {
+        const alpha = 0.04 + Math.random() * 0.06;
+        ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+        ctx.lineWidth = 0.6 + Math.random() * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        const cpx1 = a.x + (b.x - a.x) * 0.4;
+        const cpx2 = a.x + (b.x - a.x) * 0.6;
+        ctx.bezierCurveTo(cpx1, a.y, cpx2, b.y, b.x, b.y);
+        ctx.stroke();
+      });
+    });
+  }
+
+  // Draw nodes with layer-specific colors
+  nodes.forEach((layer, li) => {
+    const [cr, cg, cb] = layerDef[li].color;
+    layer.forEach((nd, ni) => {
+      const pulse = 0.25 + Math.sin(Date.now() * 0.001 + li * 0.9 + ni * 1.7) * 0.15;
+      // outer glow
+      const grad = ctx.createRadialGradient(nd.x, nd.y, 0, nd.x, nd.y, 8);
+      grad.addColorStop(0, `rgba(${cr},${cg},${cb},${pulse * 0.5})`);
+      grad.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, 8, 0, Math.PI * 2); ctx.fill();
+      // core
+      ctx.beginPath(); ctx.arc(nd.x, nd.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${cr},${cg},${cb},${pulse + 0.2})`;
+      ctx.fill();
+    });
+  });
+
+  // Draw layer labels at bottom
+  ctx.font = '8px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  layerDef.forEach((ld, i) => {
+    ctx.fillText(ld.label, layerX[i], H - 4);
+  });
+}
+window.addEventListener('resize', drawHeaderNN);
+
+// ══════════════════════════════════════
+// Run Pipeline
+// ══════════════════════════════════════
+async function runAll() {
+  if (!inputGray) return;
+  document.getElementById('statusInfo').innerHTML = '<span style="color:var(--main);">⏳ CNN 처리 중...</span>';
+
+  // Stage 0: Input
+  P[0] = {d:inputGray,w:SZ,h:SZ};
+  drawGray(document.getElementById('fm0_0'), inputGray, SZ, SZ);
+  activateConn(1);
+
+  // Stage 1: Conv1
+  P[1] = {maps: K1.map(k=>conv(inputGray,SZ,SZ,k.v)), kernels:K1};
+  P[1].maps.forEach((m,j)=>drawColor(document.getElementById('fm1_'+j),m.d,m.w,m.h,K1[j].c));
+  activateConn(2);
+
+  // Stage 2: ReLU1
+  P[2] = {maps: P[1].maps.map(m=>({d:reluOp(m.d),w:m.w,h:m.h}))};
+  P[2].maps.forEach((m,j)=>drawColor(document.getElementById('fm2_'+j),m.d,m.w,m.h,K1[j].c));
+  activateConn(3);
+
+  // Stage 3: Pool1
+  P[3] = {maps: P[2].maps.map(m=>pool(m.d,m.w,m.h))};
+  P[3].maps.forEach((m,j)=>drawColor(document.getElementById('fm3_'+j),m.d,m.w,m.h,K1[j].c));
+  activateConn(4);
+
+  // Stage 4: Conv2
+  P[4] = {maps: P[3].maps.map((m,i)=>conv(m.d,m.w,m.h,K2[i].v)), kernels:K2};
+  P[4].maps.forEach((m,j)=>drawHeat(document.getElementById('fm4_'+j),m.d,m.w,m.h));
+  activateConn(5);
+
+  // Stage 5: ReLU2
+  P[5] = {maps: P[4].maps.map(m=>({d:reluOp(m.d),w:m.w,h:m.h}))};
+  P[5].maps.forEach((m,j)=>drawHeat(document.getElementById('fm5_'+j),m.d,m.w,m.h));
+  activateConn(6);
+
+  // Stage 6: Pool2
+  P[6] = {maps: P[5].maps.map(m=>pool(m.d,m.w,m.h))};
+  P[6].maps.forEach((m,j)=>drawHeat(document.getElementById('fm6_'+j),m.d,m.w,m.h));
+  activateConn(7);
+
+  // Stage 7: Flatten
+  const flat=[];P[6].maps.forEach(m=>flat.push(...m.d));
+  P[7]={d:new Float32Array(flat)};
+  drawFlatPreview(document.getElementById('fm7_0'), P[7].d);
+  activateConn(8);
+
+  // Stage 8: FC (simulated with better weights)
+  const fc=new Float32Array(128);
+  for(let i=0;i<128;i++){let s=0;for(let j=0;j<flat.length;j++)s+=flat[j]*Math.sin((i+1)*(j+1)*0.003)*0.02;fc[i]=Math.max(0,s+Math.sin(i*0.1)*0.1);}
+  P[8]={d:fc};
+  drawFCPreview(document.getElementById('fm8_0'), fc);
+  activateConn(9);
+
+  // Stage 9: Output (simulated)
+  const labels=['원','사각형','줄무늬','체크','기타'];
+  const scores=labels.map((_,i)=>{let s=0;for(let j=0;j<128;j++)s+=fc[j]*Math.cos((i+1)*j*0.08)*0.5;return s;});
+  const mx=Math.max(...scores);
+  const exps=scores.map(s=>Math.exp(s-mx));
+  const sm=exps.reduce((a,b)=>a+b,0);
+  P[9]={labels,probs:exps.map(e=>e/sm)};
+  drawOutPreview(document.getElementById('fm9_0'), P[9]);
+
+  // Update status
+  const top = P[9].labels[P[9].probs.indexOf(Math.max(...P[9].probs))];
+  document.getElementById('statusInfo').innerHTML =
+    `<strong style="color:var(--green);">✅ 처리 완료</strong><br>` +
+    `시뮬레이션 결과: <strong>${top}</strong><br>` +
+    `<span style="font-size:0.72rem;color:var(--g500);">MobileNet 결과는 아래에서 확인</span>`;
+
+  // MobileNet
+  runMobileNet();
+
+  // Show backprop if mode
+  if (mode === 'backprop') buildBackprop();
+}
+
+function activateConn(i) {
+  const c = document.getElementById('conn'+i);
+  if (c) c.classList.add('active');
+}
+
+function drawFlatPreview(cv,d){
+  cv.width=64;cv.height=64;const ctx=cv.getContext('2d'),n=norm(d);
+  const cols=Math.ceil(Math.sqrt(n.length)),rows=Math.ceil(n.length/cols);
+  const cw=64/cols,ch=64/rows;
+  for(let i=0;i<n.length;i++){
+    const x=(i%cols)*cw,y=Math.floor(i/cols)*ch;
+    ctx.fillStyle=`hsl(210,80%,${(1-n[i])*85+15}%)`;
+    ctx.fillRect(x,y,cw+0.5,ch+0.5);
+  }
+}
+
+function drawFCPreview(cv,d){
+  cv.width=64;cv.height=64;const ctx=cv.getContext('2d'),n=norm(d);
+  const bw=64/n.length;
+  for(let i=0;i<n.length;i++){
+    ctx.fillStyle=`hsl(270,70%,${(1-n[i])*80+20}%)`;
+    ctx.fillRect(i*bw,0,bw+0.5,64);
+  }
+}
+
+function drawOutPreview(cv,out){
+  cv.width=64;cv.height=64;const ctx=cv.getContext('2d');
+  const colors=['#e53935','#2196f3','#ff9800','#43a047','#7c4dff'];
+  const bw=64/out.probs.length;
+  ctx.fillStyle='#f5f5f5';ctx.fillRect(0,0,64,64);
+  out.probs.forEach((p,i)=>{
+    ctx.fillStyle=colors[i];
+    const h=p*60;
+    ctx.fillRect(i*bw+1,64-h,bw-2,h);
+  });
+}
+
+// ══════════════════════════════════════
+// MobileNet
+// ══════════════════════════════════════
+async function runMobileNet() {
+  const sec = document.getElementById('mnSection');
+  sec.classList.add('open');
+  const res = document.getElementById('mnResults');
+  res.innerHTML = '<div class="mn-loading"><span class="spinner"></span>MobileNet 모델 로딩 중...</div>';
+
+  try {
+    if (!mnModel) mnModel = await mobilenet.load({version:2, alpha:1.0});
+
+    // Create image element for MobileNet
+    const cv = document.createElement('canvas');
+    cv.width=224;cv.height=224;
+    const ctx=cv.getContext('2d');
+    if (inputImg) {
+      ctx.drawImage(inputImg, 0, 0, 224, 224);
+    } else {
+      // reconstruct from gray
+      const tmp=document.createElement('canvas');
+      drawGray(tmp, inputGray, SZ, SZ);
+      ctx.drawImage(tmp, 0, 0, 224, 224);
+    }
+    const imgEl = new Image();
+    imgEl.width=224;imgEl.height=224;
+    imgEl.src = cv.toDataURL();
+    await new Promise(r=>{imgEl.onload=r;});
+
+    const preds = await mnModel.classify(imgEl, 5);
+    const colors = ['#00897b','#2196f3','#7c4dff','#ff9800','#e53935'];
+    let html = '';
+    preds.forEach((p, i) => {
+      const pct = (p.probability * 100).toFixed(1);
+      html += `<div class="mn-row">
+        <div class="mn-label" title="${p.className}">${p.className}</div>
+        <div class="mn-bar-bg"><div class="mn-bar-fill" style="width:${pct}%;background:${colors[i]};">${pct}%</div></div>
+      </div>`;
+    });
+    res.innerHTML = html;
+  } catch(e) {
+    res.innerHTML = `<div style="color:var(--red);font-size:0.85rem;">⚠️ MobileNet 로딩 실패: ${e.message}<br><span style="color:var(--g500);">인터넷 연결을 확인해 주세요.</span></div>`;
+  }
+}
+
+// ══════════════════════════════════════
+// Detail Panel
+// ══════════════════════════════════════
+const stageInfo = [
+  { icon:'🖼️', title:'입력 이미지 (Input)',
+    html: d => {
+      let h = '<div class="detail-explain">이미지는 컴퓨터에게 <strong>숫자의 배열(행렬)</strong>입니다. 각 픽셀은 0(검정)~1(흰색) 사이의 값을 가집니다. CNN은 이 숫자 배열에서 패턴을 찾아냅니다.</div>';
+      h += '<div class="compare"><div class="vis-box"><h4>입력 이미지</h4><canvas id="dI0" class="vis-canvas" style="width:200px;height:200px;"></canvas></div>';
+      h += '<div class="vis-box"><h4>픽셀 값 (중앙 8×8)</h4><canvas id="dI1" class="vis-canvas" width="256" height="256" style="width:200px;height:200px;"></canvas></div></div>';
+      return { html: h, draw: () => {
+        drawGray(document.getElementById('dI0'), P[0].d, SZ, SZ);
+        const pg=document.getElementById('dI1'),ctx=pg.getContext('2d'),cs=256/8;
+        for(let y=0;y<8;y++)for(let x=0;x<8;x++){
+          const v=P[0].d[(y+28)*64+(x+28)],g=Math.floor(v*255);
+          ctx.fillStyle=`rgb(${g},${g},${g})`;ctx.fillRect(x*cs,y*cs,cs,cs);
+          ctx.strokeStyle='#ccc';ctx.strokeRect(x*cs,y*cs,cs,cs);
+          ctx.fillStyle=g>128?'#333':'#fff';ctx.font='bold 11px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.fillText(v.toFixed(2),x*cs+cs/2,y*cs+cs/2);
+        }
+      }};
+    }
+  },
+  { icon:'🔍', title:'컨볼루션 (Convolution)',
+    html: d => {
+      let h = '<div class="detail-explain">작은 <strong>필터(커널, 3×3)</strong>를 이미지 위에서 슬라이딩하며 특징을 추출합니다. 각 필터가 서로 다른 패턴(수평 엣지, 수직 엣지 등)을 감지합니다.<br>💡 실제 CNN에서는 필터 값이 <strong>학습을 통해 자동으로</strong> 결정됩니다.</div>';
+      h += '<div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;">';
+      K1.forEach((k,i)=>{
+        h += `<div style="text-align:center;"><div style="font-size:0.8rem;font-weight:700;color:${k.c};margin-bottom:0.3rem;">${k.name}</div>`;
+        h += '<div class="kernel-grid">';
+        k.v.forEach(row=>row.forEach(v=>{
+          const bg = v>0?`rgba(33,150,243,${Math.abs(v)*0.3})`:v<0?`rgba(229,57,53,${Math.abs(v)*0.3})`:'#f5f5f5';
+          h += `<div class="kcell" style="background:${bg}">${Number.isInteger(v)?v:v.toFixed(1)}</div>`;
+        }));
+        h += '</div>';
+        h += `<div style="margin-top:0.3rem;"><canvas id="dC${i}" class="vis-canvas" style="width:140px;height:140px;"></canvas></div>`;
+        h += `<div style="font-size:0.7rem;color:var(--g500);">${P[1].maps[i].w}×${P[1].maps[i].h}</div></div>`;
+      });
+      h += '</div>';
+      // Add computation demo
+      h += '<div class="calc-box"><h4>🧮 컨볼루션 계산 과정 (수평 엣지 필터, 위치 (1,1))</h4>';
+      h += '<div id="convCalcArea"></div>';
+      h += '<button class="calc-anim-btn" onclick="animConvCalc()">▶ 다른 위치에서 계산 보기</button></div>';
+      return { html: h, draw: () => {
+        P[1].maps.forEach((m,i)=>drawColor(document.getElementById('dC'+i),m.d,m.w,m.h,K1[i].c));
+        drawConvCalc(1, 1);
+      }};
+    }
+  },
+  { icon:'⚡', title:'활성화 함수 (ReLU)',
+    html: d => {
+      const bd=P[1].maps[0].d; let neg=0;for(let i=0;i<bd.length;i++)if(bd[i]<0)neg++;
+      let h = '<div class="detail-explain"><strong>ReLU</strong>: 음수 → 0, 양수 → 그대로. 수식: f(x) = max(0, x)<br>비선형성을 추가하여 복잡한 패턴을 학습할 수 있게 합니다.</div>';
+      h += '<div class="compare"><div class="vis-box"><h4>ReLU 전</h4><canvas id="dR0" class="vis-canvas" style="width:180px;height:180px;"></canvas></div>';
+      h += '<div class="compare-arr">→ max(0,x)</div>';
+      h += '<div class="vis-box"><h4>ReLU 후</h4><canvas id="dR1" class="vis-canvas" style="width:180px;height:180px;"></canvas></div></div>';
+      h += `<div style="text-align:center;padding:0.6rem;background:#fff3e0;border-radius:0.5rem;font-size:0.82rem;margin-top:0.5rem;">전체 ${bd.length}개 값 중 <strong style="color:var(--red);">${neg}개(${Math.round(neg/bd.length*100)}%)</strong>가 음수 → 0으로 변환</div>`;
+      // ReLU computation table
+      h += '<div class="calc-box"><h4>🧮 ReLU 계산 예시 (실제 값)</h4>';
+      h += '<div id="reluCalcArea"></div></div>';
+      return { html: h, draw: () => {
+        drawHeat(document.getElementById('dR0'),P[1].maps[0].d,P[1].maps[0].w,P[1].maps[0].h);
+        drawHeat(document.getElementById('dR1'),P[2].maps[0].d,P[2].maps[0].w,P[2].maps[0].h);
+        drawReluCalc();
+      }};
+    }
+  },
+  { icon:'📐', title:'맥스 풀링 (Max Pooling)',
+    html: d => {
+      let h = '<div class="detail-explain">2×2 영역에서 <strong>가장 큰 값만 선택</strong>하여 크기를 절반으로 줄입니다.<br>효과: ① 계산량 감소 ② 위치 변화에 강건 ③ 중요 특징만 보존</div>';
+      h += '<div class="compare"><div class="vis-box"><h4>풀링 전 ('+P[2].maps[0].w+'×'+P[2].maps[0].h+')</h4><canvas id="dP0" class="vis-canvas" style="width:160px;height:160px;"></canvas></div>';
+      h += '<div class="compare-arr">→ 2×2 Max</div>';
+      h += '<div class="vis-box"><h4>풀링 후 ('+P[3].maps[0].w+'×'+P[3].maps[0].h+')</h4><canvas id="dP1" class="vis-canvas" style="width:160px;height:160px;"></canvas></div></div>';
+      h += '<div class="vis-box" style="margin-top:0.8rem;"><h4>맥스 풀링 예시</h4><canvas id="dPDemo" width="320" height="120" style="max-width:100%;"></canvas></div>';
+      h += '<div class="calc-box"><h4>🧮 실제 데이터로 보는 맥스 풀링</h4><div id="poolCalcArea"></div></div>';
+      return { html: h, draw: () => {
+        drawHeat(document.getElementById('dP0'),P[2].maps[0].d,P[2].maps[0].w,P[2].maps[0].h);
+        drawHeat(document.getElementById('dP1'),P[3].maps[0].d,P[3].maps[0].w,P[3].maps[0].h);
+        drawPoolDemo(document.getElementById('dPDemo'));
+        drawPoolCalc();
+      }};
+    }
+  },
+  { icon:'🔍', title:'컨볼루션 2 (깊은 특징)',
+    html: d => {
+      let h = '<div class="detail-explain">두 번째 컨볼루션은 더 <strong>추상적인 특징</strong>을 추출합니다. 첫 번째 층이 엣지를 찾았다면, 두 번째 층은 그 엣지들의 <strong>조합</strong>(모서리, 곡선, 텍스처)을 찾습니다.<br>💡 CNN이 깊어질수록: 엣지 → 텍스처 → 부품 → 물체</div>';
+      h += '<div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;">';
+      K2.forEach((k,i)=>{
+        h += `<div style="text-align:center;"><div style="font-size:0.8rem;font-weight:700;color:${k.c};margin-bottom:0.3rem;">${k.name}</div>`;
+        h += '<div class="kernel-grid">';
+        k.v.forEach(row=>row.forEach(v=>{
+          const bg=v>0?`rgba(33,150,243,${Math.min(Math.abs(v),1)*0.3})`:v<0?`rgba(229,57,53,${Math.min(Math.abs(v),1)*0.3})`:'#f5f5f5';
+          h+=`<div class="kcell" style="background:${bg}">${typeof v==='number'?(Number.isInteger(v)?v:v.toFixed(1)):v}</div>`;
+        }));
+        h += '</div>';
+        h += `<div style="margin-top:0.3rem;"><canvas id="dC2_${i}" class="vis-canvas" style="width:120px;height:120px;"></canvas></div></div>`;
+      });
+      h += '</div>';
+      return { html: h, draw: () => { P[4].maps.forEach((m,i)=>drawHeat(document.getElementById('dC2_'+i),m.d,m.w,m.h)); }};
+    }
+  },
+  { icon:'⚡', title:'ReLU 2',
+    html: d => {
+      let h = '<div class="detail-explain">두 번째 컨볼루션 결과에도 ReLU를 적용합니다. <strong>Conv → ReLU → Pool</strong> 반복이 CNN의 기본 패턴입니다.</div>';
+      h += '<div class="compare"><div class="vis-box"><h4>ReLU 전</h4><canvas id="dR20" class="vis-canvas" style="width:160px;height:160px;"></canvas></div>';
+      h += '<div class="compare-arr">→</div>';
+      h += '<div class="vis-box"><h4>ReLU 후</h4><canvas id="dR21" class="vis-canvas" style="width:160px;height:160px;"></canvas></div></div>';
+      return { html: h, draw: () => {
+        drawHeat(document.getElementById('dR20'),P[4].maps[0].d,P[4].maps[0].w,P[4].maps[0].h);
+        drawHeat(document.getElementById('dR21'),P[5].maps[0].d,P[5].maps[0].w,P[5].maps[0].h);
+      }};
+    }
+  },
+  { icon:'📐', title:'맥스 풀링 2',
+    html: d => {
+      let h = '<div class="detail-explain">두 번째 풀링으로 64×64였던 이미지가 <strong>14×14</strong>까지 줄어들었지만, 중요한 특징 정보는 보존됩니다.</div>';
+      h += '<div class="compare"><div class="vis-box"><h4>풀링 전 ('+P[5].maps[0].w+'×'+P[5].maps[0].h+')</h4><canvas id="dP20" class="vis-canvas" style="width:140px;height:140px;"></canvas></div>';
+      h += '<div class="compare-arr">→</div>';
+      h += '<div class="vis-box"><h4>풀링 후 ('+P[6].maps[0].w+'×'+P[6].maps[0].h+')</h4><canvas id="dP21" class="vis-canvas" style="width:140px;height:140px;"></canvas></div></div>';
+      return { html: h, draw: () => {
+        drawHeat(document.getElementById('dP20'),P[5].maps[0].d,P[5].maps[0].w,P[5].maps[0].h);
+        drawHeat(document.getElementById('dP21'),P[6].maps[0].d,P[6].maps[0].w,P[6].maps[0].h);
+      }};
+    }
+  },
+  { icon:'📏', title:'Flatten (평탄화)',
+    html: d => {
+      let h = '<div class="detail-explain">2D Feature Map(14×14×3)을 <strong>1D 벡터(588개)</strong>로 펼칩니다. 완전연결층이 1차원 입력을 받기 때문입니다.</div>';
+      h += '<div class="compare"><div class="vis-box"><h4>2D Feature Maps</h4><div style="display:flex;gap:0.3rem;justify-content:center;">';
+      for(let i=0;i<3;i++) h += `<canvas id="dF2d${i}" class="vis-canvas" style="width:80px;height:80px;"></canvas>`;
+      h += '</div></div><div class="compare-arr">→ 펼치기</div>';
+      h += '<div class="vis-box"><h4>1D 벡터 (588개)</h4><canvas id="dF1d" width="200" height="80" class="vis-canvas" style="width:200px;height:80px;"></canvas></div></div>';
+      h += `<div style="text-align:center;padding:0.5rem;background:var(--light);border-radius:0.5rem;font-size:0.82rem;">14 × 14 × 3 = <strong>588개</strong>의 숫자</div>`;
+      return { html: h, draw: () => {
+        P[6].maps.forEach((m,i)=>drawHeat(document.getElementById('dF2d'+i),m.d,m.w,m.h));
+        const cv=document.getElementById('dF1d'),ctx=cv.getContext('2d'),n=norm(P[7].d);
+        const bw=200/Math.min(n.length,200);
+        for(let i=0;i<Math.min(n.length,200);i++){ctx.fillStyle=`hsl(210,80%,${(1-n[i])*85+15}%)`;ctx.fillRect(i*bw,0,bw+0.5,80);}
+      }};
+    }
+  },
+  { icon:'🔗', title:'완전연결층 (Dense)',
+    html: d => {
+      let h = '<div class="detail-explain">588개 값이 128개 뉴런과 <strong>모두 연결</strong>됩니다. 각 연결에 가중치가 있으며, 학습으로 조정됩니다. 총 <strong>'+((588*128).toLocaleString())+'개</strong>의 가중치!</div>';
+      h += '<div class="vis-box" style="text-align:center;"><canvas id="dFC" width="600" height="220" style="max-width:100%;"></canvas></div>';
+      return { html: h, draw: () => drawFCNet(document.getElementById('dFC')) };
+    }
+  },
+  { icon:'🎯', title:'출력 (Softmax)',
+    html: d => {
+      const {labels,probs}=P[9], mi=probs.indexOf(Math.max(...probs));
+      const colors=['#e53935','#2196f3','#ff9800','#43a047','#7c4dff'];
+      let h = '<div class="detail-explain"><strong>Softmax</strong> 함수로 출력 합이 100%가 되도록 변환합니다. 가장 높은 확률의 클래스가 예측 결과입니다.<br>⚠️ 이 결과는 시뮬레이션입니다. 실제 분류는 아래 MobileNet 결과를 참고하세요.</div>';
+      h += `<div style="text-align:center;padding:0.8rem;background:linear-gradient(135deg,var(--light),#f3e5f5);border-radius:0.6rem;margin-bottom:0.8rem;"><div style="font-size:1.3rem;font-weight:800;color:${colors[mi]};">${labels[mi]}</div><div style="font-size:0.85rem;color:var(--g700);">${(probs[mi]*100).toFixed(1)}%</div></div>`;
+      h += '<div class="output-bars">';
+      probs.map((p,i)=>({p,i})).sort((a,b)=>b.p-a.p).forEach(({p,i})=>{
+        h += `<div class="out-row"><div class="out-label">${labels[i]}</div><div class="out-bar-bg"><div class="out-bar-fill" style="width:${p*100}%;background:${colors[i]};">${p*100>5?(p*100).toFixed(1)+'%':''}</div></div></div>`;
+      });
+      h += '</div>';
+      return { html: h, draw: ()=>{} };
+    }
+  }
+];
+
+function openDetail(i) {
+  if (!P[0]) return;
+  currentDetail = i;
+  const info = stageInfo[i];
+  document.getElementById('detailTitle').innerHTML = info.icon + ' ' + info.title;
+  const result = info.html(P);
+  document.getElementById('detailBody').innerHTML = result.html;
+  result.draw();
+  document.getElementById('dPrev').disabled = i===0;
+  document.getElementById('dNext').disabled = i===9;
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('detailPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closeDetail() { document.getElementById('detailPanel').classList.remove('open'); currentDetail=-1; }
+function navDetail(dir) { const n=currentDetail+dir; if(n>=0&&n<=9)openDetail(n); }
+document.addEventListener('keydown',e=>{
+  if(currentDetail<0)return;
+  if(e.key==='Escape')closeDetail();
+  if(e.key==='ArrowLeft')navDetail(-1);
+  if(e.key==='ArrowRight')navDetail(1);
+});
+
+function drawPoolDemo(cv){
+  const ctx=cv.getContext('2d');
+  const vals=[[1,3,2,4],[5,6,1,2],[3,2,7,8],[4,1,5,3]];
+  const result=[[6,4],[4,8]];
+  const cell=28,gap=2;
+  ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
+  const gc=[['#e3f2fd','#1565c0'],['#fff3e0','#e65100'],['#e8f5e9','#2e7d32'],['#fce4ec','#c62828']];
+  for(let y=0;y<4;y++)for(let x=0;x<4;x++){
+    const gy=Math.floor(y/2),gx=Math.floor(x/2),ci=gy*2+gx;
+    const isMax=(ci===0&&vals[y][x]===6)||(ci===1&&vals[y][x]===4)||(ci===2&&vals[y][x]===4)||(ci===3&&vals[y][x]===8);
+    ctx.fillStyle=isMax?gc[ci][1]:gc[ci][0];
+    ctx.fillRect(x*(cell+gap)+10,y*(cell+gap)+5,cell,cell);
+    ctx.fillStyle=isMax?'#fff':'#333';ctx.fillText(vals[y][x],x*(cell+gap)+10+cell/2,y*(cell+gap)+5+cell/2);
+  }
+  ctx.fillStyle='#2196f3';ctx.font='bold 20px sans-serif';ctx.fillText('→',150,60);
+  ctx.font='10px sans-serif';ctx.fillText('max',150,78);
+  const ox=180;
+  const gc2=['#1565c0','#e65100','#2e7d32','#c62828'];
+  for(let y=0;y<2;y++)for(let x=0;x<2;x++){
+    ctx.fillStyle=gc2[y*2+x];
+    ctx.fillRect(ox+x*(cell+gap),y*(cell+gap)+20,cell,cell);
+    ctx.fillStyle='#fff';ctx.font='bold 14px monospace';
+    ctx.fillText(result[y][x],ox+x*(cell+gap)+cell/2,y*(cell+gap)+20+cell/2);
+  }
+}
+
+// ══════════════════════════════════════
+// Computation Visualizations
+// ══════════════════════════════════════
+let convCalcPos = {x:1, y:1};
+function drawConvCalc(cx, cy) {
+  convCalcPos = {x:cx, y:cy};
+  const area = document.getElementById('convCalcArea');
+  if (!area || !P[0]) return;
+  const k = K1[0].v; // horizontal edge kernel
+  const inp = P[0].d;
+  const w = SZ;
+
+  // Extract 3x3 patch from input at position (cx, cy)
+  const patch = [];
+  for (let ky=0;ky<3;ky++) {
+    const row = [];
+    for (let kx=0;kx<3;kx++) row.push(inp[(cy+ky)*w+(cx+kx)]);
+    patch.push(row);
+  }
+
+  // Compute element-wise products and sum
+  const products = [];
+  let sum = 0;
+  for (let ky=0;ky<3;ky++) {
+    const row = [];
+    for (let kx=0;kx<3;kx++) {
+      const p = patch[ky][kx] * k[ky][kx];
+      row.push(p);
+      sum += p;
+    }
+    products.push(row);
+  }
+
+  let h = '<div class="calc-step">';
+  // Input patch grid
+  h += '<div style="text-align:center;"><div style="font-size:0.7rem;color:var(--g600);margin-bottom:0.2rem;">입력 패치 ('+cx+','+cy+')</div>';
+  h += '<div class="calc-grid" style="grid-template-columns:repeat(3,1fr);">';
+  for(let y=0;y<3;y++) for(let x=0;x<3;x++) {
+    const v = patch[y][x];
+    const bg = `rgba(0,0,0,${v})`;
+    h += `<div class="calc-cell" style="background:${bg};color:${v>0.5?'#fff':'#333'};">${v.toFixed(2)}</div>`;
+  }
+  h += '</div></div>';
+
+  h += '<div class="calc-op">×</div>';
+
+  // Kernel grid
+  h += '<div style="text-align:center;"><div style="font-size:0.7rem;color:var(--g600);margin-bottom:0.2rem;">필터 (수평 엣지)</div>';
+  h += '<div class="calc-grid" style="grid-template-columns:repeat(3,1fr);">';
+  for(let y=0;y<3;y++) for(let x=0;x<3;x++) {
+    const v = k[y][x];
+    const bg = v>0?'rgba(33,150,243,0.3)':v<0?'rgba(229,57,53,0.3)':'#f5f5f5';
+    h += `<div class="calc-cell" style="background:${bg};">${v}</div>`;
+  }
+  h += '</div></div>';
+
+  h += '<div class="calc-op">=</div>';
+
+  // Products grid
+  h += '<div style="text-align:center;"><div style="font-size:0.7rem;color:var(--g600);margin-bottom:0.2rem;">요소별 곱</div>';
+  h += '<div class="calc-grid" style="grid-template-columns:repeat(3,1fr);">';
+  for(let y=0;y<3;y++) for(let x=0;x<3;x++) {
+    const v = products[y][x];
+    const bg = v>0?'rgba(33,150,243,0.2)':v<0?'rgba(229,57,53,0.2)':'#f9f9f9';
+    h += `<div class="calc-cell" style="background:${bg};font-size:0.6rem;">${v.toFixed(3)}</div>`;
+  }
+  h += '</div></div>';
+
+  h += '<div class="calc-op">→ Σ =</div>';
+  h += `<div class="calc-result">${sum.toFixed(4)}</div>`;
+  h += '</div>';
+
+  // Formula breakdown
+  h += '<div class="calc-formula">';
+  const terms = [];
+  for(let y=0;y<3;y++) for(let x=0;x<3;x++) {
+    const pv = patch[y][x].toFixed(2);
+    const kv = k[y][x];
+    const cls = kv >= 0 ? 'pos' : 'neg';
+    terms.push(`<span class="${cls}">${pv}×(${kv})</span>`);
+  }
+  h += terms.join(' + ') + ` = <span class="res">${sum.toFixed(4)}</span>`;
+  h += '</div>';
+
+  area.innerHTML = h;
+}
+
+function animConvCalc() {
+  const nx = Math.floor(Math.random() * (SZ-2));
+  const ny = Math.floor(Math.random() * (SZ-2));
+  const title = document.querySelector('#convCalcArea').parentElement.querySelector('h4');
+  if(title) title.textContent = `🧮 컨볼루션 계산 과정 (수평 엣지 필터, 위치 (${nx},${ny}))`;
+  drawConvCalc(nx, ny);
+}
+
+function drawReluCalc() {
+  const area = document.getElementById('reluCalcArea');
+  if (!area || !P[1]) return;
+  const data = P[1].maps[0].d;
+  // Pick 12 sample values (mix of pos/neg)
+  const samples = [];
+  for (let i = 0; i < data.length && samples.length < 12; i += Math.floor(data.length/15)) {
+    samples.push(data[i]);
+  }
+  // Ensure we have some negative values
+  for (let i = 0; i < data.length && samples.filter(v=>v<0).length < 4; i++) {
+    if (data[i] < 0) samples.push(data[i]);
+    if (samples.length >= 12) break;
+  }
+  const display = samples.slice(0, 12);
+
+  let h = '<table class="relu-table"><tr><td style="background:var(--g100);font-weight:700;">입력 (x)</td>';
+  display.forEach(v => {
+    const cls = v < 0 ? 'neg-val' : 'pos-val';
+    h += `<td class="${cls}">${v.toFixed(3)}</td>`;
+  });
+  h += '</tr><tr><td style="background:var(--g100);font-weight:700;">max(0,x)</td>';
+  display.forEach(v => {
+    const out = Math.max(0, v);
+    const cls = v < 0 ? 'zero-val' : 'pos-val';
+    h += `<td class="${cls}">${out.toFixed(3)}</td>`;
+  });
+  h += '</tr></table>';
+  h += '<div class="calc-formula" style="text-align:center;margin-top:0.4rem;">';
+  h += '음수 예시: <span class="neg">max(0, ' + display.find(v=>v<0)?.toFixed(3) + ')</span> = <span class="res">0</span> &nbsp;&nbsp;|&nbsp;&nbsp; ';
+  const posVal = display.find(v=>v>0);
+  if(posVal) h += '양수 예시: <span class="pos">max(0, ' + posVal.toFixed(3) + ')</span> = <span class="res">' + posVal.toFixed(3) + '</span>';
+  h += '</div>';
+  area.innerHTML = h;
+}
+
+function drawPoolCalc() {
+  const area = document.getElementById('poolCalcArea');
+  if (!area || !P[2]) return;
+  const data = P[2].maps[0].d;
+  const w = P[2].maps[0].w;
+
+  // Show 4x4 region pooled to 2x2
+  const sx = 4, sy = 4;
+  const colors = ['#1565c0','#e65100','#2e7d32','#c62828'];
+  const bgColors = ['#e3f2fd','#fff3e0','#e8f5e9','#ffebee'];
+
+  let h = '<div class="calc-step">';
+  h += '<div style="text-align:center;"><div style="font-size:0.7rem;color:var(--g600);margin-bottom:0.2rem;">입력 4×4 (실제 값)</div>';
+  h += '<div class="calc-grid" style="grid-template-columns:repeat(4,1fr);">';
+  const vals4x4 = [];
+  for(let y=0;y<4;y++) { const row=[]; for(let x=0;x<4;x++) { row.push(data[(sy+y)*w+(sx+x)]); } vals4x4.push(row); }
+  const maxVals = [];
+  for(let gy=0;gy<2;gy++) for(let gx=0;gx<2;gx++) {
+    const group = [vals4x4[gy*2][gx*2], vals4x4[gy*2][gx*2+1], vals4x4[gy*2+1][gx*2], vals4x4[gy*2+1][gx*2+1]];
+    maxVals.push(Math.max(...group));
+  }
+  for(let y=0;y<4;y++) for(let x=0;x<4;x++) {
+    const gi = Math.floor(y/2)*2+Math.floor(x/2);
+    const v = vals4x4[y][x];
+    const isMax = Math.abs(v - maxVals[gi]) < 0.0001;
+    const bg = isMax ? colors[gi] : bgColors[gi];
+    const fg = isMax ? '#fff' : '#333';
+    h += `<div class="calc-cell" style="background:${bg};color:${fg};font-size:0.6rem;">${v.toFixed(2)}</div>`;
+  }
+  h += '</div></div>';
+
+  h += '<div class="calc-op">→ max</div>';
+
+  h += '<div style="text-align:center;"><div style="font-size:0.7rem;color:var(--g600);margin-bottom:0.2rem;">출력 2×2</div>';
+  h += '<div class="calc-grid" style="grid-template-columns:repeat(2,1fr);">';
+  for(let i=0;i<4;i++) {
+    h += `<div class="calc-cell" style="background:${colors[i]};color:#fff;font-size:0.65rem;">${maxVals[i].toFixed(2)}</div>`;
+  }
+  h += '</div></div>';
+  h += '</div>';
+
+  // Formula
+  h += '<div class="calc-formula">';
+  for(let gi=0;gi<4;gi++) {
+    const gy=Math.floor(gi/2), gx=gi%2;
+    const group = [vals4x4[gy*2][gx*2], vals4x4[gy*2][gx*2+1], vals4x4[gy*2+1][gx*2], vals4x4[gy*2+1][gx*2+1]];
+    h += `<span style="color:${colors[gi]}">max(${group.map(v=>v.toFixed(2)).join(', ')})</span> = <span class="res">${maxVals[gi].toFixed(2)}</span>`;
+    if(gi < 3) h += '<br>';
+  }
+  h += '</div>';
+  area.innerHTML = h;
+}
+
+function drawFCNet(cv){
+  const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
+  const layers=[{n:8,label:'입력(588)',x:60,c:'#2196f3'},{n:6,label:'은닉(128)',x:300,c:'#7c4dff'},{n:5,label:'출력(5)',x:540,c:'#e53935'}];
+  for(let l=0;l<layers.length-1;l++){
+    const f=layers[l],t=layers[l+1];
+    for(let i=0;i<f.n;i++)for(let j=0;j<t.n;j++){
+      const fy=(i+0.5)/f.n*(h-40)+20,ty=(j+0.5)/t.n*(h-40)+20;
+      ctx.strokeStyle=`rgba(150,150,150,${0.08+Math.random()*0.12})`;ctx.lineWidth=0.5;
+      ctx.beginPath();ctx.moveTo(f.x+10,fy);ctx.lineTo(t.x-10,ty);ctx.stroke();
+    }
+  }
+  layers.forEach(l=>{
+    for(let i=0;i<l.n;i++){
+      const y=(i+0.5)/l.n*(h-40)+20;
+      ctx.beginPath();ctx.arc(l.x,y,8,0,Math.PI*2);ctx.fillStyle=l.c;ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();
+    }
+    ctx.fillStyle='#666';ctx.font='10px sans-serif';ctx.textAlign='center';ctx.fillText(l.label,l.x,h-5);
+    ctx.fillStyle=l.c;ctx.font='14px sans-serif';ctx.fillText('⋮',l.x,(h-40)+25);
+  });
+}
+
+// ══════════════════════════════════════
+// Backpropagation Visualization
+// ══════════════════════════════════════
+let bpSelectedStep = -1;
+
+const BP_STEPS = [
+  { label:'순전파 출력', bg:'#ffebee', border:'#e53935',
+    calc: function() {
+      const scores = [2.1, -0.5, 1.8, 0.3, -1.2];
+      const labels = ['원','십자','세모','네모','기타'];
+      const expS = scores.map(s => Math.exp(s));
+      const sumExp = expS.reduce((a,b)=>a+b,0);
+      const softmax = expS.map(e => e/sumExp);
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">📊 Softmax 출력 (순전파 결과)</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">Dense 층의 점수를 확률로 변환합니다.</p>';
+      h += '<table style="border-collapse:collapse;width:100%;"><tr style="background:#f5f5f5;"><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">클래스</td>';
+      labels.forEach(l => { h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;">${l}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">점수 (z)</td>';
+      scores.forEach(s => { h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;">${s.toFixed(1)}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">e^z</td>';
+      expS.forEach(e => { h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;">${e.toFixed(2)}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">확률</td>';
+      softmax.forEach((s,i) => { const bg = i===0?'#e3f2fd':'#fff'; h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;font-weight:700;background:${bg};">${(s*100).toFixed(1)}%</td>`; });
+      h += '</tr></table>';
+      h += `<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--g600);">Σ(e^z) = ${sumExp.toFixed(2)}, softmax(z_i) = e^z_i / Σ(e^z)</div>`;
+      return h;
+    }
+  },
+  { label:'손실 계산', bg:'#fce4ec', border:'#c62828',
+    calc: function() {
+      const pred = 0.42; // predicted prob for correct class
+      const loss = -Math.log(pred);
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">📉 Cross-Entropy Loss 계산</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">정답 클래스의 예측 확률이 낮을수록 손실이 큽니다.</p>';
+      h += '<div style="background:#fff3e0;padding:0.8rem 1rem;border-radius:0.5rem;font-family:monospace;font-size:0.85rem;margin:0.5rem 0;">';
+      h += `정답 클래스: <strong>"원"</strong> (index=0)<br>`;
+      h += `예측 확률: p(원) = <strong>${pred.toFixed(2)}</strong><br><br>`;
+      h += `Loss = -log(p(정답))<br>`;
+      h += `&nbsp;&nbsp;&nbsp;&nbsp; = -log(${pred.toFixed(2)})<br>`;
+      h += `&nbsp;&nbsp;&nbsp;&nbsp; = <strong style="color:#c62828;">${loss.toFixed(4)}</strong>`;
+      h += '</div>';
+      h += '<p style="font-size:0.78rem;color:var(--g600);">만약 정답 확률이 0.99라면? Loss = -log(0.99) = 0.0101 (매우 작음)<br>정답 확률이 0.01이라면? Loss = -log(0.01) = 4.6052 (매우 큼)</p>';
+      return h;
+    }
+  },
+  { label:'출력층 기울기', bg:'#f3e5f5', border:'#7c4dff',
+    calc: function() {
+      const softmax = [0.42, 0.03, 0.33, 0.07, 0.15];
+      const target  = [1, 0, 0, 0, 0]; // one-hot
+      const grad = softmax.map((s,i) => s - target[i]);
+      const labels = ['원','십자','세모','네모','기타'];
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">🔢 Softmax + Cross-Entropy 기울기</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">놀라울 정도로 간단합니다: <strong>기울기 = 예측값 - 정답</strong></p>';
+      h += '<table style="border-collapse:collapse;width:100%;"><tr style="background:#f5f5f5;"><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">클래스</td>';
+      labels.forEach(l => { h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;">${l}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">예측 (ŷ)</td>';
+      softmax.forEach(s => { h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;">${s.toFixed(2)}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">정답 (y)</td>';
+      target.forEach(t => { const bg=t===1?'#e8f5e9':'#fff'; h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;background:${bg};">${t}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">기울기 (ŷ-y)</td>';
+      grad.forEach(g => { const c=g<0?'#1565c0':'#c62828'; h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;font-weight:700;color:${c};">${g.toFixed(2)}</td>`; });
+      h += '</tr></table>';
+      h += '<p style="font-size:0.78rem;color:var(--g600);margin-top:0.5rem;">정답 클래스(원)의 기울기가 음수 → 확률을 높이는 방향으로 업데이트<br>나머지 클래스의 기울기가 양수 → 확률을 낮추는 방향으로 업데이트</p>';
+      return h;
+    }
+  },
+  { label:'FC 가중치 기울기', bg:'#e8eaf6', border:'#3f51b5',
+    calc: function() {
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">🧮 완전연결층 가중치 기울기</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">체인 룰로 각 가중치의 기울기를 계산합니다.</p>';
+      h += '<div style="background:#e8eaf6;padding:0.8rem 1rem;border-radius:0.5rem;font-family:monospace;font-size:0.82rem;margin:0.5rem 0;">';
+      h += '출력: z = W·x + b (행렬 곱셈)<br><br>';
+      h += '∂L/∂W = ∂L/∂z · xᵀ &nbsp;&nbsp;(가중치 기울기)<br>';
+      h += '∂L/∂b = ∂L/∂z &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(바이어스 기울기)<br>';
+      h += '∂L/∂x = Wᵀ · ∂L/∂z &nbsp;(입력으로 전파할 기울기)';
+      h += '</div>';
+      h += '<p style="font-size:0.78rem;color:var(--g600);">예시: Flatten 출력(x)이 [0.5, 0.0, 0.8, ...], 출력 기울기(∂L/∂z)가 [-0.58, 0.03, ...]이면<br>';
+      h += '∂L/∂W[0][0] = (-0.58) × 0.5 = <strong>-0.29</strong> → 이 가중치를 키워야 함</p>';
+      return h;
+    }
+  },
+  { label:'Flatten 기울기', bg:'#e0f2f1', border:'#00897b',
+    calc: function() {
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">📏 Flatten 역전파</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">Flatten의 역전파는 단순히 <strong>모양(shape)을 되돌리는 것</strong>입니다.</p>';
+      h += '<div style="display:flex;align-items:center;gap:1rem;justify-content:center;margin:1rem 0;flex-wrap:wrap;">';
+      h += '<div style="text-align:center;padding:0.8rem;background:#e0f2f1;border-radius:0.5rem;"><div style="font-size:0.72rem;color:var(--g600);">순전파 (Flatten)</div><div style="font-size:0.85rem;font-weight:700;margin-top:0.3rem;">3채널 × 14×14</div><div style="font-size:1.5rem;">→</div><div style="font-size:0.85rem;font-weight:700;">588개 (1차원)</div></div>';
+      h += '<div style="text-align:center;padding:0.8rem;background:#fce4ec;border-radius:0.5rem;"><div style="font-size:0.72rem;color:var(--g600);">역전파 (Reshape)</div><div style="font-size:0.85rem;font-weight:700;margin-top:0.3rem;">588개 (1차원)</div><div style="font-size:1.5rem;">→</div><div style="font-size:0.85rem;font-weight:700;">3채널 × 14×14</div></div>';
+      h += '</div>';
+      h += '<p style="font-size:0.78rem;color:var(--g600);">순전파에서 2D→1D로 펼쳤던 것을, 역전파에서는 다시 원래 2D 모양으로 복원합니다.<br>계산은 없고 모양만 바꿉니다.</p>';
+      return h;
+    }
+  },
+  { label:'Pool 기울기', bg:'#e3f2fd', border:'#2196f3',
+    calc: function() {
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">📉 맥스 풀링 역전파</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">기울기는 <strong>최댓값 위치에만</strong> 전달되고, 나머지는 0입니다.</p>';
+      h += '<div style="display:flex;align-items:center;gap:1rem;justify-content:center;flex-wrap:wrap;margin:0.8rem 0;">';
+      // Forward
+      h += '<div style="text-align:center;"><div style="font-size:0.72rem;color:var(--g600);margin-bottom:0.3rem;">순전파: 최댓값 선택</div>';
+      h += '<div style="display:inline-grid;grid-template-columns:repeat(2,1fr);gap:2px;">';
+      h += '<div style="w:2.5rem;h:2.5rem;padding:0.5rem;background:#e3f2fd;text-align:center;font-weight:600;font-size:0.8rem;border-radius:3px;">1</div>';
+      h += '<div style="w:2.5rem;h:2.5rem;padding:0.5rem;background:#1565c0;color:#fff;text-align:center;font-weight:700;font-size:0.8rem;border-radius:3px;">5</div>';
+      h += '<div style="w:2.5rem;h:2.5rem;padding:0.5rem;background:#e3f2fd;text-align:center;font-weight:600;font-size:0.8rem;border-radius:3px;">3</div>';
+      h += '<div style="w:2.5rem;h:2.5rem;padding:0.5rem;background:#e3f2fd;text-align:center;font-weight:600;font-size:0.8rem;border-radius:3px;">2</div>';
+      h += '</div><div style="font-size:0.72rem;margin-top:0.2rem;">→ max = <strong>5</strong></div></div>';
+      h += '<div style="font-size:1.5rem;color:var(--g400);">↔</div>';
+      // Backward
+      h += '<div style="text-align:center;"><div style="font-size:0.72rem;color:var(--g600);margin-bottom:0.3rem;">역전파: 기울기 배분</div>';
+      h += '<div style="display:inline-grid;grid-template-columns:repeat(2,1fr);gap:2px;">';
+      h += '<div style="padding:0.5rem;background:#ffebee;text-align:center;font-weight:600;font-size:0.8rem;border-radius:3px;color:#c62828;">0</div>';
+      h += '<div style="padding:0.5rem;background:#1565c0;color:#fff;text-align:center;font-weight:700;font-size:0.8rem;border-radius:3px;">∂L/∂z</div>';
+      h += '<div style="padding:0.5rem;background:#ffebee;text-align:center;font-weight:600;font-size:0.8rem;border-radius:3px;color:#c62828;">0</div>';
+      h += '<div style="padding:0.5rem;background:#ffebee;text-align:center;font-weight:600;font-size:0.8rem;border-radius:3px;color:#c62828;">0</div>';
+      h += '</div><div style="font-size:0.72rem;margin-top:0.2rem;">최댓값 위치만 기울기 전달</div></div>';
+      h += '</div>';
+      h += '<p style="font-size:0.78rem;color:var(--g600);">맥스 풀링에서는 순전파 시 최댓값의 위치를 기억해두었다가,<br>역전파 시 그 위치에만 기울기를 전달합니다. 나머지 위치는 0.</p>';
+      return h;
+    }
+  },
+  { label:'ReLU 기울기', bg:'#fff3e0', border:'#ff9800',
+    calc: function() {
+      const vals = [3.2, -1.5, 0.7, -4.1, 2.0, -0.3, 0.0, 1.1];
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">⚡ ReLU 역전파</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">ReLU의 기울기는 매우 단순: <strong>양수→1, 음수/0→0</strong></p>';
+      h += '<table style="border-collapse:collapse;width:100%;"><tr style="background:#f5f5f5;"><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">순전파 입력 (x)</td>';
+      vals.forEach(v => { const c=v>0?'#2e7d32':'#c62828'; h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;color:${c};">${v.toFixed(1)}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">ReLU 출력</td>';
+      vals.forEach(v => { const out=Math.max(0,v); const bg=out===0?'#fff3e0':'#e8f5e9'; h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;background:${bg};font-weight:700;">${out.toFixed(1)}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">ReLU 기울기</td>';
+      vals.forEach(v => { const g=v>0?1:0; const bg=g===0?'#ffebee':'#e8f5e9'; h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;background:${bg};font-weight:800;">${g}</td>`; });
+      h += '</tr><tr><td style="padding:0.4rem;border:1px solid #e0e0e0;font-weight:700;font-size:0.78rem;">전파되는 기울기<br><span style="font-size:0.68rem;font-weight:400;">= 상위기울기 × ReLU기울기</span></td>';
+      vals.forEach(v => { const g=v>0?1:0; const upstream = 0.5; const result = upstream*g; const bg=result===0?'#ffebee':'#e3f2fd'; h += `<td style="padding:0.4rem;border:1px solid #e0e0e0;text-align:center;font-size:0.78rem;background:${bg};font-weight:700;">${result.toFixed(1)}</td>`; });
+      h += '</tr></table>';
+      h += '<p style="font-size:0.78rem;color:var(--g600);margin-top:0.5rem;">상위 기울기(∂L/∂z)를 0.5로 가정. 순전파에서 음수였던 위치의 기울기는 완전히 차단(0)됩니다.</p>';
+      return h;
+    }
+  },
+  { label:'Conv 필터 업데이트', bg:'#e8f5e9', border:'#43a047',
+    calc: function() {
+      const lr = 0.01;
+      let h = '<h4 style="font-size:0.88rem;margin-bottom:0.5rem;">🔧 컨볼루션 필터 가중치 업데이트</h4>';
+      h += '<p style="font-size:0.8rem;color:var(--g600);margin-bottom:0.5rem;">기울기와 학습률(Learning Rate)을 사용해 필터를 수정합니다.</p>';
+      h += '<div style="background:#e8f5e9;padding:0.8rem 1rem;border-radius:0.5rem;font-family:monospace;font-size:0.82rem;margin:0.5rem 0;">';
+      h += '∂L/∂K = 입력 패치 ⊛ 출력 기울기 &nbsp;(기울기 계산)<br><br>';
+      h += 'K_new = K_old - lr × ∂L/∂K &nbsp;&nbsp;&nbsp;(가중치 업데이트)';
+      h += '</div>';
+      // Show example with actual kernel values
+      if (K1 && K1[0]) {
+        const k = K1[0];
+        h += `<div style="margin-top:0.8rem;"><strong style="font-size:0.82rem;color:${k.c};">${k.name} 필터 업데이트 예시</strong> (lr=${lr})</div>`;
+        h += '<div style="display:flex;align-items:center;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin:0.5rem 0;">';
+        // Before
+        h += '<div style="text-align:center;"><div style="font-size:0.68rem;color:var(--g600);">현재 필터 (K)</div><div style="display:inline-grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ddd;padding:1px;border-radius:3px;">';
+        for(let y=0;y<3;y++) for(let x=0;x<3;x++) { const v=k.v[y][x]; const bg=v>=0?'rgba(33,150,243,0.2)':'rgba(229,57,53,0.2)'; h+=`<div style="width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;background:${bg};">${v}</div>`; }
+        h += '</div></div>';
+        h += '<div style="font-size:0.9rem;color:#999;">-</div>';
+        h += `<div style="font-size:0.75rem;font-weight:600;color:var(--g600);">${lr} ×</div>`;
+        // Gradient (simulated)
+        const grads = k.v.map(row => row.map(v => +(Math.random()*2-1).toFixed(2)));
+        h += '<div style="text-align:center;"><div style="font-size:0.68rem;color:var(--g600);">기울기 (∂L/∂K)</div><div style="display:inline-grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ddd;padding:1px;border-radius:3px;">';
+        for(let y=0;y<3;y++) for(let x=0;x<3;x++) { const v=grads[y][x]; const bg=v>=0?'rgba(33,150,243,0.15)':'rgba(229,57,53,0.15)'; h+=`<div style="width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:600;background:${bg};">${v.toFixed(2)}</div>`; }
+        h += '</div></div>';
+        h += '<div style="font-size:0.9rem;color:#999;">=</div>';
+        // Updated
+        h += '<div style="text-align:center;"><div style="font-size:0.68rem;color:#2e7d32;font-weight:700;">업데이트된 필터</div><div style="display:inline-grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ddd;padding:1px;border-radius:3px;">';
+        for(let y=0;y<3;y++) for(let x=0;x<3;x++) { const nv=k.v[y][x]-lr*grads[y][x]; const bg='rgba(76,175,80,0.15)'; h+=`<div style="width:2.2rem;height:2.2rem;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;background:${bg};color:#2e7d32;">${nv.toFixed(2)}</div>`; }
+        h += '</div></div>';
+        h += '</div>';
+      }
+      h += '<p style="font-size:0.78rem;color:var(--g600);margin-top:0.5rem;">이 과정을 수천 번 반복하면, 필터가 점점 더 유용한 특징을 감지하도록 진화합니다!</p>';
+      return h;
+    }
+  },
+];
+
+function buildBackprop() {
+  const sec = document.getElementById('bpSection');
+  sec.classList.add('open');
+
+  const flow = document.getElementById('bpFlow');
+  flow.innerHTML = '';
+  BP_STEPS.forEach((s, i) => {
+    if (i > 0) flow.innerHTML += `<div class="bp-arrow" id="bpa${i}">←</div>`;
+    flow.innerHTML += `<div class="bp-node" id="bpn${i}" style="background:${s.bg};border:2px solid ${s.border};color:${s.border};cursor:pointer;" onclick="showBpStep(${i})">${s.label}</div>`;
+  });
+
+  // Show overview by default
+  document.getElementById('bpDetail').innerHTML = `
+    <div class="bp-explain">
+      <strong>각 단계를 클릭하면 계산 과정을 확인할 수 있습니다.</strong><br><br>
+      1. <strong>순전파 출력</strong>: Softmax로 확률 계산<br>
+      2. <strong>손실 계산</strong>: 예측과 정답의 차이 (Cross-Entropy Loss)<br>
+      3. <strong>출력층 기울기</strong>: 예측값 - 정답 (놀라울 정도로 간단!)<br>
+      4. <strong>FC 가중치 기울기</strong>: 체인 룰로 각 가중치의 기울기 계산<br>
+      5. <strong>Flatten 기울기</strong>: 1D → 2D 모양 복원<br>
+      6. <strong>Pool 기울기</strong>: 최댓값 위치에만 기울기 전달<br>
+      7. <strong>ReLU 기울기</strong>: 양수 위치만 통과, 음수는 차단<br>
+      8. <strong>Conv 필터 업데이트</strong>: 기울기 × 학습률로 필터 수정
+    </div>
+  `;
+  bpSelectedStep = -1;
+}
+
+function showBpStep(idx) {
+  // Highlight selected node
+  BP_STEPS.forEach((_, i) => {
+    const n = document.getElementById('bpn'+i);
+    if (n) {
+      n.style.boxShadow = i === idx ? '0 0 12px rgba(229,57,53,0.5)' : '';
+      n.style.transform = i === idx ? 'scale(1.08)' : '';
+    }
+    // Highlight arrows up to this step
+    if (i > 0) {
+      const a = document.getElementById('bpa'+i);
+      if (a) a.style.color = i <= idx ? '#e53935' : '';
+    }
+  });
+  bpSelectedStep = idx;
+  const detail = document.getElementById('bpDetail');
+  detail.innerHTML = '<div class="bp-explain">' + BP_STEPS[idx].calc() + '</div>';
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+  const desc = document.getElementById('modeDesc');
+  if (m === 'forward') {
+    desc.innerHTML = '이미지가 CNN을 통과하며 처리되는 <strong>순전파</strong> 과정을 시각화합니다.';
+    document.getElementById('bpSection').classList.remove('open');
+  } else {
+    desc.innerHTML = '예측 오차를 역방향으로 전파하여 <strong>필터를 학습</strong>하는 과정입니다.';
+    if (P[0]) buildBackprop();
+  }
+}
+
+// ══════════════════════════════════════
+// Sample Images
+// ══════════════════════════════════════
+function genSamples() {
+  let c;
+  // 0: Circle
+  c=document.getElementById('s0').getContext('2d');
+  c.fillStyle='#1a237e';c.fillRect(0,0,60,60);
+  c.beginPath();c.arc(30,30,18,0,Math.PI*2);c.fillStyle='#ffeb3b';c.fill();
+  // 1: Rectangle
+  c=document.getElementById('s1').getContext('2d');
+  c.fillStyle='#004d40';c.fillRect(0,0,60,60);
+  c.fillStyle='#ff7043';c.fillRect(12,15,36,30);
+  // 2: Stripes
+  c=document.getElementById('s2').getContext('2d');
+  for(let i=0;i<8;i++){c.fillStyle=i%2?'#e8eaf6':'#283593';c.fillRect(0,i*7.5,60,7.5);}
+  // 3: Check
+  c=document.getElementById('s3').getContext('2d');
+  for(let y=0;y<6;y++)for(let x=0;x<6;x++){c.fillStyle=(x+y)%2?'#f5f5f5':'#37474f';c.fillRect(x*10,y*10,10,10);}
+  // 4: Star
+  c=document.getElementById('s4').getContext('2d');
+  c.fillStyle='#311b92';c.fillRect(0,0,60,60);
+  c.fillStyle='#ffd600';c.beginPath();
+  for(let i=0;i<5;i++){const a=Math.PI*2*i/5-Math.PI/2;c.lineTo(30+18*Math.cos(a),30+18*Math.sin(a));const a2=a+Math.PI/5;c.lineTo(30+8*Math.cos(a2),30+8*Math.sin(a2));}
+  c.closePath();c.fill();
+}
+
+function loadFromCanvas(cv) {
+  const tmp=document.createElement('canvas');tmp.width=SZ;tmp.height=SZ;
+  const ctx=tmp.getContext('2d');ctx.drawImage(cv,0,0,SZ,SZ);
+  const d=ctx.getImageData(0,0,SZ,SZ);
+  inputGray=new Float32Array(SZ*SZ);
+  for(let i=0;i<inputGray.length;i++){
+    inputGray[i]=(0.299*d.data[i*4]+0.587*d.data[i*4+1]+0.114*d.data[i*4+2])/255;
+  }
+  inputImg = null; // will use canvas-generated for MobileNet too
+}
+
+function selectSamp(idx) {
+  document.querySelectorAll('.samp').forEach(s=>s.classList.remove('sel'));
+  const cv=document.getElementById('s'+idx);
+  cv.classList.add('sel');
+  loadFromCanvas(cv);
+  // For MobileNet, store the canvas as image source
+  const tmp=document.createElement('canvas');tmp.width=SZ;tmp.height=SZ;
+  tmp.getContext('2d').drawImage(cv,0,0,SZ,SZ);
+  inputImg=tmp;
+  document.getElementById('statusInfo').innerHTML='<strong style="color:var(--main);">'+cv.title+'</strong> 이미지 선택됨';
+  document.getElementById('goBtn').classList.add('show');
+}
+
+for(let i=0;i<5;i++) document.getElementById('s'+i).addEventListener('click',()=>selectSamp(i));
+
+document.getElementById('fileIn').addEventListener('change',function(e){
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const img=new Image();
+    img.onload=function(){
+      const tmp=document.createElement('canvas');tmp.width=SZ;tmp.height=SZ;
+      const ctx=tmp.getContext('2d');
+      const sc=Math.min(SZ/img.width,SZ/img.height);
+      const w=img.width*sc,h=img.height*sc;
+      ctx.fillStyle='#000';ctx.fillRect(0,0,SZ,SZ);
+      ctx.drawImage(img,(SZ-w)/2,(SZ-h)/2,w,h);
+      loadFromCanvas(tmp);
+      // For MobileNet, use original resolution
+      const mnCv=document.createElement('canvas');mnCv.width=224;mnCv.height=224;
+      const mnCtx=mnCv.getContext('2d');
+      mnCtx.fillStyle='#000';mnCtx.fillRect(0,0,224,224);
+      const sc2=Math.min(224/img.width,224/img.height);
+      mnCtx.drawImage(img,(224-img.width*sc2)/2,(224-img.height*sc2)/2,img.width*sc2,img.height*sc2);
+      inputImg=mnCv;
+      document.querySelectorAll('.samp').forEach(s=>s.classList.remove('sel'));
+      document.getElementById('statusInfo').innerHTML='<strong style="color:var(--main);">'+f.name+'</strong> 업로드됨';
+      document.getElementById('goBtn').classList.add('show');
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(f);
+});
+
+// ══════════════════════════════════════
+// Init
+// ══════════════════════════════════════
+genSamples();
+buildPipeline();
+drawHeaderNN();
+</script>
+</body>
+</html>

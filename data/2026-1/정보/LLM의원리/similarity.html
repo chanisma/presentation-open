@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>프롬프트 결과 유사도 측정기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --bg: #0F0F2D;
+      --primary: #A78BFA;
+      --accent: #67E8F9;
+      --text: #FFFFFF;
+      --text-sec: #C8C8E0;
+      --glass: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.18);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+    }
+    html, body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: linear-gradient(135deg, #1A1A4E 0%, #0F0F2D 40%, #1E3A5F 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    body::before {
+      content:''; position:fixed; width:500px; height:500px;
+      background:radial-gradient(circle,rgba(167,139,250,0.2),transparent 70%);
+      top:-100px; right:-100px; border-radius:50%; filter:blur(80px); z-index:0; pointer-events:none;
+    }
+    h1, h2, h3 { font-family: 'Poppins', 'Noto Sans KR', sans-serif; }
+    .container { max-width:1100px; margin:0 auto; padding:2rem 1.5rem; position:relative; z-index:1; }
+    .header { text-align:center; margin-bottom:2rem; }
+    .header h1 { font-size:1.8rem; margin-bottom:0.3rem; }
+    .header p { color:var(--text-sec); font-size:0.95rem; }
+    .badge { display:inline-block; padding:0.2rem 0.7rem; border-radius:2rem; font-size:0.8rem; font-weight:600; background:linear-gradient(135deg,var(--primary),var(--accent)); color:#0F0F2D; margin-bottom:0.5rem; }
+    .input-section { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; }
+    .input-card { background:var(--glass); border:1px solid var(--glass-border); border-radius:1rem; padding:1.2rem; backdrop-filter:blur(20px); }
+    .input-card h3 { font-size:0.95rem; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem; }
+    .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+    .dot--original { background:var(--primary); }
+    .dot--student { background:var(--accent); }
+    textarea { width:100%; height:180px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:0.6rem; color:var(--text); font-family:'Noto Sans KR',sans-serif; font-size:0.9rem; padding:0.8rem; resize:vertical; line-height:1.6; }
+    textarea:focus { outline:none; border-color:var(--primary); }
+    textarea::placeholder { color:rgba(255,255,255,0.3); }
+    .btn-wrap { text-align:center; margin-bottom:1.5rem; }
+    .btn-analyze { background:linear-gradient(135deg,var(--primary),var(--accent)); color:#0F0F2D; border:none; padding:0.7rem 2rem; border-radius:2rem; font-size:1rem; font-weight:700; font-family:'Poppins','Noto Sans KR',sans-serif; cursor:pointer; transition:all 0.3s; }
+    .btn-analyze:hover { transform:translateY(-2px); box-shadow:0 4px 20px rgba(167,139,250,0.4); }
+    .results { display:none; }
+    .results.visible { display:block; animation:fadeIn 0.5s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .score-section { text-align:center; margin-bottom:1.5rem; }
+    .score-ring-wrap { display:inline-block; position:relative; width:160px; height:160px; }
+    .score-ring { transform:rotate(-90deg); }
+    .score-ring-bg { fill:none; stroke:rgba(255,255,255,0.1); stroke-width:12; }
+    .score-ring-fill { fill:none; stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset 1.5s ease,stroke 0.5s; }
+    .score-value { position:absolute; top:50%;left:50%; transform:translate(-50%,-50%); font-family:'Poppins',sans-serif; font-size:2.4rem; font-weight:700; }
+    .score-label { font-size:0.85rem; color:var(--text-sec); margin-top:0.3rem; }
+    .metrics-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0.8rem; margin-bottom:1.5rem; }
+    .metric-card { background:var(--glass); border:1px solid var(--glass-border); border-radius:0.8rem; padding:1rem; text-align:center; backdrop-filter:blur(10px); }
+    .metric-name { font-size:0.8rem; color:var(--text-sec); margin-bottom:0.3rem; }
+    .metric-value { font-family:'Poppins',sans-serif; font-size:1.5rem; font-weight:700; }
+    .metric-bar { height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin-top:0.4rem; overflow:hidden; }
+    .metric-bar-fill { height:100%; border-radius:2px; transition:width 1s ease; }
+    .metric-desc { font-size:0.75rem; color:var(--text-sec); margin-top:0.3rem; }
+    .keyword-section { background:var(--glass); border:1px solid var(--glass-border); border-radius:1rem; padding:1.2rem; margin-bottom:1.5rem; backdrop-filter:blur(10px); }
+    .keyword-section h3 { font-size:0.95rem; margin-bottom:0.6rem; }
+    .keyword-grid { display:flex; gap:0.8rem; flex-wrap:wrap; }
+    .keyword-col { flex:1; min-width:200px; }
+    .keyword-col h4 { font-size:0.82rem; color:var(--text-sec); margin-bottom:0.4rem; }
+    .keyword-tag { display:inline-block; padding:0.15rem 0.5rem; border-radius:0.3rem; font-size:0.8rem; margin:0.15rem; font-weight:500; }
+    .keyword-tag--match { background:rgba(52,211,153,0.2); border:1px solid rgba(52,211,153,0.3); color:var(--success); }
+    .keyword-tag--original { background:rgba(167,139,250,0.15); border:1px solid rgba(167,139,250,0.25); color:var(--primary); }
+    .keyword-tag--student { background:rgba(103,232,249,0.15); border:1px solid rgba(103,232,249,0.25); color:var(--accent); }
+    .method-section { background:var(--glass); border:1px solid var(--glass-border); border-radius:1rem; padding:1.2rem; backdrop-filter:blur(10px); }
+    .method-section h3 { font-size:0.95rem; margin-bottom:0.6rem; }
+    .method-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.6rem; }
+    .method-item { padding:0.7rem; background:rgba(255,255,255,0.03); border-radius:0.5rem; border-left:3px solid var(--primary); }
+    .method-item:nth-child(2) { border-left-color:var(--accent); }
+    .method-item:nth-child(3) { border-left-color:var(--success); }
+    .method-item:nth-child(4) { border-left-color:var(--warning); }
+    .method-item h4 { font-size:0.88rem; margin-bottom:0.2rem; }
+    .method-item p { font-size:0.78rem; color:var(--text-sec); line-height:1.5; }
+    .formula { font-family:'Poppins',monospace; font-size:0.75rem; color:var(--accent); margin-top:0.2rem; }
+    @media (max-width:768px) {
+      .input-section { grid-template-columns:1fr; }
+      .metrics-grid { grid-template-columns:repeat(2,1fr); }
+      .method-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="badge">LLM의 원리 - 역방향 프롬프트 추론</div>
+      <h1>프롬프트 결과 유사도 측정기</h1>
+      <p>원본 결과물과 학생의 LLM 출력을 비교하여 다차원 유사도를 분석합니다</p>
+    </div>
+
+    <div class="input-section">
+      <div class="input-card">
+        <h3><span class="dot dot--original"></span> 원본 결과물 (교사 제시)</h3>
+        <textarea id="originalText" readonly style="background:rgba(167,139,250,0.08);cursor:default;">온실효과와 지구온난화
+
+1. 태양 에너지 흡수
+태양에서 방출된 빛 에너지가 대기를 통과하여 지구 표면에 도달합니다. 지표면은 이 에너지를 흡수하여 따뜻해집니다.
+
+2. 적외선 방출
+따뜻해진 지표면은 흡수한 에너지를 적외선(열복사) 형태로 대기 중으로 다시 방출합니다.
+
+3. 온실가스의 역할
+대기 중의 온실가스(CO₂, CH₄, N₂O 등)가 이 적외선을 흡수하고 사방으로 재방출합니다. 이 과정에서 열이 대기 안에 갇히게 됩니다.
+
+4. 온도 상승
+갇힌 열로 인해 지구의 평균 기온이 상승합니다. 이것이 바로 '온실효과'이며, 인간 활동으로 온실가스가 증가하면서 지구온난화가 가속되고 있습니다.
+
+※ 핵심 정리: 온실효과는 [태양 에너지 → 지표면 가열 → 적외선 방출 → 온실가스 흡수 → 온도 상승]의 순환 과정입니다.</textarea>
+      </div>
+      <div class="input-card">
+        <h3><span class="dot dot--student"></span> 학생 결과물 (LLM 출력)</h3>
+        <textarea id="studentText" placeholder="학생이 역추론한 프롬프트로 생성한 결과물을 여기에 붙여넣으세요..."></textarea>
+      </div>
+    </div>
+
+    <div class="btn-wrap">
+      <button class="btn-analyze" id="analyzeBtn">유사도 분석하기</button>
+    </div>
+
+    <div class="results" id="results">
+      <div class="score-section">
+        <div class="score-ring-wrap">
+          <svg class="score-ring" viewBox="0 0 160 160">
+            <circle class="score-ring-bg" cx="80" cy="80" r="68"/>
+            <circle class="score-ring-fill" id="scoreRing" cx="80" cy="80" r="68"
+                    stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
+          </svg>
+          <span class="score-value" id="scoreValue">0%</span>
+        </div>
+        <div class="score-label">종합 유사도 점수</div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-name">단어 겹침률</div>
+          <div class="metric-value" id="jaccardValue">0%</div>
+          <div class="metric-bar"><div class="metric-bar-fill" id="jaccardBar" style="width:0;background:var(--primary)"></div></div>
+          <div class="metric-desc">공통 단어 / 전체 단어</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">구조 유사도</div>
+          <div class="metric-value" id="structValue">0%</div>
+          <div class="metric-bar"><div class="metric-bar-fill" id="structBar" style="width:0;background:var(--accent)"></div></div>
+          <div class="metric-desc">형식/구조 일치도</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">핵심 키워드</div>
+          <div class="metric-value" id="keywordValue">0%</div>
+          <div class="metric-bar"><div class="metric-bar-fill" id="keywordBar" style="width:0;background:var(--success)"></div></div>
+          <div class="metric-desc">주요 용어 매칭률</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-name">길이 유사도</div>
+          <div class="metric-value" id="lengthValue">0%</div>
+          <div class="metric-bar"><div class="metric-bar-fill" id="lengthBar" style="width:0;background:var(--warning)"></div></div>
+          <div class="metric-desc">텍스트 분량 비교</div>
+        </div>
+      </div>
+
+      <div class="keyword-section">
+        <h3>키워드 분석 결과</h3>
+        <div class="keyword-grid">
+          <div class="keyword-col">
+            <h4>공통 키워드</h4>
+            <div id="matchKeywords"></div>
+          </div>
+          <div class="keyword-col">
+            <h4>원본에만 있는 키워드</h4>
+            <div id="originalOnlyKeywords"></div>
+          </div>
+          <div class="keyword-col">
+            <h4>학생에만 있는 키워드</h4>
+            <div id="studentOnlyKeywords"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="method-section">
+        <h3>측정 방법론</h3>
+        <div class="method-grid">
+          <div class="method-item">
+            <h4>1. 단어 겹침률 (Jaccard Similarity)</h4>
+            <p>두 텍스트를 단어 단위로 분리한 뒤, 공통 단어 수를 전체 고유 단어 수로 나누어 계산합니다. 의미적 유사성보다 어휘적 일치를 측정합니다.</p>
+            <div class="formula">J(A,B) = |A ∩ B| / |A ∪ B|</div>
+          </div>
+          <div class="method-item">
+            <h4>2. 구조 유사도 (Structural Similarity)</h4>
+            <p>번호 목록, 줄바꿈 수, 특수문자 패턴 등 텍스트의 형식적 구조를 비교합니다. 동일한 프롬프트는 유사한 출력 구조를 생성하는 경향이 있습니다.</p>
+            <div class="formula">줄 수 비율 + 목록 패턴 + 구분자 유사도</div>
+          </div>
+          <div class="method-item">
+            <h4>3. 핵심 키워드 매칭 (Keyword Match)</h4>
+            <p>조사, 어미 등 기능어를 제거한 후 빈도 상위 핵심 단어(명사, 동사)를 추출하여 매칭률을 계산합니다.</p>
+            <div class="formula">Match = |공통 키워드| / |원본 키워드|</div>
+          </div>
+          <div class="method-item">
+            <h4>4. 길이 유사도 (Length Similarity)</h4>
+            <p>두 텍스트의 글자 수 비율을 비교합니다. 유사한 프롬프트는 유사한 길이의 출력을 생성합니다.</p>
+            <div class="formula">L = 1 - |len(A) - len(B)| / max(len(A), len(B))</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var STOPWORDS = ['이','가','은','는','을','를','의','에','에서','로','으로','와','과','도','만','까지',
+      '부터','에게','한테','께','이다','입니다','합니다','있다','없다','하다','되다','것','수','등','및',
+      '또는','그리고','하지만','그러나','따라서','그래서','즉','또한','이런','그런','저런','이것','그것',
+      '매우','아주','정말','더','덜','가장','같은','다른','모든','각','이러한','그러한','대한','통해',
+      '위해','대해','관한','있는','없는','하는','되는','된','한','할','들','때','중','후','전','위',
+      '아래','안','밖','사이'];
+    var stopSet = {};
+    STOPWORDS.forEach(function(w) { stopSet[w] = true; });
+
+    function tokenize(text) {
+      return text.replace(/[^\w\sㄱ-ㅎㅏ-ㅣ가-힣]/g, ' ').split(/\s+/).filter(function(w) { return w.length > 1; });
+    }
+    function removeStopwords(words) {
+      return words.filter(function(w) { return !stopSet[w] && w.length > 1; });
+    }
+    function extractKeywords(text, topN) {
+      topN = topN || 15;
+      var words = removeStopwords(tokenize(text));
+      var freq = {};
+      words.forEach(function(w) { freq[w] = (freq[w] || 0) + 1; });
+      return Object.keys(freq).sort(function(a, b) { return freq[b] - freq[a]; }).slice(0, topN);
+    }
+    function jaccardSimilarity(t1, t2) {
+      var s1 = {}, s2 = {}, inter = 0, union = 0;
+      removeStopwords(tokenize(t1)).forEach(function(w) { s1[w] = true; });
+      removeStopwords(tokenize(t2)).forEach(function(w) { s2[w] = true; });
+      var all = {};
+      Object.keys(s1).forEach(function(k) { all[k] = true; });
+      Object.keys(s2).forEach(function(k) { all[k] = true; });
+      Object.keys(all).forEach(function(k) { union++; if (s1[k] && s2[k]) inter++; });
+      return union === 0 ? 0 : inter / union;
+    }
+    function structuralSimilarity(t1, t2) {
+      var l1 = t1.split('\n').filter(function(l) { return l.trim(); });
+      var l2 = t2.split('\n').filter(function(l) { return l.trim(); });
+      var maxL = Math.max(l1.length, l2.length);
+      var lineSim = maxL === 0 ? 0 : 1 - Math.abs(l1.length - l2.length) / maxL;
+      var numP = /^\s*\d+[\.\)]/;
+      var listSim = (l1.some(function(l){return numP.test(l);}) === l2.some(function(l){return numP.test(l);})) ? 1 : 0;
+      var bulP = /^\s*[-•*]/;
+      var bulSim = (l1.some(function(l){return bulP.test(l);}) === l2.some(function(l){return bulP.test(l);})) ? 1 : 0;
+      var avg1 = l1.reduce(function(s,l){return s+l.length;},0) / (l1.length||1);
+      var avg2 = l2.reduce(function(s,l){return s+l.length;},0) / (l2.length||1);
+      var maxA = Math.max(avg1, avg2);
+      var avgSim = maxA === 0 ? 0 : 1 - Math.abs(avg1-avg2)/maxA;
+      return lineSim*0.3 + listSim*0.25 + bulSim*0.2 + avgSim*0.25;
+    }
+    function keywordMatchRate(t1, t2) {
+      var kw1 = extractKeywords(t1);
+      var kw2 = extractKeywords(t2);
+      if (kw1.length === 0) return 0;
+      var kw2Set = {};
+      kw2.forEach(function(k) { kw2Set[k] = true; });
+      var matched = kw1.filter(function(k) { return kw2Set[k]; });
+      return matched.length / kw1.length;
+    }
+    function lengthSimilarity(t1, t2) {
+      var a = t1.replace(/\s/g,'').length;
+      var b = t2.replace(/\s/g,'').length;
+      var m = Math.max(a, b);
+      return m === 0 ? 0 : 1 - Math.abs(a-b)/m;
+    }
+    function getScoreColor(s) {
+      if (s >= 70) return 'var(--success)';
+      if (s >= 40) return 'var(--warning)';
+      return 'var(--danger)';
+    }
+
+    function renderTags(container, words, cssClass) {
+      while (container.firstChild) container.removeChild(container.firstChild);
+      if (words.length === 0) {
+        var empty = document.createElement('span');
+        empty.style.color = 'var(--text-sec)';
+        empty.style.fontSize = '0.8rem';
+        empty.textContent = '없음';
+        container.appendChild(empty);
+        return;
+      }
+      words.forEach(function(w) {
+        var tag = document.createElement('span');
+        tag.className = 'keyword-tag ' + cssClass;
+        tag.textContent = w;
+        container.appendChild(tag);
+      });
+    }
+
+    function analyze() {
+      var original = document.getElementById('originalText').value.trim();
+      var student = document.getElementById('studentText').value.trim();
+      if (!original || !student) return;
+
+      var jaccard = jaccardSimilarity(original, student);
+      var structure = structuralSimilarity(original, student);
+      var keyword = keywordMatchRate(original, student);
+      var length = lengthSimilarity(original, student);
+      var total = Math.round((jaccard*35 + structure*15 + keyword*35 + length*15)*100) / 100;
+
+      var results = document.getElementById('results');
+      results.classList.add('visible');
+
+      var ring = document.getElementById('scoreRing');
+      var circumference = 2 * Math.PI * 68;
+      ring.style.strokeDashoffset = circumference - (total/100)*circumference;
+      ring.style.stroke = getScoreColor(total);
+      document.getElementById('scoreValue').textContent = Math.round(total) + '%';
+      document.getElementById('scoreValue').style.color = getScoreColor(total);
+
+      var jP = Math.round(jaccard*100), sP = Math.round(structure*100);
+      var kP = Math.round(keyword*100), lP = Math.round(length*100);
+      document.getElementById('jaccardValue').textContent = jP+'%';
+      document.getElementById('jaccardBar').style.width = jP+'%';
+      document.getElementById('structValue').textContent = sP+'%';
+      document.getElementById('structBar').style.width = sP+'%';
+      document.getElementById('keywordValue').textContent = kP+'%';
+      document.getElementById('keywordBar').style.width = kP+'%';
+      document.getElementById('lengthValue').textContent = lP+'%';
+      document.getElementById('lengthBar').style.width = lP+'%';
+
+      var kw1 = extractKeywords(original);
+      var kw2 = extractKeywords(student);
+      var kw2Set = {};
+      kw2.forEach(function(k){ kw2Set[k]=true; });
+      var kw1Set = {};
+      kw1.forEach(function(k){ kw1Set[k]=true; });
+      var matched = kw1.filter(function(k){ return kw2Set[k]; });
+      var origOnly = kw1.filter(function(k){ return !kw2Set[k]; });
+      var studOnly = kw2.filter(function(k){ return !kw1Set[k]; });
+
+      renderTags(document.getElementById('matchKeywords'), matched, 'keyword-tag--match');
+      renderTags(document.getElementById('originalOnlyKeywords'), origOnly, 'keyword-tag--original');
+      renderTags(document.getElementById('studentOnlyKeywords'), studOnly, 'keyword-tag--student');
+
+      results.scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    document.getElementById('analyzeBtn').addEventListener('click', analyze);
+  </script>
+</body>
+</html>

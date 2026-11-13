@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>음악 시간: 리듬 마스터</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #e8f5e9;
+            --primary-green: #4caf50;
+            --dark-green: #2e7d32;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            display: flex; height: 100vh; overflow: hidden;
+        }
+
+        /* 배경 패턴 */
+        .background-pattern {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.1;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5C30 5 15 20 15 35C15 43.2843 21.7157 50 30 50C38.2843 50 45 43.2843 45 35C45 20 30 5 30 5Z' fill='%232e7d32'/%3E%3C/svg%3E");
+        }
+
+        /* 왼쪽 리더보드 사이드바 */
+        #sidebar {
+            width: var(--sidebar-width);
+            background: rgba(255, 255, 255, 0.9);
+            border-right: 3px solid var(--primary-green);
+            display: flex; flex-direction: column;
+            padding: 20px; box-sizing: border-box;
+            z-index: 10;
+        }
+
+        #sidebar h2 { color: var(--dark-green); font-size: 1.2rem; margin-bottom: 20px; text-align: center; }
+
+        .rank-item {
+            display: flex; align-items: center;
+            background: white; padding: 10px; border-radius: 10px;
+            margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            animation: slideIn 0.5s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .rank-num { font-weight: bold; width: 25px; color: var(--primary-green); }
+        .rank-name { flex-grow: 1; margin-left: 10px; font-size: 0.9rem; }
+        .rank-time { font-size: 0.8rem; color: #666; }
+
+        /* 메인 게임 영역 */
+        #main-content {
+            flex-grow: 1;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px; position: relative; overflow-y: auto;
+        }
+
+        .hud {
+            width: 100%; max-width: 600px;
+            display: flex; justify-content: space-between;
+            background: white; padding: 15px; border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px; font-weight: bold;
+        }
+
+        #status-msg {
+            font-size: 1.5rem; color: var(--dark-green);
+            font-weight: bold; margin-bottom: 10px;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* 카드 그리드 */
+        .grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 15px; width: 100%; max-width: 600px;
+        }
+
+        .card {
+            aspect-ratio: 3/4; perspective: 1000px; cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative; width: 100%; height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* 카드 뒷면: 나뭇잎 패턴 */
+        .card-back {
+            background-color: var(--primary-green);
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 5 L25 15 L35 15 L27 22 L30 32 L20 26 L10 32 L13 22 L5 15 L15 15 Z' fill='%23ffffff' fill-opacity='0.2'/%3E%3C/svg%3E");
+        }
+
+        /* 카드 앞면: 음표 기호 최대화 */
+        .card-front {
+            background-color: white; transform: rotateY(180deg);
+            color: #1a1a1a; font-size: 6rem; /* 기호 크기 대폭 확대 */
+            font-family: 'serif';
+        }
+
+        /* 매칭 성공 애니메이션 */
+        .matched { animation: matchAnim 0.7s forwards; }
+        @keyframes matchAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3) rotate(15deg); }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        /* 모달 및 버튼 */
+        .modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: white; padding: 30px; border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            z-index: 1000; text-align: center; width: 350px;
+        }
+
+        button {
+            background: var(--dark-green); color: white; border: none;
+            padding: 15px; border-radius: 30px; font-size: 1.1rem;
+            margin-top: 10px; cursor: pointer; width: 100%;
+        }
+
+        .hidden { display: none; }
+        .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999; }
+
+        /* 캐릭터 선택 */
+        .char-select { display: flex; justify-content: space-around; margin: 15px 0; }
+        .char-item { font-size: 2.5rem; cursor: pointer; padding: 5px; filter: grayscale(1); }
+        .char-item.selected { filter: grayscale(0); transform: scale(1.2); border-bottom: 3px solid var(--primary-green); }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar { width: 100%; height: 150px; border-right: none; border-bottom: 3px solid var(--primary-green); }
+            #main-content { height: calc(100vh - 150px); }
+            .card-front { font-size: 4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="background-pattern"></div>
+
+<!-- 왼쪽 순위표 -->
+<aside id="sidebar">
+    <h2>🏆 실시간 순위</h2>
+    <div id="rank-list-container">
+        <!-- 순위 아이템이 여기에 추가됨 -->
+    </div>
+</aside>
+
+<!-- 메인 게임 영역 -->
+<main id="main-content">
+    <div class="hud">
+        <div id="p-info">👤 <span id="current-char">?</span> <span id="user-name">---</span></div>
+        <div>⏱️ <span id="timer">00:00</span></div>
+        <div>⭐ LV.<span id="level-num">1</span></div>
+    </div>
+
+    <div id="status-msg">음악 선생님과 함께하는 리듬 게임!</div>
+    <div id="level-name" style="font-weight: bold; margin-bottom: 10px; color: #444;"></div>
+    
+    <div class="grid" id="card-grid"></div>
+</main>
+
+<!-- 시작 모달 -->
+<div id="overlay" class="overlay"></div>
+<div id="start-modal" class="modal">
+    <h1 style="color:var(--dark-green); margin-top:0;">🎵 리듬 마스터</h1>
+    <p>캐릭터와 이름을 입력해 주세요!</p>
+    <input type="text" id="player-input" placeholder="닉네임 (최대 6자)" maxlength="6" 
+           style="padding:12px; width:80%; border:2px solid var(--light-green); border-radius:10px; font-size:1rem; margin-bottom:10px; text-align:center;">
+    
+    <div class="char-select">
+        <span class="char-item selected" onclick="selectChar('🐱', this)">🐱</span>
+        <span class="char-item" onclick="selectChar('🐶', this)">🐶</span>
+        <span class="char-item" onclick="selectChar('🦊', this)">🦊</span>
+        <span class="char-item" onclick="selectChar('🐰', this)">🐰</span>
+    </div>
+    <button onclick="startGame()">도전 시작!</button>
+</div>
+
+<!-- 결과 모달 -->
+<div id="result-modal" class="modal hidden">
+    <h2 id="result-title">🎉 LEVEL CLEAR!</h2>
+    <p id="result-text" style="font-size: 1.2rem;"></p>
+    <button onclick="nextLevel()" id="next-btn">다음 단계 도전!</button>
+    <button onclick="location.reload()" style="background:#888; font-size:0.9rem;">다시 시작</button>
+</div>
+
+<audio id="sound-flip" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+<audio id="sound-match" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+<audio id="bgm" loop src="https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3"></audio>
+
+<script>
+    const levels = [
+        { name: "1단계: 기본 음표", data: ['𝅝', '𝅗𝅥', '𝅘𝅥', '𝅘𝅥𝅮', '𝅘𝅥𝅯'], type: 'match' },
+        { name: "1단계 심화: 점음표", data: ['𝅝', '𝅗𝅥', '𝅘𝅥', '𝅘𝅥𝅮', '𝅘𝅥𝅯', '𝅗𝅥.', '𝅘𝅥.', '𝅘𝅥𝅮.'], type: 'match' },
+        { name: "2단계: 기본 쉼표", data: ['𝄻', '𝄼', '𝄽', '𝄾', '𝄿'], type: 'match' },
+        { name: "2단계 심화: 점쉼표", data: ['𝄻', '𝄼', '𝄽', '𝄾', '𝄿', '𝄼.', '𝄽.', '𝄾.'], type: 'match' },
+        { name: "3단계: 음표 & 쉼표 매칭", data: [
+            ['𝅝', '𝄻'], ['𝅗𝅥', '𝄼'], ['𝅘𝅥', '𝄽'], ['𝅘𝅥𝅮', '𝄾'], ['𝅘𝅥𝅯', '𝄿'],
+            ['𝅗𝅥.', '𝄼.'], ['𝅘𝅥.', '𝄽.'], ['𝅘𝅥𝅮.', '𝄾.']
+        ], type: 'pair' }
+    ];
+
+    let currentLevelIdx = 0;
+    let cards = [];
+    let flippedCards = [];
+    let matchedCount = 0;
+    let timerInterval;
+    let seconds = 0;
+    let selectedChar = '🐱';
+    let playerName = '';
+    let canClick = false;
+
+    // 초기 실행: 기존 순위표 로드
+    updateLeaderboardUI();
+
+    function selectChar(char, el) {
+        selectedChar = char;
+        document.querySelectorAll('.char-item').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function startGame() {
+        const input = document.getElementById('player-input').value.trim();
+        playerName = input || '음악천재';
+        document.getElementById('user-name').innerText = playerName;
+        document.getElementById('current-char').innerText = selectedChar;
+        document.getElementById('start-modal').classList.add('hidden');
+        document.getElementById('overlay').classList.add('hidden');
+        document.getElementById('bgm').play();
+        loadLevel(currentLevelIdx);
+    }
+
+    function loadLevel(idx) {
+        currentLevelIdx = idx;
+        canClick = false;
+        const level = levels[idx];
+        document.getElementById('level-num').innerText = idx + 1;
+        document.getElementById('level-name').innerText = level.name;
+        document.getElementById('status-msg').innerText = "5초간 집중하세요!";
+        document.getElementById('status-msg').style.color = "#d32f2f";
+
+        let cardData = [];
+        if (level.type === 'match') {
+            cardData = [...level.data, ...level.data];
+        } else {
+            level.data.forEach(p => cardData.push(p[0], p[1]));
+        }
+
+        shuffle(cardData);
+        renderBoard(cardData);
+
+        // 5초 미리보기 로직
+        const allCards = document.querySelectorAll('.card');
+        setTimeout(() => {
+            allCards.forEach(c => c.classList.add('flipped'));
+            
+            setTimeout(() => {
+                allCards.forEach(c => c.classList.remove('flipped'));
+                canClick = true;
+                document.getElementById('status-msg').innerText = "똑같은 길이를 찾으세요!";
+                document.getElementById('status-msg').style.color = "var(--dark-green)";
+                startTimer();
+            }, 5000);
+        }, 500);
+    }
+
+    function renderBoard(data) {
+        const grid = document.getElementById('card-grid');
+        grid.innerHTML = '';
+        matchedCount = 0;
+        cards = data;
+
+        data.forEach((val, i) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-back"></div>
+                    <div class="card-front">${val}</div>
+                </div>
+            `;
+            card.onclick = () => handleCardClick(card, i);
+            grid.appendChild(card);
+        });
+    }
+
+    function handleCardClick(cardEl, idx) {
+        if (!canClick || flippedCards.length >= 2 || cardEl.classList.contains('flipped')) return;
+
+        document.getElementById('sound-flip').play();
+        cardEl.classList.add('flipped');
+        flippedCards.push({ el: cardEl, val: cards[idx] });
+
+        if (flippedCards.length === 2) {
+            checkMatch();
+        }
+    }
+
+    function checkMatch() {
+        const [c1, c2] = flippedCards;
+        let isMatch = false;
+
+        if (levels[currentLevelIdx].type === 'pair') {
+            const pairs = levels[4].data;
+            isMatch = pairs.some(p => (p[0] === c1.val && p[1] === c2.val) || (p[0] === v2 && p[1] === v1)); // Simplified for logic
+            // 실제 데이터 기반 검증
+            isMatch = pairs.some(p => (p.includes(c1.val) && p.includes(c2.val)));
+        } else {
+            isMatch = c1.val === c2.val;
+        }
+
+        if (isMatch) {
+            setTimeout(() => {
+                document.getElementById('sound-match').play();
+                c1.el.classList.add('matched');
+                c2.el.classList.add('matched');
+                matchedCount += 2;
+                flippedCards = [];
+                if (matchedCount === cards.length) winLevel();
+            }, 600);
+        } else {
+            setTimeout(() => {
+                c1.el.classList.remove('flipped');
+                c2.el.classList.remove('flipped');
+                flippedCards = [];
+            }, 1000);
+        }
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        seconds = 0;
+        timerInterval = setInterval(() => {
+            seconds++;
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }, 1000);
+    }
+
+    function winLevel() {
+        clearInterval(timerInterval);
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        saveScore();
+        showResult();
+    }
+
+    function showResult() {
+        const modal = document.getElementById('result-modal');
+        modal.classList.remove('hidden');
+        document.getElementById('overlay').classList.remove('hidden');
+        document.getElementById('result-text').innerText = `${seconds}초 만에 성공!`;
+        
+        if(currentLevelIdx === levels.length - 1) {
+            document.getElementById('next-btn').innerText = "처음부터 다시하기";
+        }
+    }
+
+    function nextLevel() {
+        document.getElementById('result-modal').classList.add('hidden');
+        document.getElementById('overlay').classList.add('hidden');
+        currentLevelIdx = (currentLevelIdx + 1) % levels.length;
+        loadLevel(currentLevelIdx);
+    }
+
+    // 순위 저장 및 사이드바 업데이트
+    function saveScore() {
+        let scores = JSON.parse(localStorage.getItem('musicGameRank') || '[]');
+        scores.push({ name: playerName, char: selectedChar, time: seconds, level: currentLevelIdx + 1 });
+        // 레벨 높은 순 -> 시간 짧은 순 정렬
+        scores.sort((a, b) => b.level - a.level || a.time - b.time);
+        // 최대 10명만 저장
+        scores = scores.slice(0, 10);
+        localStorage.setItem('musicGameRank', JSON.stringify(scores));
+        updateLeaderboardUI();
+    }
+
+    function updateLeaderboardUI() {
+        const scores = JSON.parse(localStorage.getItem('musicGameRank') || '[]');
+        const container = document.getElementById('rank-list-container');
+        container.innerHTML = scores.map((s, i) => `
+            <div class="rank-item">
+                <div class="rank-num">${i + 1}</div>
+                <div class="rank-name">${s.char} ${s.name} <br><small>LV.${s.level}</small></div>
+                <div class="rank-time">${s.time}초</div>
+            </div>
+        `).join('');
+    }
+
+    function shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+    }
+</script>
+</body>
+</html>

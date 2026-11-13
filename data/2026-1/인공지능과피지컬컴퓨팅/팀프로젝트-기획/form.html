@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI × 피지컬컴퓨팅 팀 프로젝트 기획서</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0F0F2D;
+      --primary: #A78BFA;
+      --accent: #67E8F9;
+      --success: #34D399;
+      --warn: #FBBF24;
+      --pink: #F472B6;
+      --text: #FFFFFF;
+      --text-sub: #C8C8E0;
+      --glass: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.15);
+      --glass-strong: rgba(255,255,255,0.12);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: clamp(15px, 1.2vw, 18px); scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 15% 20%, rgba(167,139,250,0.12), transparent),
+        radial-gradient(ellipse 50% 40% at 85% 80%, rgba(103,232,249,0.08), transparent);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding-bottom: 6rem;
+    }
+    h1, h2, h3 { font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif; font-weight: 700; word-break: keep-all; }
+    p, label { font-size: 0.95rem; word-break: keep-all; }
+
+    /* ─── Header ─── */
+    .page-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,15,45,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 0.7rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .page-header-left { display: flex; align-items: center; gap: 0.7rem; }
+    .page-title { font-size: 1rem; font-weight: 600; }
+    .page-badge {
+      font-size: 0.78rem; padding: 0.15rem 0.6rem; border-radius: 2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      background: rgba(167,139,250,0.2); color: var(--primary);
+      border: 1px solid rgba(167,139,250,0.3);
+    }
+    .header-actions { display: flex; gap: 0.5rem; }
+
+    /* ─── Main ─── */
+    .main { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+    /* ─── Form Card ─── */
+    .form-card {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 1rem; overflow: hidden; margin-bottom: 1rem;
+    }
+    .form-card-header {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.7rem 1.2rem; border-bottom: 1px solid var(--glass-border);
+      background: var(--glass-strong);
+    }
+    .form-card-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 700;
+      color: var(--primary); background: rgba(167,139,250,0.15);
+      border: 1px solid rgba(167,139,250,0.25); border-radius: 50%;
+      width: 1.6rem; height: 1.6rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .form-card-title { font-size: 1rem; font-weight: 600; }
+    .form-card-desc { font-size: 0.82rem; color: var(--text-sub); margin-left: auto; }
+    .form-card-body { padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: 0.7rem; }
+
+    /* ─── Controls ─── */
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    label {
+      font-size: 0.82rem; font-weight: 600; color: var(--text-sub);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    label .required { color: var(--pink); margin-left: 2px; }
+    input[type="text"], textarea, select {
+      background: rgba(255,255,255,0.06); border: 1.5px solid var(--glass-border);
+      border-radius: 0.5rem; color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.92rem;
+      padding: 0.5rem 0.75rem; outline: none;
+      transition: border-color 0.2s, background 0.2s; width: 100%; resize: vertical;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus {
+      border-color: var(--primary); background: rgba(167,139,250,0.08);
+    }
+    input[type="text"]::placeholder, textarea::placeholder { color: rgba(200,200,224,0.4); }
+    textarea { min-height: 80px; line-height: 1.6; }
+    .formula-hint {
+      background: rgba(103,232,249,0.07); border: 1px solid rgba(103,232,249,0.2);
+      border-radius: 0.4rem; padding: 0.45rem 0.8rem;
+      font-size: 0.82rem; color: var(--accent); font-family: 'Space Grotesk', sans-serif;
+    }
+    .formula-hint strong { color: var(--text); }
+    input.invalid, textarea.invalid { border-color: rgba(244,114,182,0.6); background: rgba(244,114,182,0.05); }
+
+    /* ─── Members ─── */
+    .member-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .member-card {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+      border-radius: 0.6rem; padding: 0.7rem 0.8rem; display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .member-label { font-size: 0.78rem; font-weight: 700; color: var(--primary); font-family: 'Space Grotesk', sans-serif; }
+    .member-inputs { display: flex; gap: 0.4rem; }
+    .member-inputs input[type="text"] { flex: 2; }
+    .member-inputs select { flex: 1.2; }
+
+    /* ─── Flow ─── */
+    .flow-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .flow-row .field { flex: 1; min-width: 130px; }
+    .flow-arrow { color: var(--primary); font-size: 1.1rem; font-weight: 700; flex-shrink: 0; margin-top: 1.4rem; }
+
+    /* ─── Class Table ─── */
+    .class-table-wrap { overflow-x: auto; }
+    .class-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 500px; }
+    .class-table thead th {
+      background: rgba(167,139,250,0.18); color: var(--text);
+      padding: 0.5rem 0.6rem; text-align: left;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+      border-bottom: 2px solid var(--primary);
+    }
+    .class-table tbody td { padding: 0.3rem 0.4rem; border-bottom: 1px solid var(--glass-border); }
+    .class-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .class-table input[type="text"] {
+      background: transparent; border: 1px solid transparent;
+      padding: 0.3rem 0.5rem; border-radius: 0.3rem; font-size: 0.85rem;
+    }
+    .class-table input[type="text"]:focus { border-color: var(--primary); background: rgba(167,139,250,0.08); }
+    .del-btn {
+      background: none; border: none; color: rgba(244,114,182,0.6);
+      cursor: pointer; font-size: 1rem; padding: 0.2rem 0.4rem;
+      border-radius: 0.3rem; transition: color 0.2s, background 0.2s;
+    }
+    .del-btn:hover { color: var(--pink); background: rgba(244,114,182,0.1); }
+    .add-row-btn {
+      background: rgba(167,139,250,0.1); border: 1.5px dashed rgba(167,139,250,0.35);
+      color: var(--primary); border-radius: 0.5rem; padding: 0.45rem 1rem;
+      font-size: 0.88rem; cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600; transition: background 0.2s; width: 100%; margin-top: 0.4rem;
+    }
+    .add-row-btn:hover { background: rgba(167,139,250,0.18); }
+
+    /* ─── Schedule ─── */
+    .schedule-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .schedule-card {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+      border-radius: 0.6rem; padding: 0.7rem 0.8rem;
+    }
+    .schedule-card-label { font-size: 0.78rem; font-weight: 700; margin-bottom: 0.4rem; font-family: 'Space Grotesk', sans-serif; }
+    .schedule-card:nth-child(1) .schedule-card-label { color: var(--primary); }
+    .schedule-card:nth-child(2) .schedule-card-label { color: var(--accent); }
+    .schedule-card:nth-child(3) .schedule-card-label { color: var(--success); }
+    .schedule-card textarea { min-height: 70px; }
+
+    /* ─── Parts ─── */
+    .parts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.4rem; }
+    .part-check {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+      border-radius: 0.4rem; padding: 0.4rem 0.7rem; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .part-check:has(input:checked) { background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.4); }
+    .part-check input[type="checkbox"] { accent-color: var(--primary); width: 14px; height: 14px; cursor: pointer; }
+    .part-check span { font-size: 0.85rem; color: var(--text-sub); }
+    .parts-extra { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.4rem; }
+
+    /* ─── Buttons ─── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1.1rem; border-radius: 0.5rem;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; border: 1.5px solid transparent; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn svg { width: 1em; height: 1em; flex-shrink: 0; }
+    .btn-primary { background: linear-gradient(135deg, rgba(167,139,250,0.3), rgba(103,232,249,0.2)); border-color: rgba(167,139,250,0.5); color: var(--text); }
+    .btn-primary:hover { background: linear-gradient(135deg, rgba(167,139,250,0.45), rgba(103,232,249,0.3)); }
+    .btn-success { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.4); color: var(--success); }
+    .btn-success:hover { background: rgba(52,211,153,0.25); }
+    .btn-warn { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.35); color: var(--warn); }
+    .btn-warn:hover { background: rgba(251,191,36,0.22); }
+    .btn-ghost { background: transparent; border-color: var(--glass-border); color: var(--text-sub); }
+    .btn-ghost:hover { background: var(--glass); color: var(--text); }
+    .btn-danger { background: rgba(244,114,182,0.1); border-color: rgba(244,114,182,0.3); color: var(--pink); }
+    .btn-danger:hover { background: rgba(244,114,182,0.2); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ─── Settings Panel ─── */
+    .settings-panel {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 0.8rem; padding: 1rem 1.2rem; margin-bottom: 1rem;
+    }
+    .settings-title {
+      font-size: 0.88rem; font-weight: 600; color: var(--text-sub);
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem;
+    }
+    .settings-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+    .settings-row .field { flex: 1; }
+    .url-status { font-size: 0.78rem; margin-top: 0.3rem; font-family: 'Space Grotesk', sans-serif; }
+    .url-status.ok    { color: var(--success); }
+    .url-status.empty { color: var(--text-sub); }
+
+    /* ─── Toast ─── */
+    .toast-container {
+      position: fixed; bottom: 5rem; right: 1.2rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      z-index: 9999; pointer-events: none;
+    }
+    .toast {
+      background: rgba(15,15,45,0.95); border: 1px solid var(--glass-border);
+      border-radius: 0.6rem; padding: 0.6rem 1rem; font-size: 0.88rem; color: var(--text);
+      backdrop-filter: blur(10px);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+      max-width: 300px; pointer-events: auto;
+    }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error   { border-left: 3px solid var(--pink); }
+    .toast.info    { border-left: 3px solid var(--accent); }
+    @keyframes toastIn  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+    /* ─── Action Bar ─── */
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(15,15,45,0.95); backdrop-filter: blur(12px);
+      border-top: 1px solid var(--glass-border);
+      padding: 0.6rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+      z-index: 100; flex-wrap: wrap;
+    }
+    .action-bar-left  { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .action-bar-right { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .draft-label { font-size: 0.78rem; color: var(--text-sub); font-family: 'Space Grotesk', sans-serif; }
+
+    /* ─── Guide Modal ─── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 9000;
+      overflow-y: auto; padding: 2rem 1rem;
+    }
+    .modal-box {
+      max-width: 680px; margin: 0 auto;
+      background: #1a1a3e; border: 1px solid var(--glass-border);
+      border-radius: 1rem; padding: 1.5rem;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .modal-header h2 { font-size: 1.1rem; color: var(--accent); }
+    .guide-steps { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+    .guide-step { display: flex; gap: 0.8rem; }
+    .guide-step-num {
+      background: rgba(167,139,250,0.2); color: var(--primary); border-radius: 50%;
+      width: 1.8rem; height: 1.8rem; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; flex-shrink: 0; font-family: 'Space Grotesk', sans-serif;
+    }
+    .guide-step-body strong { display: block; margin-bottom: 0.2rem; }
+    .guide-step-body p { font-size: 0.88rem; color: var(--text-sub); }
+    .guide-step-body code { color: var(--accent); }
+    .code-block {
+      background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border);
+      border-radius: 0.5rem; padding: 0.8rem; font-size: 0.75rem;
+      color: var(--text-sub); margin-top: 0.5rem;
+      overflow-x: auto; white-space: pre; line-height: 1.5;
+      font-family: 'Consolas', 'Monaco', monospace;
+    }
+
+    /* ─── Print ─── */
+    .print-header { display: none; }
+    @media print {
+      body { background: #fff; color: #111; background-image: none; padding: 0; }
+      .page-header, .action-bar, .settings-panel, .add-row-btn, .del-btn, .header-actions, .modal-overlay { display: none !important; }
+      .main { max-width: 100%; padding: 0; }
+      .form-card { background: #fff; border: 1px solid #ddd; border-radius: 0; margin-bottom: 0.8rem; break-inside: avoid; }
+      .form-card-header { background: #f5f5f5; border-bottom: 1px solid #ddd; }
+      .form-card-num { background: #e8e0ff; border-color: #c4b0ff; color: #5b21b6; }
+      .form-card-title { color: #111; }
+      .form-card-desc { color: #666; }
+      input[type="text"], textarea, select { background: #fff; border: 1px solid #ddd; color: #111; }
+      .formula-hint { background: #f0f9ff; border-color: #bae6fd; color: #0369a1; }
+      .member-card, .schedule-card { background: #f9f9f9; border: 1px solid #ddd; }
+      .member-label { color: #5b21b6; }
+      .schedule-card:nth-child(1) .schedule-card-label { color: #5b21b6; }
+      .schedule-card:nth-child(2) .schedule-card-label { color: #0e7490; }
+      .schedule-card:nth-child(3) .schedule-card-label { color: #065f46; }
+      .part-check { background: #f9f9f9; border: 1px solid #ddd; }
+      .part-check:has(input:checked) { background: #f0e6ff; border-color: #c4b0ff; }
+      .part-check span { color: #333; }
+      .class-table thead th { background: #f0e6ff; color: #111; border-bottom-color: #7c3aed; }
+      .class-table tbody td { border-bottom-color: #ddd; }
+      .class-table input[type="text"] { color: #111; }
+      .print-header { display: block !important; text-align: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #7c3aed; }
+      .print-header h1 { color: #111; font-size: 1.2rem; }
+      .print-header p { color: #666; font-size: 0.85rem; }
+      @page { margin: 1.5cm; size: A4; }
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 640px) {
+      .member-grid, .schedule-grid { grid-template-columns: 1fr; }
+      .flow-row { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); margin-top: 0; align-self: center; }
+      .settings-row { flex-direction: column; }
+      .action-bar { flex-direction: column; }
+      .action-bar-left, .action-bar-right { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print-only header -->
+  <div class="print-header">
+    <h1>AI × 피지컬컴퓨팅 팀 프로젝트 기획서</h1>
+    <p>샘플고등학교 · 인공지능과 피지컬컴퓨팅 · 2026년 4월</p>
+  </div>
+
+  <header class="page-header">
+    <div class="page-header-left">
+      <span class="page-badge">인공지능과 피지컬컴퓨팅</span>
+      <span class="page-title">팀 프로젝트 기획서</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="btnPrint" title="인쇄">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+      </button>
+      <button class="btn btn-ghost" id="btnSettings" title="설정">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+      </button>
+      <button class="btn btn-ghost" id="btnBack">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        슬라이드 보기
+      </button>
+    </div>
+  </header>
+
+  <main class="main" id="main">
+
+    <!-- Google Sheets 설정 -->
+    <div class="settings-panel" id="settingsPanel" style="display:none;">
+      <div class="settings-title">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:1em;height:1em;color:var(--accent)" aria-hidden="true">
+          <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+        </svg>
+        구글 시트 연동 설정
+        <span style="font-size:0.75rem;color:var(--text-sub);margin-left:0.3rem;">(교사가 Apps Script URL을 입력)</span>
+      </div>
+      <div class="settings-row">
+        <div class="field">
+          <label for="scriptUrl">Apps Script 웹앱 URL</label>
+          <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
+          <div class="url-status empty" id="urlStatus">URL을 입력하면 구글 시트에 자동 저장됩니다.</div>
+        </div>
+        <button class="btn btn-ghost" id="btnSaveUrl" style="flex-shrink:0;">저장</button>
+        <button class="btn btn-ghost" id="btnSetupGuide" style="flex-shrink:0;">설정 방법</button>
+      </div>
+    </div>
+
+    <!-- 1. 팀 정보 -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">1</div>
+        <span class="form-card-title">팀 정보</span>
+        <span class="form-card-desc">팀명 · 팀원 · 역할 분담</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label for="teamName">팀명 <span class="required">*</span></label>
+          <input type="text" id="teamName" placeholder="예: 졸지마조" maxlength="30">
+        </div>
+        <div class="member-grid">
+          <div class="member-card">
+            <div class="member-label">팀원 1</div>
+            <div class="member-inputs">
+              <input type="text" id="m1name" placeholder="이름" maxlength="10">
+              <select id="m1role"><option value="">역할</option><option>AI학습</option><option>회로</option><option>코딩</option><option>발표</option><option>기획</option></select>
+            </div>
+          </div>
+          <div class="member-card">
+            <div class="member-label">팀원 2</div>
+            <div class="member-inputs">
+              <input type="text" id="m2name" placeholder="이름" maxlength="10">
+              <select id="m2role"><option value="">역할</option><option>AI학습</option><option>회로</option><option>코딩</option><option>발표</option><option>기획</option></select>
+            </div>
+          </div>
+          <div class="member-card">
+            <div class="member-label">팀원 3</div>
+            <div class="member-inputs">
+              <input type="text" id="m3name" placeholder="이름 (선택)" maxlength="10">
+              <select id="m3role"><option value="">역할</option><option>AI학습</option><option>회로</option><option>코딩</option><option>발표</option><option>기획</option></select>
+            </div>
+          </div>
+          <div class="member-card">
+            <div class="member-label">팀원 4</div>
+            <div class="member-inputs">
+              <input type="text" id="m4name" placeholder="이름 (선택)" maxlength="10">
+              <select id="m4role"><option value="">역할</option><option>AI학습</option><option>회로</option><option>코딩</option><option>발표</option><option>기획</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 문제 정의 -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">2</div>
+        <span class="form-card-title">문제 정의</span>
+        <span class="form-card-desc">한 문장으로</span>
+      </div>
+      <div class="form-card-body">
+        <div class="formula-hint">
+          공식: <strong>○○ 상황에서</strong> ○○ 문제를 <strong>○○ 방식으로</strong> 해결한다
+        </div>
+        <div class="field">
+          <label for="problemDef">문제 정의 <span class="required">*</span></label>
+          <textarea id="problemDef" placeholder="예: 야간자율학습 시간에 졸음을 감지하면 부저와 LED로 알림을 줘서 집중력을 유지하게 한다" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. 해결 방법 -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">3</div>
+        <span class="form-card-title">해결 방법</span>
+        <span class="form-card-desc">입력 → 분류 → 출력 흐름</span>
+      </div>
+      <div class="form-card-body">
+        <div class="flow-row">
+          <div class="field">
+            <label for="flowInput">웹캠으로 인식할 것 <span class="required">*</span></label>
+            <input type="text" id="flowInput" placeholder="예: 눈 감김/뜸 상태">
+          </div>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <div class="field">
+            <label for="flowClassify">TM 모델 분류 <span class="required">*</span></label>
+            <input type="text" id="flowClassify" placeholder="예: 눈뜸 / 눈감음 / 자리비움">
+          </div>
+          <span class="flow-arrow" aria-hidden="true">→</span>
+          <div class="field">
+            <label for="flowOutput">엑추에이터 동작 <span class="required">*</span></label>
+            <input type="text" id="flowOutput" placeholder="예: LED 색상 + 부저 경고">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 클래스 설계 -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">4</div>
+        <span class="form-card-title">클래스 설계</span>
+        <span class="form-card-desc">Teachable Machine 클래스 3~5개</span>
+      </div>
+      <div class="form-card-body">
+        <div class="class-table-wrap">
+          <table class="class-table" id="classTable" aria-label="클래스 설계 표">
+            <thead>
+              <tr>
+                <th style="width:25%">클래스명</th>
+                <th style="width:35%">인식 대상</th>
+                <th style="width:35%">엑추에이터 동작</th>
+                <th style="width:5%"></th>
+              </tr>
+            </thead>
+            <tbody id="classTableBody"></tbody>
+          </table>
+        </div>
+        <button class="add-row-btn" id="addClassRow">+ 클래스 행 추가</button>
+      </div>
+    </div>
+
+    <!-- 5. 필요 부품 -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">5</div>
+        <span class="form-card-title">필요 부품</span>
+        <span class="form-card-desc">화이트리스트 내 선택</span>
+      </div>
+      <div class="form-card-body">
+        <div class="parts-grid" role="group" aria-label="부품 선택">
+          <label class="part-check"><input type="checkbox" name="parts" value="LED(단색)"><span>LED (단색)</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="RGB LED"><span>RGB LED</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="피에조 부저"><span>피에조 부저</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="SG90 서보모터"><span>SG90 서보모터</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="진동 모터"><span>진동 모터</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="5V 릴레이 모듈"><span>5V 릴레이 모듈</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="I2C LCD(16x2)"><span>I2C LCD (16×2)</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="DC모터+L298N"><span>DC모터 + L298N</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="브레드보드"><span>브레드보드</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="점퍼선"><span>점퍼선</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="220Ω 저항"><span>220Ω 저항</span></label>
+          <label class="part-check"><input type="checkbox" name="parts" value="아두이노 UNO"><span>아두이노 UNO</span></label>
+        </div>
+        <div class="parts-extra">
+          <label for="partsExtra">추가 부품 메모</label>
+          <input type="text" id="partsExtra" placeholder="예: USB 선풍기, 트랜지스터 2N2222">
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. 차시별 일정 -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">6</div>
+        <span class="form-card-title">차시별 일정</span>
+        <span class="form-card-desc">총 3차시 계획</span>
+      </div>
+      <div class="form-card-body">
+        <div class="schedule-grid">
+          <div class="schedule-card">
+            <div class="schedule-card-label">1차시 — 기획</div>
+            <textarea id="sched1" placeholder="예: 주제 선정, 기획서 작성, 클래스 설계, 역할 분담"></textarea>
+          </div>
+          <div class="schedule-card">
+            <div class="schedule-card-label">2차시 — 제작 + 테스트</div>
+            <textarea id="sched2" placeholder="예: TM 모델 학습, 아두이노 회로 연결, 코드 작성, 연동 테스트"></textarea>
+          </div>
+          <div class="schedule-card">
+            <div class="schedule-card-label">3차시 — 완성 + 발표</div>
+            <textarea id="sched3" placeholder="예: 오류 수정, 최종 시연 준비, 팀 발표 2분"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. 기대 효과 -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">7</div>
+        <span class="form-card-title">기대 효과</span>
+        <span class="form-card-desc">가치 + 확장 가능성</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label for="effectValue">프로젝트의 가치 <span class="required">*</span></label>
+          <input type="text" id="effectValue" placeholder="예: 자율학습 중 졸음으로 인한 학습 효율 저하 문제를 자동으로 해결">
+        </div>
+        <div class="field">
+          <label for="effectExpand">확장 가능성</label>
+          <input type="text" id="effectExpand" placeholder="예: 운전 중 졸음 감지 시스템, 다중 센서로 정확도 향상">
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-bar-left">
+      <button class="btn btn-success" id="btnSave">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+        <span id="btnSaveText">저장하기</span>
+      </button>
+    </div>
+    <div class="action-bar-right">
+      <span class="draft-label" id="draftLabel">임시저장: 대기 중</span>
+      <button class="btn btn-danger" id="btnClear">초기화</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- Guide Modal -->
+  <div class="modal-overlay" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="guideTitle">Google Apps Script 설정 방법</h2>
+        <button class="btn btn-ghost" id="closeGuide" style="padding:0.3rem 0.7rem;">✕ 닫기</button>
+      </div>
+      <ol class="guide-steps">
+        <li class="guide-step">
+          <div class="guide-step-num">1</div>
+          <div class="guide-step-body">
+            <strong>구글 시트 열기</strong>
+            <p>sheets.google.com에서 새 시트를 만들고 첫 번째 시트 이름을 <code>기획서</code>로 변경합니다.</p>
+          </div>
+        </li>
+        <li class="guide-step">
+          <div class="guide-step-num">2</div>
+          <div class="guide-step-body">
+            <strong>Apps Script 편집기 열기</strong>
+            <p>상단 메뉴 <strong>확장 프로그램 → Apps Script</strong>를 클릭합니다.</p>
+          </div>
+        </li>
+        <li class="guide-step">
+          <div class="guide-step-num">3</div>
+          <div class="guide-step-body">
+            <strong>코드 붙여넣기</strong>
+            <p>기존 코드를 지우고 아래 코드를 붙여넣은 후 Ctrl+S로 저장합니다.</p>
+            <pre class="code-block" id="scriptCodeBlock"></pre>
+            <button class="btn btn-ghost" id="btnCopyScript" style="margin-top:0.5rem;font-size:0.82rem;">코드 복사</button>
+          </div>
+        </li>
+        <li class="guide-step">
+          <div class="guide-step-num">4</div>
+          <div class="guide-step-body">
+            <strong>웹앱으로 배포</strong>
+            <p><strong>배포 → 새 배포</strong> → 유형: <code>웹 앱</code> → 실행 계정: <code>나</code> → 액세스: <code>모든 사용자</code> → <strong>배포</strong></p>
+          </div>
+        </li>
+        <li class="guide-step">
+          <div class="guide-step-num">5</div>
+          <div class="guide-step-body">
+            <strong>URL 복사 후 위 입력란에 붙여넣기</strong>
+            <p>배포 완료 후 표시되는 <strong>웹앱 URL</strong>을 이 페이지 설정 입력란에 붙여넣고 <strong>저장</strong>을 클릭합니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    /* ─── Apps Script Source (guide용) ─── */
+    const APPS_SCRIPT_CODE =
+'function doPost(e) {\n' +
+'  try {\n' +
+'    var data = JSON.parse(e.postData.contents);\n' +
+'    var ss = SpreadsheetApp.getActiveSpreadsheet();\n' +
+'    var sheet = ss.getSheetByName("기획서") || ss.insertSheet("기획서");\n' +
+'\n' +
+'    if (sheet.getLastRow() === 0) {\n' +
+'      sheet.appendRow([\n' +
+'        "제출시각","팀명",\n' +
+'        "팀원1","역할1","팀원2","역할2","팀원3","역할3","팀원4","역할4",\n' +
+'        "문제정의","입력","분류","출력",\n' +
+'        "클래스설계","필요부품",\n' +
+'        "1차시","2차시","3차시",\n' +
+'        "기대효과(가치)","기대효과(확장)"\n' +
+'      ]);\n' +
+'    }\n' +
+'\n' +
+'    sheet.appendRow([\n' +
+'      new Date().toLocaleString("ko-KR"),\n' +
+'      data.teamName||"",\n' +
+'      data.m1name||"", data.m1role||"",\n' +
+'      data.m2name||"", data.m2role||"",\n' +
+'      data.m3name||"", data.m3role||"",\n' +
+'      data.m4name||"", data.m4role||"",\n' +
+'      data.problemDef||"",\n' +
+'      data.flowInput||"", data.flowClassify||"", data.flowOutput||"",\n' +
+'      data.classSummary||"", data.parts||"",\n' +
+'      data.sched1||"", data.sched2||"", data.sched3||"",\n' +
+'      data.effectValue||"", data.effectExpand||""\n' +
+'    ]);\n' +
+'\n' +
+'    return ContentService\n' +
+'      .createTextOutput(JSON.stringify({status:"ok"}))\n' +
+'      .setMimeType(ContentService.MimeType.JSON);\n' +
+'  } catch(err) {\n' +
+'    return ContentService\n' +
+'      .createTextOutput(JSON.stringify({status:"error",message:err.message}))\n' +
+'      .setMimeType(ContentService.MimeType.JSON);\n' +
+'  }\n' +
+'}';
+
+    /* ─── Render script code safely ─── */
+    document.getElementById('scriptCodeBlock').textContent = APPS_SCRIPT_CODE;
+
+    /* ─── Toast ─── */
+    function showToast(msg, type, duration) {
+      type = type || 'info'; duration = duration || 3000;
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.textContent = msg;
+      container.appendChild(toast);
+      setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, duration + 400);
+    }
+
+    /* ─── LocalStorage keys ─── */
+    var DRAFT_KEY = 'aiphysical_project_draft';
+    var URL_KEY   = 'aiphysical_script_url';
+
+    /* ─── Collect form data ─── */
+    function getFormData() {
+      var parts = Array.from(document.querySelectorAll('input[name="parts"]:checked'))
+        .map(function(el) { return el.value; }).join(', ');
+      var partsExtra = document.getElementById('partsExtra').value.trim();
+      var partsAll = [parts, partsExtra].filter(Boolean).join(', ');
+
+      var classes = [];
+      document.querySelectorAll('#classTableBody tr').forEach(function(row) {
+        var inputs = row.querySelectorAll('input[type="text"]');
+        if (inputs.length >= 3) {
+          var c = { name: inputs[0].value.trim(), recog: inputs[1].value.trim(), action: inputs[2].value.trim() };
+          if (c.name || c.recog || c.action) classes.push(c);
+        }
+      });
+      var classSummary = classes.map(function(c) { return '[' + c.name + '] ' + c.recog + ' → ' + c.action; }).join(' | ');
+
+      return {
+        teamName:     document.getElementById('teamName').value.trim(),
+        m1name:       document.getElementById('m1name').value.trim(),
+        m1role:       document.getElementById('m1role').value,
+        m2name:       document.getElementById('m2name').value.trim(),
+        m2role:       document.getElementById('m2role').value,
+        m3name:       document.getElementById('m3name').value.trim(),
+        m3role:       document.getElementById('m3role').value,
+        m4name:       document.getElementById('m4name').value.trim(),
+        m4role:       document.getElementById('m4role').value,
+        problemDef:   document.getElementById('problemDef').value.trim(),
+        flowInput:    document.getElementById('flowInput').value.trim(),
+        flowClassify: document.getElementById('flowClassify').value.trim(),
+        flowOutput:   document.getElementById('flowOutput').value.trim(),
+        classes:      classes,
+        classSummary: classSummary,
+        parts:        partsAll,
+        sched1:       document.getElementById('sched1').value.trim(),
+        sched2:       document.getElementById('sched2').value.trim(),
+        sched3:       document.getElementById('sched3').value.trim(),
+        effectValue:  document.getElementById('effectValue').value.trim(),
+        effectExpand: document.getElementById('effectExpand').value.trim(),
+        savedAt:      new Date().toISOString()
+      };
+    }
+
+    /* ─── Load form data ─── */
+    function loadFormData(data) {
+      if (!data) return;
+      function set(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; }
+      set('teamName', data.teamName);
+      set('m1name', data.m1name); set('m1role', data.m1role);
+      set('m2name', data.m2name); set('m2role', data.m2role);
+      set('m3name', data.m3name); set('m3role', data.m3role);
+      set('m4name', data.m4name); set('m4role', data.m4role);
+      set('problemDef', data.problemDef);
+      set('flowInput', data.flowInput); set('flowClassify', data.flowClassify); set('flowOutput', data.flowOutput);
+      set('sched1', data.sched1); set('sched2', data.sched2); set('sched3', data.sched3);
+      set('effectValue', data.effectValue); set('effectExpand', data.effectExpand);
+
+      document.querySelectorAll('input[name="parts"]').forEach(function(cb) { cb.checked = false; });
+      if (data.parts) {
+        var saved = data.parts.split(', ');
+        var extras = [];
+        document.querySelectorAll('input[name="parts"]').forEach(function(cb) {
+          if (saved.indexOf(cb.value) !== -1) cb.checked = true;
+        });
+        var checkboxVals = Array.from(document.querySelectorAll('input[name="parts"]')).map(function(c) { return c.value; });
+        extras = saved.filter(function(p) { return checkboxVals.indexOf(p) === -1; });
+        if (extras.length) document.getElementById('partsExtra').value = extras.join(', ');
+      }
+
+      if (data.classes && data.classes.length > 0) {
+        document.getElementById('classTableBody').textContent = '';
+        data.classes.forEach(function(c) { addClassRow(c.name, c.recog, c.action); });
+      }
+    }
+
+    /* ─── Auto-save draft ─── */
+    var draftTimer = null;
+    function scheduleDraft() {
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(function() {
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(getFormData()));
+          var now = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+          document.getElementById('draftLabel').textContent = '임시저장: ' + now;
+        } catch(e) {}
+      }, 1500);
+    }
+    document.getElementById('main').addEventListener('input', scheduleDraft);
+    document.getElementById('main').addEventListener('change', scheduleDraft);
+
+    /* ─── Class table — DOM only, no innerHTML ─── */
+    function makeClassInput(placeholder, value) {
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = placeholder;
+      input.value = value || '';
+      return input;
+    }
+
+    function addClassRow(name, recog, action) {
+      var tbody = document.getElementById('classTableBody');
+      var tr = document.createElement('tr');
+
+      var td1 = document.createElement('td');
+      td1.appendChild(makeClassInput('클래스명', name));
+      tr.appendChild(td1);
+
+      var td2 = document.createElement('td');
+      td2.appendChild(makeClassInput('인식 대상', recog));
+      tr.appendChild(td2);
+
+      var td3 = document.createElement('td');
+      td3.appendChild(makeClassInput('엑추에이터 동작', action));
+      tr.appendChild(td3);
+
+      var td4 = document.createElement('td');
+      var delBtn = document.createElement('button');
+      delBtn.className = 'del-btn';
+      delBtn.title = '행 삭제';
+      delBtn.setAttribute('aria-label', '이 행 삭제');
+      delBtn.textContent = '✕';
+      delBtn.addEventListener('click', function() {
+        if (tbody.rows.length > 1) {
+          tbody.removeChild(tr);
+        } else {
+          showToast('최소 1개 클래스가 필요합니다.', 'error');
+        }
+      });
+      td4.appendChild(delBtn);
+      tr.appendChild(td4);
+
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById('addClassRow').addEventListener('click', function() {
+      if (document.querySelectorAll('#classTableBody tr').length >= 5) {
+        showToast('클래스는 최대 5개까지 추가할 수 있습니다.', 'error');
+        return;
+      }
+      addClassRow('', '', '');
+    });
+
+    /* ─── Validation ─── */
+    function validate() {
+      var ids = ['teamName', 'm1name', 'problemDef', 'flowInput', 'flowClassify', 'flowOutput', 'effectValue'];
+      var ok = true;
+      ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
+        else el.classList.remove('invalid');
+      });
+      return ok;
+    }
+
+    /* ─── URL setting ─── */
+    var DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+    function loadUrl() {
+      var saved = localStorage.getItem(URL_KEY) || DEFAULT_SCRIPT_URL;
+      document.getElementById('scriptUrl').value = saved;
+      updateUrlStatus(saved);
+    }
+    function updateUrlStatus(url) {
+      var el = document.getElementById('urlStatus');
+      if (url && url.indexOf('script.google.com') !== -1) {
+        el.textContent = '✔ URL이 저장되었습니다. 구글 시트 저장이 활성화됩니다.';
+        el.className = 'url-status ok';
+      } else {
+        el.textContent = 'URL을 입력하면 구글 시트에 자동 저장됩니다.';
+        el.className = 'url-status empty';
+      }
+    }
+    document.getElementById('btnSaveUrl').addEventListener('click', function() {
+      var url = document.getElementById('scriptUrl').value.trim();
+      localStorage.setItem(URL_KEY, url);
+      updateUrlStatus(url);
+      showToast('URL이 저장되었습니다.', 'success');
+    });
+
+    /* ─── TXT 생성 ─── */
+    function buildTxt(data) {
+      var lines = [];
+      var now = new Date().toLocaleString('ko-KR');
+      lines.push('═══════════════════════════════════════');
+      lines.push('  AI × 피지컬컴퓨팅 팀 프로젝트 기획서');
+      lines.push('  작성일시: ' + now);
+      lines.push('═══════════════════════════════════════');
+      lines.push('');
+      lines.push('【 1. 팀 정보 】');
+      lines.push('팀명: ' + (data.teamName || ''));
+      var members = [
+        [data.m1name, data.m1role], [data.m2name, data.m2role],
+        [data.m3name, data.m3role], [data.m4name, data.m4role]
+      ];
+      members.forEach(function(m, i) {
+        if (m[0]) lines.push('팀원' + (i+1) + ': ' + m[0] + ' (' + (m[1] || '역할미정') + ')');
+      });
+      lines.push('');
+      lines.push('【 2. 문제 정의 】');
+      lines.push(data.problemDef || '');
+      lines.push('');
+      lines.push('【 3. 데이터 흐름 】');
+      lines.push('입력(인식): ' + (data.flowInput || ''));
+      lines.push('분류(판단): ' + (data.flowClassify || ''));
+      lines.push('출력(제어): ' + (data.flowOutput || ''));
+      lines.push('');
+      lines.push('【 4. 클래스 설계 】');
+      if (data.classes && data.classes.length) {
+        data.classes.forEach(function(c, i) {
+          lines.push((i+1) + '. [' + c.name + '] ' + c.recog + ' → ' + c.action);
+        });
+      }
+      lines.push('');
+      lines.push('【 5. 필요 부품 】');
+      lines.push(data.parts || '');
+      lines.push('');
+      lines.push('【 6. 수업 일정 】');
+      lines.push('1차시: ' + (data.sched1 || ''));
+      lines.push('2차시: ' + (data.sched2 || ''));
+      lines.push('3차시: ' + (data.sched3 || ''));
+      lines.push('');
+      lines.push('【 7. 기대 효과 】');
+      lines.push('가치/필요성: ' + (data.effectValue || ''));
+      lines.push('확장 가능성: ' + (data.effectExpand || ''));
+      lines.push('');
+      lines.push('───────────────────────────────────────');
+      return lines.join('\n');
+    }
+
+    function downloadTxt(data) {
+      var txt = buildTxt(data);
+      var blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      var teamName = (data.teamName || '팀프로젝트').replace(/\s+/g, '_');
+      a.download = '기획서_' + teamName + '_' + new Date().toLocaleDateString('ko-KR').replace(/\. /g, '').replace('.', '') + '.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* ─── 통합 저장 버튼 ─── */
+    document.getElementById('btnSave').addEventListener('click', function() {
+      if (!validate()) { showToast('필수 항목(*)을 모두 입력해 주세요.', 'error'); return; }
+      var data = getFormData();
+      var btn = this;
+      var textEl = document.getElementById('btnSaveText');
+      btn.disabled = true;
+      textEl.textContent = '저장 중...';
+
+      formSubmitted = true;
+      /* TXT 다운로드 */
+      downloadTxt(data);
+
+      /* 구글 시트 전송 */
+      var url = localStorage.getItem(URL_KEY) || DEFAULT_SCRIPT_URL;
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(function() {
+        showToast('파일 저장 + 구글 시트 전송 완료!', 'success', 4000);
+      }).catch(function(err) {
+        showToast('파일은 저장됐습니다. 시트 전송 오류: ' + err.message, 'error', 5000);
+      }).finally(function() {
+        btn.disabled = false;
+        textEl.textContent = '저장하기';
+      });
+    });
+
+    /* ─── Clear ─── */
+    document.getElementById('btnClear').addEventListener('click', function() {
+      if (!confirm('입력한 내용을 모두 초기화할까요?')) return;
+      document.querySelectorAll('#main input[type="text"], #main textarea').forEach(function(el) { el.value = ''; });
+      document.querySelectorAll('#main select').forEach(function(el) { el.selectedIndex = 0; });
+      document.querySelectorAll('input[name="parts"]').forEach(function(cb) { cb.checked = false; });
+      document.querySelectorAll('.invalid').forEach(function(el) { el.classList.remove('invalid'); });
+      document.getElementById('classTableBody').textContent = '';
+      addClassRow('', '', ''); addClassRow('', '', ''); addClassRow('', '', '');
+      localStorage.removeItem(DRAFT_KEY);
+      document.getElementById('draftLabel').textContent = '임시저장: 대기 중';
+      showToast('초기화되었습니다.', 'info');
+    });
+
+    /* ─── Back button ─── */
+    document.getElementById('btnBack').addEventListener('click', function() { location.href = 'index.html'; });
+
+    /* ─── Guide modal ─── */
+    document.getElementById('btnSetupGuide').addEventListener('click', function() {
+      document.getElementById('guideModal').style.display = 'block';
+    });
+    document.getElementById('closeGuide').addEventListener('click', function() {
+      document.getElementById('guideModal').style.display = 'none';
+    });
+    document.getElementById('guideModal').addEventListener('click', function(e) {
+      if (e.target === this) this.style.display = 'none';
+    });
+    document.getElementById('btnCopyScript').addEventListener('click', function() {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(APPS_SCRIPT_CODE)
+          .then(function() { showToast('코드가 복사되었습니다.', 'success'); })
+          .catch(function() { showToast('복사 실패. 코드를 직접 선택하여 복사하세요.', 'error'); });
+      } else {
+        showToast('이 브라우저는 자동 복사를 지원하지 않습니다. 직접 선택하세요.', 'error');
+      }
+    });
+
+    /* ─── Settings toggle ─── */
+    document.getElementById('btnSettings').addEventListener('click', function() {
+      var panel = document.getElementById('settingsPanel');
+      panel.style.display = panel.style.display === 'none' ? '' : 'none';
+    });
+
+    /* ─── Print ─── */
+    document.getElementById('btnPrint').addEventListener('click', function() { window.print(); });
+
+    /* ─── Beforeunload ─── */
+    var formSubmitted = false;
+    window.addEventListener('beforeunload', function(e) {
+      if (formSubmitted) return;
+      var hasInput = Array.from(document.querySelectorAll('#main input[type="text"], #main textarea')).some(function(el) { return el.value.trim(); });
+      if (hasInput) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    /* ─── Init ─── */
+    (function init() {
+      /* default 3 class rows */
+      addClassRow('', '', ''); addClassRow('', '', ''); addClassRow('', '', '');
+
+      loadUrl();
+
+      try {
+        var saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+        if (saved) {
+          loadFormData(saved);
+          var time = saved.savedAt ? new Date(saved.savedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }) : '';
+          document.getElementById('draftLabel').textContent = '임시저장: ' + time + ' (불러옴)';
+          showToast('이전에 작성하던 내용을 불러왔습니다.', 'info', 4000);
+        }
+      } catch(e) {}
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "entries": {
+    "packet-idle": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        129,
+        182,
+        434,
+        377
+      ],
+      "w": 434,
+      "h": 377,
+      "cropped_at": "2026-08-20"
+    },
+    "packet-run": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        683,
+        173,
+        456,
+        395
+      ],
+      "w": 456,
+      "h": 395,
+      "cropped_at": "2026-08-20"
+    },
+    "packet-worry": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        153,
+        697,
+        392,
+        378
+      ],
+      "w": 392,
+      "h": 378,
+      "cropped_at": "2026-08-20"
+    },
+    "packet-cheer": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        676,
+        693,
+        446,
+        382
+      ],
+      "w": 446,
+      "h": 382,
+      "cropped_at": "2026-08-20"
+    },
+    "person-phone": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        272,
+        144,
+        212,
+        483
+      ],
+      "w": 212,
+      "h": 483,
+      "cropped_at": "2026-08-20"
+    },
+    "router-robot": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        693,
+        206,
+        387,
+        421
+      ],
+      "w": 387,
+      "h": 421,
+      "cropped_at": "2026-08-20"
+    },
+    "server-rack": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        171,
+        627,
+        342,
+        479
+      ],
+      "w": 342,
+      "h": 479,
+      "cropped_at": "2026-08-20"
+    },
+    "envelope-pieces": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        680,
+        627,
+        373,
+        440
+      ],
+      "w": 373,
+      "h": 440,
+      "cropped_at": "2026-08-20"
+    }
+  }
+}

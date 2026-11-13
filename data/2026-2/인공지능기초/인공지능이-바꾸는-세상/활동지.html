@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 세상 탐험 일지 — 인공지능 기초</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+<style>
+  :root {
+    --bg: #eef5fc;
+    --surface: #ffffff;
+    --fg: #0b1c33;
+    --fg-muted: #475972;
+    --fg-faint: #7c8ca3;
+    --hair: rgba(13, 44, 84, 0.16);
+    --primary: #2563eb;
+    --accent: linear-gradient(115deg, #22d3ee 0%, #2563eb 55%, #4f46e5 100%);
+    --c-blue: #2563eb; --c-cyan: #0891b2; --c-violet: #7c3aed;
+    --c-amber: #d97706; --c-green: #059669; --c-rose: #e11d48; --c-pink: #db2777;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 15% -5%, rgba(37, 99, 235, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(34, 211, 238, 0.10), transparent 55%),
+      var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    padding-bottom: 110px;
+    word-break: keep-all;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 0; }
+
+  /* ── 헤더 ── */
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 30px 28px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(15, 55, 105, 0.35);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(13, 44, 84, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13, 44, 84, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker {
+    font-size: 12px; font-weight: 800; letter-spacing: 0.14em;
+    color: var(--primary); text-transform: uppercase;
+  }
+  .hero h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad {
+    background: var(--accent);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.sub { color: var(--fg-muted); font-size: 14.5px; margin-top: 8px; max-width: 620px; }
+  .hero .gear {
+    position: absolute; top: 14px; right: 14px; border: none; background: transparent;
+    font-size: 17px; cursor: pointer; opacity: 0.35;
+  }
+
+  /* ── 학생 정보 ── */
+  .idrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; position: relative; }
+  .idrow .field { flex: 1 1 150px; }
+
+  /* ── 설정 패널 (교사 전용, 기본 숨김) ── */
+  #settingsPanel {
+    display: none; background: #fffbe9; border: 1px dashed #d9b53c; border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 18px; font-size: 13px;
+  }
+  #settingsPanel input { width: 100%; margin-top: 6px; }
+  #settingsPanel button { margin-top: 8px; }
+
+  /* ── 섹션 카드 ── */
+  section.card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 24px 24px 26px; margin-bottom: 18px;
+    box-shadow: 0 16px 44px -32px rgba(15, 55, 105, 0.3);
+    border-top: 4px solid var(--sec, var(--primary));
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .sec-badge {
+    flex: none; width: 34px; height: 34px; border-radius: 10px;
+    display: grid; place-items: center; font-weight: 800; font-size: 16px;
+    color: #fff; background: var(--sec, var(--primary));
+  }
+  .sec-head h2 { font-size: 18.5px; font-weight: 800; }
+  .sec-desc { color: var(--fg-muted); font-size: 13.5px; margin-bottom: 16px; }
+
+  label.q { display: block; font-weight: 700; font-size: 14.5px; margin: 16px 0 6px; }
+  label.q .req { color: var(--c-rose); }
+  .hint { font-weight: 500; color: var(--fg-faint); font-size: 12.5px; margin-left: 6px; }
+  input[type="text"], input[type="url"], input[type="date"], input[type="password"], textarea, select {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px;
+    padding: 10px 13px; font: inherit; font-size: 14.5px; color: var(--fg);
+    background: #fbfdff; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13);
+  }
+  textarea { resize: vertical; min-height: 74px; }
+
+  /* ── 현장 선택 (A) ── */
+  .scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .scene-grid label {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    border: 1.5px solid var(--hair); border-radius: 10px; padding: 9px 12px;
+    font-size: 13.5px; font-weight: 600; background: #fbfdff; transition: all 0.15s;
+  }
+  .scene-grid label:has(input:checked) {
+    border-color: var(--primary); background: rgba(37, 99, 235, 0.07); color: var(--primary);
+  }
+  .scene-grid input { accent-color: var(--primary); }
+
+  /* ── 패턴 칩 (B/C) ── */
+  .chip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+  .chip-item {
+    display: flex; align-items: center; gap: 10px; cursor: pointer;
+    border: 1.5px dashed var(--tone); border-radius: 12px; padding: 10px 13px;
+    background: color-mix(in srgb, var(--tone) 4%, #fff); transition: all 0.15s;
+  }
+  .chip-item:has(input:checked) {
+    border-style: solid; background: color-mix(in srgb, var(--tone) 11%, #fff);
+    box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--tone) 55%, transparent);
+  }
+  .chip-item input { accent-color: var(--tone); }
+  .chip-glyph {
+    flex: none; width: 22px; height: 22px; border-radius: 6px; background: var(--tone);
+    display: grid; place-items: center;
+  }
+  .chip-glyph::after { content: ''; width: 9px; height: 9px; border-radius: 2.5px; background: rgba(255,255,255,0.9); }
+  .chip-item .t { font-size: 13.5px; font-weight: 700; }
+  .chip-item .n { font-size: 11px; color: var(--fg-faint); font-weight: 700; }
+
+  /* ── 금지 스탬프 ── */
+  .no-stamp {
+    display: inline-block; margin-top: 12px; padding: 7px 14px; border-radius: 8px;
+    border: 2px solid var(--c-rose); color: var(--c-rose);
+    font-weight: 800; font-size: 12.5px; transform: rotate(-1.5deg); background: #fff;
+  }
+
+  /* ── 토론 (D) ── */
+  .stance-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .stance-row label {
+    flex: 1 1 140px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    border: 1.5px solid var(--hair); border-radius: 10px; padding: 11px 10px;
+    font-size: 13.5px; font-weight: 700; cursor: pointer; background: #fbfdff; text-align: center;
+  }
+  .stance-row label:has(input:checked) {
+    border-color: var(--c-green); background: rgba(5, 150, 105, 0.08); color: var(--c-green);
+  }
+  .stance-row input { accent-color: var(--c-green); }
+
+  /* ── 액션 바 ── */
+  .actionbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--hair); padding: 12px 18px;
+  }
+  .actionbar .inner {
+    max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 12px;
+  }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #draftStatus { font-size: 12px; color: var(--fg-faint); }
+  #draftStatus.pending { color: var(--c-amber); }
+  #draftStatus.saved { color: var(--c-green); }
+  #draftStatus.failed { color: var(--c-rose); font-weight: 700; }
+  .draft-note { font-size: 11px; color: var(--fg-faint); opacity: 0.8; }
+  .btn {
+    border: none; border-radius: 999px; padding: 12px 26px; font: inherit;
+    font-weight: 800; font-size: 15px; cursor: pointer; transition: transform 0.12s, opacity 0.15s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: linear-gradient(115deg, #22d3ee 0%, #2563eb 55%, #4f46e5 100%); color: #fff; box-shadow: 0 10px 26px -12px rgba(37, 99, 235, 0.6); }
+  .btn-primary:disabled { opacity: 0.55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+
+  /* ── 학번 풀이 미리보기 ── */
+  .sid-hint {
+    margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px;
+    font-family: 'JetBrains Mono', 'Malgun Gothic', monospace;
+  }
+  .sid-hint.ok { color: var(--c-green); }
+  .sid-hint.bad { color: var(--c-rose); }
+
+  /* ── 제출 확인 모달 ── */
+  .backdrop {
+    position: fixed; inset: 0; background: rgba(9, 26, 51, 0.45); backdrop-filter: blur(3px);
+    display: grid; place-items: center; padding: 18px; z-index: 70;
+  }
+  .backdrop[hidden] { display: none; }
+  .modal {
+    width: min(460px, 100%); max-height: 88vh; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 20px;
+    padding: 24px 24px 20px; box-shadow: 0 30px 80px -30px rgba(9, 30, 60, 0.5);
+  }
+  .modal h3 { font-size: 19px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .modal .btn { padding: 10px 18px; font-size: 14px; }
+  #lkResult { margin-top: 16px; }
+  #lkResult[hidden] { display: none; }
+  .lk-ok {
+    border: 1.5px solid var(--c-green); background: rgba(5, 150, 105, 0.07);
+    border-radius: 14px; padding: 14px 16px;
+  }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-green); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--fg); margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { color: var(--fg); overflow-wrap: anywhere; }
+  .lk-bad {
+    border: 1.5px solid var(--c-rose); background: rgba(225, 29, 72, 0.06);
+    border-radius: 14px; padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--c-rose);
+  }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; }
+
+  /* ── 제출 상태 배너 ── */
+  #submitBanner {
+    display: none; align-items: center; gap: 10px; margin-bottom: 18px;
+    border: 1.5px solid var(--c-green); background: rgba(5, 150, 105, 0.07);
+    border-radius: 14px; padding: 11px 16px; font-size: 13.5px; font-weight: 700; color: var(--fg);
+  }
+  #submitBanner.show { display: flex; }
+  #submitBanner .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-green); }
+
+  /* ── 토스트 ── */
+  #toast {
+    position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(16px);
+    background: #0b1c33; color: #fff; padding: 12px 22px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s; z-index: 60; max-width: 90vw; text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #059669; }
+  #toast.error { background: #e11d48; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    section.card { padding: 18px 16px 20px; }
+    /* 액션바: 상태 줄을 위로 빼고 버튼 3개가 한 줄을 나눠 쓴다 */
+    .actionbar .inner { flex-wrap: wrap; gap: 8px; }
+    .draft-wrap { flex: 1 0 100%; order: -1; }
+    .draft-note { display: none; }
+    .actionbar .btn { flex: 1 1 auto; padding: 11px 10px; font-size: 13.5px; }
+    .wide-only { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <header class="hero">
+    <button class="gear" id="btnGear" type="button" aria-label="설정">⚙</button>
+    <div class="kicker">인공지능 기초 · 2026-2 · 인공지능이 바꾸는 세상</div>
+    <h1>AI 세상 <span class="grad">탐험 일지</span></h1>
+    <p class="sub">오늘 여행한 아홉 현장을 기록하고, 열 번째 현장은 직접 찾는다.
+      잘 쓴 일지의 기준은 화려함이 아니라 — <strong>패턴 칩이 정확히 꽂혔는가</strong>.</p>
+    <div class="idrow">
+      <div class="field">
+        <label class="q" for="studentId">학번 <span class="req">*</span></label>
+        <input type="text" id="studentId" placeholder="예: 20317" inputmode="numeric"
+               maxlength="5" autocomplete="off">
+        <div id="sidPreview" class="sid-hint"></div>
+      </div>
+      <div class="field">
+        <label class="q" for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="이름">
+      </div>
+      <div class="field">
+        <label class="q" for="today">날짜 <span class="req">*</span></label>
+        <input type="date" id="today">
+      </div>
+      <div class="field">
+        <label class="q" for="password">제출 암호 <span class="req">*</span></label>
+        <input type="password" id="password" placeholder="4자 이상" autocomplete="off">
+      </div>
+    </div>
+    <p class="sub" style="margin-top:10px; font-size:12.5px;">
+      🎫 <strong>학번</strong>은 <strong>학년(1) + 반(2) + 번호(2)</strong> 다섯 자리 —
+      2학년 3반 17번이면 <strong>20317</strong>. 입력하면 아래에 자동으로 풀어서 보여 준다.<br>
+      🔑 <strong>제출 암호</strong>는 나중에 <strong>제출 확인·불러오기</strong>에 쓰는 열쇠다.
+      학번 · 이름 · 암호 세 가지가 맞아야 내 제출 내용을 다시 볼 수 있다.
+      <span style="color:var(--c-rose); font-weight:700;">평소 쓰는 비밀번호는 쓰지 말 것</span> — 잊으면 선생님께 문의.
+    </p>
+  </header>
+
+  <!-- 제출 상태 배너 -->
+  <div id="submitBanner"><span class="dot"></span><span id="submitBannerText"></span></div>
+
+  <!-- 설정 패널 (교사 전용) -->
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정 — Apps Script 배포 URL</strong>
+    <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus" style="margin-left:8px;"></span>
+  </div>
+
+  <!-- A. 오늘의 발견 -->
+  <section class="card" style="--sec: var(--c-blue);">
+    <div class="sec-head"><span class="sec-badge">A</span><h2>오늘의 발견</h2></div>
+    <p class="sec-desc">아홉 현장 중 가장 인상 깊었던 곳 하나를 고르고, 이유를 적는다.</p>
+    <label class="q">가장 인상 깊은 현장 <span class="req">*</span></label>
+    <div class="scene-grid" id="sceneGrid">
+      <label><input type="radio" name="aScene" value="생명 (AlphaFold·AI 신약)"> 생명</label>
+      <label><input type="radio" name="aScene" value="병원 (루닛·뷰노)"> 병원</label>
+      <label><input type="radio" name="aScene" value="하늘 (GenCast 기상)"> 하늘</label>
+      <label><input type="radio" name="aScene" value="도로 (Waymo)"> 도로</label>
+      <label><input type="radio" name="aScene" value="공장 (휴머노이드)"> 공장</label>
+      <label><input type="radio" name="aScene" value="수학 (에르되시·AlphaEvolve)"> 수학</label>
+      <label><input type="radio" name="aScene" value="고대 문서 (헤르쿨라네움)"> 고대 문서</label>
+      <label><input type="radio" name="aScene" value="바다 (Project CETI)"> 바다</label>
+      <label><input type="radio" name="aScene" value="뇌 (BCI)"> 뇌</label>
+    </div>
+    <label class="q" for="aReason">이유 <span class="req">*</span><span class="hint">2~3문장 — "신기해서"에서 한 걸음 더</span></label>
+    <textarea id="aReason" placeholder="무엇이 어떻게 인상 깊었는지, 그 기술 전과 후로 무엇이 달라졌는지 적어 보자."></textarea>
+  </section>
+
+  <!-- B. 나의 탐구 -->
+  <section class="card" style="--sec: var(--c-violet);">
+    <div class="sec-head"><span class="sec-badge">B</span><h2>나의 탐구 — 열 번째 현장</h2></div>
+    <p class="sec-desc">오늘 수업에 <strong>나오지 않은</strong> AI 기술·사례를 하나 찾아 조사한다.
+      힌트: 뉴스에서 "AI + 분야명" 검색, DeepMind·Boston Dynamics·NASA 유튜브, 오늘 슬라이드의 링크들.</p>
+    <label class="q" for="bTech">기술·사례 이름 <span class="req">*</span></label>
+    <input type="text" id="bTech" placeholder="예: AI 산불 조기 감지 시스템">
+    <label class="q" for="bField">분야 <span class="req">*</span></label>
+    <input type="text" id="bField" placeholder="예: 재난·환경">
+    <label class="q" for="bWhat">무엇을 하는 기술인가? <span class="req">*</span><span class="hint">3문장 정도</span></label>
+    <textarea id="bWhat" placeholder="무엇을 입력받아, 무엇을 하고, 무엇이 달라지는가?"></textarea>
+    <label class="q" for="bUrl">출처 링크 <span class="req">*</span><span class="hint">조사한 기사·영상·사이트 주소</span></label>
+    <input type="url" id="bUrl" placeholder="https://…">
+    <label class="q">패턴 칩 판정 <span class="req">*</span><span class="hint">이 기술에 해당하는 칩을 모두 선택 (1개 이상)</span></label>
+    <div class="chip-grid" id="chipGridB">
+      <label class="chip-item" style="--tone: var(--c-cyan);"><input type="checkbox" name="bChips" value="1 시간을 접다"><span class="chip-glyph"></span><span><span class="n">칩 #1</span><br><span class="t">시간을 접다</span></span></label>
+      <label class="chip-item" style="--tone: var(--c-violet);"><input type="checkbox" name="bChips" value="2 안 보이는 신호를 읽다"><span class="chip-glyph"></span><span><span class="n">칩 #2</span><br><span class="t">안 보이는 신호를 읽다</span></span></label>
+      <label class="chip-item" style="--tone: var(--c-amber);"><input type="checkbox" name="bChips" value="3 미리 경고하다"><span class="chip-glyph"></span><span><span class="n">칩 #3</span><br><span class="t">미리 경고하다</span></span></label>
+      <label class="chip-item" style="--tone: var(--c-green);"><input type="checkbox" name="bChips" value="4 시연으로 배우다"><span class="chip-glyph"></span><span><span class="n">칩 #4</span><br><span class="t">시연으로 배우다</span></span></label>
+      <label class="chip-item" style="--tone: var(--c-rose);"><input type="checkbox" name="bChips" value="5 새 구조를 찾다"><span class="chip-glyph"></span><span><span class="n">칩 #5</span><br><span class="t">새 구조를 찾다</span></span></label>
+      <label class="chip-item" style="--tone: var(--c-pink);"><input type="checkbox" name="bChips" value="6 언어를 번역하다"><span class="chip-glyph"></span><span><span class="n">칩 #6</span><br><span class="t">언어를 번역하다</span></span></label>
+    </div>
+    <label class="q" for="bWhy">판정 이유 <span class="req">*</span><span class="hint">한 줄 — 왜 그 칩인가?</span></label>
+    <input type="text" id="bWhy" placeholder="예: 사람 눈으로 못 보는 연기 패턴을 위성 영상에서 읽어내니까 — 칩 #2">
+  </section>
+
+  <!-- C. 칩 × 분야 아이디어 -->
+  <section class="card" style="--sec: var(--c-rose);">
+    <div class="sec-head"><span class="sec-badge">C</span><h2>칩 × 내 분야 — 아이디어 발상</h2></div>
+    <p class="sec-desc">칩 하나를 골라 내 관심 분야에 꽂아 본다. 조건: <strong>어떤 패턴인지 말할 수 있어야</strong> 아이디어다.</p>
+    <label class="q" for="cChip">사용할 패턴 칩 <span class="req">*</span></label>
+    <select id="cChip">
+      <option value="">— 칩 선택 —</option>
+      <option value="1 시간을 접다">칩 #1 시간을 접다 — 오래 걸려서 못 하는 계산은?</option>
+      <option value="2 안 보이는 신호를 읽다">칩 #2 안 보이는 신호를 읽다 — 데이터는 있는데 아무도 못 읽는 것은?</option>
+      <option value="3 미리 경고하다">칩 #3 미리 경고하다 — 몇 시간만 미리 알면 결과가 바뀌는 일은?</option>
+      <option value="4 시연으로 배우다">칩 #4 시연으로 배우다 — 몸으로만 익히는 기술은?</option>
+      <option value="5 새 구조를 찾다">칩 #5 새 구조를 찾다 — "최선이라 믿어온 방법"이 있는 분야는?</option>
+      <option value="6 언어를 번역하다">칩 #6 언어를 번역하다 — 소통이 안 되어 생기는 문제는?</option>
+    </select>
+    <label class="q" for="cField">내 관심 분야 <span class="req">*</span><span class="hint">농업·스포츠·음악·게임·우리 학교·우리 동네… 무엇이든</span></label>
+    <input type="text" id="cField" placeholder="예: 배드민턴">
+    <label class="q" for="cTitle">아이디어 제목 <span class="req">*</span></label>
+    <input type="text" id="cTitle" placeholder="예: 스매시 폼 코치 AI — 몸으로만 배우던 자세를 데이터로">
+    <label class="q" for="cChange">무엇이 달라지나? <span class="req">*</span></label>
+    <textarea id="cChange" placeholder="이 아이디어가 실현되면, 지금과 무엇이 달라지는가?"></textarea>
+    <label class="q" for="cWho">누가 좋아지나? <span class="req">*</span></label>
+    <textarea id="cWho" placeholder="누구의 어떤 문제가 풀리는가?"></textarea>
+    <span class="no-stamp">"그냥 챗GPT로 숙제" — 칩 판정 불가, 아이디어 아님</span>
+  </section>
+
+  <!-- D. 피치 + 토론 -->
+  <section class="card" style="--sec: var(--c-green);">
+    <div class="sec-head"><span class="sec-badge">D</span><h2>한 문장 피치 + 토론</h2></div>
+    <p class="sec-desc">내 아이디어를 한 문장으로. 그리고 도로 현장에서 만난 질문에 입장을 정한다.</p>
+    <label class="q" for="dPitch">한 문장 피치 <span class="req">*</span><span class="hint">다음 수업에서 투표에 올라간다</span></label>
+    <input type="text" id="dPitch" placeholder="예: 「○○ 칩으로 △△를 바꾸는 □□」 — 한 문장으로.">
+    <label class="q">토론 <span class="req">*</span> — 자율주행차는 완벽하지 않다. 그래도 "사람보다 나으면" 허용해야 할까?</label>
+    <div class="stance-row">
+      <label><input type="radio" name="dStance" value="허용해야 한다"> 허용해야 한다</label>
+      <label><input type="radio" name="dStance" value="아직 이르다"> 아직 이르다</label>
+      <label><input type="radio" name="dStance" value="조건부 허용"> 조건부 허용</label>
+    </div>
+    <label class="q" for="dReason">근거 한 문장 <span class="req">*</span></label>
+    <input type="text" id="dReason" placeholder="내 입장의 근거를 한 문장으로.">
+  </section>
+
+</div>
+
+<!-- 액션 바 -->
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <a class="btn btn-ghost" href="/data/2026-2/인공지능기초/제출현황.html"
+       style="text-decoration:none; display:inline-block;">제출 현황</a>
+    <button class="btn btn-ghost" id="btnLookup" type="button">제출 확인</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-primary" id="btnSave" type="button">제출하기<span class="wide-only"> (TXT + 시트 저장)</span></button>
+  </div>
+</div>
+
+<!-- 제출 확인 모달 -->
+<div class="backdrop" id="lookupBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
+    <h3 id="lookupTitle">제출 확인 · 지난 제출 불러오기</h3>
+    <p class="m-desc">제출할 때 쓴 <strong>학번 · 이름 · 암호</strong>를 넣으면
+      가장 마지막으로 제출한 내용을 확인할 수 있어요.</p>
+    <label class="q" for="lkSid">학번</label>
+    <input type="text" id="lkSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label class="q" for="lkName">이름</label>
+    <input type="text" id="lkName" placeholder="이름">
+    <label class="q" for="lkPw">제출 암호</label>
+    <input type="password" id="lkPw" placeholder="제출할 때 정한 암호" autocomplete="off">
+    <div id="lkResult" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="lkClose" type="button">닫기</button>
+      <button class="btn btn-ghost" id="lkFill" type="button" hidden>양식에 불러오기</button>
+      <button class="btn btn-primary" id="lkGo" type="button">확인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var DRAFT_KEY = 'draft_ai_world_explore';
+  var URL_KEY = 'gas_url_ai_basics_2026_2';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec'; // 인공지능 기초(2026-2) 과목 공용 배포 URL
+
+  /* ── 학번(GCCNN) — 학년1 + 반2 + 번호2 ── */
+  var SID_RE = /^\d{5}$/;
+
+  function parseSid(sid) {
+    if (!SID_RE.test(sid)) return null;
+    return {
+      grade: parseInt(sid.slice(0, 1), 10),
+      cls: parseInt(sid.slice(1, 3), 10),
+      no: parseInt(sid.slice(3, 5), 10)
+    };
+  }
+  function sidLabel(sid) {
+    var s = parseSid(sid);
+    return s ? s.grade + '학년 ' + s.cls + '반 ' + s.no + '번' : sid;
+  }
+  function renderSidPreview() {
+    var el = document.getElementById('sidPreview');
+    if (!el) return;
+    var sid = v('studentId');
+    if (!sid) { el.textContent = ''; el.className = 'sid-hint'; return; }
+    var s = parseSid(sid);
+    if (!s) {
+      el.textContent = '↳ 숫자 5자리로 입력하세요 (예: 20317)';
+      el.className = 'sid-hint bad';
+      return;
+    }
+    var sane = s.grade >= 1 && s.grade <= 3 && s.cls >= 1 && s.no >= 1;
+    el.textContent = '↳ ' + sidLabel(sid) + (sane ? '' : ' — 맞나요?');
+    el.className = 'sid-hint ' + (sane ? 'ok' : 'bad');
+  }
+
+  /* ── 오늘 날짜 기본값 ── */
+  var todayEl = document.getElementById('today');
+  if (!todayEl.value) {
+    var d = new Date();
+    todayEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  /* ── 데이터 수집 ── */
+  function pickRadio(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function pickChecks(name) {
+    return Array.prototype.map.call(
+      document.querySelectorAll('input[name="' + name + '"]:checked'),
+      function (el) { return el.value; }
+    ).join(', ');
+  }
+  function v(id) { return document.getElementById(id).value.trim(); }
+
+  function getFormData() {
+    return {
+      source: 'ai_world_explore',
+      studentName: v('studentName'),
+      studentId: v('studentId'),
+      today: v('today'),
+      password: v('password'),
+      aScene: pickRadio('aScene'),
+      aReason: v('aReason'),
+      bTech: v('bTech'),
+      bField: v('bField'),
+      bWhat: v('bWhat'),
+      bUrl: v('bUrl'),
+      bChips: pickChecks('bChips'),
+      bWhy: v('bWhy'),
+      cChip: v('cChip'),
+      cField: v('cField'),
+      cTitle: v('cTitle'),
+      cChange: v('cChange'),
+      cWho: v('cWho'),
+      dPitch: v('dPitch'),
+      dStance: pickRadio('dStance'),
+      dReason: v('dReason')
+    };
+  }
+
+  /* ── 임시저장 (localStorage) ── */
+  var draftTimer = null;
+  var statusEl = document.getElementById('draftStatus');
+
+  function saveDraft() {
+    try {
+      var d = getFormData();
+      delete d.password; // 암호는 브라우저에 남기지 않는다
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+      statusEl.textContent = '임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      statusEl.className = 'saved';
+    } catch (e) {
+      // 저장 공간 부족 등 — 저장되지 않았다는 사실을 숨기지 않는다
+      statusEl.textContent = '임시저장 실패 — 이 기기에 저장 공간이 부족해요';
+      statusEl.className = 'failed';
+    }
+  }
+
+  /* 입력이 시작되면 곧바로 '저장 대기 중'으로 바꾼다. 그러지 않으면 방금 친
+     내용이 아직 저장되지 않았는데도 앞서 뜬 '임시저장됨'이 그대로 남아,
+     학생이 저장된 줄 알고 창을 닫아 버린다. */
+  function scheduleDraft() {
+    statusEl.textContent = '입력 중… 잠시 멈추면 임시저장됩니다';
+    statusEl.className = 'pending';
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function restoreDraft() {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    try {
+      var d = JSON.parse(raw);
+      ['studentName', 'studentId', 'today', 'aReason', 'bTech', 'bField', 'bWhat', 'bUrl', 'bWhy',
+       'cChip', 'cField', 'cTitle', 'cChange', 'cWho', 'dPitch', 'dReason'].forEach(function (id) {
+        if (d[id]) document.getElementById(id).value = d[id];
+      });
+      if (d.aScene) {
+        var r = document.querySelector('input[name="aScene"][value="' + CSS.escape(d.aScene) + '"]');
+        if (r) r.checked = true;
+      }
+      if (d.dStance) {
+        var s = document.querySelector('input[name="dStance"][value="' + CSS.escape(d.dStance) + '"]');
+        if (s) s.checked = true;
+      }
+      if (d.bChips) {
+        d.bChips.split(', ').forEach(function (val) {
+          var c = document.querySelector('input[name="bChips"][value="' + CSS.escape(val) + '"]');
+          if (c) c.checked = true;
+        });
+      }
+      statusEl.textContent = '임시저장 불러옴';
+      statusEl.className = 'saved';
+    } catch (e) { /* 손상된 draft — 무시 */ }
+  }
+  document.querySelectorAll('input, textarea, select').forEach(function (el) {
+    el.addEventListener('input', scheduleDraft);
+    el.addEventListener('change', scheduleDraft);
+  });
+  restoreDraft();
+
+  /* 학번 칸은 숫자 5자리만 받고, 입력할 때마다 풀이를 보여 준다 */
+  ['studentId', 'lkSid'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      var cleaned = el.value.replace(/\D/g, '').slice(0, 5);
+      if (cleaned !== el.value) el.value = cleaned;
+      if (id === 'studentId') renderSidPreview();
+    });
+  });
+  renderSidPreview();
+
+  /* ── 토스트 ── */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg, type, ms) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, ms || 2600);
+  }
+
+  /* ── 유효성 검사 — 모든 항목 필수 (문서 순서 그대로) ── */
+  var REQUIRED = [
+    { id: 'studentId',   label: '학번' },
+    { id: 'studentName', label: '이름' },
+    { id: 'today',       label: '날짜' },
+    { id: 'password',    label: '제출 암호' },
+    { radio: 'aScene',   label: 'A. 인상 깊은 현장' },
+    { id: 'aReason',     label: 'A. 이유' },
+    { id: 'bTech',       label: 'B. 기술·사례 이름' },
+    { id: 'bField',      label: 'B. 분야' },
+    { id: 'bWhat',       label: 'B. 무엇을 하는 기술인가' },
+    { id: 'bUrl',        label: 'B. 출처 링크' },
+    { checks: 'bChips',  label: 'B. 패턴 칩 판정' },
+    { id: 'bWhy',        label: 'B. 판정 이유' },
+    { id: 'cChip',       label: 'C. 사용할 패턴 칩' },
+    { id: 'cField',      label: 'C. 관심 분야' },
+    { id: 'cTitle',      label: 'C. 아이디어 제목' },
+    { id: 'cChange',     label: 'C. 무엇이 달라지나' },
+    { id: 'cWho',        label: 'C. 누가 좋아지나' },
+    { id: 'dPitch',      label: 'D. 한 문장 피치' },
+    { radio: 'dStance',  label: 'D. 토론 입장' },
+    { id: 'dReason',     label: 'D. 근거 한 문장' }
+  ];
+
+  /* 첫 미입력 칸으로 스크롤 + 포커스 — 어디가 빠졌는지 바로 보이게 */
+  function focusField(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { el.focus({ preventScroll: true }); }, 120);
+  }
+  function focusGroup(name) {
+    var el = document.querySelector('input[name="' + name + '"]');
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function validate() {
+    var missing = [];
+    var first = null;
+
+    REQUIRED.forEach(function (f) {
+      var filled = f.id ? !!v(f.id)
+        : f.radio ? !!pickRadio(f.radio)
+        : !!pickChecks(f.checks);
+      if (filled) return;
+      missing.push(f.label);
+      if (!first) first = f;
+    });
+
+    if (missing.length) {
+      var head = missing.slice(0, 3).join(', ');
+      showToast('아직 안 쓴 곳이 ' + missing.length + '군데 있어요: ' + head +
+        (missing.length > 3 ? ' 외 ' + (missing.length - 3) + '개' : ''), 'error', 5000);
+      if (first.id) focusField(first.id);
+      else focusGroup(first.radio || first.checks);
+      return false;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      showToast('학번은 학년(1) + 반(2) + 번호(2) 다섯 자리 숫자예요. 예: 20317', 'error', 4600);
+      document.getElementById('studentId').focus();
+      return false;
+    }
+    if (v('password').length < 4) {
+      showToast('제출 암호는 4자 이상으로 정해 주세요.', 'error', 3800);
+      return false;
+    }
+    return true;
+  }
+
+  /* ── TXT 저장 ── */
+  function buildTxt(data) {
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  AI 세상 탐험 일지 — 인공지능이 바꾸는 세상');
+    L.push('  ' + data.studentId + ' (' + sidLabel(data.studentId) + ') ' + data.studentName + ' · ' + data.today);
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    L.push('');
+    L.push('【 A. 오늘의 발견 】');
+    L.push('인상 깊은 현장: ' + data.aScene);
+    L.push('이유: ' + data.aReason);
+    L.push('');
+    L.push('【 B. 나의 탐구 — 열 번째 현장 】');
+    L.push('기술·사례: ' + data.bTech);
+    L.push('분야: ' + data.bField);
+    L.push('무엇을 하나: ' + data.bWhat);
+    L.push('출처: ' + data.bUrl);
+    L.push('패턴 칩 판정: ' + data.bChips);
+    L.push('판정 이유: ' + data.bWhy);
+    L.push('');
+    L.push('【 C. 칩 × 내 분야 아이디어 】');
+    L.push('선택한 칩: ' + data.cChip);
+    L.push('관심 분야: ' + data.cField);
+    L.push('아이디어 제목: ' + data.cTitle);
+    L.push('무엇이 달라지나: ' + data.cChange);
+    L.push('누가 좋아지나: ' + data.cWho);
+    L.push('');
+    L.push('【 D. 피치 + 토론 】');
+    L.push('한 문장 피치: ' + data.dPitch);
+    L.push('자율주행 토론 입장: ' + data.dStance);
+    L.push('근거: ' + data.dReason);
+    return L.join('\n');
+  }
+  function downloadTxt(data) {
+    var blob = new Blob([buildTxt(data)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'AI세상탐험일지_' + (data.studentId || '') + '_' + (data.studentName || '무명') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── 제출 ── */
+  document.getElementById('btnSave').addEventListener('click', function () {
+    if (!validate()) return;
+    var data = getFormData();
+    var btn = this;
+    btn.disabled = true;
+
+    downloadTxt(data);
+
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) {
+      showToast('TXT 파일로 저장됐어요. (시트 전송은 선생님 설정 후 가능)', 'success', 4200);
+      btn.disabled = false;
+      return;
+    }
+    fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(function () {
+      showToast('제출 완료! TXT 파일도 함께 저장됐어요.', 'success', 4200);
+      localStorage.removeItem(DRAFT_KEY);
+      recordSubmitted(data);
+    }).catch(function (err) {
+      showToast('TXT는 저장됐어요. 시트 전송 오류: ' + err.message, 'error', 5000);
+    }).finally(function () {
+      btn.disabled = false;
+    });
+  });
+
+  /* ── 초기화 ── */
+  document.getElementById('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요?')) return;
+    document.querySelectorAll('input[type="text"], input[type="url"], input[type="password"], textarea').forEach(function (el) { el.value = ''; });
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(function (el) { el.checked = false; });
+    document.getElementById('cChip').value = '';
+    localStorage.removeItem(DRAFT_KEY);
+    statusEl.textContent = '초기화됨';
+    statusEl.className = '';
+    showToast('모든 입력을 지웠어요.');
+  });
+
+  /* ── 제출 상태 배너 ── */
+  var SUBMIT_KEY = 'submitted_ai_world_explore';
+  var bannerEl = document.getElementById('submitBanner');
+  var bannerTextEl = document.getElementById('submitBannerText');
+
+  function showBanner(text) {
+    bannerTextEl.textContent = text;
+    bannerEl.classList.add('show');
+  }
+  function recordSubmitted(data) {
+    var stamp = new Date().toLocaleString('ko-KR');
+    try {
+      localStorage.setItem(SUBMIT_KEY, JSON.stringify({
+        at: stamp, name: data.studentName, sid: data.studentId
+      }));
+    } catch (e) { /* 무시 */ }
+    showBanner('제출을 보냈습니다 · ' + stamp + ' — [제출 확인]으로 서버에 저장됐는지 확인할 수 있어요.');
+  }
+  (function restoreBanner() {
+    try {
+      var raw = localStorage.getItem(SUBMIT_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      showBanner('이 기기에서 ' + s.at + '에 제출을 보냈습니다 — [제출 확인]으로 내용을 다시 볼 수 있어요.');
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* ── 제출 확인 · 불러오기 ── */
+  var lookupBackdrop = document.getElementById('lookupBackdrop');
+  var lkResult = document.getElementById('lkResult');
+  var lkFillBtn = document.getElementById('lkFill');
+  var lkGoBtn = document.getElementById('lkGo');
+  var lastLookup = null;
+  var lastLookupPw = ''; // 방금 확인에 성공한 암호 — 불러올 때 양식에 채워 준다
+
+  function openLookup() {
+    document.getElementById('lkSid').value = v('studentId');
+    document.getElementById('lkName').value = v('studentName');
+    document.getElementById('lkPw').value = '';
+    lkResult.hidden = true;
+    lkResult.textContent = '';
+    lkFillBtn.hidden = true;
+    lastLookup = null;
+    lookupBackdrop.hidden = false;
+    document.getElementById('lkPw').focus();
+  }
+  function closeLookup() { lookupBackdrop.hidden = true; }
+
+  /* JSONP — Apps Script는 CORS 헤더를 주지 않으므로 fetch 실패 시 이 경로로 받는다 */
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'lkcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버 응답이 없습니다.')); }, 20000);
+      function cleanup() {
+        clearTimeout(timer);
+        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      window[cb] = function (data) { cleanup(); resolve(data); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결할 수 없습니다.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function requestLookup(p) {
+    var base = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!base) return Promise.reject(new Error('서버 주소가 설정되지 않았습니다. 선생님께 문의하세요.'));
+    var qs = 'action=lookup&source=ai_world_explore' +
+      '&studentId=' + encodeURIComponent(p.studentId) +
+      '&studentName=' + encodeURIComponent(p.studentName) +
+      '&password=' + encodeURIComponent(p.password);
+    var url = base + '?' + qs;
+    return fetch(url)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return jsonp(url); });
+  }
+
+  function renderLookup(res) {
+    lkResult.textContent = '';
+    lkResult.hidden = false;
+    if (res && res.status === 'ok') {
+      lastLookup = res.data;
+      lkFillBtn.hidden = false;
+      var box = document.createElement('div');
+      box.className = 'lk-ok';
+      var stamp = document.createElement('div');
+      stamp.className = 'stamp';
+      stamp.textContent = '제출이 확인되었습니다';
+      var when = document.createElement('div');
+      when.className = 'when';
+      when.textContent = res.submittedAt;
+      box.appendChild(stamp);
+      box.appendChild(when);
+      var dl = document.createElement('dl');
+      [['A 현장', res.data.aScene], ['B 기술', res.data.bTech], ['B 칩', res.data.bChips],
+       ['C 아이디어', res.data.cTitle], ['D 피치', res.data.dPitch]].forEach(function (pair) {
+        if (!pair[1]) return;
+        var dt = document.createElement('dt');
+        dt.textContent = pair[0];
+        var dd = document.createElement('dd');
+        dd.textContent = pair[1];
+        dl.appendChild(dt);
+        dl.appendChild(dd);
+      });
+      box.appendChild(dl);
+      lkResult.appendChild(box);
+      return;
+    }
+    lkFillBtn.hidden = true;
+    lastLookup = null;
+    var bad = document.createElement('div');
+    bad.className = 'lk-bad';
+    if (res && res.status === 'denied') {
+      bad.textContent = '암호가 일치하지 않습니다. 제출할 때 정한 암호를 다시 확인해 주세요.';
+    } else if (res && res.status === 'notfound') {
+      bad.textContent = '이 학번·이름으로 제출된 기록이 없습니다. 아직 제출하지 않았거나, 학번·이름이 제출할 때와 다를 수 있어요.';
+    } else {
+      bad.textContent = '오류: ' + ((res && res.message) || '알 수 없는 오류');
+    }
+    lkResult.appendChild(bad);
+  }
+
+  function setRadio(name, val) {
+    document.querySelectorAll('input[name="' + name + '"]').forEach(function (r) { r.checked = false; });
+    if (!val) return;
+    var el = document.querySelector('input[name="' + name + '"][value="' + CSS.escape(val) + '"]');
+    if (el) el.checked = true;
+  }
+  function fillFormFrom(d) {
+    ['studentName', 'studentId', 'today', 'aReason', 'bTech', 'bField', 'bWhat', 'bUrl', 'bWhy',
+     'cChip', 'cField', 'cTitle', 'cChange', 'cWho', 'dPitch', 'dReason'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && typeof d[id] === 'string') el.value = d[id];
+    });
+    setRadio('aScene', d.aScene);
+    setRadio('dStance', d.dStance);
+    document.querySelectorAll('input[name="bChips"]').forEach(function (c) { c.checked = false; });
+    String(d.bChips || '').split(',').forEach(function (raw) {
+      var val = raw.trim();
+      if (!val) return;
+      var c = document.querySelector('input[name="bChips"][value="' + CSS.escape(val) + '"]');
+      if (c) c.checked = true;
+    });
+    renderSidPreview();
+    saveDraft();
+  }
+
+  document.getElementById('btnLookup').addEventListener('click', openLookup);
+  document.getElementById('lkClose').addEventListener('click', closeLookup);
+  lookupBackdrop.addEventListener('click', function (e) { if (e.target === lookupBackdrop) closeLookup(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !lookupBackdrop.hidden) closeLookup();
+  });
+  ['lkSid', 'lkName', 'lkPw'].forEach(function (id) {
+    document.getElementById(id).addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); lkGoBtn.click(); }
+    });
+  });
+
+  lkGoBtn.addEventListener('click', function () {
+    var p = {
+      studentId: document.getElementById('lkSid').value.trim(),
+      studentName: document.getElementById('lkName').value.trim(),
+      password: document.getElementById('lkPw').value.trim()
+    };
+    if (!p.studentId || !p.studentName || !p.password) {
+      renderLookup({ status: 'error', message: '학번 · 이름 · 암호를 모두 입력해 주세요.' });
+      return;
+    }
+    if (!SID_RE.test(p.studentId)) {
+      renderLookup({ status: 'error', message: '학번은 숫자 5자리예요 (학년1 + 반2 + 번호2, 예: 20317).' });
+      return;
+    }
+    lkGoBtn.disabled = true;
+    lkResult.hidden = false;
+    lkResult.textContent = '';
+    lkFillBtn.hidden = true;
+    var wait = document.createElement('div');
+    wait.className = 'lk-wait';
+    wait.textContent = '확인하는 중…';
+    lkResult.appendChild(wait);
+
+    requestLookup(p)
+      .then(function (res) {
+        if (res && res.status === 'ok') lastLookupPw = p.password;
+        renderLookup(res);
+      })
+      .catch(function (err) { renderLookup({ status: 'error', message: err.message }); })
+      .finally(function () { lkGoBtn.disabled = false; });
+  });
+
+  lkFillBtn.addEventListener('click', function () {
+    if (!lastLookup) return;
+    if (!window.confirm('지금 화면의 내용을 지우고, 제출했던 내용을 불러올까요?')) return;
+    fillFormFrom(lastLookup);
+    if (lastLookupPw) document.getElementById('password').value = lastLookupPw;
+    closeLookup();
+    showToast('제출했던 내용을 양식에 불러왔어요. 고친 뒤 다시 제출하면 최신 내용으로 갱신돼요.', 'success', 4200);
+  });
+
+  /* ── 설정 패널 (⚙ 5번 클릭으로 열림 — 교사 전용) ── */
+  var gearCount = 0, gearTimer = null;
+  document.getElementById('btnGear').addEventListener('click', function () {
+    gearCount += 1;
+    clearTimeout(gearTimer);
+    gearTimer = setTimeout(function () { gearCount = 0; }, 1600);
+    if (gearCount >= 5) {
+      gearCount = 0;
+      var p = document.getElementById('settingsPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('scriptUrl').value = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    }
+  });
+  document.getElementById('btnSaveUrl').addEventListener('click', function () {
+    var u = document.getElementById('scriptUrl').value.trim();
+    if (u) {
+      localStorage.setItem(URL_KEY, u);
+      document.getElementById('urlStatus').textContent = '저장됨 ✓';
+    } else {
+      localStorage.removeItem(URL_KEY);
+      document.getElementById('urlStatus').textContent = '기본값 사용';
+    }
+  });
+
+  /* ── 제출 현황 페이지에서 넘어온 경우 ──────────────────────────────
+     ?sid=20317        → 학번 칸 채우기
+     &restore=1        → 현황 페이지에서 암호로 연 내용을 그대로 이어받기
+     (내용은 이 탭의 sessionStorage에만 잠깐 담기고, 읽는 즉시 지운다) */
+  (function handoff() {
+    var params = new URLSearchParams(location.search);
+    var sid = params.get('sid');
+    if (sid && /^\d{5}$/.test(sid)) {
+      document.getElementById('studentId').value = sid;
+      renderSidPreview();
+      scheduleDraft();
+    }
+    if (params.get('restore') !== '1') return;
+
+    var key = 'handoff_ai_world_explore';
+    var raw = null;
+    try { raw = sessionStorage.getItem(key); sessionStorage.removeItem(key); } catch (e) { /* 무시 */ }
+    if (!raw) return;
+    try {
+      var payload = JSON.parse(raw);
+      if (!payload || !payload.data) return;
+      fillFormFrom(payload.data);
+      if (payload.password) document.getElementById('password').value = payload.password;
+      if (payload.at) showBanner(payload.at + '에 낸 내용을 불러왔어요 — 고쳐서 다시 제출하면 최신 내용으로 갱신됩니다.');
+      showToast('제출했던 내용을 불러왔어요.', 'success', 3800);
+    } catch (e) { /* 손상된 핸드오프 — 무시 */ }
+  })();
+})();
+</script>
+<!-- 제출 마감 — apps-script.js SOURCES의 deadline과 같은 값 (생성일 + 45일).
+     서버도 마감 뒤 제출을 받지 않는다. 제출 확인(조회)은 마감 뒤에도 쓸 수 있다. -->
+<script>
+(function () {
+  var DEADLINE = '2026-10-01';
+  var end = new Date(DEADLINE + 'T23:59:59+09:00');
+  var closed = Date.now() > end.getTime();
+  var p = DEADLINE.split('-');
+  var label = Number(p[1]) + '월 ' + Number(p[2]) + '일';
+  var lookupBtn = document.getElementById('btnLookup');
+  var lookupName = lookupBtn ? lookupBtn.textContent.trim() : '제출 확인';
+  var box = document.createElement('div');
+  box.id = 'deadlineNotice';
+  box.setAttribute('role', 'status');
+  box.style.cssText = 'margin:14px 0 4px; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; line-height:1.5;' +
+    (closed ? 'background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5;'
+            : 'background:#eef4ff; color:#1e3a8a; border:1px solid #c7d7fe;');
+  box.textContent = closed
+    ? '⏰ 제출이 마감되었습니다 (' + label + ' 23:59까지). 이미 낸 내용은 [' + lookupName + ']에서 볼 수 있습니다.'
+    : '⏰ 제출 마감: ' + label + ' 23:59까지';
+  var hero = document.querySelector('header');
+  if (hero) hero.appendChild(box);
+  if (!closed) return;
+  var btn = document.getElementById('btnSubmit') || document.getElementById('btnSave');
+  if (!btn) return;
+  btn.disabled = true;
+  btn.textContent = '제출 마감';
+  btn.style.opacity = '0.5';
+  btn.style.cursor = 'not-allowed';
+  btn.title = label + '에 마감되었습니다.';
+  btn.addEventListener('click', function (e) { e.stopImmediatePropagation(); e.preventDefault(); }, true);
+})();
+</script>
+</body>
+</html>

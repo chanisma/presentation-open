@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>바나나 언제 먹지?</title>
+<style>
+  :root {
+    --paper: #f3eee3;
+    --card: #fffdf8;
+    --ink: #2b3a55;
+    --ink-soft: #5c6780;
+    --berry: #9c3d6e;
+    --berry-soft: #f3dfe8;
+    --line: #ddd3c2;
+    --amber: #d98e04;
+    --amber-soft: #fbf0d6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+  main {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 28px 16px 48px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--berry);
+  }
+  header p {
+    margin: 6px 0 14px;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+  .sample-note {
+    margin: 0 0 18px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--amber-soft);
+    border: 1.5px solid #ecd29a;
+    font-size: 14px;
+    color: #7a5503;
+  }
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--line);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 0 rgba(43, 58, 85, 0.06);
+  }
+  .card-title {
+    margin: 0 0 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .samples {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .sample {
+    padding: 0;
+    border: 2.5px solid transparent;
+    border-radius: 12px;
+    background: var(--paper);
+    cursor: pointer;
+    overflow: hidden;
+    font: inherit;
+    color: inherit;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .sample:hover { transform: translateY(-2px); }
+  .sample.on { border-color: var(--berry); }
+  .sample img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .sample span { display: block; padding: 6px 4px 8px; font-size: 13px; font-weight: 700; }
+
+  .threshold {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .threshold button {
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--card);
+    font: inherit;
+    font-weight: 700;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .threshold button.on { border-color: var(--amber); background: var(--amber-soft); color: #7a5503; }
+
+  #answer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 14px;
+    border: 2px solid var(--line);
+    background: var(--paper);
+    font-size: 21px;
+    font-weight: 800;
+    min-height: 72px;
+  }
+  #answer .emoji { font-size: 34px; line-height: 1; }
+  #answer.empty { color: var(--ink-soft); font-size: 16px; font-weight: 500; }
+  #answer.unknown { border-color: var(--amber); background: var(--amber-soft); }
+
+  .bars { margin-top: 16px; display: grid; gap: 10px; }
+  .bar-row { display: grid; grid-template-columns: 80px 1fr 48px; align-items: center; gap: 10px; }
+  .bar-name { font-weight: 700; font-size: 15px; overflow-wrap: anywhere; }
+  .bar-track { position: relative; height: 18px; background: #ece5d8; border-radius: 9px; overflow: hidden; }
+  .bar-fill { height: 100%; width: 0; border-radius: 9px; background: var(--ink); transition: width 0.4s ease; }
+  .bar-mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--amber); transition: left 0.3s; }
+  .bar-pct { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+  .threshold-note { margin: 10px 0 0; font-size: 13px; color: var(--ink-soft); }
+  .threshold-note b { color: var(--amber); }
+
+  @media (min-width: 900px) {
+    main { max-width: 1000px; }
+    .layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; align-items: start; }
+    .layout .card { margin-bottom: 0; }
+  }
+
+  footer { margin-top: 24px; font-size: 12px; color: var(--ink-soft); text-align: center; }
+
+  @media (max-width: 420px) {
+    header h1 { font-size: 26px; }
+    #answer { font-size: 18px; }
+    .bar-row { grid-template-columns: 70px 1fr 44px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🍌 바나나 언제 먹지?</h1>
+    <p>바나나 사진을 넣으면 지금 먹을지, 기다릴지 알려 줘요.</p>
+  </header>
+  <p class="sample-note">수업용 예시 화면이에요. 진짜 모델 대신 사진마다 미리 정해 둔 결과를 보여 줍니다. 여러분이 만들 프로그램에서는 Teachable Machine 모델이 직접 계산해요.</p>
+
+  <div class="layout">
+  <section class="card" aria-label="사진 고르기">
+    <p class="card-title">사진을 하나 눌러 보세요</p>
+    <div class="samples" id="samples"></div>
+    <div class="threshold" id="threshold">기준값</div>
+  </section>
+
+  <section class="card" aria-label="결과" aria-live="polite">
+    <div id="answer" class="empty"><span class="emoji" id="answerEmoji"></span><span id="answerText">사진을 고르면 여기에 결과가 나와요.</span></div>
+    <div class="bars" id="bars"></div>
+    <p class="threshold-note" id="thresholdNote"></p>
+  </section>
+  </div>
+
+  <footer>예시 그림: 수업용 생성 이미지 · 결과 수치는 설명을 위해 정한 예시입니다.</footer>
+</main>
+
+<script>
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+ * ★★★★★ 이 파일의 주인이 나중에 이 값들만 고칩니다 ★★★★★
+ * CLASS_RESPONSES : 클래스 이름마다 보여 줄 문장 · 이모지 · 색
+ * THRESHOLD       : 기준값(0~1). 가장 높은 신뢰도가 이보다 낮으면 답하지 않습니다
+ * UNKNOWN_MESSAGE : 기준값보다 낮을 때 보여 줄 문장
+ * (학생 프로그램에는 여기에 MODEL_URL이 더 있습니다. 이 예시는 모델 대신 SAMPLES의 값을 씁니다.)
+ * ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+const CLASS_RESPONSES = {
+  "덜 익음":   { message: "아직 일러요. 2~3일 실온에 두세요.",            emoji: "🟢", color: "#4f8a2f" },
+  "딱 좋음":   { message: "지금이 딱 먹기 좋아요!",                       emoji: "🍌", color: "#b47d00" },
+  "너무 익음": { message: "오늘 꼭 드세요. 바나나 빵이나 스무디도 좋아요.", emoji: "🟤", color: "#8a4b2a" }
+};
+
+let THRESHOLD = 0.7;   // 0~1 사이 값 (이 예시에서는 아래 버튼으로 바꿔 볼 수 있습니다)
+
+const UNKNOWN_MESSAGE = "🤔 잘 모르겠어요. 밝은 곳에서 바나나만 크게 다시 찍어 주세요.";
+
+/* 예시 사진과 미리 정해 둔 신뢰도 (진짜 모델이 아니라 설명용 값) */
+const SAMPLES = [
+  { file: "samples/banana-green.jpg",   name: "초록 바나나",     p: { "덜 익음": 0.96, "딱 좋음": 0.04, "너무 익음": 0.00 } },
+  { file: "samples/banana-yellow.jpg",  name: "노란 바나나",     p: { "덜 익음": 0.02, "딱 좋음": 0.95, "너무 익음": 0.03 } },
+  { file: "samples/banana-spotted.jpg", name: "반점 바나나",     p: { "덜 익음": 0.00, "딱 좋음": 0.07, "너무 익음": 0.93 } },
+  { file: "samples/banana-turning.jpg", name: "반쯤 익은 바나나", p: { "덜 익음": 0.76, "딱 좋음": 0.23, "너무 익음": 0.01 } },
+  { file: "samples/banana-dim.jpg",     name: "어두운 곳",       p: { "덜 익음": 0.44, "딱 좋음": 0.31, "너무 익음": 0.25 } },
+  { file: "samples/banana-chamoe.jpg",  name: "참외",           p: { "덜 익음": 0.03, "딱 좋음": 0.90, "너무 익음": 0.07 } }
+];
+
+  const labels = Object.keys(CLASS_RESPONSES);
+  const samplesEl = document.getElementById("samples");
+  const thresholdEl = document.getElementById("threshold");
+  const answerEl = document.getElementById("answer");
+  const answerEmoji = document.getElementById("answerEmoji");
+  const answerText = document.getElementById("answerText");
+  const barsEl = document.getElementById("bars");
+  const thresholdNote = document.getElementById("thresholdNote");
+  let current = null;
+
+  function buildBars() {
+    barsEl.textContent = "";
+    labels.forEach(function (name) {
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      row.dataset.name = name;
+
+      const nameEl = document.createElement("span");
+      nameEl.className = "bar-name";
+      nameEl.textContent = name;
+
+      const track = document.createElement("div");
+      track.className = "bar-track";
+      const fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.background = CLASS_RESPONSES[name].color;
+      const mark = document.createElement("div");
+      mark.className = "bar-mark";
+      track.appendChild(fill);
+      track.appendChild(mark);
+
+      const pct = document.createElement("span");
+      pct.className = "bar-pct";
+      pct.textContent = "0%";
+
+      row.appendChild(nameEl);
+      row.appendChild(track);
+      row.appendChild(pct);
+      barsEl.appendChild(row);
+    });
+  }
+
+  function updateThresholdNote() {
+    barsEl.querySelectorAll(".bar-mark").forEach(function (m) {
+      m.style.left = Math.round(THRESHOLD * 100) + "%";
+    });
+    thresholdNote.textContent = "";
+    const b = document.createElement("b");
+    b.textContent = "주황색 선";
+    thresholdNote.appendChild(b);
+    thresholdNote.appendChild(document.createTextNode(
+      "은 기준값 " + Math.round(THRESHOLD * 100) + "%예요. 가장 높은 막대가 이 선을 넘어야 답을 알려 줘요."
+    ));
+  }
+
+  function showResult(sample) {
+    let bestName = labels[0];
+    labels.forEach(function (name) {
+      const prob = sample.p[name] || 0;
+      if (prob > (sample.p[bestName] || 0)) bestName = name;
+      const row = barsEl.querySelector('[data-name="' + CSS.escape(name) + '"]');
+      const percent = Math.round(prob * 100);
+      row.querySelector(".bar-fill").style.width = percent + "%";
+      row.querySelector(".bar-pct").textContent = percent + "%";
+    });
+
+    answerEl.classList.remove("empty", "unknown");
+    answerEl.style.borderColor = "";
+    answerEl.style.color = "";
+    const response = CLASS_RESPONSES[bestName];
+    if (sample.p[bestName] >= THRESHOLD) {
+      answerEmoji.textContent = response.emoji;
+      answerText.textContent = response.message;
+      answerEl.style.borderColor = response.color;
+      answerEl.style.color = response.color;
+    } else {
+      answerEl.classList.add("unknown");
+      answerEmoji.textContent = "";
+      answerText.textContent = UNKNOWN_MESSAGE;
+    }
+  }
+
+  SAMPLES.forEach(function (s) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "sample";
+    const img = document.createElement("img");
+    img.src = s.file;
+    img.alt = s.name;
+    const cap = document.createElement("span");
+    cap.textContent = s.name;
+    btn.appendChild(img);
+    btn.appendChild(cap);
+    btn.addEventListener("click", function () {
+      samplesEl.querySelectorAll(".sample").forEach(function (el) { el.classList.remove("on"); });
+      btn.classList.add("on");
+      current = s;
+      showResult(s);
+    });
+    samplesEl.appendChild(btn);
+  });
+
+  [0.5, 0.6, 0.7, 0.8, 0.9].forEach(function (v) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = Math.round(v * 100) + "%";
+    if (v === THRESHOLD) btn.classList.add("on");
+    btn.addEventListener("click", function () {
+      THRESHOLD = v;
+      thresholdEl.querySelectorAll("button").forEach(function (el) { el.classList.remove("on"); });
+      btn.classList.add("on");
+      updateThresholdNote();
+      if (current) showResult(current);
+    });
+    thresholdEl.appendChild(btn);
+  });
+
+  buildBars();
+  updateThresholdNote();
+</script>
+</body>
+</html>

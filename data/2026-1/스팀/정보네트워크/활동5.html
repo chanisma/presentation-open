@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>활동 5 · 프로젝트 진행 워크북 — 디지털 네트워크와 행렬 [정보편]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FDFDFB;--card:#FFFFFF;--ink:#33415C;--ink-soft:#7B8698;--rule:#D5DBE1;--teal:#3E9C93;--coral:#E8705A;--mustard:#E4B04A;--teal-wash:rgba(62,156,147,0.09);--coral-wash:rgba(232,112,90,0.10);--mustard-wash:rgba(228,176,74,0.16);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.6;padding-bottom:96px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  header{background:var(--paper);border-bottom:1px solid var(--rule);padding:20px 28px 0;position:relative;}
+  .backlink{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--teal);text-decoration:none;font-weight:500;margin-bottom:12px;}
+  .backlink:hover{text-decoration:underline;}
+  header h1{font-size:24px;font-weight:700;color:var(--teal);letter-spacing:-0.01em;}
+  header .sub{font-size:13.5px;color:var(--ink-soft);margin-top:5px;}
+  .head-actions{position:absolute;top:18px;right:28px;display:flex;gap:8px;}
+  .icon-btn{background:transparent;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;border-radius:8px;cursor:pointer;font:500 13px 'Noto Sans KR';}
+  .icon-btn:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttabs{display:flex;gap:4px;margin-top:16px;flex-wrap:wrap;}
+  .acttab{font-size:12.5px;padding:8px 14px;border:1px solid var(--rule);border-bottom:none;border-radius:9px 9px 0 0;background:var(--paper);color:var(--ink-soft);text-decoration:none;}
+  .acttab:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttab.on{background:var(--card);color:var(--teal);font-weight:700;border-color:var(--teal);border-bottom:1px solid var(--card);position:relative;top:1px;}
+  #settingsPanel{display:none;max-width:1000px;margin:16px auto 0;padding:16px 18px;background:var(--card);border:1px dashed var(--rule);border-radius:12px;}
+  #settingsPanel label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
+  #settingsPanel input{width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:8px;font:14px 'Noto Sans KR';color:var(--ink);}
+  #settingsPanel .row{display:flex;gap:8px;margin-top:10px;}
+  main{max-width:1000px;margin:0 auto;padding:24px 28px;}
+
+  /* 진행률 바 */
+  .progresswrap{position:sticky;top:0;z-index:30;background:rgba(253,253,251,0.96);backdrop-filter:blur(4px);padding:12px 0 10px;margin:-4px 0 18px;border-bottom:1px solid var(--rule);}
+  .progresswrap .lab{font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;display:flex;justify-content:space-between;}
+  .progresswrap .lab b{color:var(--teal);}
+  .ptrack{height:8px;border-radius:6px;background:var(--rule);overflow:hidden;}
+  .pfill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--mustard));transition:width .4s ease;}
+
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;margin-bottom:20px;position:relative;}
+  .card>h2{font-size:18px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .stepnum{flex:none;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;}
+  .stepkind{font-size:11px;font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:12px;margin-left:auto;flex:none;}
+  .stepkind.proc{background:var(--teal-wash);color:var(--teal);}
+  .stepkind.result{background:var(--coral-wash);color:var(--coral);}
+  .goal{font-size:13px;color:var(--ink-soft);margin:2px 0 0 40px;padding-bottom:14px;}
+  .goal b{color:var(--ink);}
+
+  .example{background:#FBFAF7;border:1px solid var(--rule);border-left:3px solid var(--mustard);border-radius:10px;padding:14px 16px;margin-bottom:16px;}
+  .example .lab{font-size:11.5px;font-weight:700;letter-spacing:.03em;color:#9a7a1e;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .example .row{font-size:13px;color:var(--ink);margin-bottom:5px;line-height:1.65;}
+  .example .row:last-child{margin-bottom:0;}
+  .example .row b{color:var(--teal);}
+  .example .k{display:inline-block;min-width:96px;color:var(--ink-soft);font-size:12px;}
+  .example code, .codeblk{font-family:'JetBrains Mono',monospace;font-size:12.5px;}
+  .codeblk{display:block;background:#2C3444;color:#E7ECF3;border-radius:8px;padding:12px 14px;margin-top:8px;white-space:pre-wrap;line-height:1.6;overflow-x:auto;}
+  .codeblk .cm{color:#8B98A8;}.codeblk .kw{color:#E4B04A;}.codeblk .res{color:#7FD1A6;}
+
+  .mine{border-top:1px dashed var(--rule);padding-top:14px;}
+  .mine .lab{font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--teal);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;}
+  .field label .tag{font-size:11.5px;color:var(--ink-soft);font-weight:400;}
+  .field input,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:9px;font:14px 'Noto Sans KR';color:var(--ink);background:var(--paper);}
+  .field textarea{resize:vertical;min-height:64px;line-height:1.7;}
+  .field textarea.mono{font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--teal);background:#fff;}
+  .subrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:560px){.subrow{grid-template-columns:1fr;}}
+
+  .aitip{background:var(--teal-wash);border-radius:8px;padding:9px 12px;font-size:12.5px;color:#2f7268;margin:12px 0 0;}
+  .aitip b{color:var(--teal);}
+
+  /* 분야를 바꾸면 — 다분야 변주 박스 */
+  .variant{background:#fff;border:1px dashed var(--coral);border-radius:10px;padding:12px 14px;margin-bottom:16px;}
+  .variant .vlab{font-size:11.5px;font-weight:700;color:var(--coral);margin-bottom:9px;display:flex;align-items:center;gap:6px;}
+  .variant .vrow{font-size:12.5px;line-height:1.6;margin-bottom:7px;color:var(--ink);display:flex;gap:9px;}
+  .variant .vrow:last-child{margin-bottom:0;}
+  .variant .vd{flex:none;align-self:flex-start;font-weight:700;color:#7a5a12;background:var(--mustard-wash);border-radius:9px;padding:2px 8px;font-size:10.5px;min-width:70px;text-align:center;}
+  .variant .vrow .vt b{color:var(--teal);font-weight:700;}
+
+  /* STEP1 관계 표(클릭 그리드) — 활동1과 같은 방식 */
+  .mtable{border-collapse:collapse;}
+  .mtable th{font-size:12px;font-weight:500;color:var(--ink-soft);padding:4px;max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mtable th.rowh{text-align:right;padding-right:8px;}
+  .cell{width:38px;height:38px;border:1px solid var(--rule);border-radius:7px;background:var(--paper);color:var(--ink);font:600 14px 'Noto Sans KR';cursor:pointer;}
+  .cell:hover:not(:disabled){border-color:var(--teal);}
+  .cell.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .cell:disabled{background:#F1F3F5;color:#B6BCC5;cursor:default;border-style:dashed;}
+  .modetoggle{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;}
+  .modeopt{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink);cursor:pointer;}
+  .modeopt input{accent-color:var(--teal);}
+  .modeopt .tag{font-size:11.5px;color:var(--ink-soft);font-weight:400;}
+  .cell.wtd{width:48px;padding:0;text-align:center;font:600 13px 'JetBrains Mono',monospace;cursor:text;}
+  .gridwrap{margin-top:10px;overflow-x:auto;}
+  .gridempty{font-size:13px;color:var(--ink-soft);padding:12px 14px;background:var(--paper);border:1px dashed var(--rule);border-radius:9px;}
+  .gridstat{font-size:12.5px;color:var(--ink-soft);margin-top:9px;}
+  .gridstat b{color:var(--teal);}
+  .btnmini{padding:7px 12px;font-size:12.5px;margin-top:8px;}
+  @media(max-width:640px){.cell{width:33px;height:33px;font-size:13px;}}
+
+  /* STEP2 · 1단계 표 → 파이썬 코드 (라이브) */
+  .s2code{margin-bottom:16px;}
+  .s2code .lab2{font-size:11.5px;font-weight:700;color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .s2code .lab2 .sub2{font-weight:400;color:var(--ink-soft);}
+  .s2code .codeblk{margin-top:0;}
+  .copied{color:var(--teal)!important;border-color:var(--teal)!important;}
+
+  .donecheck{margin-top:14px;display:flex;align-items:center;gap:9px;padding:10px 13px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);cursor:pointer;}
+  .donecheck:hover{border-color:var(--teal);}
+  .donecheck.on{background:var(--teal-wash);border-color:var(--teal);}
+  .donecheck input{width:18px;height:18px;accent-color:var(--teal);}
+  .donecheck .t{font-size:13px;font-weight:600;color:var(--ink);}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+
+  .btn{padding:10px 18px;border:none;border-radius:9px;cursor:pointer;font:600 14px 'Noto Sans KR';transition:opacity .15s;}
+  .btn:hover{opacity:.88;}.btn:active{transform:translateY(1px);}
+  .btn-teal{background:var(--teal);color:#fff;}.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}
+  .btn-draft{background:var(--mustard);color:#3D2E06;}.btn-load{background:#7C3AED;color:#fff;}
+  .btn-reset{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}.btn-submit{background:var(--teal);color:#fff;padding:10px 24px;}
+  .actionbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(253,253,251,0.97);border-top:1px solid var(--rule);padding:12px 28px;}
+  .actionbar .inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+  .actionbar .spacer{flex:1;}.draft-label{font-size:12.5px;color:var(--ink-soft);}
+  #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:60;max-width:88vw;text-align:center;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}#toast.success{background:var(--teal);}#toast.error{background:var(--coral);}
+  @media print{.head-actions,.actionbar,#settingsPanel,.acttabs,.backlink,#toast,.progresswrap{display:none!important;}body{padding-bottom:0;}.card{break-inside:avoid;}}
+  @media(max-width:640px){main{padding:18px 14px;}.card{padding:18px 16px;}.goal{margin-left:0;}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="a-fox"><path d="M-16-14L-6-6-16-2z" fill="#E8705A"/><path d="M16-14L6-6 16-2z" fill="#E8705A"/><circle cx="0" cy="2" r="16" fill="#E8705A"/><path d="M0 18L-9 6 9 6z" fill="#FDFDFB"/><circle cx="-6" cy="0" r="2.3" fill="#33415C"/><circle cx="6" cy="0" r="2.3" fill="#33415C"/></g>
+  <g id="a-bird"><circle cx="0" cy="0" r="15" fill="#E4B04A"/><path d="M-15 0Q-24-4-22 4z" fill="#E4B04A"/><circle cx="4" cy="-3" r="2.3" fill="#33415C"/><path d="M13-2l7-2-4 5z" fill="#E8705A"/></g>
+</defs></svg>
+
+<header>
+  <div class="wrap">
+    <a class="backlink" href="index.html">← 슬라이드덱으로 돌아가기</a>
+    <h1>활동 5 · 프로젝트 진행 워크북</h1>
+    <div class="sub">설계한 프로젝트를 <b>실제로 완성</b>하기까지 — 예시를 따라 우리 모둠 것을 한 단계씩 채워 보세요 &nbsp;·&nbsp; 슬라이드 21~26 이후</div>
+    <div class="acttabs">
+      <a class="acttab" href="활동1.html">활동 1 · 파이썬 실습</a>
+      <a class="acttab" href="활동2.html">활동 2 · 중심성 비교</a>
+      <a class="acttab" href="활동3.html">활동 3 · AI 프롬프트</a>
+      <a class="acttab" href="활동4.html">활동 4 · 프로젝트 설계</a>
+      <a class="acttab on" href="활동5.html">활동 5 · 프로젝트 진행</a>
+      <a class="acttab" href="활동6.html">활동 6 · 심화 결과물</a>
+    </div>
+  </div>
+  <div class="head-actions">
+    <button class="icon-btn" id="btnPrint" type="button">인쇄</button>
+    <button class="icon-btn" id="btnSettings" type="button" title="교사 설정">⚙</button>
+  </div>
+</header>
+
+<div id="settingsPanel">
+  <label for="urlInput">Apps Script 배포 URL (교사 전용)</label>
+  <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row"><button class="btn btn-teal" id="btnSaveUrl" type="button">URL 저장</button><button class="btn btn-ghost" id="btnClearUrl" type="button">초기화</button></div>
+</div>
+
+<main>
+  <div class="progresswrap">
+    <div class="lab"><span>프로젝트 진행률 <span class="tag" style="color:var(--ink-soft)">— 각 단계 완료 체크로 채워집니다</span></span><b id="progText">0 / 5 단계</b></div>
+    <div class="ptrack"><div class="pfill" id="pfill"></div></div>
+  </div>
+
+  <section class="card">
+    <h2>기본 정보</h2>
+    <div class="goal" style="margin-left:0;padding-bottom:12px;">활동 4에서 설계한 프로젝트를 이어서 진행합니다. 아래 <b>📎 예시 프로젝트</b>(활동 2의 '옆 반' 관계망)를 축으로 따라가되, 각 단계의 <b style="color:var(--coral)">🔀 분야를 바꾸면</b> 박스에서 교통·생물·역사·확산 등 <b>다른 분야</b>는 그 단계가 어떻게 달라지는지 확인하세요.</div>
+    <div class="grid2">
+      <div class="field" style="margin-bottom:0;"><label for="studentName">이름 <span style="color:var(--coral)">*</span></label><input type="text" id="studentName" placeholder="홍길동"></div>
+      <div class="field" style="margin-bottom:0;"><label for="classInfo">반 / 번호 <span style="color:var(--coral)">*</span></label><input type="text" id="classInfo" placeholder="1학년 3반 12번"></div>
+    </div>
+    <div class="field" style="margin-top:14px;"><label for="teamName">모둠 이름 <span class="tag">(개인이면 비워도 됩니다)</span></label><input type="text" id="teamName" placeholder="예) 3반 연결고리팀"></div>
+    <div class="field" style="margin-bottom:0;"><label for="topic">우리 프로젝트 한 줄 소개 <span class="tag">(활동 4의 질문을 옮겨 적으세요)</span></label><input type="text" id="topic" placeholder="예) 우리 반에서 누가 두 무리를 잇는 다리일까? 모둠을 짤 때 어떻게 활용할까?"></div>
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="card">
+    <h2><span class="stepnum">1</span> 데이터 모으기 <span class="stepkind proc">과정</span></h2>
+    <div class="goal"><b>목표:</b> 머릿속 관계를 <b>셀 수 있는 데이터</b>로 바꾼다 — 설문·관찰로 모아 인접행렬(0·1 표)을 만든다.</div>
+    <div class="example">
+      <div class="lab">📎 예시 — "옆 반 다리 찾기" 프로젝트</div>
+      <div class="row"><span class="k">수집 방법</span> 옆 반 7명에게 "쉬는 시간에 자주 함께 있는 친구"를 서로 적게 함 (무방향·가중치 없음)</div>
+      <div class="row"><span class="k">모은 관계</span> 소라–바다, 소라–하늘, 바다–하늘, 하늘–<b>나루</b>, <b>나루</b>–별, 별–달, 별–해, 달–해 (총 8개)</div>
+      <div class="row"><span class="k">인접행렬</span> 7×7 표. 관계 있으면 1, 없으면 0 — 활동 1에서 만든 방식 그대로</div>
+    </div>
+    <div class="variant">
+      <div class="vlab">🔀 분야를 바꾸면 — 데이터는 이렇게 모아요</div>
+      <div class="vrow"><span class="vd">교통</span><span class="vt">노선도·시간표(공개 데이터)에서 <b>역–노선 연결</b>을 표로 옮긴다</span></div>
+      <div class="vrow"><span class="vd">생물</span><span class="vt">생태 도감에서 종 사이 <b>먹고–먹힘</b>을 조사해 방향 있는 화살표로 적는다</span></div>
+      <div class="vrow"><span class="vd">역사</span><span class="vt">문집·연보에서 학자들이 <b>주고받은 편지</b>를 세어 인접행렬로 만든다</span></div>
+    </div>
+    <div class="mine">
+      <div class="lab">✍ 우리 모둠 차례</div>
+      <div class="field"><label for="s1_method">① 데이터 수집 방법 <span class="tag">(설문·관찰·기록 등)</span></label><textarea id="s1_method" placeholder="예) 반 친구들에게 '점심시간에 자주 어울리는 친구 3명'을 익명 설문"></textarea></div>
+      <div class="field"><label for="s1_nodes">② 노드(점) 이름 먼저 정하기 <span class="tag">— 쉼표로 구분하면 아래 표가 만들어집니다</span></label>
+        <input type="text" id="s1_nodes" placeholder="예) 소라, 바다, 하늘, 나루, 별, 달, 해">
+        <button class="btn btn-ghost btnmini" id="btnSampleNodes" type="button">예시(옆 반) 채우기</button>
+      </div>
+      <div class="field">
+        <label>③ 관계(엣지) 표 채우기 <span class="tag">— 두 사람이 관계 있으면 칸을 눌러 1로(0-1 방식) 또는 숫자를 직접 입력(가중치 방식)</span></label>
+        <div class="modetoggle" id="s1ModeToggle">
+          <label class="modeopt"><input type="radio" name="s1_mode" value="binary" checked><span>0-1 방식 <span class="tag">(있다/없다)</span></span></label>
+          <label class="modeopt"><input type="radio" name="s1_mode" value="weighted"><span>가중치 방식 <span class="tag">(숫자 직접 입력)</span></span></label>
+        </div>
+        <div class="modetoggle" id="s1DirToggle">
+          <label class="modeopt"><input type="radio" name="s1_dir" value="undirected" checked><span>쌍방향 <span class="tag">(무방향 — 한 칸 입력 시 반대쪽도 자동으로 채워짐)</span></span></label>
+          <label class="modeopt"><input type="radio" name="s1_dir" value="directed"><span>일방향 <span class="tag">(방향 있음 — 행의 사람 → 열의 사람. 반대쪽은 따로 입력)</span></span></label>
+        </div>
+        <div class="gridwrap" id="s1GridWrap">
+          <div class="gridempty" id="s1GridEmpty">먼저 위에 노드 이름을 <b>2명 이상</b> 적어 주세요.</div>
+          <table class="mtable" id="s1Matrix" style="display:none;"></table>
+        </div>
+        <div class="gridstat" id="s1GridStat">노드 <b>0</b>개 · 관계 <b>0</b>개</div>
+      </div>
+      <div class="aitip">💡 <b>AI 활용:</b> 노드가 아주 많으면 "다음 관계 목록을 파이썬 인접행렬로 바꿔줘"처럼 부탁해 표 만들기를 도울 수 있어요. 여기서 만든 표는 <b>활동 6</b>에서 그대로 씁니다.</div>
+      <label class="donecheck"><input type="checkbox" data-step="1"><span class="t">✅ 노드를 정하고 관계 표를 완성했다</span></label>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card">
+    <h2><span class="stepnum">2</span> 코드로 계산하기 <span class="stepkind proc">과정</span></h2>
+    <div class="goal"><b>목표:</b> 배운 파이썬 + <b>AI의 도움</b>으로 중심성 지표를 계산한다. 코드를 다 이해하지 못해도 좋다 — <b>무엇을 왜 계산하는지</b>가 핵심.</div>
+    <div class="example">
+      <div class="lab">📎 예시 — AI에게 이렇게 부탁했어요</div>
+      <div class="row"><span class="k">보낸 프롬프트</span> "인접행렬 A에서 연결·근접·매개 중심성을 NetworkX로 구하고, 값이 큰 순으로 상위 3명을 출력하는 코드를 만들어줘. 각 줄이 무슨 일을 하는지 주석으로 설명해줘."</div>
+      <code class="codeblk"><span class="cm"># AI가 준 코드 (역할만 이해하면 충분)</span>
+<span class="kw">import</span> networkx <span class="kw">as</span> nx
+G = nx.from_numpy_array(A)      <span class="cm"># 행렬 A로 그래프 만들기</span>
+nx.betweenness_centrality(G)    <span class="cm"># 매개 중심성 = 다리 역할</span>
+<span class="res">→ 매개 1위 나루 0.60 · 하늘/별 0.53</span>
+<span class="res">→ 연결 1위 하늘·별 0.50 · 근접 1위 나루 0.60</span></code>
+      <div class="row" style="margin-top:8px;"><span class="k">읽어낸 결과</span> 연결이 많은 사람(하늘·별)과 다리 역할(나루)이 <b>다르다</b> — 활동 2에서 본 반전 그대로!</div>
+    </div>
+    <div class="variant">
+      <div class="vlab">🔀 분야마다 계산하는 지표가 달라요</div>
+      <div class="vrow"><span class="vd">교통·구조</span><span class="vt"><b>매개 중심성</b>으로 환승 길목(꼭 거쳐야 하는 역)을 찾는다</span></div>
+      <div class="vrow"><span class="vd">생물·취약</span><span class="vt"><b>차수·단절점</b>으로 핵심종(사라지면 생태계가 흔들리는 종)을 찾는다</span></div>
+      <div class="vrow"><span class="vd">확산형</span><span class="vt">행렬 곱 <b>x₊₁ = A·x</b>로 몇 단계 만에 전체에 퍼지는지 계산한다</span></div>
+    </div>
+    <div class="mine">
+      <div class="lab">✍ 우리 모둠 차례</div>
+      <div class="s2code">
+        <div class="lab2">🔗 1단계에서 만든 우리 행렬 → 파이썬 코드 <span class="sub2">— 이 코드를 복사해 아래 프롬프트·Colab에 붙여넣으세요</span></div>
+        <div class="gridempty" id="s2CodeEmpty">먼저 <b>1단계 · 데이터 모으기</b>에서 관계 표를 완성하면, 여기에 우리 행렬이 <b>코드로</b> 나타납니다.</div>
+        <code class="codeblk" id="s2Code" style="display:none;"></code>
+        <button class="btn btn-ghost btnmini" id="btnCopyMatrix" type="button" style="display:none;">📋 코드 복사</button>
+      </div>
+      <div class="field"><label for="s2_prompt">① AI에게 보낼(보낸) 프롬프트 <span class="tag">— 활동 3의 4요소를 담아, 위 <b>A</b>를 붙여넣어</span></label><textarea id="s2_prompt" class="mono" placeholder="예) 위 인접행렬 A에서 매개 중심성을 NetworkX로 구하고 상위 3명을 출력하는 코드를 만들어줘. 각 줄 역할을 주석으로 달아줘."></textarea></div>
+      <div class="field"><label for="s2_code">② AI가 준 결과 코드 <span class="tag">— 프롬프트로 받아 Colab에서 실행해 본 코드를 그대로 붙여넣기</span></label><textarea id="s2_code" class="mono" placeholder="예)&#10;import networkx as nx&#10;import numpy as np&#10;G = nx.from_numpy_array(np.array(A))   # 위 A로 그래프 만들기&#10;bt = nx.betweenness_centrality(G)      # 매개 중심성&#10;print(sorted(bt.items(), key=lambda x: -x[1])[:3])"></textarea></div>
+      <div class="subrow">
+        <div class="field"><label for="s2_metric">③ 우리가 계산한 지표</label><textarea id="s2_metric" placeholder="예) 연결·매개 중심성 (다리 역할을 찾고 싶어서)"></textarea></div>
+        <div class="field"><label for="s2_result">④ 계산 결과(상위 3명·값)</label><textarea id="s2_result" placeholder="예) 매개 1위 다온 0.42, 2위 나래 0.31 ..."></textarea></div>
+      </div>
+      <div class="aitip">💡 <b>AI 활용:</b> 코드에 이해 안 되는 줄이 있으면 "이 줄이 무슨 일을 하는지 더 쉽게 설명해줘"라고 다시 물어보세요. <b>기술보다 결과의 의미</b>가 중요합니다.</div>
+      <label class="donecheck"><input type="checkbox" data-step="2"><span class="t">✅ 지표 값을 계산해 냈다</span></label>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card">
+    <h2><span class="stepnum">3</span> 그림으로 보고 해석하기 <span class="stepkind proc">과정</span></h2>
+    <div class="goal"><b>목표:</b> 숫자를 그래프로 그려 <b>구조를 눈으로</b> 확인하고, "그래서 이 값이 무슨 뜻인가"를 우리 말로 설명한다.</div>
+    <div class="example">
+      <div class="lab">📎 예시 — 그래프가 말해준 것</div>
+      <div class="row"><span class="k">보이는 구조</span> {소라·바다·하늘} 무리와 {별·달·해} 무리가 <b>나루 한 명</b>을 통해서만 이어짐 — 두 삼각형을 잇는 외길</div>
+      <div class="row"><span class="k">우리의 해석</span> 나루는 친구가 2명뿐이라 '연결'은 낮지만, 두 무리의 <b>유일한 다리</b>라서 '매개'가 가장 높다. 인기(연결)와 영향력(매개)은 다른 것.</div>
+    </div>
+    <div class="variant">
+      <div class="vlab">🔀 그래프가 분야마다 다른 걸 보여줘요</div>
+      <div class="vrow"><span class="vd">교통</span><span class="vt">노선망에서 <b>환승 허브</b> 역이 크게 — 여기가 막히면 파장이 크다</span></div>
+      <div class="vrow"><span class="vd">스포츠</span><span class="vt">패스망에서 <b>공이 몰리는 핵심 선수</b>가 한눈에 보인다</span></div>
+      <div class="vrow"><span class="vd">역사</span><span class="vt">편지 네트워크에서 <b>사상 전파의 중심 인물</b>이 드러난다</span></div>
+    </div>
+    <div class="mine">
+      <div class="lab">✍ 우리 모둠 차례</div>
+      <div class="field"><label for="s3_structure">① 우리 그래프에서 보이는 구조 <span class="tag">(무리·다리·외톨이 등)</span></label><textarea id="s3_structure" placeholder="예) 두 개의 큰 무리가 다온을 통해 연결됨. 라온은 아무와도 이어지지 않은 외톨이."></textarea></div>
+      <div class="field" style="margin-bottom:0;"><label for="s3_interpret">② 지표 해석 — <b>왜 이 사람이 중요한가?</b> <span class="tag">우리 말로 설명</span></label><textarea id="s3_interpret" placeholder="예) 다온은 두 무리를 잇는 다리라 정보가 다온을 거쳐야만 반대편에 전해진다."></textarea></div>
+      <div class="aitip">💡 <b>AI 활용:</b> "nx.draw로 그래프를 그리되 매개 중심성이 높은 노드를 크고 진하게 표시해줘"처럼 부탁하면 중요한 사람이 그림에서 바로 보입니다.</div>
+      <label class="donecheck"><input type="checkbox" data-step="3"><span class="t">✅ 그래프를 그리고 의미를 해석했다</span></label>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card">
+    <h2><span class="stepnum">4</span> 실험하고 개입 설계하기 <span class="stepkind result">결과</span></h2>
+    <div class="goal"><b>목표:</b> "선/노드를 하나 바꾸면?"을 <b>직접 실험</b>해 개입의 효과를 정량화하고, "그래서 무엇을 하자"는 <b>제안</b>을 만든다.</div>
+    <div class="example">
+      <div class="lab">📎 예시 — 다리를 지웠더니</div>
+      <div class="row"><span class="k">한 실험</span> "나루가 전학 가면?" → 코드로 나루 노드를 지워보니 네트워크가 <b>두 조각으로 분리</b>(연결 성분 1개 → 2개)</div>
+      <div class="row"><span class="k">발견</span> 나루는 단절점(articulation point). 이 한 명에게 두 무리의 소통이 전부 걸려 있어 <b>취약</b>하다.</div>
+      <div class="row"><span class="k">개입 제안</span> 모둠을 짤 때 두 무리에서 한 명씩 섞어 <b>새 다리 2개</b>를 만든다 → 나루 혼자 지던 부담을 나누고, 나루가 빠져도 반이 갈라지지 않게.</div>
+    </div>
+    <div class="variant">
+      <div class="vlab">🔀 활동 4에서 고른 유형에 맞는 실험을 골라요</div>
+      <div class="vrow"><span class="vd">A 개입형</span><span class="vt">엣지를 <b>추가</b>해 본다 → 고립·쏠림이 나아지나? (예: 두 무리를 잇는 선 만들기)</span></div>
+      <div class="vrow"><span class="vd">B 확산형</span><span class="vt">배치·연결을 <b>바꿔</b> 본다 → 퍼짐이 얼마나 줄어드나? (x₊₁=A·x로 비교)</span></div>
+      <div class="vrow"><span class="vd">C 취약형</span><span class="vt">노드·엣지를 <b>지워</b> 본다 → 몇 조각으로 갈라지나? (단절점 찾기)</span></div>
+    </div>
+    <div class="mine">
+      <div class="lab">✍ 우리 모둠 차례</div>
+      <div class="field"><label for="s4_experiment">① 우리가 한 실험 <span class="tag">— 어떤 선/노드를 바꿔봤나?</span></label><textarea id="s4_experiment" placeholder="예) 다온을 지워봤다 / 라온과 다온 사이에 선을 추가해봤다"></textarea></div>
+      <div class="field"><label for="s4_change">② 결과가 어떻게 바뀌었나 <span class="tag">(값·구조 변화)</span></label><textarea id="s4_change" placeholder="예) 다온을 지우니 두 무리로 갈라졌다 / 라온이 외톨이에서 벗어났다"></textarea></div>
+      <div class="field" style="margin-bottom:0;"><label for="s4_propose">③ 그래서 무엇을 하자 — <b>우리의 제안</b></label><textarea id="s4_propose" placeholder="예) 라온이 참여할 공동 활동을 만들고, 다온에게 쏠린 연결을 분산하도록 모둠을 재배치하자."></textarea></div>
+      <div class="aitip">💡 <b>AI 활용:</b> "이 노드를 지웠을 때 그래프가 몇 개로 나뉘는지 세는 코드"나 "단절점을 찾는 코드"를 요청하면 취약점 실험을 자동화할 수 있습니다.</div>
+      <label class="donecheck"><input type="checkbox" data-step="4"><span class="t">✅ 실험으로 개선안을 도출했다</span></label>
+    </div>
+  </section>
+
+  <!-- STEP 5 -->
+  <section class="card">
+    <h2><span class="stepnum">5</span> 결론 내고 발표 준비하기 <span class="stepkind result">결과</span></h2>
+    <div class="goal"><b>목표:</b> 발견과 제안을 <b>한 편의 이야기</b>로 정리하고, "우리 답이 맞는지" 검증하고, 솔직한 한계를 밝힌다.</div>
+    <div class="example">
+      <div class="lab">📎 예시 — 발표 3장 + 검증</div>
+      <div class="row"><span class="k">발표 구성</span> ①질문: 누가 다리인가 → ②발견: 연결 1위(하늘·별)와 다리(나루)는 다르다, 나루가 빠지면 반이 쪼개진다 → ③제안: 새 다리를 만드는 모둠 편성</div>
+      <div class="row"><span class="k">검증</span> 우리 반 5명 작은 예로 손계산한 값과 코드 결과가 같은지 대조 → 일치 확인 (활동 3의 안전벨트)</div>
+      <div class="row"><span class="k">한계</span> "자주 함께 있다"는 설문이 주관적이고, 하루치 관찰이라 관계가 고정된 건 아님</div>
+    </div>
+    <div class="variant">
+      <div class="vlab">🔀 검증도 분야에 맞게</div>
+      <div class="vrow"><span class="vd">공개데이터</span><span class="vt">실제 자료(노선도·도감 등)와 코드 결과가 맞는지 대조한다</span></div>
+      <div class="vrow"><span class="vd">설문·관찰</span><span class="vt">작은 표본을 <b>손계산</b>해 코드 값과 같은지 확인한다 (활동 3의 안전벨트)</span></div>
+    </div>
+    <div class="mine">
+      <div class="lab">✍ 우리 모둠 차례</div>
+      <div class="field"><label for="s5_conclusion">① 결론 한 문장 <span class="tag">— 질문에 대한 우리의 답</span></label><textarea id="s5_conclusion" placeholder="예) 우리 반의 다리는 다온이며, 라온의 고립을 풀려면 다온-라온을 잇는 활동이 필요하다."></textarea></div>
+      <div class="subrow">
+        <div class="field"><label for="s5_verify">② 검증 방법 <span class="tag">— 결과가 맞는지 어떻게 확인?</span></label><textarea id="s5_verify" placeholder="예) 5명 작은 예로 손계산해 코드 값과 대조"></textarea></div>
+        <div class="field"><label for="s5_limit">③ 우리 프로젝트의 한계 / 배운 점</label><textarea id="s5_limit" placeholder="예) 설문이 주관적. AI로 계산은 빨랐지만 해석은 우리가 해야 했다."></textarea></div>
+      </div>
+      <div class="field" style="margin-bottom:0;"><label for="s5_roles">④ 발표 역할 분담 <span class="tag">(개인이면 발표 순서)</span></label><textarea id="s5_roles" placeholder="예) 질문·데이터(가은), 계산·그래프(다온), 제안·마무리(하늘)"></textarea></div>
+      <label class="donecheck"><input type="checkbox" data-step="5"><span class="t">✅ 결론·검증·발표 준비를 마쳤다</span></label>
+    </div>
+  </section>
+</main>
+
+<div class="actionbar"><div class="inner">
+  <button class="btn btn-load" id="btnLoad" type="button">불러오기</button>
+  <span class="draft-label" id="draftLabel">임시저장: —</span>
+  <span class="spacer"></span>
+  <button class="btn btn-reset" id="btnReset" type="button">초기화</button>
+  <button class="btn btn-draft" id="btnDraft" type="button">임시저장</button>
+  <button class="btn btn-submit" id="btnSubmit" type="button">제출하기</button>
+</div></div>
+<input type="file" id="fileInput" accept=".json" hidden>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var DEFAULT_URL='https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';var URL_KEY='sheets_url_net_activities';var DRAFT_KEY='draft_net_projectlog_2026';var INFO_KEY='net_student_info';var SOURCE='net_projectlog';
+  var FIELDS=['studentName','classInfo','teamName','topic',
+    's1_method','s1_nodes',
+    's2_prompt','s2_code','s2_metric','s2_result',
+    's3_structure','s3_interpret',
+    's4_experiment','s4_change','s4_propose',
+    's5_conclusion','s5_verify','s5_limit','s5_roles'];
+  function val(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+
+  /* STEP1 노드·관계 표(클릭 그리드) */
+  var s1nodes=[], s1A=[], s1Mode='binary', s1Directed=false;
+  function parseS1NodeInput(){return val('s1_nodes').split(',').map(function(s){return s.trim();}).filter(Boolean);}
+  function rebuildS1Nodes(){
+    var nn=parseS1NodeInput();
+    var na=nn.map(function(){return nn.map(function(){return 0;});});
+    for(var i=0;i<s1nodes.length;i++)for(var j=0;j<s1nodes.length;j++){
+      if(s1A[i]&&s1A[i][j]){var ni=nn.indexOf(s1nodes[i]),nj=nn.indexOf(s1nodes[j]);if(ni>=0&&nj>=0)na[ni][nj]=s1A[i][j];}
+    }
+    s1nodes=nn;s1A=na;renderGrid();
+  }
+  function setS1Mode(mode){
+    if(mode!==s1Mode&&mode==='binary'){
+      for(var i=0;i<s1A.length;i++)for(var j=0;j<s1A.length;j++)if(s1A[i][j])s1A[i][j]=1;
+    }
+    s1Mode=mode;renderGrid();scheduleDraft();
+  }
+  function setS1Direction(dir){
+    s1Directed=(dir==='directed');renderGrid();scheduleDraft();
+  }
+  function renderGrid(){
+    var t=document.getElementById('s1Matrix'),empty=document.getElementById('s1GridEmpty');
+    t.textContent='';var N=s1nodes.length;
+    if(N<2){empty.style.display='block';t.style.display='none';updateGridStat();renderS2Code();return;}
+    empty.style.display='none';t.style.display='';
+    var hr=document.createElement('tr');hr.appendChild(document.createElement('th'));
+    for(var c=0;c<N;c++){var th=document.createElement('th');th.textContent=s1nodes[c];th.title=s1nodes[c];hr.appendChild(th);}
+    t.appendChild(hr);
+    for(var i=0;i<N;i++){
+      var tr=document.createElement('tr');var rh=document.createElement('th');rh.className='rowh';rh.textContent=s1nodes[i];rh.title=s1nodes[i];tr.appendChild(rh);
+      for(var j=0;j<N;j++){
+        var td=document.createElement('td');
+        if(i===j){
+          var bt=document.createElement('button');bt.type='button';bt.className='cell';bt.textContent='0';bt.disabled=true;bt.title='자기 자신과의 관계는 0';
+          td.appendChild(bt);
+        }else if(s1Mode==='weighted'){
+          var inp=document.createElement('input');inp.type='number';inp.step='any';inp.min='0';inp.className='cell wtd';inp.value=s1A[i][j]?String(s1A[i][j]):'0';
+          (function(x,y,inpEl){inpEl.addEventListener('input',function(){var v=parseFloat(inpEl.value);if(isNaN(v)||v<0)v=0;s1A[x][y]=v;if(!s1Directed)s1A[y][x]=v;updateGridStat();renderS2Code();scheduleDraft();});
+            inpEl.addEventListener('change',function(){renderGrid();});})(i,j,inp);
+          td.appendChild(inp);
+        }else{
+          var bt2=document.createElement('button');bt2.type='button';bt2.className='cell'+(s1A[i][j]?' on':'');bt2.textContent=String(s1A[i][j]?1:0);
+          (function(x,y){bt2.addEventListener('click',function(){var v=s1A[x][y]?0:1;s1A[x][y]=v;if(!s1Directed)s1A[y][x]=v;renderGrid();scheduleDraft();});})(i,j);
+          td.appendChild(bt2);
+        }
+        tr.appendChild(td);
+      }
+      t.appendChild(tr);
+    }
+    updateGridStat();renderS2Code();
+  }
+  function updateGridStat(){
+    var n=s1nodes.length,m=0;
+    if(s1Directed){for(var i=0;i<n;i++)for(var j=0;j<n;j++)if(i!==j&&s1A[i]&&s1A[i][j])m++;}
+    else{for(var i2=0;i2<n;i2++)for(var j2=i2+1;j2<n;j2++)if(s1A[i2]&&s1A[i2][j2])m++;}
+    document.getElementById('s1GridStat').textContent='노드 '+n+'개 · 관계 '+m+'개';
+  }
+  function s1MatrixStr(){return s1A.map(function(r){return r.join(' ');}).join(' | ');}
+  function s1EdgesStr(){
+    var e=[];
+    if(s1Directed){
+      for(var i=0;i<s1nodes.length;i++)for(var j=0;j<s1nodes.length;j++)if(i!==j&&s1A[i][j])e.push(s1nodes[i]+'→'+s1nodes[j]+(s1Mode==='weighted'?'('+s1A[i][j]+')':''));
+    }else{
+      for(var i2=0;i2<s1nodes.length;i2++)for(var j2=i2+1;j2<s1nodes.length;j2++)if(s1A[i2][j2])e.push(s1nodes[i2]+'-'+s1nodes[j2]+(s1Mode==='weighted'?'('+s1A[i2][j2]+')':''));
+    }
+    return e.join(', ');
+  }
+
+  /* STEP2 · 1단계 표를 그대로 파이썬 코드로 (노드명은 사용자 입력 → textContent로만 렌더) */
+  function s2CodeStr(){
+    if(s1nodes.length<2)return '';
+    var quoted=s1nodes.map(function(n){return "'"+n.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";}).join(', ');
+    var rows=s1A.map(function(r,i){return '    ['+r.join(', ')+'],   # '+s1nodes[i];});
+    return '# 1단계에서 만든 관계 표 — 이 행렬 위에서 계산합니다\n'
+         +'nodes = ['+quoted+']\n'
+         +'A = [\n'+rows.join('\n')+'\n]';
+  }
+  function renderS2Code(){
+    var code=document.getElementById('s2Code'),empty=document.getElementById('s2CodeEmpty'),btn=document.getElementById('btnCopyMatrix');
+    if(!code)return;
+    var s=s2CodeStr();
+    if(!s){code.style.display='none';empty.style.display='block';if(btn)btn.style.display='none';return;}
+    empty.style.display='none';code.style.display='block';if(btn)btn.style.display='';
+    code.textContent=s;
+  }
+  function fallbackCopy(txt,cb){var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');cb&&cb();}catch(e){}document.body.removeChild(ta);}
+  function copyText(txt,btn){
+    function done(){if(btn){var o=btn.textContent;btn.textContent='✓ 복사됨';btn.classList.add('copied');setTimeout(function(){btn.textContent=o;btn.classList.remove('copied');},1600);}}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){fallbackCopy(txt,done);});}
+    else fallbackCopy(txt,done);
+  }
+  function fillSampleNodes(){
+    s1nodes=['소라','바다','하늘','나루','별','달','해'];
+    s1A=s1nodes.map(function(){return s1nodes.map(function(){return 0;});});
+    [[0,1],[0,2],[1,2],[2,3],[3,4],[4,5],[4,6],[5,6]].forEach(function(e){s1A[e[0]][e[1]]=1;s1A[e[1]][e[0]]=1;});
+    document.getElementById('s1_nodes').value=s1nodes.join(', ');
+    setS1ModeRadio('binary');s1Mode='binary';
+    setS1DirRadio('undirected');s1Directed=false;
+    renderGrid();scheduleDraft();showToast('예시(옆 반) 데이터를 채웠어요. 표의 칸을 눌러 관계를 바꿔 보세요.','success');
+  }
+  function setS1ModeRadio(mode){document.querySelectorAll('input[name="s1_mode"]').forEach(function(r){r.checked=(r.value===mode);});}
+  function setS1DirRadio(dir){document.querySelectorAll('input[name="s1_dir"]').forEach(function(r){r.checked=(r.value===dir);});}
+
+  function doneSteps(){var n=0;document.querySelectorAll('.donecheck input').forEach(function(cb){if(cb.checked)n++;});return n;}
+  function updateProgress(){
+    document.querySelectorAll('.donecheck input').forEach(function(cb){cb.closest('.donecheck').classList.toggle('on',cb.checked);});
+    var n=doneSteps();
+    document.getElementById('progText').textContent=n+' / 5 단계'+(n===5?' — 완성!':'');
+    document.getElementById('pfill').style.width=(n/5*100)+'%';
+    return n;
+  }
+  function getFormData(){
+    var d={source:SOURCE,activity:'5_프로젝트진행'};
+    FIELDS.forEach(function(k){d[k]=val(k);});
+    d.s1_mode=s1Mode;d.s1_direction=(s1Directed?'directed':'undirected');d.s1_edges=s1EdgesStr();d.s1_matrix=s1MatrixStr();d.s1_count=String(s1nodes.length);
+    var steps=[];document.querySelectorAll('.donecheck input').forEach(function(cb){if(cb.checked)steps.push(cb.getAttribute('data-step'));});
+    d.doneSteps=steps.join(',');d.progress=doneSteps()+'/5';
+    return d;
+  }
+  function setFormData(d){
+    if(!d)return;
+    FIELDS.forEach(function(k){var e=document.getElementById(k);if(e&&typeof d[k]==='string')e.value=d[k];});
+    s1nodes=(typeof d.s1_nodes==='string'?d.s1_nodes:'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+    s1A=s1nodes.map(function(){return s1nodes.map(function(){return 0;});});
+    if(typeof d.s1_matrix==='string'&&d.s1_matrix){d.s1_matrix.split('|').forEach(function(rs,i){if(i<s1nodes.length){rs.trim().split(/\s+/).forEach(function(v,j){if(j<s1nodes.length){var pv=parseFloat(v);s1A[i][j]=isNaN(pv)||pv<0?0:pv;}});}});}
+    s1Mode=(d.s1_mode==='weighted')?'weighted':'binary';setS1ModeRadio(s1Mode);
+    s1Directed=(d.s1_direction==='directed');setS1DirRadio(s1Directed?'directed':'undirected');
+    renderGrid();
+    if(typeof d.doneSteps==='string'){var set=d.doneSteps.split(',');document.querySelectorAll('.donecheck input').forEach(function(cb){cb.checked=set.indexOf(cb.getAttribute('data-step'))>=0;});}
+    updateProgress();saveInfo();
+  }
+  function validate(){
+    if(!val('studentName'))return '이름을 입력해 주세요.';
+    if(!val('classInfo'))return '반 / 번호를 입력해 주세요.';
+    if(!val('topic'))return '우리 프로젝트 한 줄 소개를 적어 주세요.';
+    if(!val('s1_method'))return '1단계 — 데이터 수집 방법을 적어 주세요.';
+    if(!val('s5_conclusion'))return '5단계 — 결론 한 문장을 적어 주세요.';
+    return '';
+  }
+  function buildTxt(d){
+    var L=[];L.push('═══════════════════════════════════════');
+    L.push('  디지털 네트워크와 행렬 [정보편]');L.push('  활동 5 · 프로젝트 진행 워크북');
+    L.push('  작성일시: '+new Date().toLocaleString('ko-KR'));L.push('═══════════════════════════════════════');L.push('');
+    L.push('이름: '+d.studentName+'   반/번호: '+d.classInfo+'   모둠: '+(d.teamName||'(개인)'));
+    L.push('프로젝트: '+d.topic);L.push('진행률: '+d.progress);L.push('');
+    L.push('[1단계 · 데이터 모으기]');
+    L.push(' 수집 방법: '+d.s1_method);
+    L.push(' 관계 표시 방식: '+(d.s1_mode==='weighted'?'가중치':'0-1')+' / '+(d.s1_direction==='directed'?'일방향':'쌍방향'));
+    L.push(' 노드('+d.s1_count+'): '+d.s1_nodes);
+    L.push(' 관계: '+d.s1_edges);
+    L.push(' 인접행렬: '+d.s1_matrix);L.push('');
+    L.push('[2단계 · 코드로 계산]');
+    L.push(' 프롬프트: '+d.s2_prompt);
+    L.push(' 결과 코드:');L.push((d.s2_code||'').split('\n').map(function(x){return '   '+x;}).join('\n'));
+    L.push(' 지표: '+d.s2_metric);L.push(' 결과: '+d.s2_result);L.push('');
+    L.push('[3단계 · 그림·해석]');
+    L.push(' 구조: '+d.s3_structure);L.push(' 해석: '+d.s3_interpret);L.push('');
+    L.push('[4단계 · 실험·개입]');
+    L.push(' 실험: '+d.s4_experiment);L.push(' 변화: '+d.s4_change);L.push(' 제안: '+d.s4_propose);L.push('');
+    L.push('[5단계 · 결론·발표]');
+    L.push(' 결론: '+d.s5_conclusion);L.push(' 검증: '+d.s5_verify);L.push(' 한계/배운점: '+d.s5_limit);L.push(' 역할: '+d.s5_roles);L.push('');
+    L.push('═══════════════════════════════════════');return L.join('\n');
+  }
+  function saveInfo(){try{localStorage.setItem(INFO_KEY,JSON.stringify({studentName:val('studentName'),classInfo:val('classInfo')}));}catch(e){}}
+  function loadInfo(){try{var r=localStorage.getItem(INFO_KEY);if(!r)return;var d=JSON.parse(r);if(!val('studentName')&&d.studentName)document.getElementById('studentName').value=d.studentName;if(!val('classInfo')&&d.classInfo)document.getElementById('classInfo').value=d.classInfo;}catch(e){}}
+  function downloadBlob(c,fn,mime){var b=new Blob([c],{type:mime});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+  function stamp(){return new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');}
+  function safeName(d){return (d.studentName||'학생').replace(/[\\/:*?"<>|\s]/g,'');}
+  var draftTimer=null;function scheduleDraft(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,1200);}
+  function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(getFormData()));document.getElementById('draftLabel').textContent='임시저장: '+new Date().toLocaleTimeString('ko-KR');saveInfo();}catch(e){}}
+  function loadDraft(){try{var r=localStorage.getItem(DRAFT_KEY);if(!r)return;setFormData(JSON.parse(r));document.getElementById('draftLabel').textContent='임시저장: 복원됨';}catch(e){}}
+  var toastTimer=null;function showToast(m,t,ms){var el=document.getElementById('toast');el.textContent=m;el.className='show'+(t?' '+t:'');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.className='';},ms||2600);}
+  function sendToSheet(data){var url=localStorage.getItem(URL_KEY)||DEFAULT_URL;if(!url){showToast('파일은 저장됐습니다. (시트 URL 미설정)','error',4200);return;}fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(){showToast('제출 완료! 파일 저장 + 시트 전송','success',4200);}).catch(function(e){showToast('파일은 저장됐습니다. 시트 오류: '+e.message,'error',4600);});}
+
+  function init(){
+    loadInfo();loadDraft();updateProgress();renderGrid();
+    document.getElementById('s1_nodes').addEventListener('input',function(){rebuildS1Nodes();scheduleDraft();});
+    document.getElementById('btnSampleNodes').addEventListener('click',fillSampleNodes);
+    document.querySelectorAll('input[name="s1_mode"]').forEach(function(r){r.addEventListener('change',function(){if(this.checked)setS1Mode(this.value);});});
+    document.querySelectorAll('input[name="s1_dir"]').forEach(function(r){r.addEventListener('change',function(){if(this.checked)setS1Direction(this.value);});});
+    document.getElementById('btnCopyMatrix').addEventListener('click',function(){var s=s2CodeStr();if(!s){showToast('먼저 1단계에서 관계 표를 완성하세요.','error');return;}copyText(s,this);showToast('행렬 코드를 복사했어요. 프롬프트나 Colab에 붙여넣으세요.','success');});
+    document.querySelectorAll('.donecheck input').forEach(function(cb){cb.addEventListener('change',function(){updateProgress();scheduleDraft();});});
+    document.getElementById('btnPrint').addEventListener('click',function(){window.print();});
+    document.getElementById('btnSettings').addEventListener('click',function(){var p=document.getElementById('settingsPanel');p.style.display=(p.style.display==='block')?'none':'block';document.getElementById('urlInput').value=localStorage.getItem(URL_KEY)||'';});
+    document.getElementById('btnSaveUrl').addEventListener('click',function(){var u=document.getElementById('urlInput').value.trim();if(!u){showToast('URL을 입력해 주세요.','error');return;}localStorage.setItem(URL_KEY,u);showToast('URL이 저장되었습니다.','success');});
+    document.getElementById('btnClearUrl').addEventListener('click',function(){localStorage.removeItem(URL_KEY);document.getElementById('urlInput').value='';showToast('URL이 초기화되었습니다.');});
+    document.getElementById('btnDraft').addEventListener('click',function(){var d=getFormData();d._draftMeta={savedAt:new Date().toISOString(),source:SOURCE,version:1};downloadBlob(JSON.stringify(d,null,2),safeName(d)+'_활동5_프로젝트진행_'+stamp()+'.json','application/json;charset=utf-8');saveDraft();showToast('임시저장 파일(.json) 다운로드됨','success');});
+    var fi=document.getElementById('fileInput');
+    document.getElementById('btnLoad').addEventListener('click',function(){fi.click();});
+    fi.addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){try{setFormData(JSON.parse(ev.target.result));saveDraft();showToast('불러왔습니다.','success');}catch(err){showToast('파일을 읽을 수 없습니다: '+err.message,'error');}};rd.readAsText(f,'utf-8');e.target.value='';});
+    document.getElementById('btnReset').addEventListener('click',function(){if(!confirm('작성한 내용을 지웁니다. 계속할까요?'))return;localStorage.removeItem(DRAFT_KEY);location.reload();});
+    document.getElementById('btnSubmit').addEventListener('click',function(){var msg=validate();if(msg){showToast(msg,'error',3400);return;}if(!confirm('제출하시겠습니까?\n· TXT 파일 다운로드\n· 구글 시트로 전송'))return;var btn=this;btn.disabled=true;var d=getFormData();downloadBlob(buildTxt(d),safeName(d)+'_활동5_프로젝트진행_'+stamp()+'.txt','text/plain;charset=utf-8');sendToSheet(d);setTimeout(function(){btn.disabled=false;},1500);});
+    document.querySelectorAll('input, textarea').forEach(function(el){el.addEventListener('input',scheduleDraft);el.addEventListener('change',function(){scheduleDraft();saveInfo();});});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI × 피지컬컴퓨팅 프로젝트 결과 보고서</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #F4F1FF;
+      --primary: #6B5DD3;
+      --primary-soft: #A89BFF;
+      --accent: #2EC5E0;
+      --accent-soft: #9FE6F2;
+      --success: #1FB890;
+      --warn: #E8A422;
+      --pink: #EC4D8E;
+      --coral: #FF8A6B;
+      --text: #1F2540;
+      --text-sub: #4E5677;
+      --text-muted: #828AAA;
+      --glass: rgba(255,255,255,0.55);
+      --glass-strong: rgba(255,255,255,0.78);
+      --glass-border: rgba(255,255,255,0.85);
+      --glass-divide: rgba(107,93,211,0.12);
+      --shadow-sm: 0 2px 10px rgba(31,37,64,0.05);
+      --shadow-md: 0 6px 24px rgba(31,37,64,0.08);
+      --shadow-lg: 0 10px 38px rgba(31,37,64,0.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: clamp(15px, 1.2vw, 17px); scroll-behavior: smooth; }
+    body {
+      background: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 70% 55% at 12% 15%, rgba(168,155,255,0.45), transparent 60%),
+        radial-gradient(ellipse 55% 50% at 88% 18%, rgba(159,230,242,0.45), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 18% 90%, rgba(236,77,142,0.20), transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 80%, rgba(31,184,144,0.22), transparent 60%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      line-height: 1.65;
+      min-height: 100vh;
+      padding-bottom: 7rem;
+    }
+    h1, h2, h3 { font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif; font-weight: 700; word-break: keep-all; color: var(--text); }
+    p, label { font-size: 0.93rem; word-break: keep-all; }
+
+    /* ───── Header ───── */
+    .page-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.65); backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 0.7rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .page-header-left { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+    .page-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .page-badge {
+      font-size: 0.74rem; padding: 0.18rem 0.65rem; border-radius: 2rem;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+      background: linear-gradient(135deg, rgba(107,93,211,0.18), rgba(46,197,224,0.18));
+      color: var(--primary);
+      border: 1px solid rgba(107,93,211,0.30);
+    }
+    .header-actions { display: flex; gap: 0.4rem; }
+
+    /* ───── Main ───── */
+    .main { max-width: 920px; margin: 0 auto; padding: 1.5rem 1rem; }
+    .intro-title {
+      font-size: clamp(1.4rem, 3vw, 1.85rem);
+      font-weight: 700; text-align: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      margin: 0.5rem 0 0.4rem;
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+    }
+    .intro-sub {
+      text-align: center; color: var(--text-sub); font-size: 0.95rem;
+      margin-bottom: 1.8rem;
+    }
+
+    /* ───── Form Card ───── */
+    .form-card {
+      background: var(--glass); backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.1rem; overflow: hidden;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.25s;
+    }
+    .form-card:hover { box-shadow: var(--shadow-md); }
+    .form-card-header {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.85rem 1.3rem; border-bottom: 1px solid var(--glass-divide);
+      background: var(--glass-strong);
+    }
+    .form-card-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 700;
+      color: #fff; background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 50%;
+      width: 1.7rem; height: 1.7rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(107,93,211,0.30);
+    }
+    .form-card-title { font-size: 1rem; font-weight: 600; color: var(--text); }
+    .form-card-desc { font-size: 0.82rem; color: var(--text-sub); margin-left: auto; }
+    .form-card-body { padding: 1.1rem 1.3rem; display: flex; flex-direction: column; gap: 0.85rem; }
+
+    /* ───── Controls ───── */
+    .field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .field-label, label {
+      font-size: 0.82rem; font-weight: 600; color: var(--text-sub);
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+    }
+    .required { color: var(--pink); margin-left: 2px; }
+    input[type="text"], textarea, select {
+      background: rgba(255,255,255,0.78);
+      border: 1.5px solid rgba(107,93,211,0.15); border-radius: 0.55rem;
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif; font-size: 0.93rem;
+      padding: 0.55rem 0.8rem; outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      width: 100%; resize: vertical;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus {
+      border-color: var(--primary); background: #fff;
+      box-shadow: 0 0 0 3px rgba(107,93,211,0.15);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-muted); }
+    textarea { min-height: 88px; line-height: 1.65; }
+    textarea.code-area {
+      min-height: 260px;
+      font-family: 'Consolas', 'Monaco', monospace; font-size: 0.82rem;
+      line-height: 1.55; white-space: pre;
+    }
+    .invalid { border-color: rgba(236,77,142,0.65) !important; background: rgba(236,77,142,0.05) !important; }
+
+    .hint {
+      background: rgba(46,197,224,0.07); border: 1px solid rgba(46,197,224,0.25);
+      border-left: 3px solid var(--accent);
+      border-radius: 0.45rem; padding: 0.55rem 0.85rem;
+      font-size: 0.83rem; color: var(--text-sub); line-height: 1.6;
+    }
+    .hint strong { color: var(--accent); }
+    .fields-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; }
+
+    /* ───── Table (팀원 구성) ───── */
+    .grid-table-wrap { overflow-x: auto; }
+    .grid-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      font-size: 0.88rem; min-width: 480px;
+    }
+    .grid-table thead th {
+      background: rgba(107,93,211,0.10); color: var(--text);
+      padding: 0.55rem 0.7rem; text-align: left;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.83rem;
+      border-bottom: 2px solid rgba(107,93,211,0.30);
+    }
+    .grid-table thead th:first-child { border-top-left-radius: 0.5rem; }
+    .grid-table thead th:last-child  { border-top-right-radius: 0.5rem; }
+    .grid-table tbody td { padding: 0.3rem 0.45rem; border-bottom: 1px solid rgba(107,93,211,0.10); vertical-align: middle; }
+    .grid-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.4); }
+    .grid-table input[type="text"], .grid-table select, .grid-table textarea {
+      padding: 0.35rem 0.55rem; font-size: 0.86rem; border-radius: 0.35rem;
+      background: rgba(255,255,255,0.7);
+    }
+    .grid-table textarea { min-height: 48px; }
+    .del-btn {
+      background: none; border: none; color: rgba(236,77,142,0.55);
+      cursor: pointer; font-size: 1rem; padding: 0.2rem 0.4rem;
+      border-radius: 0.3rem; transition: all 0.2s;
+    }
+    .del-btn:hover { color: var(--pink); background: rgba(236,77,142,0.10); }
+    .add-row-btn {
+      background: rgba(107,93,211,0.08); border: 1.5px dashed rgba(107,93,211,0.35);
+      color: var(--primary); border-radius: 0.55rem; padding: 0.5rem 1rem;
+      font-size: 0.88rem; cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600; transition: background 0.2s; width: 100%; margin-top: 0.5rem;
+    }
+    .add-row-btn:hover { background: rgba(107,93,211,0.16); }
+
+    /* ───── Image upload ───── */
+    .image-upload-zone {
+      border: 2px dashed rgba(107,93,211,0.35);
+      background: rgba(255,255,255,0.45);
+      border-radius: 0.7rem; padding: 1.1rem;
+      text-align: center; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .image-upload-zone:hover {
+      background: rgba(107,93,211,0.06); border-color: rgba(107,93,211,0.55);
+    }
+    .image-upload-zone.has-files { padding: 0.6rem; border-style: solid; border-color: rgba(107,93,211,0.45); background: rgba(255,255,255,0.7); }
+    .image-upload-zone .upload-cta { font-size: 0.9rem; color: var(--primary); font-weight: 600; }
+    .image-upload-zone .upload-sub { font-size: 0.78rem; color: var(--text-sub); margin-top: 0.2rem; }
+    .image-preview-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 0.5rem; margin-top: 0.6rem;
+    }
+    .image-preview-item {
+      position: relative; border-radius: 0.5rem; overflow: hidden;
+      background: #fff; border: 1px solid var(--glass-border);
+      aspect-ratio: 4 / 3;
+    }
+    .image-preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .image-preview-item .remove-btn {
+      position: absolute; top: 0.25rem; right: 0.25rem;
+      background: rgba(31,37,64,0.75); color: #fff;
+      border: none; border-radius: 50%; width: 1.4rem; height: 1.4rem;
+      cursor: pointer; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center; line-height: 1;
+    }
+    .image-preview-item .remove-btn:hover { background: var(--pink); }
+
+    /* ───── Buttons ───── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1.1rem; border-radius: 0.55rem;
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; border: 1.5px solid transparent;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .btn svg { width: 1em; height: 1em; flex-shrink: 0; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; border-color: transparent;
+      box-shadow: 0 4px 14px rgba(107,93,211,0.30);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(107,93,211,0.35); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.55); border-color: rgba(107,93,211,0.20); color: var(--text-sub);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.85); color: var(--text); }
+    .btn-danger {
+      background: rgba(236,77,142,0.08); border-color: rgba(236,77,142,0.30); color: var(--pink);
+    }
+    .btn-danger:hover { background: rgba(236,77,142,0.18); }
+    .btn-purple {
+      background: rgba(107,93,211,0.10); border-color: rgba(107,93,211,0.35); color: var(--primary);
+    }
+    .btn-purple:hover { background: rgba(107,93,211,0.20); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-big { padding: 0.7rem 1.5rem; font-size: 0.95rem; }
+    .btn-icon { width: 2.2rem; height: 2.2rem; padding: 0; justify-content: center; }
+    .code-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* ───── Settings Panel ───── */
+    .settings-panel {
+      background: var(--glass-strong); border: 1px solid var(--glass-border);
+      border-radius: 0.9rem; padding: 1rem 1.2rem; margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .settings-title {
+      font-size: 0.88rem; font-weight: 600; color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.6rem;
+    }
+    .settings-row { display: flex; gap: 0.5rem; align-items: flex-end; }
+    .settings-row .field { flex: 1; }
+    .url-status { font-size: 0.78rem; margin-top: 0.3rem; font-family: 'Space Grotesk', sans-serif; }
+    .url-status.ok    { color: var(--success); }
+    .url-status.empty { color: var(--text-sub); }
+
+    /* ───── Toast ───── */
+    .toast-container {
+      position: fixed; bottom: 5.5rem; right: 1.2rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      z-index: 9999; pointer-events: none;
+    }
+    .toast {
+      background: rgba(255,255,255,0.96); color: var(--text);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.65rem; padding: 0.65rem 1rem; font-size: 0.88rem;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-md);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+      max-width: 320px; pointer-events: auto;
+    }
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error   { border-left: 3px solid var(--pink); }
+    .toast.info    { border-left: 3px solid var(--accent); }
+    @keyframes toastIn  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+    /* ───── Action Bar ───── */
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(18px) saturate(170%);
+      -webkit-backdrop-filter: blur(18px) saturate(170%);
+      border-top: 1px solid var(--glass-border);
+      padding: 0.7rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 0.6rem;
+      z-index: 100; flex-wrap: wrap;
+      box-shadow: 0 -4px 18px rgba(31,37,64,0.05);
+    }
+    .action-bar-left  { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .action-bar-right { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .draft-label { font-size: 0.78rem; color: var(--text-sub); font-family: 'Space Grotesk', sans-serif; }
+
+    /* ───── Modal ───── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(31,37,64,0.55); backdrop-filter: blur(4px);
+      z-index: 9000; overflow-y: auto; padding: 2rem 1rem;
+    }
+    .modal-box {
+      max-width: 720px; margin: 0 auto;
+      background: #fff; border: 1px solid var(--glass-border);
+      border-radius: 1.1rem; padding: 1.5rem; box-shadow: var(--shadow-lg);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .modal-header h2 { font-size: 1.1rem; color: var(--primary); }
+    .modal-body p, .modal-body li { font-size: 0.9rem; color: var(--text-sub); line-height: 1.7; }
+    .modal-body strong { color: var(--text); }
+    .modal-body code {
+      background: rgba(46,197,224,0.12); color: var(--accent);
+      padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-size: 0.85em;
+      font-family: 'Consolas', monospace;
+    }
+    .modal-body ol, .modal-body ul { padding-left: 1.5rem; }
+    .modal-body ol li, .modal-body ul li { margin-bottom: 0.5rem; }
+
+    /* ───── Print ───── */
+    .print-header { display: none; }
+    @media print {
+      body { background: #fff; color: #111; background-image: none; padding: 0; }
+      .page-header, .action-bar, .settings-panel, .modal-overlay,
+      .header-actions, .add-row-btn, .del-btn, .code-actions,
+      .image-upload-zone .upload-cta, .image-upload-zone .upload-sub { display: none !important; }
+      .main { max-width: 100%; padding: 0; }
+      .intro-title, .intro-sub { display: none; }
+      .form-card { background: #fff; border: 1px solid #d4d4dd; border-radius: 0; margin-bottom: 0.8rem; break-inside: avoid; box-shadow: none; }
+      .form-card-header { background: #f3f1ff; border-bottom: 1px solid #d4d4dd; }
+      .form-card-num { background: #6B5DD3; }
+      .form-card-title, .form-card-desc { color: #111; }
+      input, textarea, select { background: #fff; border: 1px solid #ccc; color: #111; }
+      .hint { background: #f9f9ff; border-color: #c4b0ff; color: #333; }
+      .grid-table thead th { background: #efebff; color: #111; }
+      .print-header { display: block !important; text-align: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #6B5DD3; }
+      @page { margin: 1.5cm; size: A4; }
+    }
+
+    /* ───── Responsive ───── */
+    @media (max-width: 720px) {
+      .fields-row { grid-template-columns: 1fr; }
+      .settings-row { flex-direction: column; align-items: stretch; }
+      .action-bar { flex-direction: column; align-items: stretch; }
+      .action-bar-left, .action-bar-right { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-header">
+    <h1>AI × 피지컬컴퓨팅 프로젝트 결과 보고서</h1>
+    <p id="printMeta"></p>
+  </div>
+
+  <header class="page-header">
+    <div class="page-header-left">
+      <span class="page-badge">팀 프로젝트 · 결과 보고</span>
+      <span class="page-title">프로젝트 결과 보고서</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-icon" id="btnPrint" title="인쇄" aria-label="인쇄">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+      </button>
+      <button class="btn btn-ghost btn-icon" id="btnSettings" title="설정" aria-label="설정">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ───── 설정 패널 (교사 전용, 기본 숨김) ───── -->
+    <div class="settings-panel" id="settingsPanel" style="display:none;">
+      <div class="settings-title">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:1em;height:1em;color:var(--accent)" aria-hidden="true"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        구글 시트 연동 설정 <span style="font-size:0.75rem;color:var(--text-sub);">(교사가 Apps Script URL 입력)</span>
+      </div>
+      <div class="settings-row">
+        <div class="field">
+          <label for="scriptUrl">Apps Script 웹앱 URL</label>
+          <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" spellcheck="false">
+          <div class="url-status empty" id="urlStatus">URL을 입력하면 구글 시트에 자동 저장됩니다.</div>
+        </div>
+        <button class="btn btn-ghost" id="btnSaveUrl">저장</button>
+        <button class="btn btn-ghost" id="btnSetupGuide">설정 방법</button>
+      </div>
+    </div>
+
+    <div class="intro-title">프로젝트 결과 보고서</div>
+    <div class="intro-sub">
+      한 학기 동안 진행한 AI × 피지컬컴퓨팅 팀 프로젝트의 결과를 정리합니다.<br>
+      완성된 작품 사진과 최종 코드, 그리고 우리 팀이 <b>특별히 집중했던 포인트</b>를 담아 제출해 주세요.
+    </div>
+
+    <!-- ═══════ 1. 팀 정보 · 팀 구성 ═══════ -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">1</div>
+        <span class="form-card-title">팀 정보 · 팀 구성</span>
+        <span class="form-card-desc">팀명과 팀원별 역할</span>
+      </div>
+      <div class="form-card-body">
+        <div class="fields-row">
+          <div class="field">
+            <label for="teamName">팀명 <span class="required">*</span></label>
+            <select id="teamName">
+              <option value="">— 팀을 선택하세요 —</option>
+              <option value="사이다">사이다</option>
+              <option value="뉴런">뉴런</option>
+              <option value="엘리자베스는 엘레강스하게 진화한다">엘리자베스는 엘레강스하게 진화한다</option>
+              <option value="쏜다">쏜다</option>
+              <option value="공대조">공대조</option>
+              <option value="데빌다이어트4세">데빌다이어트4세</option>
+              <option value="승민이가캐리해줄거야">승민이가캐리해줄거야</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="classInfo">반/번호</label>
+            <input type="text" id="classInfo" placeholder="예: 2-3 / 15번" maxlength="20">
+          </div>
+          <div class="field">
+            <label for="studentName">작성자 이름 <span class="required">*</span></label>
+            <input type="text" id="studentName" placeholder="홍길동" maxlength="20">
+          </div>
+        </div>
+        <div class="hint">💡 팀원 전원의 <strong>이름 · 맡은 역할 · 실제로 담당한 일</strong>을 적어주세요. 역할은 설계 단계의 역할(디자이너/코드/회로/TM 모델)이 기준이지만, 실제로 한 일이 다르면 그대로 적습니다.</div>
+        <div class="grid-table-wrap">
+          <table class="grid-table" id="memberTable" aria-label="팀원 구성">
+            <thead>
+              <tr>
+                <th style="width:20%">이름</th>
+                <th style="width:28%">맡은 역할</th>
+                <th style="width:44%">실제로 담당한 일</th>
+                <th style="width:8%"></th>
+              </tr>
+            </thead>
+            <tbody id="memberTbody"></tbody>
+          </table>
+        </div>
+        <button class="add-row-btn" id="btnAddMember" type="button">+ 팀원 행 추가</button>
+      </div>
+    </div>
+
+    <!-- ═══════ 2. 프로젝트 소개 ═══════ -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">2</div>
+        <span class="form-card-title">프로젝트 소개</span>
+        <span class="form-card-desc">무엇을, 왜, 어떻게 만들었나</span>
+      </div>
+      <div class="form-card-body">
+        <div class="field">
+          <label for="projectName">프로젝트(작품) 이름 <span class="required">*</span></label>
+          <input type="text" id="projectName" placeholder="예: 졸음 깨우미 — AI 학습 도우미">
+        </div>
+        <div class="field">
+          <label for="projectIntro">한 줄 소개 <span class="required">*</span></label>
+          <input type="text" id="projectIntro" placeholder="예: 웹캠으로 졸음을 감지하면 LED와 부저로 깨워주는 책상 위 도우미">
+        </div>
+        <div class="field">
+          <label for="projectDesc">프로젝트 상세 설명 <span class="required">*</span></label>
+          <textarea id="projectDesc" style="min-height:130px;" placeholder="다음 내용이 들어가면 좋습니다.&#10;· 해결하려고 한 문제 (왜 이 프로젝트를 선택했나)&#10;· 작동 방식 (웹캠 → Teachable Machine 분류 → 시리얼 신호 → 아두이노 동작)&#10;· 사용한 부품과 각각의 역할"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ 3. 결과물 이미지 ═══════ -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">3</div>
+        <span class="form-card-title">결과물 이미지</span>
+        <span class="form-card-desc">완성 작품 사진 · 실행 화면 캡처</span>
+      </div>
+      <div class="form-card-body">
+        <div class="hint">
+          📷 <strong>완성된 작품의 전체 모습</strong>과 <strong>동작 중인 장면</strong>(LED 켜짐, LCD 표시 등), <strong>웹 화면 캡처</strong>를 골고루 올려주세요.<br>
+          작품의 매력이 잘 드러나는 각도로 찍을수록 좋습니다.
+        </div>
+        <div class="image-upload-zone" data-upload="result">
+          <input type="file" id="resultInput" accept="image/*" multiple hidden>
+          <div class="upload-cta">📷 결과물 이미지 업로드</div>
+          <div class="upload-sub">최대 8장 · 원본 10MB 이하 · 업로드 시 자동 압축(긴 변 1600px) · 클릭하거나 드래그</div>
+          <div class="image-preview-grid" id="resultPreview"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ 4. 최종 Arduino 코드 ═══════ -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">4</div>
+        <span class="form-card-title">최종 Arduino 코드</span>
+        <span class="form-card-desc">실제 작품에 업로드한 코드</span>
+      </div>
+      <div class="form-card-body">
+        <div class="hint">💡 설계 단계의 코드가 아니라 <strong>마지막에 실제로 보드에 업로드한 코드</strong>를 붙여넣으세요. 직접 수정한 부분이 있다면 그 버전이어야 합니다.</div>
+        <div class="field">
+          <label for="arduinoCode">Arduino 코드 전체 붙여넣기 <span class="required">*</span></label>
+          <textarea id="arduinoCode" class="code-area" placeholder="// 최종 Arduino 코드를 여기에 붙여넣으세요." spellcheck="false"></textarea>
+        </div>
+        <div class="code-actions">
+          <button class="btn btn-purple" type="button" data-copy="arduinoCode">📋 코드 복사</button>
+          <button class="btn btn-ghost" type="button" data-download="arduinoCode" data-filename="final_project.ino">💾 .ino로 저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ 5. 최종 HTML 코드 ═══════ -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">5</div>
+        <span class="form-card-title">최종 HTML 코드</span>
+        <span class="form-card-desc">Teachable Machine + Web Serial 페이지</span>
+      </div>
+      <div class="form-card-body">
+        <div class="hint">💡 웹캠 분류와 시리얼 전송을 담당하는 <strong>최종 HTML 페이지 전체 코드</strong>를 붙여넣으세요.</div>
+        <div class="field">
+          <label for="htmlCode">HTML 코드 전체 붙여넣기 <span class="required">*</span></label>
+          <textarea id="htmlCode" class="code-area" placeholder="<!-- 최종 HTML 코드를 여기에 붙여넣으세요. -->" spellcheck="false"></textarea>
+        </div>
+        <div class="code-actions">
+          <button class="btn btn-purple" type="button" data-copy="htmlCode">📋 코드 복사</button>
+          <button class="btn btn-ghost" type="button" data-download="htmlCode" data-filename="final_project.html">💾 .html로 저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ 6. 프로젝트 핵심 포인트 ═══════ -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">6</div>
+        <span class="form-card-title">프로젝트 핵심 포인트</span>
+        <span class="form-card-desc">특별히 더 집중했던 내용</span>
+      </div>
+      <div class="form-card-body">
+        <div class="hint">
+          🎯 우리 팀이 <strong>프로젝트를 진행하면서 특별히 더 집중했던 부분</strong>을 구체적으로 적어주세요.<br>
+          예: 분류 정확도를 높이기 위한 데이터 수집 전략, 오작동을 줄이는 신호 처리 방식, 사용자가 쓰기 편한 외형 디자인, 부품 배치와 배선 정리 등
+        </div>
+        <div class="field">
+          <label for="keyPoint">핵심 포인트 <span class="required">*</span></label>
+          <textarea id="keyPoint" style="min-height:130px;" placeholder="예: 졸음 오인식이 많아서 '정면 응시 / 고개 숙임 / 눈 감음' 3개 클래스로 세분화하고, 같은 신호가 1.5초 안에 반복되면 무시하도록 처리해 오작동을 크게 줄였다."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ 7. 기타 부각하고 싶은 내용 ═══════ -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-card-num">7</div>
+        <span class="form-card-title">기타 부각하고 싶은 내용</span>
+        <span class="form-card-desc">자유 서술 (선택)</span>
+      </div>
+      <div class="form-card-body">
+        <div class="hint">
+          ✨ 위 항목에 담지 못했지만 꼭 알리고 싶은 내용을 자유롭게 적어주세요.<br>
+          예: 힘들었던 점과 극복 과정, 팀워크 에피소드, 아쉬웠던 점과 다음에 해보고 싶은 확장 아이디어 등
+        </div>
+        <div class="field">
+          <label for="highlight">자유 서술</label>
+          <textarea id="highlight" style="min-height:110px;" placeholder="예: 서보모터가 계속 떨리는 문제를 외부 전원 분리로 해결했다. 발표 전날 밤까지 팀원 모두가 남아서 테스트한 것이 기억에 남는다."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ───── 하단 액션 바 ───── -->
+  <div class="action-bar" id="actionBar">
+    <div class="action-bar-left">
+      <button class="btn btn-ghost" id="btnDraft">💾 임시저장 .json</button>
+      <button class="btn btn-ghost" id="btnLoad">📂 불러오기</button>
+      <input type="file" id="fileInput" accept="application/json" hidden>
+      <button class="btn btn-danger" id="btnClear">↺ 초기화</button>
+    </div>
+    <div class="action-bar-right">
+      <span class="draft-label" id="draftLabel">자동 임시저장 대기 중</span>
+      <button class="btn btn-primary btn-big" id="btnSubmit">📤 보고서 제출</button>
+    </div>
+  </div>
+
+  <!-- ───── 가이드 모달 ───── -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>구글 시트 연동 설정 방법</h2>
+        <button class="btn btn-ghost btn-icon" id="closeGuide" aria-label="닫기">✕</button>
+      </div>
+      <div class="modal-body">
+        <ol>
+          <li>과목 공용 Google 스프레드시트를 엽니다 (설계 활동지와 같은 시트).</li>
+          <li><strong>확장 프로그램 → Apps Script</strong>에서 과목 폴더의 <code>apps-script.js</code> 최신 버전이 반영되어 있는지 확인합니다.</li>
+          <li>코드를 갱신했다면 <strong>배포 → 배포 관리 → ⚙ → 새 버전 → 배포</strong>로 재배포합니다 (URL은 유지됩니다).</li>
+          <li>웹앱 URL(<code>.../exec</code>)을 위 설정 패널에 붙여넣고 저장합니다.</li>
+          <li>제출 데이터는 <strong>프로젝트보고서</strong> 시트 탭에 1행씩 기록되고, 이미지는 Drive 폴더에 저장된 뒤 링크로 연결됩니다.</li>
+        </ol>
+        <p>※ 배포 시 액세스 권한은 반드시 <strong>"모든 사용자(익명 포함)"</strong>로 설정해야 합니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+  (function() {
+    'use strict';
+
+    /* ═══════════════════════════════════════════════════════════════
+       0. 상수 / 키
+       ═══════════════════════════════════════════════════════════════ */
+    var SOURCE_ID  = 'ai_physical_report';
+    var DRAFT_KEY  = 'aiphysical_report_draft';
+    var URL_KEY    = 'aiphysical_report_url';
+    var DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+
+    var ROLE_OPTIONS = ['', '제품 디자이너', '프로그래밍 코드', '아두이노 회로', 'TM 모델 제작', '팀장/총괄', '기타'];
+
+    /* ═══════════════════════════════════════════════════════════════
+       1. 유틸
+       ═══════════════════════════════════════════════════════════════ */
+    function $(id) { return document.getElementById(id); }
+    function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+    function val(id) { var el = $(id); return el ? el.value.trim() : ''; }
+    function setVal(id, v) { var el = $(id); if (el) el.value = v || ''; }
+    function clearChildren(el) { while (el && el.firstChild) el.removeChild(el.firstChild); }
+
+    function showToast(msg, type, duration) {
+      type = type || 'info'; duration = duration || 3000;
+      var t = document.createElement('div');
+      t.className = 'toast ' + type;
+      t.textContent = msg;
+      $('toastContainer').appendChild(t);
+      setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, duration + 400);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       2. 팀원 구성 표
+       ═══════════════════════════════════════════════════════════════ */
+    function addMemberRow(name, role, work) {
+      var tbody = $('memberTbody');
+      var tr = document.createElement('tr');
+
+      var td1 = document.createElement('td');
+      var nameInput = document.createElement('input');
+      nameInput.type = 'text'; nameInput.placeholder = '이름'; nameInput.value = name || '';
+      nameInput.maxLength = 20;
+      td1.appendChild(nameInput);
+
+      var td2 = document.createElement('td');
+      var sel = document.createElement('select');
+      ROLE_OPTIONS.forEach(function(opt, i) {
+        var o = document.createElement('option');
+        o.value = i === 0 ? '' : opt;
+        o.textContent = i === 0 ? '(역할 선택)' : opt;
+        sel.appendChild(o);
+      });
+      sel.value = role || '';
+      td2.appendChild(sel);
+
+      var td3 = document.createElement('td');
+      var workArea = document.createElement('textarea');
+      workArea.placeholder = '예: 외형 제작과 부품 배치, 발표 자료 정리';
+      workArea.value = work || '';
+      td3.appendChild(workArea);
+
+      var td4 = document.createElement('td');
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'del-btn'; del.textContent = '✕';
+      del.setAttribute('aria-label', '행 삭제');
+      del.addEventListener('click', function() {
+        if ($('memberTbody').rows.length > 1) {
+          tr.parentNode.removeChild(tr); scheduleDraft();
+        } else { showToast('최소 1명의 팀원이 필요합니다.', 'error'); }
+      });
+      td4.appendChild(del);
+
+      [td1, td2, td3, td4].forEach(function(td) { tr.appendChild(td); });
+      tbody.appendChild(tr);
+    }
+
+    function getMembers() {
+      return $$('#memberTbody tr').map(function(tr) {
+        var name = tr.querySelector('input[type="text"]');
+        var sel  = tr.querySelector('select');
+        var work = tr.querySelector('textarea');
+        return {
+          name: name ? name.value.trim() : '',
+          role: sel  ? sel.value : '',
+          work: work ? work.value.trim() : ''
+        };
+      }).filter(function(m) { return m.name || m.role || m.work; });
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       3. 결과물 이미지 첨부 (base64)
+       ═══════════════════════════════════════════════════════════════ */
+    var imageStore = { result: [] };
+    var MAX_FILE_SIZE = 10 * 1024 * 1024; // 압축 전 원본 한도 10MB
+    var MAX_IMAGES = 8;
+    var MAX_DIM = 1600;       // 압축 시 긴 변 최대 픽셀
+    var JPEG_QUALITY = 0.8;
+
+    /* 업로드 이미지를 캔버스로 리사이즈 + JPEG 압축해 base64로 반환.
+       8장 × 대용량 원본을 그대로 보내면 Apps Script 수신 한도(~50MB)와
+       localStorage 임시저장 한도를 넘기 때문에 업로드 시점에 줄인다. */
+    function compressImage(file, done) {
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var original = ev.target.result;
+        var img = new Image();
+        img.onload = function() {
+          var w = img.naturalWidth, h = img.naturalHeight;
+          var scale = Math.min(1, MAX_DIM / Math.max(w, h));
+          var canvas = document.createElement('canvas');
+          canvas.width  = Math.max(1, Math.round(w * scale));
+          canvas.height = Math.max(1, Math.round(h * scale));
+          var ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#fff'; // JPEG은 투명도가 없어 흰색 배경으로 채움
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          var compressed = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+          done(compressed.length < original.length ? compressed : original);
+        };
+        img.onerror = function() { done(original); }; // 디코딩 실패 시 원본 유지
+        img.src = original;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setupImageZone(key, maxCount) {
+      var zone = document.querySelector('[data-upload="' + key + '"]');
+      var input = $(key + 'Input');
+      var preview = $(key + 'Preview');
+      if (!zone || !input || !preview) return;
+
+      zone.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-btn') || e.target.tagName === 'IMG') return;
+        input.click();
+      });
+      zone.addEventListener('dragover', function(e) {
+        e.preventDefault(); zone.style.background = 'rgba(107,93,211,0.15)';
+      });
+      zone.addEventListener('dragleave', function() { zone.style.background = ''; });
+      zone.addEventListener('drop', function(e) {
+        e.preventDefault(); zone.style.background = '';
+        handleFiles(e.dataTransfer.files);
+      });
+      input.addEventListener('change', function() { handleFiles(input.files); input.value = ''; });
+
+      function handleFiles(files) {
+        Array.prototype.slice.call(files || []).forEach(function(file) {
+          if (!file.type.indexOf || file.type.indexOf('image/') !== 0) {
+            showToast('이미지 파일만 업로드 가능합니다: ' + file.name, 'error'); return;
+          }
+          if (file.size > MAX_FILE_SIZE) {
+            showToast('10MB 이하 이미지만 가능합니다: ' + file.name, 'error'); return;
+          }
+          if (imageStore[key].length >= maxCount) {
+            showToast('최대 ' + maxCount + '장까지 업로드 가능합니다.', 'error'); return;
+          }
+          compressImage(file, function(dataUrl) {
+            if (imageStore[key].length >= maxCount) {
+              showToast('최대 ' + maxCount + '장까지 업로드 가능합니다.', 'error'); return;
+            }
+            imageStore[key].push({ name: file.name, dataUrl: dataUrl });
+            renderPreview(key);
+            scheduleDraft();
+          });
+        });
+      }
+    }
+
+    function renderPreview(key) {
+      var preview = $(key + 'Preview');
+      var zone = document.querySelector('[data-upload="' + key + '"]');
+      if (!preview) return;
+      clearChildren(preview);
+      var arr = imageStore[key] || [];
+      if (zone) {
+        if (arr.length) zone.classList.add('has-files');
+        else            zone.classList.remove('has-files');
+      }
+      arr.forEach(function(item, idx) {
+        var div = document.createElement('div');
+        div.className = 'image-preview-item';
+        var img = document.createElement('img');
+        img.src = item.dataUrl; img.alt = item.name;
+        var btn = document.createElement('button');
+        btn.className = 'remove-btn'; btn.type = 'button'; btn.textContent = '✕';
+        btn.setAttribute('aria-label', '삭제');
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          imageStore[key].splice(idx, 1);
+          renderPreview(key); scheduleDraft();
+        });
+        div.appendChild(img); div.appendChild(btn);
+        preview.appendChild(div);
+      });
+    }
+
+    /* 업로드된 이미지 전체를 한 장의 격자 이미지로 합성 (시트 셀 미리보기용).
+       시트 셀에는 이미지를 1장만 넣을 수 있어, 여러 장을 2열 그리드로 합쳐 보낸다. */
+    function buildMergedImage(done) {
+      var items = imageStore.result;
+      if (!items.length) { done(''); return; }
+      var TILE_W = 560, TILE_H = 420, GAP = 10;
+      var cols = items.length === 1 ? 1 : 2;
+      var rows = Math.ceil(items.length / cols);
+      var loaded = 0;
+      var imgs = [];
+      items.forEach(function(item, i) {
+        var im = new Image();
+        im.onload = im.onerror = function() {
+          imgs[i] = im.naturalWidth ? im : null;
+          loaded++;
+          if (loaded === items.length) compose();
+        };
+        im.src = item.dataUrl;
+      });
+      function compose() {
+        var canvas = document.createElement('canvas');
+        canvas.width  = cols * TILE_W + GAP * (cols + 1);
+        canvas.height = rows * TILE_H + GAP * (rows + 1);
+        var ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        imgs.forEach(function(im, i) {
+          if (!im) return;
+          var col = i % cols, row = Math.floor(i / cols);
+          var x = GAP + col * (TILE_W + GAP), y = GAP + row * (TILE_H + GAP);
+          var scale = Math.min(TILE_W / im.naturalWidth, TILE_H / im.naturalHeight);
+          var w = im.naturalWidth * scale, h = im.naturalHeight * scale;
+          ctx.drawImage(im, x + (TILE_W - w) / 2, y + (TILE_H - h) / 2, w, h);
+        });
+        /* 셀 이미지 삽입 한도를 넘지 않도록 1.8M자(≈1.35MB) 이하로 품질 조절 */
+        var q = 0.75;
+        var out = canvas.toDataURL('image/jpeg', q);
+        while (out.length > 1800000 && q > 0.4) {
+          q -= 0.15;
+          out = canvas.toDataURL('image/jpeg', q);
+        }
+        done(out);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       4. 폼 데이터 수집 / 복원
+       ═══════════════════════════════════════════════════════════════ */
+    function getFormData() {
+      return {
+        source: SOURCE_ID,
+        teamName:     val('teamName'),
+        classInfo:    val('classInfo'),
+        studentName:  val('studentName'),
+        members:      getMembers(),
+        projectName:  val('projectName'),
+        projectIntro: val('projectIntro'),
+        projectDesc:  val('projectDesc'),
+        resultImages: imageStore.result.slice(),
+        arduinoCode:  $('arduinoCode').value,
+        htmlCode:     $('htmlCode').value,
+        keyPoint:     val('keyPoint'),
+        highlight:    val('highlight')
+      };
+    }
+
+    function setFormData(d) {
+      if (!d) return;
+      setVal('teamName', d.teamName);
+      setVal('classInfo', d.classInfo);
+      setVal('studentName', d.studentName);
+      setVal('projectName', d.projectName);
+      setVal('projectIntro', d.projectIntro);
+      setVal('projectDesc', d.projectDesc);
+      setVal('arduinoCode', d.arduinoCode);
+      setVal('htmlCode', d.htmlCode);
+      setVal('keyPoint', d.keyPoint);
+      setVal('highlight', d.highlight);
+
+      clearChildren($('memberTbody'));
+      var members = (d.members && d.members.length) ? d.members : [{}, {}, {}, {}];
+      members.forEach(function(m) { addMemberRow(m.name, m.role, m.work); });
+
+      imageStore.result = (d.resultImages || []).slice();
+      renderPreview('result');
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       5. 자동 임시저장 (localStorage)
+       ═══════════════════════════════════════════════════════════════ */
+    var draftTimer = null;
+    function scheduleDraft() {
+      clearTimeout(draftTimer);
+      draftTimer = setTimeout(function() {
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(getFormData()));
+          var now = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+          $('draftLabel').textContent = '임시저장: ' + now;
+        } catch (e) {
+          if (e && e.name === 'QuotaExceededError') {
+            $('draftLabel').textContent = '임시저장 용량 부족 (이미지 포함 시 .json 저장 권장)';
+          }
+        }
+      }, 1200);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       6. 검증
+       ═══════════════════════════════════════════════════════════════ */
+    function validate() {
+      var required = ['teamName', 'studentName', 'projectName', 'projectIntro', 'projectDesc', 'arduinoCode', 'htmlCode', 'keyPoint'];
+      var ok = true; var firstInvalid = null;
+      required.forEach(function(id) {
+        var el = $(id); if (!el) return;
+        if (!el.value.trim()) { el.classList.add('invalid'); ok = false; if (!firstInvalid) firstInvalid = el; }
+        else el.classList.remove('invalid');
+      });
+      if (!ok && firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return ok;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       7. TXT 생성 / 다운로드
+       ═══════════════════════════════════════════════════════════════ */
+    function buildTxt(d) {
+      var lines = [];
+      var now = new Date().toLocaleString('ko-KR');
+      lines.push('═══════════════════════════════════════════════════');
+      lines.push('  AI × 피지컬컴퓨팅 프로젝트 결과 보고서');
+      lines.push('  작성일시: ' + now);
+      lines.push('═══════════════════════════════════════════════════');
+      lines.push('');
+      lines.push('【 팀 정보 】');
+      lines.push('팀명: ' + (d.teamName || ''));
+      lines.push('반/번호: ' + (d.classInfo || ''));
+      lines.push('작성자: ' + (d.studentName || ''));
+      lines.push('');
+      lines.push('【 팀 구성 】');
+      (d.members || []).forEach(function(m) {
+        lines.push('- ' + m.name + (m.role ? ' (' + m.role + ')' : '') + (m.work ? ': ' + m.work : ''));
+      });
+      lines.push('');
+      lines.push('【 프로젝트 소개 】');
+      lines.push('프로젝트명: ' + (d.projectName || ''));
+      lines.push('한 줄 소개: ' + (d.projectIntro || ''));
+      lines.push('');
+      lines.push(d.projectDesc || '');
+      lines.push('');
+      lines.push('【 결과물 이미지 】 ' + ((d.resultImages || []).length) + '장 첨부');
+      lines.push('');
+      lines.push('【 프로젝트 핵심 포인트 】');
+      lines.push(d.keyPoint || '');
+      lines.push('');
+      lines.push('【 기타 부각하고 싶은 내용 】');
+      lines.push(d.highlight || '(없음)');
+      lines.push('');
+      lines.push('───────── 최종 Arduino 코드 ─────────');
+      lines.push(d.arduinoCode || '(미입력)');
+      lines.push('');
+      lines.push('───────── 최종 HTML 코드 ─────────');
+      lines.push(d.htmlCode || '(미입력)');
+      lines.push('');
+      lines.push('───────────────────────────────────────────────────');
+      return lines.join('\n');
+    }
+
+    function downloadBlob(content, filename, mime) {
+      var blob = new Blob([content], { type: (mime || 'text/plain') + ';charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }
+
+    function downloadTxt(d) {
+      var safeTeam = (d.teamName || '팀').replace(/\s+/g, '_');
+      var stamp = new Date().toISOString().slice(0, 10);
+      downloadBlob(buildTxt(d), '결과보고서_' + safeTeam + '_' + (d.studentName || '학생').replace(/\s+/g, '') + '_' + stamp + '.txt');
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       8. 제출 / 임시저장 / 불러오기 / 초기화
+       ═══════════════════════════════════════════════════════════════ */
+    var formSubmitted = false;
+
+    $('btnSubmit').addEventListener('click', function() {
+      if (!validate()) { showToast('필수 항목(*)을 모두 입력해 주세요.', 'error'); return; }
+      if (!confirm('보고서를 제출하시겠습니까?\n· TXT 파일이 다운로드됩니다\n· 구글 시트로 자동 전송됩니다')) return;
+
+      var data = getFormData();
+      var btn = this; btn.disabled = true;
+      formSubmitted = true;
+
+      downloadTxt(data);
+
+      var url = localStorage.getItem(URL_KEY) || DEFAULT_SCRIPT_URL;
+      if (!url) {
+        showToast('TXT는 저장됐습니다. 시트 URL이 설정되지 않아 시트 전송은 생략됩니다.', 'info', 5000);
+        btn.disabled = false;
+        return;
+      }
+      buildMergedImage(function(merged) {
+        data.mergedImage = merged;
+        fetch(url, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        }).then(function() {
+          showToast('제출 완료 — TXT 저장 + 시트 전송', 'success', 4500);
+        }).catch(function(err) {
+          showToast('TXT는 저장됐습니다. 시트 전송 오류: ' + err.message, 'error', 5000);
+        }).finally(function() { btn.disabled = false; });
+      });
+    });
+
+    $('btnDraft').addEventListener('click', function() {
+      var data = getFormData();
+      data._draftMeta = { savedAt: new Date().toISOString(), source: SOURCE_ID, version: 1 };
+      var stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+      var safe = (data.studentName || '학생').replace(/\s+/g, '');
+      downloadBlob(JSON.stringify(data, null, 2), safe + '_결과보고서_임시저장_' + stamp + '.json', 'application/json');
+      showToast('임시저장 .json 파일을 내려받았습니다.', 'success');
+    });
+
+    $('btnLoad').addEventListener('click', function() { $('fileInput').click(); });
+    $('fileInput').addEventListener('change', function(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          setFormData(JSON.parse(ev.target.result));
+          scheduleDraft();
+          showToast('불러왔습니다.', 'success');
+        } catch (err) { showToast('JSON 파일을 읽을 수 없습니다: ' + err.message, 'error'); }
+      };
+      reader.readAsText(file, 'utf-8');
+      e.target.value = '';
+    });
+
+    $('btnClear').addEventListener('click', function() {
+      if (!confirm('입력 내용과 첨부 이미지를 모두 초기화할까요?')) return;
+      ['teamName', 'classInfo', 'studentName', 'projectName', 'projectIntro', 'projectDesc',
+       'arduinoCode', 'htmlCode', 'keyPoint', 'highlight'].forEach(function(id) { setVal(id, ''); });
+      clearChildren($('memberTbody'));
+      addMemberRow(); addMemberRow(); addMemberRow(); addMemberRow();
+      imageStore.result = [];
+      renderPreview('result');
+      $$('.invalid').forEach(function(el) { el.classList.remove('invalid'); });
+      localStorage.removeItem(DRAFT_KEY);
+      $('draftLabel').textContent = '자동 임시저장 대기 중';
+      showToast('초기화했습니다.', 'info');
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       9. 코드 복사 / 파일 저장 버튼
+       ═══════════════════════════════════════════════════════════════ */
+    document.addEventListener('click', function(e) {
+      var copyTarget = e.target.closest('[data-copy]');
+      var dlTarget   = e.target.closest('[data-download]');
+      if (copyTarget) {
+        var text = $(copyTarget.dataset.copy).value;
+        if (!text.trim()) { showToast('복사할 내용이 없습니다.', 'error'); return; }
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text)
+            .then(function() { showToast('복사했습니다.', 'success'); })
+            .catch(function() { showToast('복사 실패. 직접 선택하세요.', 'error'); });
+        } else {
+          showToast('이 브라우저는 자동 복사를 지원하지 않습니다.', 'error');
+        }
+      }
+      if (dlTarget) {
+        var text2 = $(dlTarget.dataset.download).value;
+        if (!text2.trim()) { showToast('저장할 내용이 없습니다.', 'error'); return; }
+        downloadBlob(text2, dlTarget.dataset.filename || 'code.txt');
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       10. 설정 패널 / 기타
+       ═══════════════════════════════════════════════════════════════ */
+    function updateUrlStatus(url) {
+      var el = $('urlStatus');
+      if (url && url.indexOf('script.google.com') !== -1) {
+        el.textContent = '✔ URL이 저장되었습니다. 구글 시트 자동 전송이 활성화됩니다.';
+        el.className = 'url-status ok';
+      } else {
+        el.textContent = 'URL을 입력하면 구글 시트에 자동 저장됩니다.';
+        el.className = 'url-status empty';
+      }
+    }
+    $('btnSettings').addEventListener('click', function() {
+      var p = $('settingsPanel');
+      p.style.display = p.style.display === 'none' ? '' : 'none';
+    });
+    $('btnSaveUrl').addEventListener('click', function() {
+      var url = $('scriptUrl').value.trim();
+      localStorage.setItem(URL_KEY, url);
+      updateUrlStatus(url);
+      showToast('URL이 저장되었습니다.', 'success');
+    });
+    $('btnSetupGuide').addEventListener('click', function() { $('guideModal').style.display = 'block'; });
+    $('closeGuide').addEventListener('click', function() { $('guideModal').style.display = 'none'; });
+    $('guideModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
+    $('btnPrint').addEventListener('click', function() {
+      $('printMeta').textContent = '팀: ' + val('teamName') + ' · 작성자: ' + val('studentName') + ' · ' + new Date().toLocaleDateString('ko-KR');
+      window.print();
+    });
+
+    document.addEventListener('input', function(e) {
+      if (e.target.matches('input, textarea, select')) scheduleDraft();
+    });
+    document.addEventListener('change', function(e) {
+      if (e.target.matches('input, textarea, select')) scheduleDraft();
+    });
+
+    $('btnAddMember').addEventListener('click', function() {
+      if ($('memberTbody').rows.length >= 6) { showToast('최대 6명까지 추가할 수 있습니다.', 'error'); return; }
+      addMemberRow(); scheduleDraft();
+    });
+
+    window.addEventListener('beforeunload', function(e) {
+      if (formSubmitted) return;
+      var hasInput = ['teamName', 'studentName', 'projectName', 'projectDesc', 'keyPoint']
+        .some(function(id) { var el = $(id); return el && el.value.trim(); })
+        || imageStore.result.length;
+      if (hasInput) { e.preventDefault(); e.returnValue = ''; }
+    });
+
+    /* ═══════════════════════════════════════════════════════════════
+       11. 초기화
+       ═══════════════════════════════════════════════════════════════ */
+    (function init() {
+      addMemberRow(); addMemberRow(); addMemberRow(); addMemberRow();
+      setupImageZone('result', MAX_IMAGES);
+
+      var savedUrl = localStorage.getItem(URL_KEY) || DEFAULT_SCRIPT_URL;
+      $('scriptUrl').value = savedUrl;
+      updateUrlStatus(savedUrl);
+
+      try {
+        var saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
+        if (saved && (saved.teamName || saved.projectName)) {
+          setFormData(saved);
+          showToast('이전에 작성하던 내용을 불러왔습니다.', 'info', 5000);
+        }
+      } catch (e) {}
+    })();
+
+  })();
+  </script>
+</body>
+</html>

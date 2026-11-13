@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoBot - AI 기반 교실 에너지 절약 로봇</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #F5F500;
+      --style-primary: #000000;
+      --style-accent: #FF3B30;
+      --style-text: #000000;
+      --style-text-secondary: #333333;
+      --card-white: #FFFFFF;
+      --card-black: #000000;
+      --border-thick: 3px solid #000000;
+      --shadow-hard: 6px 6px 0 #000000;
+      --main: #FF3B30;
+      --white: #FFFFFF;
+      --gray-200: #000000;
+      --gray-600: #333333;
+      --gray-700: #000000;
+      --light: #FFFFCC;
+    }
+
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: Arial, 'Helvetica Neue', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden; height: 100%;
+    }
+
+    h1, h2, h3 { font-family: 'Arial Black', Arial, sans-serif; color: var(--style-primary); }
+    h1 { font-size: 2.4rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; }
+    h2 { font-size: 1.5rem; font-weight: 900; }
+    h3 { font-size: 1.15rem; font-weight: 900; }
+    p { font-size: 1rem; line-height: 1.7; font-family: 'Space Mono', monospace; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-accent); color: var(--white); padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-contrast: high) {
+      :root { --style-bg: #FFFFFF; --style-accent: #CC0000; }
+      .browser-card { border: 3px solid #000000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 4px;
+      background: var(--style-accent);
+      z-index: 1000; transition: width 0.3s ease;
+      will-change: width; transform: translateZ(0);
+    }
+
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transform: translateZ(0); backface-visibility: hidden;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* Neo-Brutalism browser card */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--card-white);
+      border: var(--border-thick);
+      box-shadow: var(--shadow-hard);
+      position: relative;
+    }
+
+    .browser-topbar {
+      display: flex; align-items: center;
+      padding: 0.5rem 0.8rem;
+      border-bottom: var(--border-thick);
+      background: var(--card-white);
+      gap: 0.4rem;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--style-primary); }
+    .dot.red { background: var(--style-accent); }
+    .dot.yellow { background: var(--style-bg); }
+    .dot.green { background: #00C853; }
+    .topbar-title {
+      font-family: 'Arial Black', Arial, sans-serif;
+      font-size: 0.82rem;
+      color: var(--style-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin: 0 auto;
+    }
+
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    .browser-card--frameless {
+      background: transparent;
+      border: none; box-shadow: none;
+    }
+    .browser-card--frameless .browser-topbar { display: none; }
+
+    /* Section header */
+    .section-header { margin-bottom: 0.4rem; }
+    .section-header h2 { margin-bottom: 0.1rem; display: inline-block; background: var(--style-accent); color: var(--white); padding: 0.1rem 0.5rem; }
+    .section-icon { display: inline; font-size: 1.1em; margin-right: 0.3em; vertical-align: -0.05em; }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; margin-top: 0.2rem; }
+
+    /* Highlight box */
+    .highlight-box {
+      background: var(--light);
+      border: var(--border-thick);
+      box-shadow: 4px 4px 0 var(--style-primary);
+      padding: 0.5rem 1rem;
+      margin: 0.4rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* Card grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .card {
+      background: var(--card-white);
+      border: var(--border-thick);
+      box-shadow: var(--shadow-hard);
+      padding: 0.8rem 1rem;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--style-primary); }
+    .card-accent { background: var(--style-accent); color: var(--white); }
+    .card-accent h3, .card-accent p { color: var(--white); }
+    .card-yellow { background: var(--style-bg); }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
+    .card-title { font-size: 1.15rem; margin-bottom: 0.2rem; }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* Two column */
+    .two-col { display: flex; gap: 0.8rem; align-items: flex-start; }
+    .col-left, .col-right { flex: 1; }
+    .col-title { font-size: 1.15rem; margin-bottom: 0.4rem; padding-bottom: 0.2rem; border-bottom: 3px solid var(--style-primary); display: inline-block; }
+    .col-divider { width: 3px; background: var(--style-primary); align-self: stretch; }
+    .col-list { list-style: none; padding: 0; }
+    .col-list li { padding: 0.25rem 0; font-size: 0.95rem; font-family: 'Space Mono', monospace; border-bottom: 2px dashed rgba(0,0,0,0.15); }
+
+    /* Timeline */
+    .timeline { display: flex; gap: 0.5rem; margin-top: 0.4rem; position: relative; padding-top: 1rem; }
+    .timeline::before {
+      content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 3px;
+      background: var(--style-primary);
+    }
+    .timeline-item { flex: 1; text-align: center; position: relative; }
+    .timeline-marker {
+      width: 16px; height: 16px;
+      border: 3px solid var(--style-primary); background: var(--card-white);
+      margin: 0 auto 0.3rem;
+    }
+    .timeline-item.highlight .timeline-marker { background: var(--style-accent); }
+    .timeline-date { font-family: 'Arial Black', sans-serif; font-size: 0.82rem; font-weight: 900; color: var(--style-accent); display: block; text-transform: uppercase; }
+    .timeline-title { font-size: 0.95rem; font-weight: 900; margin: 0.1rem 0; }
+    .timeline-desc { font-size: 0.8rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; }
+
+    /* Stat highlight */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin: 0.5rem 0; }
+    .stat-item {
+      text-align: center; padding: 0.6rem;
+      background: var(--card-white);
+      border: var(--border-thick);
+      box-shadow: var(--shadow-hard);
+    }
+    .stat-number { display: block; font-family: 'Arial Black', sans-serif; font-size: 2.5rem; font-weight: 900; color: var(--style-accent); line-height: 1.1; }
+    .stat-label { font-size: 0.88rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; }
+
+    /* Image focus */
+    .image-focus { display: flex; gap: 1rem; align-items: center; margin-top: 0.4rem; }
+    .image-placeholder {
+      flex: 1; min-height: 200px;
+      background: repeating-linear-gradient(45deg, var(--light), var(--light) 10px, var(--card-white) 10px, var(--card-white) 20px);
+      border: var(--border-thick);
+      box-shadow: var(--shadow-hard);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Arial Black', sans-serif; font-size: 1.2rem; color: var(--style-text-secondary);
+    }
+    .image-desc { flex: 1; }
+    .image-desc h3 { margin-bottom: 0.3rem; }
+    .feature-list { list-style: none; padding: 0; }
+    .feature-list li { padding: 0.2rem 0; font-size: 0.95rem; font-family: 'Space Mono', monospace; }
+    .feature-list li::before { content: '→ '; color: var(--style-accent); font-weight: 700; }
+
+    /* Cover */
+    .cover-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 60vh; }
+    .cover-title { margin: 0.3rem 0; line-height: 1.1; font-size: 3rem; }
+    .cover-title-accent { color: var(--style-accent); }
+    .cover-subtitle { font-size: 1rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; }
+    .cover-divider { width: 80px; height: 4px; background: var(--style-primary); margin: 0.5rem auto; }
+    .cover-meta { font-size: 0.88rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; }
+    .cover-team { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; justify-content: center; }
+    .team-badge {
+      background: var(--card-white);
+      border: 2px solid var(--style-primary);
+      box-shadow: 3px 3px 0 var(--style-primary);
+      padding: 0.2rem 0.8rem;
+      font-family: 'Arial Black', sans-serif;
+      font-size: 0.88rem;
+    }
+
+    /* End slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .end-header { margin-bottom: 0.6rem; }
+    .end-title { font-size: 2rem; }
+    .end-title-accent { background: var(--style-accent); color: var(--white); padding: 0 0.3rem; display: inline; }
+    .end-subtitle { font-size: 0.95rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; margin-top: 0.3rem; }
+    .end-summary { text-align: left; max-width: 550px; width: 100%; }
+    .summary-title { font-size: 1.05rem; margin-bottom: 0.2rem; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 0.15rem 0; font-size: 0.88rem; font-family: 'Space Mono', monospace; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; height: 3px; }
+      .image-focus { flex-direction: column; }
+      .timeline { flex-direction: column; align-items: flex-start; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+      .cover-title { font-size: 2.2rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+    }
+
+    /* Nav bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: var(--card-white);
+      border-top: var(--border-thick);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 2px solid var(--style-primary);
+      background: var(--card-white);
+      cursor: pointer; font-size: 0;
+      color: var(--style-primary); transition: all 0.15s;
+      padding: 0; line-height: 1;
+      box-shadow: 2px 2px 0 var(--style-primary);
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { background: var(--style-accent); color: var(--white); box-shadow: 3px 3px 0 var(--style-primary); transform: translate(-1px, -1px); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 900; color: var(--style-primary);
+      font-family: 'Arial Black', sans-serif;
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none; border-bottom: 2px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 900; color: inherit;
+      font-family: inherit; padding: 0; outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-accent); }
+    .slide-input:focus { border-bottom-color: var(--style-accent); background: var(--light); }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide.active { animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="7" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">PROJECT PRESENTATION</span>
+        </div>
+        <div class="browser-content cover-slide">
+          <h1 class="cover-title"><span class="cover-title-accent">ECO</span>BOT</h1>
+          <p class="cover-subtitle">AI 기반 교실 에너지 절약 로봇</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-team">
+            <span class="team-badge">김민준</span>
+            <span class="team-badge">이서연</span>
+            <span class="team-badge">박지호</span>
+          </div>
+          <p class="cover-meta" style="margin-top: 0.4rem;">○○고등학교 2학년 · 2026</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 문제 정의 (two-column) -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 문제 정의">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">PROBLEM</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⚡</span> 문제 정의</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">교실 에너지 낭비 현황</h3>
+              <ul class="col-list" role="list">
+                <li>빈 교실 조명·에어컨 방치</li>
+                <li>연간 전기료 약 2,000만원 낭비</li>
+                <li>탄소 배출량 지속적 증가</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">EcoBot 해결 방향</h3>
+              <ul class="col-list" role="list">
+                <li>센서로 재실 인원 자동 감지</li>
+                <li>AI가 에너지 사용 최적화 판단</li>
+                <li>원격 제어 및 실시간 모니터링</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 개발 과정 (timeline) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 개발 과정">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">PROCESS</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>개발 과정</h2>
+          </div>
+          <div class="timeline" role="list" aria-label="개발 4단계">
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 1</span>
+              <h3 class="timeline-title">아이디어</h3>
+              <p class="timeline-desc">문제 발견 및 해결책 구상</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 2</span>
+              <h3 class="timeline-title">설계</h3>
+              <p class="timeline-desc">회로도, AI 모델 설계</p>
+            </div>
+            <div class="timeline-item highlight" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 3</span>
+              <h3 class="timeline-title">개발</h3>
+              <p class="timeline-desc">하드웨어 조립, 코딩</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <span class="timeline-date">STEP 4</span>
+              <h3 class="timeline-title">테스트</h3>
+              <p class="timeline-desc">교실 실증 실험 2주</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: EcoBot 소개 (image-focus) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: EcoBot 소개">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">ECOBOT</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>EcoBot 소개</h2>
+          </div>
+          <div class="image-focus">
+            <div class="image-placeholder" aria-label="EcoBot 로봇 이미지 (준비 중)">
+              [ ECOBOT IMAGE ]
+            </div>
+            <div class="image-desc">
+              <h3>핵심 기능</h3>
+              <ul class="feature-list" role="list">
+                <li>적외선 센서로 재실 인원 감지</li>
+                <li>AI가 조명·냉난방 자동 제어</li>
+                <li>스마트폰 앱으로 실시간 모니터링</li>
+                <li>월간 에너지 리포트 자동 생성</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 핵심 성과 (stat-highlight) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 핵심 성과">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">RESULTS</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>핵심 성과</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="30퍼센트">30%</span>
+              <span class="stat-label">전기 사용량 절약</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="15킬로그램">15kg</span>
+              <span class="stat-label">CO₂ 월간 감소량</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="2회">2회</span>
+              <span class="stat-label">교내외 대회 수상</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>2주간 교실 실증 실험 결과, 빈 교실 에너지 낭비를 30% 줄이는 데 성공했습니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 배운 점 (card-grid 2x1) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 배운 점">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">LESSONS</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>우리가 배운 것</h2>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card card-yellow" role="listitem">
+              <h3 class="card-title">기술적 배움</h3>
+              <p class="card-desc">라즈베리파이 프로그래밍, 센서 회로 설계, 머신러닝 모델 학습 과정을 직접 경험했습니다. 이론과 실제의 차이를 체감했습니다.</p>
+            </div>
+            <div class="card card-accent" role="listitem">
+              <h3 class="card-title">협업의 가치</h3>
+              <p class="card-desc">각자의 강점을 살려 역할을 분담하고, 매주 회의를 통해 진행 상황을 공유했습니다. 소통의 중요성을 배웠습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 마무리 (end) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 마무리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">THANK YOU</span>
+        </div>
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <h2 class="end-title"><span class="end-title-accent">THANK YOU</span></h2>
+            <p class="end-subtitle">질문이나 의견을 환영합니다!</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="데모 안내">
+            <h3 class="summary-title">데모 영상</h3>
+            <ul class="summary-list" role="list">
+              <li>→ QR 코드를 스캔하면 EcoBot 작동 영상을 볼 수 있습니다</li>
+              <li>→ GitHub: github.com/ecobot-team</li>
+            </ul>
+          </div>
+          <div class="cover-team" style="margin-top: 0.6rem;">
+            <span class="team-badge">김민준</span>
+            <span class="team-badge">이서연</span>
+            <span class="team-badge">박지호</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">7</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = `슬라이드 ${current + 1} / ${total}`;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { diff < 0 ? nextSlide() : prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => {
+      const n = parseInt(slideInput.value);
+      if (n >= 1 && n <= totalSlides) goToSlide(n - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    updateNav();
+  </script>
+</body>
+</html>

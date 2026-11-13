@@ -1,0 +1,199 @@
+{
+  "project_id": "pd-data-first-lesson-design",
+  "source": "script.json",
+  "total_sentences": 61,
+  "beats": [
+    {
+      "beat_index": 1, "chapter_id": "ch01", "sentences": [1],
+      "narration_summary": "작년 6팀 중 2팀이 6주 차에 멈췄다",
+      "scene": { "role": "declaration", "semantic_shape": "metric", "merge_hint": "standalone", "visual_weight": "high", "energy": "sharp",
+        "focal_candidate": "6팀 중 2팀", "subline_candidate": "6주 차에 멈춘 프로젝트 팀", "support_candidates": ["작년", "6주차"],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": false },
+      "semantic": { "tone": "dramatic", "evidence_type": "statistic", "emphasis_tokens": ["두 팀", "6주 차"], "density": 2, "brand_keywords": [], "visual_keywords": ["막대", "끊김"] }
+    },
+    {
+      "beat_index": 2, "chapter_id": "ch01", "sentences": [2, 3, 4],
+      "narration_summary": "미세먼지-결석률 팀은 개인정보 때문에 데이터를 못 받아 석 달이 사라졌다",
+      "scene": { "role": "evidence", "semantic_shape": "transformation", "merge_hint": "merge_prev", "visual_weight": "medium", "energy": "sharp",
+        "focal_candidate": "석 달", "subline_candidate": "결석률은 개인정보라 받을 수 없었다", "support_candidates": ["미세먼지 × 결석률", "개인정보"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "dramatic", "evidence_type": "example", "emphasis_tokens": ["개인정보", "석 달"], "density": 3, "brand_keywords": [], "visual_keywords": ["달력", "지워짐"] }
+    },
+    {
+      "beat_index": 3, "chapter_id": "ch01", "sentences": [5, 6],
+      "narration_summary": "제안: 첫 차시를 문제 정하기가 아니라 데이터 찾기로",
+      "scene": { "role": "declaration", "semantic_shape": "contrast", "merge_hint": "standalone", "visual_weight": "high", "energy": "sharp",
+        "focal_candidate": "데이터 찾기", "subline_candidate": "프로젝트 수업의 첫 차시를 여기서 시작한다", "support_candidates": ["문제 정하기"],
+        "contrast_with_prev": true, "continues_motif": false, "should_break_rhythm": true },
+      "semantic": { "tone": "confident", "evidence_type": "statement", "emphasis_tokens": ["첫 차시", "데이터 찾기"], "density": 2, "brand_keywords": [], "visual_keywords": ["순서", "뒤집기"] }
+    },
+    {
+      "beat_index": 4, "chapter_id": "ch02", "sentences": [7, 8],
+      "narration_summary": "통상 순서: 문제 먼저 — 동기가 생긴다는 이유",
+      "scene": { "role": "support", "semantic_shape": "flow", "merge_hint": "merge_next", "visual_weight": "low", "energy": "calm",
+        "focal_candidate": "문제 → 데이터", "subline_candidate": "동기가 생긴다는 이유로 문제를 먼저 정하게 한다", "support_candidates": ["동기"],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": false },
+      "semantic": { "tone": "neutral", "evidence_type": "definition", "emphasis_tokens": ["동기"], "density": 2, "brand_keywords": [], "visual_keywords": ["화살표"] }
+    },
+    {
+      "beat_index": 5, "chapter_id": "ch02", "sentences": [9, 10, 11, 12],
+      "narration_summary": "동기는 생기는데 데이터가 없다 — 문제와 데이터 사이 간격을 학생이 메울 수 없다",
+      "scene": { "role": "comparison", "semantic_shape": "contrast", "merge_hint": "standalone", "visual_weight": "high", "energy": "sharp",
+        "focal_candidate": "간격", "subline_candidate": "풀고 싶은 문제와 손에 넣을 수 있는 데이터 사이", "support_candidates": ["행정 자료", "공공 통계"],
+        "contrast_with_prev": true, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "analytical", "evidence_type": "statement", "emphasis_tokens": ["간격", "메울 수 없다"], "density": 3, "brand_keywords": [], "visual_keywords": ["틈", "절벽"] }
+    },
+    {
+      "beat_index": 6, "chapter_id": "ch02", "sentences": [13, 14],
+      "narration_summary": "순서를 뒤집으면 데이터가 없어서 멈추는 일이 구조적으로 사라진다",
+      "scene": { "role": "payoff", "semantic_shape": "transformation", "merge_hint": "standalone", "visual_weight": "high", "energy": "sharp",
+        "focal_candidate": "데이터 → 문제", "subline_candidate": "멈추는 일이 구조적으로 사라진다", "support_candidates": ["순서 뒤집기"],
+        "contrast_with_prev": true, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "confident", "evidence_type": "statement", "emphasis_tokens": ["뒤집자", "구조적으로"], "density": 2, "brand_keywords": [], "visual_keywords": ["화살표 반전"] }
+    },
+    {
+      "beat_index": 7, "chapter_id": "ch03", "sentences": [15],
+      "narration_summary": "데이터는 세 갈래에 있다",
+      "scene": { "role": "pause", "semantic_shape": "symbol", "merge_hint": "merge_next", "visual_weight": "low", "energy": "calm",
+        "focal_candidate": "세 갈래", "subline_candidate": null, "support_candidates": [],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": true },
+      "semantic": { "tone": "neutral", "evidence_type": "definition", "emphasis_tokens": ["세 갈래"], "density": 1, "brand_keywords": [], "visual_keywords": ["분기"] }
+    },
+    {
+      "beat_index": 8, "chapter_id": "ch03", "sentences": [16, 17, 18],
+      "narration_summary": "공개 데이터: 당장 받을 수 있지만 학생과 멀다",
+      "scene": { "role": "cluster", "semantic_shape": "hierarchy", "merge_hint": "standalone", "visual_weight": "medium", "energy": "neutral",
+        "focal_candidate": "공개", "subline_candidate": "당장 받을 수 있지만 학생과 멀다", "support_candidates": ["공공데이터포털", "국가통계포털", "학교알리미"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "neutral", "evidence_type": "example", "emphasis_tokens": ["공개", "멀다"], "density": 3, "brand_keywords": ["공공데이터포털", "KOSIS", "학교알리미"], "visual_keywords": ["포털"] }
+    },
+    {
+      "beat_index": 9, "chapter_id": "ch03", "sentences": [19, 20, 21],
+      "narration_summary": "학교 안 데이터: 문제는 보이는데 정리돼 있지 않다",
+      "scene": { "role": "cluster", "semantic_shape": "hierarchy", "merge_hint": "merge_prev", "visual_weight": "medium", "energy": "neutral",
+        "focal_candidate": "학교 안", "subline_candidate": "문제는 보이는데 파일로 정리돼 있지 않다", "support_candidates": ["급식", "시간표", "도서 대출"],
+        "contrast_with_prev": true, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "neutral", "evidence_type": "example", "emphasis_tokens": ["학교 안", "정리"], "density": 3, "brand_keywords": [], "visual_keywords": ["게시판"] }
+    },
+    {
+      "beat_index": 10, "chapter_id": "ch03", "sentences": [22, 23, 24],
+      "narration_summary": "직접 만드는 데이터: 가치는 가장 높지만 시간이 든다",
+      "scene": { "role": "cluster", "semantic_shape": "hierarchy", "merge_hint": "merge_prev", "visual_weight": "medium", "energy": "neutral",
+        "focal_candidate": "직접", "subline_candidate": "세상에 없어서 가치가 가장 높다", "support_candidates": ["설문", "2주 자기 기록"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "neutral", "evidence_type": "example", "emphasis_tokens": ["직접", "가치"], "density": 3, "brand_keywords": [], "visual_keywords": ["설문", "기록"] }
+    },
+    {
+      "beat_index": 11, "chapter_id": "ch03", "sentences": [25, 26],
+      "narration_summary": "규칙: 세 갈래를 모두 채운다 — 한 갈래에 몰리면 문장이 안 나온다",
+      "scene": { "role": "declaration", "semantic_shape": "summary", "merge_hint": "standalone", "visual_weight": "high", "energy": "sharp",
+        "focal_candidate": "셋 다", "subline_candidate": "한 갈래에만 몰리면 다음 단계가 막힌다", "support_candidates": ["첫 차시 규칙"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "confident", "evidence_type": "statement", "emphasis_tokens": ["모두", "몰리면"], "density": 2, "brand_keywords": [], "visual_keywords": ["체크 3"] }
+    },
+    {
+      "beat_index": 12, "chapter_id": "ch04", "sentences": [27, 28],
+      "narration_summary": "쓸 만한 데이터의 조건을 세 개로 고정해 학습지 체크박스로",
+      "scene": { "role": "support", "semantic_shape": "cluster", "merge_hint": "merge_next", "visual_weight": "low", "energy": "calm",
+        "focal_candidate": "조건 셋", "subline_candidate": "학습지 체크박스 세 칸", "support_candidates": [],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": true },
+      "semantic": { "tone": "neutral", "evidence_type": "definition", "emphasis_tokens": ["조건", "체크박스"], "density": 2, "brand_keywords": [], "visual_keywords": ["체크박스"] }
+    },
+    {
+      "beat_index": 13, "chapter_id": "ch04", "sentences": [29, 30, 31, 32, 33, 34],
+      "narration_summary": "행 30 이상, 열 3 이상, 직접 열 수 있는가 — 각 조건의 이유",
+      "scene": { "role": "sequence", "semantic_shape": "flow", "merge_hint": "standalone", "visual_weight": "high", "energy": "neutral",
+        "focal_candidate": "행 ≥ 30 · 열 ≥ 3 · 직접 연다", "subline_candidate": "셋을 차례로 통과해야 쓸 수 있다", "support_candidates": ["비교·추천", "속성", "CSV·엑셀·표"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "analytical", "evidence_type": "definition", "emphasis_tokens": ["30", "3", "직접"], "density": 4, "brand_keywords": [], "visual_keywords": ["체", "필터"] }
+    },
+    {
+      "beat_index": 14, "chapter_id": "ch04", "sentences": [35],
+      "narration_summary": "하나라도 통과 못 하면 후보에서 뺀다",
+      "scene": { "role": "payoff", "semantic_shape": "symbol", "merge_hint": "merge_prev", "visual_weight": "medium", "energy": "sharp",
+        "focal_candidate": "뺀다", "subline_candidate": "하나라도 걸리면 후보에서 제외", "support_candidates": [],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "confident", "evidence_type": "statement", "emphasis_tokens": ["뺀다"], "density": 1, "brand_keywords": [], "visual_keywords": ["탈락"] }
+    },
+    {
+      "beat_index": 15, "chapter_id": "ch05", "sentences": [36, 37, 38],
+      "narration_summary": "데이터→문제 전환을 위한 문장 틀 하나: 누가/상황/무엇을 몰라서/무엇을 알 수 있다",
+      "scene": { "role": "declaration", "semantic_shape": "transformation", "merge_hint": "standalone", "visual_weight": "high", "energy": "neutral",
+        "focal_candidate": "빈칸 넷", "subline_candidate": "누가 · 어떤 상황 · 무엇을 몰라서 · 무엇을 안다", "support_candidates": ["틀은 하나"],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": true },
+      "semantic": { "tone": "confident", "evidence_type": "definition", "emphasis_tokens": ["틀", "누가"], "density": 3, "brand_keywords": [], "visual_keywords": ["빈칸", "폼"] }
+    },
+    {
+      "beat_index": 16, "chapter_id": "ch05", "sentences": [39, 40],
+      "narration_summary": "급식 예시로 채운 문장 — 영양사가 메뉴 조합별 잔반 경향을 안다",
+      "scene": { "role": "evidence", "semantic_shape": "evidence", "merge_hint": "merge_prev", "visual_weight": "medium", "energy": "neutral",
+        "focal_candidate": "영양사", "subline_candidate": "급식 메뉴와 잔반량으로 채운 한 문장", "support_candidates": ["메뉴 조합", "잔반 경향"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "neutral", "evidence_type": "example", "emphasis_tokens": ["영양사", "잔반"], "density": 3, "brand_keywords": [], "visual_keywords": ["급식"] }
+    },
+    {
+      "beat_index": 17, "chapter_id": "ch05", "sentences": [41, 42, 43],
+      "narration_summary": "'만족도 조사'는 문제가 아니다 — 누군가가 덜 힘들어져야 문제",
+      "scene": { "role": "comparison", "semantic_shape": "contrast", "merge_hint": "standalone", "visual_weight": "high", "energy": "sharp",
+        "focal_candidate": "덜 힘들어지는 사람", "subline_candidate": "조사로 끝나는 문장은 문제가 아니다", "support_candidates": ["만족도 조사", "그래서?"],
+        "contrast_with_prev": true, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "confident", "evidence_type": "statement", "emphasis_tokens": ["덜 힘들어져야"], "density": 2, "brand_keywords": [], "visual_keywords": ["대비", "✗/✓"] }
+    },
+    {
+      "beat_index": 18, "chapter_id": "ch06", "sentences": [44, 45, 46],
+      "narration_summary": "데이터당 3문장·총 9문장, '누가'가 매번 달라야 한다",
+      "scene": { "role": "declaration", "semantic_shape": "metric", "merge_hint": "standalone", "visual_weight": "medium", "energy": "neutral",
+        "focal_candidate": "3 × 3 = 9", "subline_candidate": "문장마다 누가를 바꾼다", "support_candidates": ["누가"],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": true },
+      "semantic": { "tone": "neutral", "evidence_type": "definition", "emphasis_tokens": ["아홉", "누가"], "density": 2, "brand_keywords": [], "visual_keywords": ["곱셈"] }
+    },
+    {
+      "beat_index": 19, "chapter_id": "ch06", "sentences": [47, 48],
+      "narration_summary": "같은 급식 데이터가 영양사·학생회·행정실에게 다른 것을 준다",
+      "scene": { "role": "evidence", "semantic_shape": "hierarchy", "merge_hint": "merge_prev", "visual_weight": "high", "energy": "neutral",
+        "focal_candidate": "급식 데이터 하나", "subline_candidate": "사람을 바꾸면 문제 후보의 질이 올라간다", "support_candidates": ["영양사", "학생회", "행정실"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "analytical", "evidence_type": "example", "emphasis_tokens": ["영양사", "학생회", "행정실"], "density": 3, "brand_keywords": [], "visual_keywords": ["분기 트리"] }
+    },
+    {
+      "beat_index": 20, "chapter_id": "ch07", "sentences": [49],
+      "narration_summary": "매년 반복되는 장애 셋",
+      "scene": { "role": "pause", "semantic_shape": "symbol", "merge_hint": "merge_next", "visual_weight": "low", "energy": "calm",
+        "focal_candidate": "장애 셋", "subline_candidate": null, "support_candidates": [],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": true },
+      "semantic": { "tone": "warning", "evidence_type": "statement", "emphasis_tokens": ["매년"], "density": 1, "brand_keywords": [], "visual_keywords": ["경고"] }
+    },
+    {
+      "beat_index": 21, "chapter_id": "ch07", "sentences": [50, 51, 52, 53, 54, 55],
+      "narration_summary": "찾을 게 없다→예비 카드 / 거대 통계표→지역 필터 / AI 의존→URL 확인 조건",
+      "scene": { "role": "comparison", "semantic_shape": "contrast", "merge_hint": "standalone", "visual_weight": "high", "energy": "neutral",
+        "focal_candidate": "장애 → 대처", "subline_candidate": "세 장애마다 대처가 하나씩 있다", "support_candidates": ["예비 카드", "지역 필터", "URL 확인"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "analytical", "evidence_type": "example", "emphasis_tokens": ["예비 카드", "필터", "URL"], "density": 4, "brand_keywords": [], "visual_keywords": ["do-dont"] }
+    },
+    {
+      "beat_index": 22, "chapter_id": "ch08", "sentences": [56, 57],
+      "narration_summary": "첫 차시를 데이터 찾기로 두면 멈추는 팀이 구조적으로 사라진다",
+      "scene": { "role": "payoff", "semantic_shape": "symbol", "merge_hint": "standalone", "visual_weight": "high", "energy": "sharp",
+        "focal_candidate": "첫 차시", "subline_candidate": "학기를 결정하는 50분", "support_candidates": [],
+        "contrast_with_prev": false, "continues_motif": false, "should_break_rhythm": true },
+      "semantic": { "tone": "confident", "evidence_type": "statement", "emphasis_tokens": ["첫 차시", "구조적으로"], "density": 2, "brand_keywords": [], "visual_keywords": ["키스톤"] }
+    },
+    {
+      "beat_index": 23, "chapter_id": "ch08", "sentences": [58, 59],
+      "narration_summary": "네 가지 장치: 세 갈래 강제 · 조건 셋 · 문장 틀 하나 · 누가 바꾸기 → 3 데이터 + 9 문제",
+      "scene": { "role": "cluster", "semantic_shape": "summary", "merge_hint": "merge_prev", "visual_weight": "high", "energy": "neutral",
+        "focal_candidate": "장치 넷", "subline_candidate": "50분 안에 데이터 셋과 문제 아홉", "support_candidates": ["세 갈래", "조건 셋", "틀 하나", "누가"],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "confident", "evidence_type": "statement", "emphasis_tokens": ["네 가지", "50분"], "density": 3, "brand_keywords": [], "visual_keywords": ["요약 4"] }
+    },
+    {
+      "beat_index": 24, "chapter_id": "ch08", "sentences": [60, 61],
+      "narration_summary": "공유 폴더에 학습지와 덱이 있다 — 다음 학기에 써 보고 결과를 나누자",
+      "scene": { "role": "support", "semantic_shape": "symbol", "merge_hint": "merge_prev", "visual_weight": "low", "energy": "calm",
+        "focal_candidate": "공유 폴더", "subline_candidate": "써 보고 결과를 나누자", "support_candidates": [],
+        "contrast_with_prev": false, "continues_motif": true, "should_break_rhythm": false },
+      "semantic": { "tone": "neutral", "evidence_type": "statement", "emphasis_tokens": ["공유"], "density": 1, "brand_keywords": [], "visual_keywords": ["폴더"] }
+    }
+  ]
+}

@@ -1,0 +1,1722 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>슬라이드를 위한 모션 8컷</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   토큰 — 밝은 테마가 기본. 다크는 토큰만 재정의한다.
+   ═══════════════════════════════════════════════════════════════ */
+:root{
+  /* 지면: 차가운 흑연 그레이 (청사진/도프시트) */
+  --bg:        #E7EAEC;
+  --bg-grid:   #D3DADE;
+  --surface:   #FAFBFC;
+  --surface-2: #F0F3F5;
+  --ink:       #10171C;
+  --ink-2:     #4E5B65;
+  --ink-3:     #7C8A94;
+  --line:      #CBD3D8;
+  --line-2:    #DDE3E7;
+
+  /* 강조: 플레이헤드 앰버 — 지면과 온도가 반대라 눈에 걸린다 */
+  --accent:    #C4701A;
+  --accent-w:  #F2E3D0;
+  --accent-2:  #0F5158;   /* 딥 틸 — 이징 곡선, 링크 */
+  --accent-2w: #DCE9EA;
+
+  /* 의미색 (강조색과 별개) */
+  --ok:   #1D7A4E;
+  --ok-w: #DDEEE4;
+  --err:  #B93A2C;
+  --err-w:#F5DFDC;
+  --warn: #A9720B;
+
+  --shadow: 0 1px 2px rgba(16,23,28,.06), 0 8px 22px -14px rgba(16,23,28,.30);
+  --shadow-lift: 0 2px 4px rgba(16,23,28,.07), 0 18px 40px -22px rgba(16,23,28,.40);
+
+  /* ── 모션 토큰: 스킬이 정한 브랜드 모션 아이덴티티 ──
+     Corporate 아키타입(200/300/450ms) × 투사 보정 1.3배 */
+  --ts: 1;                       /* 전역 재생 속도 배율 */
+  --d-quick: calc(260ms * var(--ts));
+  --d-std:   calc(390ms * var(--ts));
+  --d-slow:  calc(580ms * var(--ts));
+  --e-std:   cubic-bezier(.2,0,0,1);        /* MD3 Standard — 시그니처 */
+  --e-emph:  cubic-bezier(.05,.7,.1,1);     /* MD3 Emphasized — 등장 */
+  --e-accel: cubic-bezier(.3,0,1,1);        /* MD3 Accelerate — 퇴장 */
+  --e-decel: cubic-bezier(0,0,0,1);         /* MD3 Decelerate */
+  --e-back:  cubic-bezier(.175,.885,.32,1.275); /* Bounce settle */
+  --e-sine:  cubic-bezier(.37,0,.63,1);     /* 앰비언트 루프 */
+
+  --maxw: 1180px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:        #101619;
+    --bg-grid:   #1A2429;
+    --surface:   #182025;
+    --surface-2: #131B1F;
+    --ink:       #E4EAED;
+    --ink-2:     #9DABB4;
+    --ink-3:     #74848E;
+    --line:      #2B373E;
+    --line-2:    #212C32;
+    --accent:    #EBA354;
+    --accent-w:  #3A2A18;
+    --accent-2:  #4FB6C0;
+    --accent-2w: #143134;
+    --ok:   #4FC98C; --ok-w:  #14322A;
+    --err:  #F0705F; --err-w: #3A211E;
+    --warn: #D9A03F;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 26px -16px rgba(0,0,0,.8);
+    --shadow-lift: 0 2px 5px rgba(0,0,0,.55), 0 22px 48px -24px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:        #101619;
+  --bg-grid:   #1A2429;
+  --surface:   #182025;
+  --surface-2: #131B1F;
+  --ink:       #E4EAED;
+  --ink-2:     #9DABB4;
+  --ink-3:     #74848E;
+  --line:      #2B373E;
+  --line-2:    #212C32;
+  --accent:    #EBA354;
+  --accent-w:  #3A2A18;
+  --accent-2:  #4FB6C0;
+  --accent-2w: #143134;
+  --ok:   #4FC98C; --ok-w:  #14322A;
+  --err:  #F0705F; --err-w: #3A211E;
+  --warn: #D9A03F;
+  --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 26px -16px rgba(0,0,0,.8);
+  --shadow-lift: 0 2px 5px rgba(0,0,0,.55), 0 22px 48px -24px rgba(0,0,0,.9);
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  background:var(--bg);
+  background-image:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 64px 64px, 64px 64px;
+  color:var(--ink);
+  font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  font-weight:400;
+  font-size:16px;
+  line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3,h4{ font-family:"Gothic A1","IBM Plex Sans KR",system-ui,sans-serif; margin:0; text-wrap:balance; word-break:keep-all; }
+p{ margin:0; }
+a{ color:var(--accent-2); text-underline-offset:3px; text-decoration-thickness:1px; }
+a:hover{ color:var(--accent); }
+code,kbd,.mono{ font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace; font-variant-numeric:tabular-nums; }
+:where(a,button,summary,input):focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:3px; }
+
+.wrap{ width:min(100% - 2.5rem, var(--maxw)); margin-inline:auto; }
+
+/* ═══════════ 머리말 ═══════════ */
+.masthead{
+  padding:clamp(3rem,7vw,5.5rem) 0 clamp(2rem,4vw,3rem);
+  border-bottom:1px solid var(--line);
+}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace; font-size:.7rem; font-weight:500;
+  letter-spacing:.18em; text-transform:uppercase; color:var(--ink-3);
+  display:flex; flex-wrap:wrap; gap:.5rem .9rem; align-items:center;
+}
+.eyebrow b{ color:var(--accent); font-weight:600; }
+.masthead h1{
+  font-size:clamp(2.5rem,7.5vw,4.6rem); font-weight:900; line-height:1.02;
+  letter-spacing:-.035em; margin:1.5rem 0 0; max-width:16ch;
+}
+.masthead h1 em{ font-style:normal; color:var(--accent); }
+.lede{
+  margin-top:1.4rem; max-width:60ch; font-size:1.08rem; color:var(--ink-2); font-weight:300;
+}
+.lede strong{ color:var(--ink); font-weight:500; }
+
+.factstrip{
+  margin-top:2.6rem; display:grid; gap:1px; background:var(--line);
+  border:1px solid var(--line); grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+}
+.fact{ background:var(--surface); padding:.95rem 1.1rem; }
+.fact dt{ font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); }
+.fact dd{ margin:.25rem 0 0; font-size:.95rem; font-weight:500; }
+.fact dd small{ display:block; font-weight:400; font-size:.78rem; color:var(--ink-3); line-height:1.5; }
+
+/* ═══════════ 컨트롤 바 ═══════════ */
+.controlbar{
+  position:sticky; top:0; z-index:50;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.controlbar__in{
+  display:flex; flex-wrap:wrap; align-items:center; gap:.55rem 1.2rem;
+  padding:.6rem 0; min-height:52px;
+}
+/* 좁은 화면에서는 3줄로 접히며 세로 공간을 다 먹는다 — 고정 해제 */
+@media (max-width:640px){ .controlbar{ position:static; } .spacer{ display:none; } }
+.ctl-label{
+  font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+.seg{ display:flex; border:1px solid var(--line); background:var(--surface); }
+.seg button{
+  font:inherit; font-family:"IBM Plex Mono",monospace; font-size:.78rem; font-weight:500;
+  padding:.3rem .68rem; background:none; border:0; border-right:1px solid var(--line-2);
+  color:var(--ink-2); cursor:pointer; transition:background 120ms var(--e-std), color 120ms var(--e-std);
+}
+.seg button:last-child{ border-right:0; }
+.seg button:hover{ background:var(--surface-2); color:var(--ink); }
+.seg button[aria-pressed="true"]{ background:var(--accent); color:#fff; }
+:root[data-theme="dark"] .seg button[aria-pressed="true"],
+:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{ color:#101619; }
+.btn{
+  font:inherit; font-size:.82rem; font-weight:500; padding:.34rem .8rem;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink-2);
+  cursor:pointer; transition:background 120ms var(--e-std), color 120ms var(--e-std), transform 120ms var(--e-std);
+}
+.btn:hover{ background:var(--surface-2); color:var(--ink); }
+.btn:active{ transform:scale(.97); }
+.spacer{ flex:1 1 auto; }
+
+/* ═══════════ 섹션 공통 ═══════════ */
+.section{ padding:clamp(3rem,6vw,5rem) 0; border-bottom:1px solid var(--line); }
+.section__head{ max-width:66ch; margin-bottom:2.4rem; }
+.section__no{
+  font-family:"IBM Plex Mono",monospace; font-size:.7rem; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--accent); font-weight:600;
+}
+.section h2{
+  font-size:clamp(1.6rem,3.4vw,2.3rem); font-weight:800; letter-spacing:-.025em;
+  margin:.5rem 0 0; line-height:1.2;
+}
+.section__head p{ margin-top:.85rem; color:var(--ink-2); font-weight:300; }
+
+/* ═══════════ 파이프라인 ═══════════ */
+/* 항목이 4개 고정이므로 auto-fit 대신 명시적 열 수를 쓴다.
+   auto-fit은 중간 폭에서 빈 셀을 만들고, 1px 갭 기법에서 빈 셀은
+   구분선 색이 그대로 드러나는 회색 덩어리가 된다. */
+.pipe{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line);
+  grid-template-columns:repeat(4,1fr); }
+@media (max-width:1000px){ .pipe{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:560px){ .pipe{ grid-template-columns:1fr; } }
+.pipe__step{ background:var(--surface); padding:1.4rem 1.3rem 1.5rem; }
+.pipe__k{ font-family:"IBM Plex Mono",monospace; font-size:.72rem; color:var(--accent);
+  font-weight:600; letter-spacing:.1em; }
+.pipe__step h3{ font-size:1.02rem; font-weight:700; margin:.5rem 0 .5rem; letter-spacing:-.01em; }
+.pipe__step p{ font-size:.87rem; color:var(--ink-2); line-height:1.65; font-weight:300; }
+.pipe__step p + p{ margin-top:.6rem; }
+.src{ display:block; margin-top:.8rem; font-family:"IBM Plex Mono",monospace;
+  font-size:.7rem; color:var(--ink-3); line-height:1.6; word-break:break-all; }
+.src b{ color:var(--accent-2); font-weight:500; }
+
+/* ═══════════ 아이덴티티 패널 ═══════════ */
+.ident{ display:grid; gap:1.6rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+.panel{ background:var(--surface); border:1px solid var(--line); padding:1.4rem 1.3rem 1.5rem; }
+.panel h3{ font-size:.95rem; font-weight:700; letter-spacing:-.01em; }
+.panel > p{ font-size:.85rem; color:var(--ink-2); margin-top:.4rem; font-weight:300; }
+
+.curves{ display:grid; grid-template-columns:repeat(auto-fit,minmax(88px,1fr)); gap:.9rem .8rem; margin-top:1.1rem; }
+.curve{ margin:0; min-width:0; }   /* figure 기본 마진(1em 40px) 제거 — 안 하면 곡선이 뭉갠다 */
+.curve figcaption{ font-family:"IBM Plex Mono",monospace; font-size:.6rem; color:var(--ink-3);
+  margin-top:.4rem; line-height:1.5; }
+.curve figcaption b{ display:block; color:var(--ink); font-weight:600; font-size:.68rem; }
+.curve svg{ display:block; width:100%; height:auto; background:var(--surface-2); border:1px solid var(--line-2); }
+.curve .grid{ stroke:var(--line); stroke-width:1; }
+.curve .path{ stroke:var(--accent-2); stroke-width:5; fill:none; stroke-linecap:round; }
+.curve.is-accent .path{ stroke:var(--accent); stroke-width:6; }
+
+.durtable{ width:100%; border-collapse:collapse; margin-top:1rem; font-size:.82rem; }
+.durtable th,.durtable td{ text-align:left; padding:.42rem .5rem; border-bottom:1px solid var(--line-2); }
+.durtable th{ font-family:"IBM Plex Mono",monospace; font-size:.65rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:500; }
+.durtable td.num{ font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; }
+.durtable tr:last-child td{ border-bottom:0; }
+.durtable .out{ color:var(--accent); font-weight:600; }
+
+/* ═══════════ 컷 카드 ═══════════ */
+.cuts{ display:flex; flex-direction:column; gap:2.2rem; }
+.cut{ background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); }
+.cut__head{ padding:1.25rem 1.4rem 1.1rem; border-bottom:1px solid var(--line-2);
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:.5rem .9rem; }
+.cut__no{ font-family:"IBM Plex Mono",monospace; font-size:.76rem; font-weight:600;
+  color:var(--accent); letter-spacing:.08em; }
+.cut__head h3{ font-size:1.24rem; font-weight:800; letter-spacing:-.02em; }
+.cut__tag{ font-family:"IBM Plex Mono",monospace; font-size:.63rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-2); border:1px solid var(--line);
+  padding:.14rem .5rem; background:var(--surface-2); }
+.cut__use{ flex-basis:100%; font-size:.88rem; color:var(--ink-2); font-weight:300; margin-top:.15rem; }
+
+.cut__body{ display:grid; grid-template-columns:1.25fr 1fr; }
+@media (max-width:860px){ .cut__body{ grid-template-columns:1fr; } }
+.cut__left{ border-right:1px solid var(--line-2); }
+@media (max-width:860px){ .cut__left{ border-right:0; border-bottom:1px solid var(--line-2); } }
+
+/* 무대 */
+.stage{
+  position:relative; overflow:hidden; aspect-ratio:16/9;
+  background:var(--surface-2);
+  display:grid; place-items:center; padding:clamp(1rem,3vw,2rem);
+  container-type:inline-size;
+}
+.stagebar{
+  display:flex; align-items:center; gap:.7rem; padding:.55rem .9rem;
+  border-top:1px solid var(--line-2); background:var(--surface);
+}
+.stagebar .total{ font-family:"IBM Plex Mono",monospace; font-size:.72rem; color:var(--ink-3); }
+.stagebar .total b{ color:var(--ink-2); font-weight:600; }
+
+/* 비트 바 — 내러티브 4막 (director/narrative-structure.md) */
+.beats{ display:flex; height:26px; border-top:1px solid var(--line-2); }
+.beat{ position:relative; display:grid; place-items:center; border-right:1px solid var(--line-2);
+  font-family:"IBM Plex Mono",monospace; font-size:.6rem; letter-spacing:.06em;
+  color:var(--ink-3); overflow:hidden; white-space:nowrap; }
+.beat:last-child{ border-right:0; }
+.beat--a{ background:var(--surface-2); }
+.beat--b{ background:var(--accent-w); color:var(--accent); font-weight:600; }
+.beat--c{ background:var(--surface-2); }
+.beat--d{ background:var(--accent-2w); color:var(--accent-2); }
+
+/* 결정 시트 */
+.sheet{ padding:1.1rem 1.3rem 1.3rem; }
+.sheet h4{ font-family:"IBM Plex Mono",monospace; font-size:.63rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:500; margin-bottom:.7rem; }
+.sheet dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:0; }
+.sheet dt{ font-family:"IBM Plex Mono",monospace; font-size:.68rem; color:var(--ink-3);
+  padding:.4rem .9rem .4rem 0; border-bottom:1px solid var(--line-2); white-space:nowrap;
+  display:flex; align-items:baseline; gap:.4rem; }
+.sheet dt i{ font-style:normal; color:var(--accent); font-weight:600; }
+.sheet dd{ margin:0; font-size:.83rem; padding:.4rem 0; border-bottom:1px solid var(--line-2);
+  color:var(--ink); line-height:1.55; }
+.sheet dl > :nth-last-child(-n+2){ border-bottom:0; }
+.sheet dd .mono{ font-size:.78rem; color:var(--accent-2); }
+.sheet dd em{ font-style:normal; color:var(--ink-2); }
+
+.cite{ padding:.85rem 1.4rem; border-top:1px solid var(--line-2); background:var(--surface-2);
+  font-family:"IBM Plex Mono",monospace; font-size:.68rem; color:var(--ink-3); line-height:1.75; }
+.cite b{ color:var(--accent-2); font-weight:500; }
+.cite span{ color:var(--ink-2); }
+
+details.code{ border-top:1px solid var(--line-2); }
+details.code summary{ cursor:pointer; padding:.7rem 1.4rem; font-family:"IBM Plex Mono",monospace;
+  font-size:.72rem; letter-spacing:.06em; color:var(--ink-2); list-style:none;
+  display:flex; align-items:center; gap:.5rem; }
+details.code summary::-webkit-details-marker{ display:none; }
+details.code summary::before{ content:"▸"; color:var(--accent); transition:transform 140ms var(--e-std); }
+details.code[open] summary::before{ transform:rotate(90deg); }
+details.code summary:hover{ color:var(--ink); background:var(--surface-2); }
+details.code pre{ margin:0; padding:1rem 1.4rem 1.3rem; overflow-x:auto; background:var(--surface-2);
+  border-top:1px solid var(--line-2); font-size:.76rem; line-height:1.7; }
+details.code code{ color:var(--ink-2); }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-01 오프닝 타이틀 리빌
+   ═══════════════════════════════════════════════════════════════ */
+.s-title{ background:var(--surface-2); }
+.tt-amb{ position:absolute; inset:-30%;
+  background:radial-gradient(48% 42% at 30% 35%, var(--accent-w) 0%, transparent 62%),
+             radial-gradient(46% 40% at 72% 68%, var(--accent-2w) 0%, transparent 60%);
+  opacity:.9; }
+.tt-wrap{ position:relative; text-align:left; width:100%; max-width:34ch; }
+.tt-kicker{ font-family:"IBM Plex Mono",monospace; font-size:clamp(.6rem,1.6cqi,.78rem);
+  letter-spacing:.2em; text-transform:uppercase; color:var(--accent); opacity:0; }
+.tt-title{ font-size:clamp(1.5rem,6.2cqi,3.1rem); font-weight:900; letter-spacing:-.04em;
+  line-height:1.06; margin:.3rem 0 0; }
+.tt-title span{ display:inline-block; clip-path:inset(0 100% 0 0); }
+.tt-rule{ display:block; height:3px; background:var(--accent); margin-top:.8rem;
+  transform:scaleX(0); transform-origin:left center; }
+.tt-sub{ font-size:clamp(.75rem,2.2cqi,1rem); color:var(--ink-2); margin-top:.65rem;
+  letter-spacing:.02em; opacity:0; }
+
+@keyframes ttKicker{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+@keyframes ttTitle { from{ clip-path:inset(0 100% 0 0); transform:translateY(12px); }
+                     to  { clip-path:inset(0 -8% 0 0);  transform:none; } }
+@keyframes ttRule  { from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+@keyframes ttSub   { from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+@keyframes ttAmb   { 0%{ transform:rotate(0deg) scale(1.02); } 100%{ transform:rotate(360deg) scale(1.02); } }
+
+.stage[data-run] .tt-kicker{ animation:ttKicker var(--d-quick) var(--e-emph) both; }
+.stage[data-run] .tt-title span{ animation:ttTitle var(--d-slow) var(--e-emph) both;
+  animation-delay:calc(120ms * var(--ts)); }
+.stage[data-run] .tt-rule{ animation:ttRule var(--d-std) var(--e-std) both;
+  animation-delay:calc(300ms * var(--ts)); }
+.stage[data-run] .tt-sub{ animation:ttSub var(--d-std) var(--e-emph) both;
+  animation-delay:calc(420ms * var(--ts)); }
+.tt-amb{ animation:ttAmb 26s linear infinite; }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-02 불릿 스태거
+   ═══════════════════════════════════════════════════════════════ */
+.bl-wrap{ width:100%; max-width:32ch; }
+.bl-h{ font-family:"Gothic A1",sans-serif; font-weight:800; font-size:clamp(.9rem,3.2cqi,1.35rem);
+  letter-spacing:-.02em; margin-bottom:.9rem; opacity:0; }
+.bl-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.55rem; }
+.bl-list li{ display:flex; align-items:baseline; gap:.65rem; opacity:0;
+  font-size:clamp(.72rem,2.5cqi,1rem); line-height:1.5; }
+.bl-dot{ flex:none; width:.5em; height:.5em; border-radius:50%; background:var(--accent-2);
+  transform:scale(0); transform-origin:center; translate:0 -.1em; }
+.bl-list li.is-key .bl-dot{ background:var(--accent); }
+.bl-list li.is-key span{ font-weight:600; }
+
+@keyframes blIn  { from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:none; } }
+@keyframes blDot { from{ transform:scale(0); } 70%{ transform:scale(1.03); } to{ transform:scale(1); } }
+@keyframes blBreathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.012); } }
+
+.stage[data-run] .bl-h{ animation:blIn var(--d-quick) var(--e-std) both; }
+.stage[data-run] .bl-list li{ animation:blIn var(--d-quick) var(--e-std) both;
+  animation-delay:calc((130ms + 65ms * var(--i)) * var(--ts)); }
+.stage[data-run] .bl-dot{ animation:blDot calc(180ms * var(--ts)) var(--e-std) both;
+  animation-delay:calc((190ms + 65ms * var(--i)) * var(--ts)); }
+.stage[data-run] .bl-list li.is-key{ animation:blIn var(--d-quick) var(--e-std) both,
+  blBreathe 3000ms var(--e-sine) infinite;
+  animation-delay:calc((130ms + 65ms * var(--i)) * var(--ts)), calc(900ms * var(--ts)); }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-03 KPI 카운터
+   ═══════════════════════════════════════════════════════════════ */
+.kpi{ position:relative; width:min(100%,20rem); background:var(--surface);
+  border:1px solid var(--line); padding:clamp(.9rem,3cqi,1.6rem); opacity:0; transform:scale(.96); }
+.kpi-halo{ position:absolute; inset:-14%; background:radial-gradient(50% 50% at 50% 50%, var(--accent-w) 0%, transparent 70%);
+  z-index:0; opacity:.75; }
+.kpi > *{ position:relative; z-index:1; }
+.kpi-label{ font-family:"IBM Plex Mono",monospace; font-size:clamp(.58rem,1.7cqi,.72rem);
+  letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3); }
+.kpi-num{ display:flex; align-items:baseline; gap:.12em; margin-top:.15rem;
+  font-family:"Gothic A1",sans-serif; font-weight:900; letter-spacing:-.05em;
+  font-size:clamp(2rem,10cqi,4rem); line-height:1; font-variant-numeric:tabular-nums; }
+.kpi-unit{ font-size:.42em; font-weight:700; color:var(--accent); opacity:0; }
+.kpi-delta{ margin-top:.35rem; font-size:clamp(.65rem,2cqi,.85rem); font-weight:600;
+  color:var(--ok); opacity:0; }
+
+@keyframes kpiCard { from{ opacity:0; transform:scale(.96) translateY(10px); } to{ opacity:1; transform:none; } }
+@keyframes kpiSec  { from{ opacity:0; transform:translateY(7px); } to{ opacity:1; transform:none; } }
+@keyframes kpiHalo { 0%,100%{ transform:scale(1); opacity:.55; } 50%{ transform:scale(1.03); opacity:.85; } }
+
+.stage[data-run] .kpi{ animation:kpiCard var(--d-std) var(--e-emph) both; }
+.stage[data-run] .kpi-unit{ animation:kpiSec var(--d-quick) var(--e-std) both;
+  animation-delay:calc(200ms * var(--ts)); }
+.stage[data-run] .kpi-delta{ animation:kpiSec var(--d-quick) var(--e-std) both;
+  animation-delay:calc(560ms * var(--ts)); }
+.kpi-halo{ animation:kpiHalo 2500ms var(--e-sine) infinite; }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-04 차트 웨이브
+   ═══════════════════════════════════════════════════════════════ */
+.ch{ position:relative; width:100%; height:100%; display:flex; flex-direction:column; }
+.ch-title{ font-family:"IBM Plex Mono",monospace; font-size:clamp(.58rem,1.7cqi,.72rem);
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-bottom:auto; }
+.ch-plot{ position:relative; flex:1; display:flex; align-items:stretch; gap:clamp(.3rem,1.4cqi,.7rem);
+  padding-bottom:.4rem; min-height:0; }
+.ch-grid{ position:absolute; inset:0 0 .4rem; display:flex; flex-direction:column;
+  justify-content:space-between; pointer-events:none; }
+.ch-grid i{ display:block; height:1px; background:var(--line); }
+.ch-bar{ position:relative; flex:1; display:flex; flex-direction:column;
+  justify-content:flex-end; align-items:center; min-width:0; }
+.ch-val{ font-family:"IBM Plex Mono",monospace; font-size:clamp(.5rem,1.5cqi,.68rem);
+  font-weight:600; color:var(--ink-2); opacity:0; margin-bottom:.2rem; }
+.ch-fill{ width:100%; height:var(--h); background:var(--accent-2); transform:scaleY(0);
+  transform-origin:bottom center; }
+.ch-bar.is-peak .ch-fill{ background:var(--accent); }
+.ch-bar.is-peak .ch-val{ color:var(--accent); }
+.ch-axis{ display:flex; gap:clamp(.3rem,1.4cqi,.7rem); border-top:1px solid var(--line); padding-top:.25rem; }
+.ch-axis span{ flex:1; text-align:center; font-family:"IBM Plex Sans KR",sans-serif;
+  font-size:clamp(.55rem,1.6cqi,.72rem); color:var(--ink-3); }
+.ch-base{ position:absolute; left:0; right:0; bottom:.4rem; height:2px; background:var(--accent);
+  opacity:.35; transform:scaleX(0); transform-origin:left center; }
+
+@keyframes chBar { from{ transform:scaleY(0); } to{ transform:scaleY(1); } }
+@keyframes chVal { from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+@keyframes chBase{ from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+@keyframes chGrid{ 0%,100%{ opacity:.45; } 50%{ opacity:.9; } }
+
+.stage[data-run] .ch-fill{ animation:chBar var(--d-std) var(--e-emph) both;
+  animation-delay:calc((100ms + 58ms * var(--i)) * var(--ts)); }
+.stage[data-run] .ch-val{ animation:chVal calc(200ms * var(--ts)) var(--e-std) both;
+  animation-delay:calc((360ms + 58ms * var(--i)) * var(--ts)); }
+.stage[data-run] .ch-base{ animation:chBase var(--d-std) var(--e-std) both;
+  animation-delay:calc(100ms * var(--ts)); }
+.ch-grid{ animation:chGrid 5000ms var(--e-sine) infinite; }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-05 강조 펄스
+   ═══════════════════════════════════════════════════════════════ */
+.em-line{ font-family:"Gothic A1",sans-serif; font-weight:700; letter-spacing:-.02em;
+  font-size:clamp(1rem,4.4cqi,2.1rem); line-height:1.45; text-align:center; max-width:22ch; }
+.em-mark{ position:relative; display:inline-block; background:none; color:inherit; padding:0 .12em; }
+.em-fill{ position:absolute; left:0; right:0; bottom:.02em; top:.14em; background:var(--accent-w);
+  transform:scaleX(0); transform-origin:left center; z-index:0; }
+.em-txt{ position:relative; z-index:1; display:inline-block; }
+.em-under{ position:absolute; left:0; right:0; bottom:0; height:.1em; background:var(--accent);
+  transform:scaleX(0); transform-origin:left center; z-index:1; }
+
+@keyframes emAnticip{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-3px); } }
+@keyframes emFill  { from{ transform:scaleX(0); } to{ transform:scaleX(1); } }
+@keyframes emTxt   { 0%{ transform:translateX(-3px) scale(1); }
+                     55%{ transform:translateX(0) scale(1.04); }
+                     100%{ transform:translateX(0) scale(1); } }
+@keyframes emBreathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.02); } }
+
+.stage[data-run] .em-txt{ animation:emAnticip calc(100ms * var(--ts)) var(--e-std) both,
+  emTxt var(--d-std) var(--e-std) both;
+  animation-delay:0ms, calc(100ms * var(--ts)); }
+.stage[data-run] .em-fill{ animation:emFill var(--d-std) var(--e-std) both;
+  animation-delay:calc(100ms * var(--ts)); }
+.stage[data-run] .em-under{ animation:emFill var(--d-std) var(--e-std) both;
+  animation-delay:calc(180ms * var(--ts)); }
+.stage[data-run] .em-mark{ animation:emBreathe 2500ms var(--e-sine) infinite;
+  animation-delay:calc(700ms * var(--ts)); }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-06 퀴즈 피드백
+   ═══════════════════════════════════════════════════════════════ */
+.qz{ position:relative; width:100%; display:grid; place-items:center; gap:1rem; }
+.qz-card{ position:relative; display:flex; align-items:center; gap:.8rem;
+  background:var(--surface); border:2px solid var(--line);
+  padding:clamp(.6rem,2.4cqi,1rem) clamp(.9rem,3.4cqi,1.5rem); min-width:min(88%,16rem); }
+.qz-icon{ flex:none; width:clamp(22px,7cqi,34px); height:clamp(22px,7cqi,34px);
+  display:grid; place-items:center; border-radius:50%; background:var(--surface-2); }
+.qz-icon svg{ width:70%; height:70%; }
+.qz-icon path{ fill:none; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round;
+  stroke:var(--ink-3); }
+.qz-msg{ font-family:"Gothic A1",sans-serif; font-weight:800; letter-spacing:-.02em;
+  font-size:clamp(.85rem,3.2cqi,1.3rem); color:var(--ink-2); }
+.qz-sub{ font-size:clamp(.6rem,2cqi,.8rem); color:var(--ink-3); font-weight:300; }
+
+.qz-spark{ position:absolute; inset:0; pointer-events:none; }
+.qz-spark i{ position:absolute; width:6px; height:6px; border-radius:50%; background:var(--ok);
+  opacity:0; top:50%; left:50%; }
+
+/* 정답 — Playful 차용 */
+.qz[data-fb="ok"] .qz-card{ animation:qzPop calc(260ms * var(--ts)) var(--e-back) both,
+  qzOk calc(260ms * var(--ts)) var(--e-std) both; }
+.qz[data-fb="ok"] .qz-icon{ background:var(--ok-w); }
+.qz[data-fb="ok"] .qz-icon path{ stroke:var(--ok); stroke-dasharray:26; stroke-dashoffset:26;
+  animation:qzDraw calc(195ms * var(--ts)) var(--e-std) both; animation-delay:calc(130ms * var(--ts)); }
+.qz[data-fb="ok"] .qz-msg{ color:var(--ok); }
+.qz[data-fb="ok"] .qz-spark i{ animation:qzSpark calc(420ms * var(--ts)) var(--e-decel) both;
+  animation-delay:calc((160ms + 26ms * var(--i)) * var(--ts)); }
+
+/* 오답 — Corporate 그대로 */
+.qz[data-fb="no"] .qz-card{ animation:qzShake calc(350ms * var(--ts)) var(--e-sine) both,
+  qzErr calc(150ms * var(--ts)) var(--e-std) both; }
+.qz[data-fb="no"] .qz-icon{ background:var(--err-w); }
+.qz[data-fb="no"] .qz-icon path{ stroke:var(--err); }
+.qz[data-fb="no"] .qz-msg{ color:var(--err); }
+
+@keyframes qzPop  { 0%{ transform:scale(.9); } 100%{ transform:scale(1); } }
+@keyframes qzOk   { to{ border-color:var(--ok); background:var(--ok-w); } }
+@keyframes qzErr  { to{ border-color:var(--err); background:var(--err-w); } }
+@keyframes qzDraw { to{ stroke-dashoffset:0; } }
+@keyframes qzShake{ 0%{ transform:translateX(0); } 18%{ transform:translateX(-12px); }
+                    38%{ transform:translateX(10px); } 58%{ transform:translateX(-7px); }
+                    78%{ transform:translateX(4px); } 100%{ transform:translateX(0); } }
+@keyframes qzSpark{ 0%{ opacity:0; transform:translate(-50%,-50%) scale(.4); }
+                    35%{ opacity:1; }
+                    100%{ opacity:0; transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(.8); } }
+
+.qz-btns{ display:flex; gap:.5rem; }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-07 슬라이드 전환
+   ═══════════════════════════════════════════════════════════════ */
+.tr{ position:relative; width:100%; height:100%; overflow:hidden; background:var(--surface); }
+.tr-slide{ position:absolute; inset:0; padding:clamp(.9rem,4cqi,2rem);
+  display:flex; flex-direction:column; justify-content:center; gap:.4rem; }
+.tr-slide h5{ font-family:"Gothic A1",sans-serif; font-weight:900; letter-spacing:-.035em;
+  font-size:clamp(1.1rem,5.2cqi,2.4rem); line-height:1.1; }
+.tr-slide p{ font-size:clamp(.65rem,2.2cqi,.95rem); color:var(--ink-2); font-weight:300; }
+.tr-a{ background:var(--surface); }
+.tr-b{ background:var(--surface-2); opacity:0; transform:translateX(26%); }
+.tr-chip{ position:absolute; top:clamp(.6rem,2.6cqi,1.1rem); left:clamp(.9rem,4cqi,2rem);
+  font-family:"IBM Plex Mono",monospace; font-size:clamp(.52rem,1.6cqi,.68rem);
+  letter-spacing:.12em; text-transform:uppercase; background:var(--accent); color:#fff;
+  padding:.16rem .55rem; z-index:5; }
+:root[data-theme="dark"] .tr-chip, :root:not([data-theme="light"]) .tr-chip{ color:#101619; }
+.tr-prog{ position:absolute; left:0; right:0; bottom:0; height:3px; background:var(--line-2); z-index:5; }
+.tr-prog i{ display:block; height:100%; width:100%; background:var(--accent-2);
+  transform:scaleX(.35); transform-origin:left center; }
+
+@keyframes trOut { from{ transform:translateX(0); opacity:1; }
+                   to  { transform:translateX(-26%); opacity:0; } }
+@keyframes trIn  { from{ transform:translateX(26%); opacity:0; }
+                   to  { transform:translateX(0); opacity:1; } }
+@keyframes trBody{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+@keyframes trChip{ from{ transform:translate(0,0); } to{ transform:translate(0, calc(1cqi * 0)); } }
+@keyframes trChipMove{ from{ transform:translateX(0) scale(1); }
+                       to  { transform:translateX(calc(58cqi)) scale(.92); } }
+@keyframes trProg{ from{ transform:scaleX(.35); } to{ transform:scaleX(.7); } }
+
+.stage[data-run] .tr-a{ animation:trOut calc(390ms * var(--ts)) var(--e-accel) both; }
+.stage[data-run] .tr-b{ animation:trIn calc(520ms * var(--ts)) var(--e-emph) both;
+  animation-delay:calc(130ms * var(--ts)); }
+.stage[data-run] .tr-b h5{ animation:trBody calc(260ms * var(--ts)) var(--e-std) both;
+  animation-delay:calc(300ms * var(--ts)); }
+.stage[data-run] .tr-b p{ animation:trBody calc(260ms * var(--ts)) var(--e-std) both;
+  animation-delay:calc(352ms * var(--ts)); }
+.stage[data-run] .tr-chip{ animation:trChipMove calc(520ms * var(--ts)) var(--e-std) both;
+  animation-delay:calc(130ms * var(--ts)); }
+.stage[data-run] .tr-prog i{ animation:trProg calc(520ms * var(--ts)) var(--e-std) both;
+  animation-delay:calc(130ms * var(--ts)); }
+
+/* ═══════════════════════════════════════════════════════════════
+   S-08 앰비언트 배경
+   ═══════════════════════════════════════════════════════════════ */
+.amb{ position:relative; width:100%; height:100%; overflow:hidden; }
+.amb-grad{ position:absolute; inset:0;
+  background:linear-gradient(115deg, var(--surface-2) 0%, var(--accent-w) 34%, var(--surface-2) 62%, var(--accent-2w) 100%);
+  background-size:280% 280%; background-position:0% 50%; }
+.amb-f{ position:absolute; border-radius:50%; }
+.amb-f1{ width:19%; aspect-ratio:1; left:12%; top:22%; background:var(--accent); opacity:.16; }
+.amb-f2{ width:11%; aspect-ratio:1; right:20%; top:16%; background:var(--accent-2); opacity:.2; }
+.amb-f3{ width:26%; aspect-ratio:1; right:9%; bottom:-8%; background:var(--accent-2); opacity:.12; }
+.amb-note{ position:absolute; inset:0; display:grid; place-items:center; text-align:center;
+  font-family:"Gothic A1",sans-serif; font-weight:700; letter-spacing:-.02em;
+  font-size:clamp(.9rem,4cqi,1.7rem); color:var(--ink); }
+
+@keyframes ambGrad { 0%{ background-position:0% 50%; } 100%{ background-position:100% 50%; } }
+@keyframes ambF1   { 0%,100%{ transform:translateY(-10px); } 50%{ transform:translateY(10px); } }
+@keyframes ambF2   { 0%,100%{ transform:translateY(8px) rotate(-2deg); } 50%{ transform:translateY(-8px) rotate(2deg); } }
+@keyframes ambF3   { 0%,100%{ transform:translateY(12px); } 50%{ transform:translateY(-12px); } }
+@keyframes ambNote { 0%,100%{ opacity:.82; } 50%{ opacity:1; } }
+
+.amb-grad{ animation:ambGrad 16s var(--e-sine) infinite alternate; }
+.amb-f1{ animation:ambF1 4000ms var(--e-sine) infinite; }
+.amb-f2{ animation:ambF2 5500ms var(--e-sine) infinite; animation-delay:-1650ms; }
+.amb-f3{ animation:ambF3 3500ms var(--e-sine) infinite; animation-delay:-2100ms; }
+.amb-note{ animation:ambNote 3000ms var(--e-sine) infinite; }
+
+/* 앰비언트 일시정지 (reference/quality-checklist.md — 5초 넘는 애니메이션은 정지 가능해야) */
+:root[data-ambient="off"] .tt-amb,
+:root[data-ambient="off"] .kpi-halo,
+:root[data-ambient="off"] .ch-grid,
+:root[data-ambient="off"] .amb-grad,
+:root[data-ambient="off"] .amb-f,
+:root[data-ambient="off"] .amb-note,
+:root[data-ambient="off"] .bl-list li.is-key,
+:root[data-ambient="off"] .stage[data-run] .em-mark{ animation-play-state:paused; }
+
+/* ═══════════ 검수 테이블 ═══════════ */
+.qa{ width:100%; border-collapse:collapse; font-size:.87rem; background:var(--surface);
+  border:1px solid var(--line); }
+.qa th,.qa td{ text-align:left; padding:.7rem .9rem; border-bottom:1px solid var(--line-2);
+  vertical-align:top; }
+.qa thead th{ font-family:"IBM Plex Mono",monospace; font-size:.64rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:500; background:var(--surface-2); }
+.qa tbody tr:last-child td{ border-bottom:0; }
+.qa td:first-child{ font-weight:600; white-space:nowrap; }
+.qa td:last-child{ color:var(--ink-2); font-weight:300; }
+.pill{ display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:.62rem;
+  letter-spacing:.08em; padding:.1rem .45rem; border:1px solid currentColor; }
+.pill--ok{ color:var(--ok); }
+.pill--note{ color:var(--accent); }
+.tablewrap{ overflow-x:auto; }
+
+/* ═══════════ 파일 지도 ═══════════ */
+.map{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line);
+  grid-template-columns:repeat(2,1fr); align-items:stretch; }
+@media (max-width:760px){ .map{ grid-template-columns:1fr; } }
+.map__group{ background:var(--surface); padding:1.2rem 1.2rem 1.4rem; }
+.map__group h3{ font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent); font-weight:600; margin-bottom:.9rem; }
+.map__group ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.75rem; }
+.map__group li{ font-size:.82rem; line-height:1.55; }
+.map__group li b{ display:block; font-family:"IBM Plex Mono",monospace; font-size:.74rem;
+  font-weight:500; color:var(--ink); }
+.map__group li span{ color:var(--ink-2); font-weight:300; }
+.map__group li u{ text-decoration:none; font-family:"IBM Plex Mono",monospace;
+  font-size:.68rem; color:var(--accent-2); }
+
+/* ═══════════ 재사용 ═══════════ */
+.reuse{ display:grid; gap:1.4rem; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); }
+.reuse .panel h3{ margin-bottom:.5rem; }
+.reuse .panel p{ font-size:.85rem; }
+.reuse .panel pre{ margin:.8rem 0 0; padding:.75rem .85rem; background:var(--surface-2);
+  border:1px solid var(--line-2); overflow-x:auto; font-size:.72rem; line-height:1.65;
+  color:var(--ink-2); }
+
+footer{ padding:2.6rem 0 3.4rem; color:var(--ink-3); font-size:.8rem; font-weight:300; }
+footer p + p{ margin-top:.4rem; }
+
+/* ═══════════ 접근성: 모션 축소 ═══════════
+   context-adaptation.md — 공간 이동 제거, 불투명도만 유지, 루프 정지, 지속 50%↓ */
+@keyframes rmFade{ from{ opacity:0; } to{ opacity:1; } }
+:root[data-motion="reduced"] .mo{
+  animation:rmFade 200ms linear both !important;
+  animation-delay:0ms !important;
+  transform:none !important;
+  clip-path:none !important;
+}
+/* 앰비언트 루프는 전부 정지 */
+:root[data-motion="reduced"] .tt-amb,
+:root[data-motion="reduced"] .amb-grad,
+:root[data-motion="reduced"] .amb-f,
+:root[data-motion="reduced"] .amb-note,
+:root[data-motion="reduced"] .ch-grid,
+:root[data-motion="reduced"] .kpi-halo,
+:root[data-motion="reduced"] .stage[data-run] .em-mark{ animation:none !important; opacity:1; }
+:root[data-motion="reduced"] .tt-amb,
+:root[data-motion="reduced"] .kpi-halo{ opacity:.5; }
+
+/* 퀴즈 판정: 팝·흔들림은 없애되 색·아이콘 정보는 그대로 남긴다
+   — "중요한 정보를 모션만으로 전달하지 않는다" */
+:root[data-motion="reduced"] .qz[data-fb] .qz-card,
+:root[data-motion="reduced"] .qz .qz-icon path,
+:root[data-motion="reduced"] .qz-spark i{ animation:none !important; }
+:root[data-motion="reduced"] .qz .qz-icon path{ stroke-dashoffset:0 !important; }
+:root[data-motion="reduced"] .qz-spark i{ opacity:0 !important; }
+:root[data-motion="reduced"] .qz[data-fb="ok"] .qz-card{ border-color:var(--ok); background:var(--ok-w); }
+:root[data-motion="reduced"] .qz[data-fb="no"] .qz-card{ border-color:var(--err); background:var(--err-w); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ 머리말 ══════════════════ -->
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">
+      <b>LottieFiles / motion-design-skill</b>
+      <span>MIT</span>
+      <span>모듈 17개 전부 적용</span>
+      <span>2026-08-18</span>
+    </p>
+    <h1>슬라이드를 위한 <em>모션 8컷</em></h1>
+    <p class="lede">
+      LottieFiles의 <strong>motion-design</strong> 스킬을 이 저장소에 설치하고,
+      그 원칙만으로 수업 발표자료에 바로 쓸 수 있는 모션 샘플 8종을 만들었다.
+      각 컷은 <strong>살아 있는 데모</strong>와 함께, 스킬의 8단계 체크리스트를 어떻게 통과했는지
+      — 어떤 표를 보고 몇 밀리초를 골랐는지 — 를 나란히 보여준다.
+    </p>
+
+    <dl class="factstrip">
+      <div class="fact">
+        <dt>설치 경로</dt>
+        <dd><span class="mono">.claude/skills/motion-design/</span>
+          <small>SKILL.md + director 8 + patterns 4 + reference 4</small></dd>
+      </div>
+      <div class="fact">
+        <dt>선택한 퍼스널리티</dt>
+        <dd>Corporate
+          <small>수업 자료 = 정보 전달. 정답 연출 1컷만 Playful 차용</small></dd>
+      </div>
+      <div class="fact">
+        <dt>지속시간 보정</dt>
+        <dd>× 1.3 (투사)
+          <small>교실 스크린은 Desktop이 아니라 TV/Kiosk 티어</small></dd>
+      </div>
+      <div class="fact">
+        <dt>시그니처 이징</dt>
+        <dd><span class="mono">(.2, 0, 0, 1)</span>
+          <small>MD3 Standard — 전체 모션의 80%</small></dd>
+      </div>
+    </dl>
+  </div>
+</header>
+
+<!-- ══════════════════ 컨트롤 ══════════════════ -->
+<div class="controlbar">
+  <div class="wrap controlbar__in">
+    <span class="ctl-label">재생 속도</span>
+    <div class="seg" id="speed" role="group" aria-label="재생 속도">
+      <button type="button" data-speed="4" aria-pressed="false">0.25×</button>
+      <button type="button" data-speed="2" aria-pressed="false">0.5×</button>
+      <button type="button" data-speed="1" aria-pressed="true">1×</button>
+    </div>
+    <button class="btn" type="button" id="playAll">전체 다시 재생</button>
+    <span class="spacer"></span>
+    <button class="btn" type="button" id="ambToggle" aria-pressed="false">앰비언트 정지</button>
+    <button class="btn" type="button" id="themeToggle">테마 전환</button>
+  </div>
+</div>
+
+<!-- ══════════════════ 1. 파이프라인 ══════════════════ -->
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="section__no">01 — 스킬을 어떻게 썼나</p>
+      <h2>표를 읽고, 값을 고르고, 마지막에 검수한다</h2>
+      <p>
+        이 스킬은 애니메이션 코드를 주지 않는다. <em>결정 순서</em>를 준다.
+        그래서 작업은 아래 네 단계로 흘렀고, 8컷 모두 같은 순서를 밟았다.
+      </p>
+    </div>
+
+    <div class="pipe">
+      <div class="pipe__step">
+        <p class="pipe__k">STEP 1</p>
+        <h3>컨텍스트 확정</h3>
+        <p>“누가, 어디서, 몇 번 보나”를 먼저 못 박는다. 관객은 교실 뒷자리 학생,
+          매체는 프로젝터, 같은 모션을 한 학기 내내 본다.</p>
+        <p>여기서 두 가지가 결정됐다 — 콘텐츠 타입은 <b>낮은 모션 밀도</b>,
+          플랫폼 티어는 Desktop이 아니라 <b>TV/Kiosk(1.3×)</b>.</p>
+        <span class="src"><b>director/context-adaptation.md</b> §Platform Scaling, §Content Type<br>
+          <b>director/decision-framework.md</b> §Audience, §Context</span>
+      </div>
+      <div class="pipe__step">
+        <p class="pipe__k">STEP 2</p>
+        <h3>모션 아이덴티티 고정</h3>
+        <p>퍼스널리티를 하나만 고르고 상수 3개를 박아둔다. 컷마다 감으로 정하면
+          8컷이 8가지 성격이 된다.</p>
+        <p>Corporate 선택 → 시그니처 이징 1개, 지속시간 3단, 등장 패턴 1개.
+          이후 모든 값은 여기서 파생된다.</p>
+        <span class="src"><b>director/motion-personality.md</b> §Brand Motion Identity<br>
+          <b>reference/timing-easing-tables.md</b> §Duration by Personality</span>
+      </div>
+      <div class="pipe__step">
+        <p class="pipe__k">STEP 3</p>
+        <h3>컷별 8단계 체크리스트</h3>
+        <p>감정 → 퍼스널리티 → 주 속성 → 지속 → 이징 → 히어로 → 3개 레이어 → 1/3 규칙.
+          여덟 칸을 채우기 전에는 코드를 쓰지 않는다.</p>
+        <p>패턴 파일에 이미 레시피가 있으면 그대로 쓰고, 없으면 표에서 값을 뽑아 조립한다.</p>
+        <span class="src"><b>SKILL.md</b> §8-Step Checklist<br>
+          <b>patterns/</b> entrance-exit · state-feedback · multi-element · ambient-continuous</span>
+      </div>
+      <div class="pipe__step">
+        <p class="pipe__k">STEP 4</p>
+        <h3>품질 검수</h3>
+        <p>CRITICAL 4개 규칙(선형 이징 금지 · 불투명도 단독 금지 · 1/3 화면 · 3개 레이어)을
+          컷마다 통과시키고, 증상별 처방표로 되돌아본다.</p>
+        <p>여기서 실제로 두 컷이 수정됐다 — 전환 컷의 이동 거리와 스태거 총량.</p>
+        <span class="src"><b>reference/quality-checklist.md</b> §Severity Tiers<br>
+          <b>reference/troubleshooting.md</b> §Quick Diagnostic</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 2. 아이덴티티 ══════════════════ -->
+<section class="section" id="identity">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="section__no">02 — 브랜드 모션 아이덴티티</p>
+      <h2>이 덱이 쓰는 상수 세 개</h2>
+      <p>
+        스킬은 “알아볼 수 있는 모션”의 조건으로 시그니처 이징 · 지속시간 팔레트 · 등장 패턴
+        딱 세 가지를 고정하라고 말한다. 8컷 전부가 아래 값만 쓴다.
+      </p>
+    </div>
+
+    <div class="ident">
+      <div class="panel">
+        <h3>① 시그니처 이징</h3>
+        <p>전체의 80%는 MD3 Standard 하나로 간다. 나머지는 방향 규칙
+          — 등장은 감속, 퇴장은 가속 — 에 따라 정해진 4개만 쓴다.</p>
+        <div class="curves">
+          <figure class="curve is-accent">
+            <svg viewBox="-6 -6 112 112" role="img" aria-label="cubic-bezier(0.2, 0, 0, 1) 곡선">
+              <path class="grid" d="M0,100 H100 M0,0 V100"></path>
+              <path class="path" d="M0,100 C20,100 0,0 100,0"></path>
+            </svg>
+            <figcaption><b>Standard</b>.2, 0, 0, 1<br>기본 · 온스크린</figcaption>
+          </figure>
+          <figure class="curve">
+            <svg viewBox="-6 -6 112 112" role="img" aria-label="cubic-bezier(0.05, 0.7, 0.1, 1) 곡선">
+              <path class="grid" d="M0,100 H100 M0,0 V100"></path>
+              <path class="path" d="M0,100 C5,30 10,0 100,0"></path>
+            </svg>
+            <figcaption><b>Emphasized</b>.05,.7,.1,1<br>등장 · 주목</figcaption>
+          </figure>
+          <figure class="curve">
+            <svg viewBox="-6 -6 112 112" role="img" aria-label="cubic-bezier(0.3, 0, 1, 1) 곡선">
+              <path class="grid" d="M0,100 H100 M0,0 V100"></path>
+              <path class="path" d="M0,100 C30,100 100,0 100,0"></path>
+            </svg>
+            <figcaption><b>Accelerate</b>.3, 0, 1, 1<br>퇴장</figcaption>
+          </figure>
+          <figure class="curve">
+            <svg viewBox="-6 -18 112 130" role="img" aria-label="cubic-bezier(0.175, 0.885, 0.32, 1.275) 곡선">
+              <path class="grid" d="M0,100 H100 M0,0 V100"></path>
+              <path class="path" d="M0,100 C17,12 32,-27 100,0"></path>
+            </svg>
+            <figcaption><b>Back</b>.175,.885,.32,1.275<br>정답 연출만</figcaption>
+          </figure>
+          <figure class="curve">
+            <svg viewBox="-6 -6 112 112" role="img" aria-label="사인 이즈인아웃 곡선">
+              <path class="grid" d="M0,100 H100 M0,0 V100"></path>
+              <path class="path" d="M0,100 C37,100 63,0 100,0"></path>
+            </svg>
+            <figcaption><b>Sine</b>.37, 0, .63, 1<br>앰비언트 루프</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>② 지속시간 팔레트</h3>
+        <p>Corporate 아키타입의 3단 값에 투사 보정 1.3배를 곱한 값이
+          이 덱의 전부다. 그 외의 숫자는 쓰지 않는다.</p>
+        <div class="tablewrap">
+          <table class="durtable">
+            <thead>
+              <tr><th>티어</th><th>Corporate 기본</th><th>× 1.3</th><th>쓰는 곳</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Quick</td><td class="num">200ms</td><td class="num out">260ms</td><td>불릿 1줄, 라벨</td></tr>
+              <tr><td>Standard</td><td class="num">300ms</td><td class="num out">390ms</td><td>카드, 막대, 하이라이트</td></tr>
+              <tr><td>Slow</td><td class="num">450ms</td><td class="num out">580ms</td><td>타이틀 리빌, 수치 카운트</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:1rem;">
+          <strong style="font-weight:600;">예외 — 스케일하지 않는 값.</strong>
+          호버 100ms · 누름 150ms · 오답 흔들림 350ms는 “보기 좋은 길이”가 아니라
+          <em>지각 한계</em>다. 투사 보정을 곱하면 반응이 굼떠 보인다.
+        </p>
+      </div>
+
+      <div class="panel">
+        <h3>③ 등장 패턴</h3>
+        <p>모든 요소는 <span class="mono">아래에서 20~24px + 불투명도</span> 하나로만 들어온다.
+          컷마다 방향이 바뀌면 혼란이 된다는 것이 스킬의 <em>Spatial Origin Consistency</em> 규칙.</p>
+        <p style="margin-top:.9rem;">
+          <strong style="font-weight:600;">아키타입 기본값에서 의도적으로 벗어난 지점:</strong>
+          Corporate의 표준 등장은 “오른쪽에서 슬라이드”지만,
+          투사 슬라이드는 관객이 아래에서 위로 읽어 올라간다.
+          방향 표의 <span class="mono">below = arrival</span>을 근거로 아래에서 올라오는 쪽을 택했다.
+        </p>
+        <span class="src"><b>director/choreography.md</b> §Coordinated Entry Rules<br>
+          <b>patterns/entrance-exit.md</b> §Direct Entrance — Direction</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 3. 샘플 8컷 ══════════════════ -->
+<section class="section" id="samples">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="section__no">03 — 샘플</p>
+      <h2>슬라이드 한 장이 살아가는 순서대로</h2>
+      <p>
+        8컷은 취향대로 고른 목록이 아니라 수업 슬라이드가 실제로 지나가는 순서다 —
+        표지가 열리고(01), 내용이 쌓이고(02), 데이터가 등장하고(03·04), 핵심이 강조되고(05),
+        학생이 답하고(06), 다음 장으로 넘어가고(07), 설명하는 동안 화면이 숨 쉰다(08).
+        컷 번호는 그 순서를 가리킨다.
+      </p>
+    </div>
+
+    <div class="cuts">
+
+      <!-- ─────────── S-01 ─────────── -->
+      <article class="cut" id="s01">
+        <div class="cut__head">
+          <span class="cut__no">S-01</span>
+          <h3>오프닝 타이틀 리빌</h3>
+          <span class="cut__tag">Revealing</span>
+          <p class="cut__use">수업 첫 장. 교사가 “자, 시작합니다” 하고 화면을 띄우는 3초를 위한 연출.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage s-title" data-stage data-auto>
+              <div class="tt-amb"></div>
+              <div class="tt-wrap">
+                <p class="tt-kicker mo">3차시 · 알고리즘</p>
+                <h4 class="tt-title"><span class="mo">알고리즘의 세 얼굴</span></h4>
+                <span class="tt-rule mo"></span>
+                <p class="tt-sub mo">순차 · 선택 · 반복</p>
+              </div>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--a" style="flex:12">준비 120</span>
+              <span class="beat beat--b" style="flex:36">액션 580</span>
+              <span class="beat beat--c" style="flex:22">반응 390</span>
+              <span class="beat beat--d" style="flex:30">정리 390</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" data-replay>다시 재생</button>
+              <span class="total">총 <b>810ms</b> · Dramatic reveal 예산 600–1200ms 내</span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>Calm + Confidence <em>— 페이지 로드의 기본값</em></dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>Corporate</dd>
+              <dt><i>3</i>주 속성</dt><dd>clip-path 리빌 (읽기 방향 L→R) + position</dd>
+              <dt><i>4</i>지속</dt><dd><span class="mono">580ms</span> 타이틀 / <span class="mono">390ms</span> 부제</dd>
+              <dt><i>5</i>이징</dt><dd><span class="mono">(.05,.7,.1,1)</span> Emphasized — 등장</dd>
+              <dt><i>6</i>히어로</dt><dd>타이틀. 변위·지속 모두 최대, 나머지는 전부 더 작게</dd>
+              <dt><i>7</i>레이어</dt><dd>주 = 타이틀 리빌 · 보조 = 밑줄 확장(180ms 뒤, 다른 이징) · 앰비언트 = 배경 그라데이션 26s 회전</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd>변위 12px — 화면의 1/3에 한참 못 미침 <span class="pill pill--ok">OK</span></dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 CSS</summary>
+<pre><code>@keyframes ttTitle {
+  from { clip-path: inset(0 100% 0 0); transform: translateY(12px); }
+  to   { clip-path: inset(0 -8%  0 0); transform: none; }
+}
+.tt-title span { animation: ttTitle var(--d-slow) var(--e-emph) both; animation-delay: 120ms; }
+.tt-rule       { animation: ttRule  var(--d-std)  var(--e-std)  both; animation-delay: 300ms; }
+.tt-sub        { animation: ttSub   var(--d-std)  var(--e-emph) both; animation-delay: 420ms; }
+.tt-amb        { animation: ttAmb   26s linear infinite; }   /* 앰비언트 */</code></pre>
+        </details>
+        <p class="cite">참조 — <b>patterns/entrance-exit.md</b> <span>§Reveal Entrance (clip/mask, 300–500ms, L-to-R = reading order)</span> ·
+          <b>director/narrative-structure.md</b> <span>§Four-Act (400–800ms 배분)</span> ·
+          <b>director/emotion-mapping.md</b> <span>§Context Defaults (Page load → Calm + Confidence)</span></p>
+      </article>
+
+      <!-- ─────────── S-02 ─────────── -->
+      <article class="cut" id="s02">
+        <div class="cut__head">
+          <span class="cut__no">S-02</span>
+          <h3>불릿 스태거</h3>
+          <span class="cut__tag">Revealing</span>
+          <p class="cut__use">설명 슬라이드의 기본기. 다섯 줄이 한꺼번에 튀어나오면 학생은 어디부터 읽을지 모른다.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage" data-stage data-auto>
+              <div class="bl-wrap">
+                <h4 class="bl-h mo">문제를 푸는 네 걸음</h4>
+                <ul class="bl-list">
+                  <li class="mo" style="--i:0"><i class="bl-dot mo"></i><span>문제를 작게 나눈다</span></li>
+                  <li class="mo" style="--i:1"><i class="bl-dot mo"></i><span>규칙을 찾는다</span></li>
+                  <li class="is-key mo" style="--i:2"><i class="bl-dot mo"></i><span>필요 없는 것을 지운다</span></li>
+                  <li class="mo" style="--i:3"><i class="bl-dot mo"></i><span>순서대로 적는다</span></li>
+                </ul>
+              </div>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--a" style="flex:13">준비 130</span>
+              <span class="beat beat--b" style="flex:26">액션 260</span>
+              <span class="beat beat--c" style="flex:26">스태거 260</span>
+              <span class="beat beat--d" style="flex:35">앰비언트 →</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" data-replay>다시 재생</button>
+              <span class="total">스태거 스팬 <b>260ms</b> · 표준 예산 400ms 내</span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>Confidence <em>— 직선, 결단력 있게</em></dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>Corporate → List Items 행 그대로</dd>
+              <dt><i>3</i>주 속성</dt><dd>position(위로 20px) + opacity</dd>
+              <dt><i>4</i>지속</dt><dd><span class="mono">260ms</span> / 항목 · 스태거 <span class="mono">65ms</span></dd>
+              <dt><i>5</i>이징</dt><dd><span class="mono">(.2,0,0,1)</span> 시그니처. 스태거 요소는 시작 시각만 다르고 곡선은 동일</dd>
+              <dt><i>6</i>히어로</dt><dd>없음 — 동급 항목. 대신 3번째 “핵심” 줄만 굵게</dd>
+              <dt><i>7</i>레이어</dt><dd>주 = 텍스트 상승 · 보조 = 점 마커가 60ms 뒤따라옴(팔로스루) · 앰비언트 = 착지 후 핵심 줄 호흡 3000ms</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd>동시 활성 최대 2/4줄 <span class="pill pill--ok">OK</span> · 스태거 총량 260ms <span class="pill pill--ok">&lt;400ms</span></dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 CSS</summary>
+<pre><code>/* --i 는 항목 인덱스. 곡선은 고정, 시작 시각만 이동시킨다. */
+.bl-list li  { animation: blIn  260ms var(--e-std) both;
+               animation-delay: calc(130ms + 65ms * var(--i)); }
+.bl-dot      { animation: blDot 180ms var(--e-std) both;      /* 보조: 60ms 뒤따라옴 */
+               animation-delay: calc(190ms + 65ms * var(--i)); }
+.bl-list li.is-key { animation: blIn 260ms var(--e-std) both,
+                                blBreathe 3000ms var(--e-sine) infinite;
+                     animation-delay: calc(130ms + 65ms * var(--i)), 900ms; }</code></pre>
+        </details>
+        <p class="cite">참조 — <b>patterns/multi-element.md</b> <span>§List Items — Corporate 행(200ms / 50ms / (.2,0,0,1))에 1.3배</span> ·
+          <b>director/disney-principles.md</b> <span>§5 Follow Through (자식 50–150ms 지연)</span> ·
+          <b>patterns/ambient-continuous.md</b> <span>§Breathing (idle 0.98–1.02, 3000ms)</span></p>
+      </article>
+
+      <!-- ─────────── S-03 ─────────── -->
+      <article class="cut" id="s03">
+        <div class="cut__head">
+          <span class="cut__no">S-03</span>
+          <h3>수치 카운트업</h3>
+          <span class="cut__tag">Emphasizing</span>
+          <p class="cut__use">“우리 반 제출률은?” 하고 뜸을 들인 뒤 숫자가 굴러 올라가는 순간.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage" data-stage data-auto>
+              <div class="kpi mo">
+                <div class="kpi-halo"></div>
+                <p class="kpi-label">이번 주 과제 제출률</p>
+                <p class="kpi-num"><span class="kpi-val" data-count="87">0</span><span class="kpi-unit mo">%</span></p>
+                <p class="kpi-delta mo">▲ 지난주보다 12%p</p>
+              </div>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--a" style="flex:10">카드 390</span>
+              <span class="beat beat--b" style="flex:44">카운트 580</span>
+              <span class="beat beat--c" style="flex:20">단위 260</span>
+              <span class="beat beat--d" style="flex:26">증감 260</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" data-replay>다시 재생</button>
+              <span class="total">총 <b>820ms</b> · 숫자에도 감속 이징 적용</span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>Confidence <em>— 대시보드의 기본값</em></dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>Corporate</dd>
+              <dt><i>3</i>주 속성</dt><dd>숫자 값 + scale(카드 .96→1)</dd>
+              <dt><i>4</i>지속</dt><dd><span class="mono">580ms</span> 카운트 · <span class="mono">390ms</span> 카드</dd>
+              <dt><i>5</i>이징</dt><dd><span class="mono">(0,0,0,1)</span> Decelerate — 숫자가 목표값에 <em>안착</em>하도록</dd>
+              <dt><i>6</i>히어로</dt><dd>숫자 자체. 단위·증감은 전부 그 뒤에 등장</dd>
+              <dt><i>7</i>레이어</dt><dd>주 = 카운트업 · 보조 = % 단위 200ms, 증감 560ms 뒤 · 앰비언트 = 헤일로 2500ms 맥동</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd>공간 이동 없음. 동시 활성 1개 <span class="pill pill--ok">OK</span></dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 JS — 숫자에도 이징을 건다</summary>
+<pre><code>// 선형 카운트는 "기계가 세는" 느낌이 난다. 감속 곡선을 태워
+// 목표값 근처에서 속도가 줄도록 만든다 (MD3 Decelerate 근사).
+function countUp(el, target, ms) {
+  const t0 = performance.now();
+  const tick = now => {
+    const p = Math.min(1, (now - t0) / ms);
+    const eased = 1 - Math.pow(1 - p, 3);          // ease-out-cubic
+    el.textContent = Math.round(target * eased);
+    if (p &lt; 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}</code></pre>
+        </details>
+        <p class="cite">참조 — <b>reference/property-selection.md</b> <span>§Scale (scale up = 중요도) · §Combined (Scale + Opacity = 카드)</span> ·
+          <b>reference/timing-easing-tables.md</b> <span>§Directional Rules (entrance = ease-out)</span> ·
+          <b>patterns/ambient-continuous.md</b> <span>§Breathing — CTA attention 2500ms</span></p>
+      </article>
+
+      <!-- ─────────── S-04 ─────────── -->
+      <article class="cut" id="s04">
+        <div class="cut__head">
+          <span class="cut__no">S-04</span>
+          <h3>차트 웨이브</h3>
+          <span class="cut__tag">Revealing</span>
+          <p class="cut__use">막대그래프. 7개가 동시에 솟으면 어느 막대가 제일 높은지 눈이 못 따라간다.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage" data-stage data-auto>
+              <div class="ch">
+                <p class="ch-title">요일별 코딩 연습 제출 수</p>
+                <div class="ch-plot">
+                  <div class="ch-grid"><i></i><i></i><i></i><i></i></div>
+                  <div class="ch-bar" style="--i:0"><span class="ch-val mo">12</span><span class="ch-fill mo" style="--h:34%"></span></div>
+                  <div class="ch-bar" style="--i:1"><span class="ch-val mo">18</span><span class="ch-fill mo" style="--h:51%"></span></div>
+                  <div class="ch-bar" style="--i:2"><span class="ch-val mo">15</span><span class="ch-fill mo" style="--h:43%"></span></div>
+                  <div class="ch-bar is-peak" style="--i:3"><span class="ch-val mo">31</span><span class="ch-fill mo" style="--h:88%"></span></div>
+                  <div class="ch-bar" style="--i:4"><span class="ch-val mo">24</span><span class="ch-fill mo" style="--h:68%"></span></div>
+                  <div class="ch-bar" style="--i:5"><span class="ch-val mo">9</span><span class="ch-fill mo" style="--h:26%"></span></div>
+                  <div class="ch-bar" style="--i:6"><span class="ch-val mo">6</span><span class="ch-fill mo" style="--h:17%"></span></div>
+                  <div class="ch-base mo"></div>
+                </div>
+                <div class="ch-axis"><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span></div>
+              </div>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--a" style="flex:10">준비 100</span>
+              <span class="beat beat--b" style="flex:35">막대 390</span>
+              <span class="beat beat--c" style="flex:35">웨이브 348</span>
+              <span class="beat beat--d" style="flex:20">라벨 200</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" data-replay>다시 재생</button>
+              <span class="total">웨이브 스팬 <b>348ms</b> · 예산 500ms 내</span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>Confidence <em>— 통제된, 정확한</em></dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>Corporate</dd>
+              <dt><i>3</i>주 속성</dt><dd>scaleY (아래 기준점) — 위 방향 = <em>성장</em></dd>
+              <dt><i>4</i>지속</dt><dd><span class="mono">390ms</span> / 막대 · 웨이브 스태거 <span class="mono">58ms</span></dd>
+              <dt><i>5</i>이징</dt><dd><span class="mono">(.05,.7,.1,1)</span> Emphasized — 등장 + 주목</dd>
+              <dt><i>6</i>히어로</dt><dd>목요일 막대(최댓값)만 강조색. 나머지는 틸 단색</dd>
+              <dt><i>7</i>레이어</dt><dd>주 = 막대 성장 · 보조 = 값 라벨 260ms 뒤, 기준선 동시 확장(카운터 모션) · 앰비언트 = 격자선 5000ms 명암</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd>7개 중 동시 활성 ≈ 2개(58ms 간격 × 390ms) <span class="pill pill--ok">OK</span></dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 CSS</summary>
+<pre><code>.ch-fill { transform-origin: bottom center; }              /* 아래에서 자란다 = 성장 */
+.ch-fill { animation: chBar 390ms var(--e-emph) both;
+           animation-delay: calc(100ms + 58ms * var(--i)); }  /* wave 30–60ms 범위 */
+.ch-val  { animation: chVal 200ms var(--e-std)  both;         /* 보조: 막대보다 260ms 늦게 */
+           animation-delay: calc(360ms + 58ms * var(--i)); }
+.ch-base { animation: chBase 390ms var(--e-std) both; }       /* 카운터 모션 */
+.ch-grid { animation: chGrid 5000ms var(--e-sine) infinite; } /* 앰비언트 */</code></pre>
+        </details>
+        <p class="cite">참조 — <b>patterns/multi-element.md</b> <span>§Stagger — Wave (30–60ms, &lt;500ms)</span> ·
+          <b>director/choreography.md</b> <span>§Counter-Motion (Lifts up → shadow spreads)</span> ·
+          <b>reference/property-selection.md</b> <span>§Position — Upward = 성장</span></p>
+      </article>
+
+      <!-- ─────────── S-05 ─────────── -->
+      <article class="cut" id="s05">
+        <div class="cut__head">
+          <span class="cut__no">S-05</span>
+          <h3>핵심 용어 강조</h3>
+          <span class="cut__tag">Emphasizing</span>
+          <p class="cut__use">“오늘 이 단어 하나만 가져가세요” — 형광펜이 그어지는 순간.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage" data-stage data-auto>
+              <p class="em-line">중요한 건
+                <span class="em-mark"><span class="em-fill mo"></span><span class="em-under mo"></span><span class="em-txt mo">추상화</span></span>
+                입니다</p>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--a" style="flex:14">준비(윈드업) 100</span>
+              <span class="beat beat--b" style="flex:46">스와이프 390</span>
+              <span class="beat beat--c" style="flex:12">밑줄 +80</span>
+              <span class="beat beat--d" style="flex:28">호흡 →</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" data-replay>다시 재생</button>
+              <span class="total">총 <b>490ms</b> 후 호흡 루프 · 맥동 폭 ±2%</span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>Urgency(약) <em>— 날카롭지만 위협적이지 않게</em></dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>Corporate</dd>
+              <dt><i>3</i>주 속성</dt><dd>scaleX 하이라이트(L→R, 읽기 방향) + 텍스트 scale</dd>
+              <dt><i>4</i>지속</dt><dd><span class="mono">390ms</span> 스와이프 · 윈드업 <span class="mono">100ms</span></dd>
+              <dt><i>5</i>이징</dt><dd><span class="mono">(.2,0,0,1)</span> 시그니처</dd>
+              <dt><i>6</i>히어로</dt><dd>단어 하나. 문장의 나머지는 아예 움직이지 않음</dd>
+              <dt><i>7</i>레이어</dt><dd>주 = 형광 스와이프 · 보조 = 밑줄이 80ms 뒤 따라옴 + 텍스트 4% 팽창 · 앰비언트 = 700ms 뒤 호흡 2500ms</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd>이동 3px <span class="pill pill--ok">OK</span> · 맥동 ±2% <span class="pill pill--ok">±5% 미만</span></dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 CSS — 디즈니 ‘예비동작’</summary>
+<pre><code>/* 하이라이트가 오른쪽으로 쓸리기 직전, 단어가 왼쪽으로 3px 물러선다.
+   본동작의 10~20% 크기, 100ms — 스킬의 Anticipation 규격. */
+@keyframes emAnticip { 0% { transform: translateX(0); } 100% { transform: translateX(-3px); } }
+@keyframes emTxt {
+  0%   { transform: translateX(-3px) scale(1);    }
+  55%  { transform: translateX(0)    scale(1.04); }
+  100% { transform: translateX(0)    scale(1);    }
+}
+.em-txt  { animation: emAnticip 100ms var(--e-std) both, emTxt 390ms var(--e-std) both;
+           animation-delay: 0ms, 100ms; }
+.em-fill { animation: emFill 390ms var(--e-std) both; animation-delay: 100ms; }
+.em-mark { animation: emBreathe 2500ms var(--e-sine) infinite; animation-delay: 700ms; }</code></pre>
+        </details>
+        <p class="cite">참조 — <b>director/disney-principles.md</b> <span>§2 Anticipation (100–200ms, 본동작의 10–20%)</span> ·
+          <b>patterns/ambient-continuous.md</b> <span>§Breathing — “±5% 넘으면 주의를 빼앗는다”</span> ·
+          <b>reference/property-selection.md</b> <span>§Selection — primary scale, secondary color</span></p>
+      </article>
+
+      <!-- ─────────── S-06 ─────────── -->
+      <article class="cut" id="s06">
+        <div class="cut__head">
+          <span class="cut__no">S-06</span>
+          <h3>퀴즈 피드백 · 정답 / 오답</h3>
+          <span class="cut__tag">Responding</span>
+          <p class="cut__use">실시간 퀴즈에서 학생 화면에 뜨는 판정. 이 저장소의 라이브 레이어에 그대로 붙는 컷.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage" data-stage data-quiz>
+              <div class="qz">
+                <div class="qz-card">
+                  <span class="qz-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path class="qz-glyph" d="M5 12.5 L10 17.5 L19 7"></path></svg>
+                  </span>
+                  <span>
+                    <span class="qz-msg">정답입니다</span><br>
+                    <span class="qz-sub">순차 구조가 맞아요</span>
+                  </span>
+                </div>
+                <div class="qz-spark">
+                  <i style="--i:0;--dx:-58px;--dy:-42px"></i><i style="--i:1;--dx:52px;--dy:-48px"></i>
+                  <i style="--i:2;--dx:-70px;--dy:14px"></i><i style="--i:3;--dx:66px;--dy:22px"></i>
+                  <i style="--i:4;--dx:-22px;--dy:-62px"></i><i style="--i:5;--dx:30px;--dy:52px"></i>
+                </div>
+              </div>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--b" style="flex:34">팝 260</span>
+              <span class="beat beat--c" style="flex:26">체크 그리기 195</span>
+              <span class="beat beat--d" style="flex:40">스파클 420</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" data-fb-btn="ok">정답</button>
+              <button class="btn" type="button" data-fb-btn="no">오답</button>
+              <span class="total">정답 <b>520ms</b> / 오답 <b>350ms</b></span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>정답 = Joy + Confidence · 오답 = 약한 Urgency</dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>정답만 <em>Playful 차용</em> — 스킬이 허용한 “Corporate 대시보드가 성공 상태에서만 Playful을 빌린다” 예외</dd>
+              <dt><i>3</i>주 속성</dt><dd>정답 = scale 팝 · 오답 = position 흔들림</dd>
+              <dt><i>4</i>지속</dt><dd>정답 <span class="mono">520ms</span> · 오답 <span class="mono">350ms</span> <em>(투사 보정 미적용 — 지각 한계값)</em></dd>
+              <dt><i>5</i>이징</dt><dd>정답 <span class="mono">(.175,.885,.32,1.275)</span> 8% 오버슛 · 오답 sine ease-in-out, <em>오버슛 0%</em></dd>
+              <dt><i>6</i>히어로</dt><dd>판정 카드 하나. 문항 텍스트는 정지</dd>
+              <dt><i>7</i>레이어</dt><dd>주 = 카드 팝/흔들림 · 보조 = 체크마크 획 그리기 130ms 뒤, 색 전환 · 앰비언트 = 스파클 6개 (정답만)</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd>흔들림 ±12px, 감쇠 3회 <span class="pill pill--ok">OK</span></dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 CSS — 정답은 튀고, 오답은 단호하다</summary>
+<pre><code>/* 정답: 팝 + 체크 획 그리기 + 색 전환 (state-feedback.md §Checkmark Success) */
+.qz[data-fb="ok"] .qz-card { animation: qzPop 260ms var(--e-back) both,   /* 오버슛 8% */
+                                        qzOk  260ms var(--e-std)  both; }
+.qz[data-fb="ok"] .qz-icon path { stroke-dasharray: 26; stroke-dashoffset: 26;
+                                  animation: qzDraw 195ms var(--e-std) both;
+                                  animation-delay: 130ms; }
+
+/* 오답: 수평 감쇠 진동 2.5회, 오버슛 없음. 원점에 정확히 선다. */
+@keyframes qzShake {
+  0%{ translate:0 } 18%{ translate:-12px } 38%{ translate:10px }
+  58%{ translate:-7px } 78%{ translate:4px } 100%{ translate:0 }
+}
+.qz[data-fb="no"] .qz-card { animation: qzShake 350ms var(--e-sine) both,
+                                        qzErr   150ms var(--e-std)  both; }</code></pre>
+        </details>
+        <p class="cite">참조 — <b>patterns/state-feedback.md</b> <span>§Checkmark Success (400–500ms) · §Error Shake (±10–15px, 2–3회, 300–400ms)</span> ·
+          <b>director/motion-personality.md</b> <span>§Mixing Archetypes (90% 주 아키타입)</span> ·
+          <b>reference/timing-easing-tables.md</b> <span>§Overshoot Budget (Success 5–10%, Error 0%)</span></p>
+      </article>
+
+      <!-- ─────────── S-07 ─────────── -->
+      <article class="cut" id="s07">
+        <div class="cut__head">
+          <span class="cut__no">S-07</span>
+          <h3>슬라이드 전환</h3>
+          <span class="cut__tag">Transitioning</span>
+          <p class="cut__use">다음 장으로 넘어가는 순간. 하루에 60번 보게 되는, 가장 많이 반복되는 모션.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage" data-stage data-auto style="padding:0">
+              <div class="tr">
+                <div class="tr-slide tr-a mo">
+                  <h5>순차 구조</h5>
+                  <p>위에서 아래로, 적힌 순서 그대로</p>
+                </div>
+                <div class="tr-slide tr-b mo">
+                  <h5 class="mo">선택 구조</h5>
+                  <p class="mo">조건이 참일 때만 들어가는 갈림길</p>
+                </div>
+                <span class="tr-chip mo">2단원</span>
+                <div class="tr-prog"><i class="mo"></i></div>
+              </div>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--a" style="flex:26">퇴장 390</span>
+              <span class="beat beat--b" style="flex:40">등장 520</span>
+              <span class="beat beat--c" style="flex:14">겹침 130</span>
+              <span class="beat beat--d" style="flex:20">본문 스태거</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" data-replay>다시 재생</button>
+              <span class="total">퇴장/등장 = <b>75%</b> · 규칙 65–75% 충족</span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>Confidence <em>— 내비게이션의 기본값</em></dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>Corporate</dd>
+              <dt><i>3</i>주 속성</dt><dd>position(수평) + opacity</dd>
+              <dt><i>4</i>지속</dt><dd>퇴장 <span class="mono">390ms</span> / 등장 <span class="mono">520ms</span> / 겹침 <span class="mono">130ms</span></dd>
+              <dt><i>5</i>이징</dt><dd>퇴장 <span class="mono">(.3,0,1,1)</span> 가속 · 등장 <span class="mono">(.05,.7,.1,1)</span> 감속</dd>
+              <dt><i>6</i>히어로</dt><dd>들어오는 슬라이드. 나가는 쪽은 더 짧고 더 흐리게</dd>
+              <dt><i>7</i>레이어</dt><dd>주 = 슬라이드 변위 · 보조 = 단원 칩이 공유 요소로 이동(모프) + 본문 52ms 스태거 · 앰비언트 = 진행 바 채워짐</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd><span class="pill pill--note">수정됨</span> 처음엔 100% 폭 슬라이드였으나 규칙 위반 → <strong>26%</strong> 변위 + 나머지는 불투명도가 담당</dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 CSS — 1/3 규칙에 맞춘 변위</summary>
+<pre><code>/* 슬라이드를 화면 폭만큼 밀면 "1/3 화면 초과" CRITICAL 위반이다.
+   변위는 26%로 자르고, 나머지 거리감은 불투명도가 대신 만든다. */
+@keyframes trOut { from{ transform:translateX(0);   opacity:1 }
+                   to  { transform:translateX(-26%); opacity:0 } }
+@keyframes trIn  { from{ transform:translateX(26%);  opacity:0 }
+                   to  { transform:translateX(0);    opacity:1 } }
+
+.tr-a    { animation: trOut 390ms var(--e-accel) both; }               /* 퇴장 = 등장의 75% */
+.tr-b    { animation: trIn  520ms var(--e-emph)  both; animation-delay: 130ms; }
+.tr-b h5 { animation: trBody 260ms var(--e-std)  both; animation-delay: 300ms; }
+.tr-b p  { animation: trBody 260ms var(--e-std)  both; animation-delay: 352ms; }
+.tr-chip { animation: trChipMove 520ms var(--e-std) both; animation-delay: 130ms; } /* 공유 요소 */</code></pre>
+        </details>
+        <p class="cite">참조 — <b>patterns/entrance-exit.md</b> <span>§Page Transition (Forward) · §Exit = 진입의 65–75%</span> ·
+          <b>director/core-philosophy.md</b> <span>§The 1/3 Screen Rule</span> ·
+          <b>patterns/multi-element.md</b> <span>§Timing Overlap — 25% brisk</span></p>
+      </article>
+
+      <!-- ─────────── S-08 ─────────── -->
+      <article class="cut" id="s08">
+        <div class="cut__head">
+          <span class="cut__no">S-08</span>
+          <h3>앰비언트 대기 화면</h3>
+          <span class="cut__tag">Ambient</span>
+          <p class="cut__use">교사가 3분간 설명하거나 학생이 활동하는 동안 떠 있는 화면. 죽지도, 방해하지도 않아야 한다.</p>
+        </div>
+        <div class="cut__body">
+          <div class="cut__left">
+            <div class="stage" data-stage style="padding:0">
+              <div class="amb">
+                <div class="amb-grad"></div>
+                <span class="amb-f amb-f1"></span>
+                <span class="amb-f amb-f2"></span>
+                <span class="amb-f amb-f3"></span>
+                <p class="amb-note">잠깐, 각자 3분만 생각해 봅시다</p>
+              </div>
+            </div>
+            <div class="beats" aria-hidden="true">
+              <span class="beat beat--a" style="flex:34">그라데이션 16s</span>
+              <span class="beat beat--c" style="flex:33">부유 3.5–5.5s</span>
+              <span class="beat beat--d" style="flex:33">문구 호흡 3s</span>
+            </div>
+            <div class="stagebar">
+              <button class="btn" type="button" id="ambToggle2" aria-pressed="false">정지</button>
+              <span class="total">무한 루프 · 진폭은 주 모션의 <b>10–20%</b></span>
+            </div>
+          </div>
+          <div class="sheet">
+            <h4>8단계 결정 시트</h4>
+            <dl>
+              <dt><i>1</i>감정</dt><dd>Calm <em>— 느리게, 흐르듯</em></dd>
+              <dt><i>2</i>퍼스널리티</dt><dd>Corporate (밀도 최저)</dd>
+              <dt><i>3</i>주 속성</dt><dd>position(Y 부유) + background-position</dd>
+              <dt><i>4</i>지속</dt><dd>부유 <span class="mono">3500 / 4000 / 5500ms</span> — 서로 나누어떨어지지 않게 해서 동기화를 깬다</dd>
+              <dt><i>5</i>이징</dt><dd><span class="mono">sine ease-in-out</span> — 루프 이음매가 안 보이는 유일한 곡선</dd>
+              <dt><i>6</i>히어로</dt><dd>없음. 히어로가 생기는 순간 앰비언트가 아니다</dd>
+              <dt><i>7</i>레이어</dt><dd>배경 = 그라데이션 16s · 중경 = 원 3개 부유(오프셋 30%/60%) · 전경 = 문구 호흡 3000ms</dd>
+              <dt><i>8</i>1/3 규칙</dt><dd>진폭 ±8–12px <span class="pill pill--ok">OK</span> · 5초 초과 루프이므로 <strong>정지 버튼 제공</strong> <span class="pill pill--ok">a11y</span></dd>
+            </dl>
+          </div>
+        </div>
+        <details class="code">
+          <summary>핵심 CSS — 동기화를 깨는 법</summary>
+<pre><code>/* 같은 주기로 띄우면 셋이 한 몸처럼 붙어 움직인다.
+   서로 배수가 아닌 주기 + 음수 delay 로 위상을 30% / 60% 어긋낸다. */
+.amb-f1 { animation: ambF1 4000ms var(--e-sine) infinite; }
+.amb-f2 { animation: ambF2 5500ms var(--e-sine) infinite; animation-delay: -1650ms; }
+.amb-f3 { animation: ambF3 3500ms var(--e-sine) infinite; animation-delay: -2100ms; }
+.amb-grad { animation: ambGrad 16s var(--e-sine) infinite alternate; }
+
+/* 5초 넘는 루프는 반드시 멈출 수 있어야 한다 */
+:root[data-ambient="off"] .amb-grad,
+:root[data-ambient="off"] .amb-f { animation-play-state: paused; }</code></pre>
+        </details>
+        <p class="cite">참조 — <b>patterns/ambient-continuous.md</b> <span>§Layered Floating (4000/5500/3500ms, 오프셋 30%/60%) · §Gradient Shift (8–20s)</span> ·
+          <b>reference/quality-checklist.md</b> <span>§Accessibility — “5초 넘는 애니메이션은 정지 가능”</span></p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 4. 검수 ══════════════════ -->
+<section class="section" id="qa">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="section__no">04 — 품질 검수</p>
+      <h2>CRITICAL 규칙 네 개를 8컷 전부에 대고 확인</h2>
+      <p>
+        스킬은 규칙에 심각도를 매긴다. CRITICAL은 “절대 깨지 말 것”. 아래는 8컷을
+        그 네 항목으로 훑은 결과이고, 두 항목에서 실제로 되돌아가 고쳤다.
+      </p>
+    </div>
+    <div class="tablewrap">
+      <table class="qa">
+        <thead>
+          <tr><th>CRITICAL 규칙</th><th>결과</th><th>근거 / 조치</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>공간 이동에 선형 이징 금지</td>
+            <td><span class="pill pill--ok">통과</span></td>
+            <td>모든 <span class="mono">transform</span> 애니메이션이 5개 지정 곡선 중 하나를 쓴다. 선형은 어디에도 없다 — 스피너·진행바가 이 덱에 없기 때문.</td>
+          </tr>
+          <tr>
+            <td>중요한 상태 변화에 불투명도 단독 금지</td>
+            <td><span class="pill pill--note">수정함</span></td>
+            <td>S-02 불릿이 처음엔 페이드만 했다. 위로 20px 상승을 더해 “도착”이 읽히도록 고쳤다. S-06 판정도 색만 바꾸지 않고 스케일·위치를 함께 움직인다.</td>
+          </tr>
+          <tr>
+            <td>화면의 1/3 초과 이동 금지</td>
+            <td><span class="pill pill--note">수정함</span></td>
+            <td>S-07 전환의 슬라이드 변위를 100% → <strong>26%</strong>로 줄이고 남은 거리감을 불투명도에 넘겼다. 나머지 컷의 최대 변위는 20px.</td>
+          </tr>
+          <tr>
+            <td>주 · 보조 · 앰비언트 3개 레이어 필수</td>
+            <td><span class="pill pill--ok">통과</span></td>
+            <td>8컷 모두 세 층을 갖는다. 각 컷의 결정 시트 7번 항목에 어느 요소가 어느 층인지 적어 두었다.</td>
+          </tr>
+          <tr>
+            <td>스태거 총량 500ms 미만 <em style="font-style:normal;color:var(--ink-3)">(HIGH)</em></td>
+            <td><span class="pill pill--ok">통과</span></td>
+            <td>최대치는 S-04 차트의 <span class="mono">348ms</span>(58ms × 6). S-02는 260ms.</td>
+          </tr>
+          <tr>
+            <td>모션 축소 대안 제공 <em style="font-style:normal;color:var(--ink-3)">(HIGH)</em></td>
+            <td><span class="pill pill--ok">통과</span></td>
+            <td><span class="mono">prefers-reduced-motion</span>일 때 공간 이동·클립·오버슛을 전부 제거하고 200ms 페이드만 남긴다. 앰비언트 루프는 정지. 카운트업은 최종값을 즉시 표시.</td>
+          </tr>
+          <tr>
+            <td>100번째 시청에도 괜찮은가</td>
+            <td><span class="pill pill--ok">통과</span></td>
+            <td>한 학기 반복될 S-07 전환은 오버슛 0%·총 650ms로 가장 절제했다. 오버슛이 큰 연출은 하루 몇 번뿐인 S-06 정답 판정에만 남겼다.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 5. 파일 지도 ══════════════════ -->
+<section class="section" id="map">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="section__no">05 — 스킬 파일 사용 지도</p>
+      <h2>17개 파일이 각각 어디에 쓰였나</h2>
+      <p>
+        <span class="mono">SKILL.md</span> 하나 + director 8 + patterns 4 + reference 4.
+        “읽었다”가 아니라 “이 값을 여기서 가져왔다”를 기준으로 적었다.
+      </p>
+    </div>
+    <div class="map">
+      <div class="map__group">
+        <h3>director/ — 판단 기준</h3>
+        <ul>
+          <li><b>core-philosophy.md</b><span>3개 레이어 정의(주 100% / 보조 30–50% / 앰비언트 10–20%)와 1/3 화면 규칙.</span> <u>→ 8컷 전부, 특히 S-07</u></li>
+          <li><b>decision-framework.md</b><span>모션 카테고리 6종으로 각 컷을 분류(Revealing / Emphasizing / Responding / Transitioning / Ambient). 카드 상단 태그가 그것.</span> <u>→ 컷 태그 전부</u></li>
+          <li><b>motion-personality.md</b><span>Corporate 선택과 상수 3개 고정. “90%는 한 아키타입” 규칙에 따라 Playful은 정답 연출 1곳만.</span> <u>→ §02, S-06</u></li>
+          <li><b>emotion-mapping.md</b><span>컨텍스트별 기본 감정표(페이지 로드 → Calm+Confidence, 폼 성공 → Joy+Confidence)와 색 전환 규칙(성공은 초록으로 <em>가고</em>, 오류는 번쩍이고 <em>가라앉는다</em>).</span> <u>→ S-01, S-03, S-06</u></li>
+          <li><b>disney-principles.md</b><span>2번 예비동작, 5번 팔로스루(자식 50–150ms), 8번 보조 동작(진폭 30–50%).</span> <u>→ S-05, S-02, S-04</u></li>
+          <li><b>choreography.md</b><span>공간 원점 일치, 카운터 모션, 스태거 패턴 5종.</span> <u>→ §02 등장 패턴, S-04</u></li>
+          <li><b>narrative-structure.md</b><span>4막 구조와 총 길이별 배분표. 각 컷 아래 ‘비트 바’가 그 배분이다.</span> <u>→ 비트 바 전부</u></li>
+          <li><b>context-adaptation.md</b><span>플랫폼 티어(TV/Kiosk 1.3×), 콘텐츠 타입 밀도, 모션 축소 대체표, 성능 예산(transform+opacity만).</span> <u>→ 전역 지속시간, a11y</u></li>
+        </ul>
+      </div>
+      <div class="map__group">
+        <h3>patterns/ — 레시피</h3>
+        <ul>
+          <li><b>entrance-exit.md</b><span>Reveal Entrance(clip/mask 300–500ms), 방향 의미표(below = 도착), 페이지 전환 레시피, 퇴장 = 진입의 65–75%.</span> <u>→ S-01, S-07</u></li>
+          <li><b>multi-element.md</b><span>List Items 퍼스널리티별 표, Wave 스태거, 타이밍 겹침 25%.</span> <u>→ S-02, S-04, S-07</u></li>
+          <li><b>state-feedback.md</b><span>Checkmark Success 4단계, Error Shake 규격(±10–15px, 2–3회, 오버슛 0%).</span> <u>→ S-06</u></li>
+          <li><b>ambient-continuous.md</b><span>Breathing 진폭표, Layered Floating 주기 3종, Gradient Shift 8–20s, 파티클 성능 한계.</span> <u>→ S-08, S-01·S-03·S-05의 앰비언트 층</u></li>
+        </ul>
+      </div>
+      <div class="map__group">
+        <h3>reference/ — 조회표와 검수</h3>
+        <ul>
+          <li><b>timing-easing-tables.md</b><span>퍼스널리티별 3단 지속시간, 산업 표준 이징 10종, 오버슛 예산, 반응 지연 한계.</span> <u>→ 전역 토큰</u></li>
+          <li><b>property-selection.md</b><span>속성이 무엇을 <em>말하는지</em>(위 = 성장, 스케일업 = 중요), 목적별 주/보조 속성표, 성능 등급.</span> <u>→ 모든 결정 시트 3번 항목</u></li>
+          <li><b>quality-checklist.md</b><span>심각도 3단(CRITICAL / HIGH / MEDIUM) 검수 목록.</span> <u>→ §04 전체</u></li>
+          <li><b>troubleshooting.md</b><span>증상 → 원인 → 처방. “싸구려로 보인다 = 보조·앰비언트 없음”이 실제로 초기 S-03을 고쳤다.</span> <u>→ S-03 헤일로 추가</u></li>
+        </ul>
+      </div>
+      <div class="map__group">
+        <h3>SKILL.md — 진입점</h3>
+        <ul>
+          <li><b>§8-Step Checklist</b><span>이 문서의 ‘결정 시트’ 8행이 곧 그 체크리스트다. 컷마다 여덟 칸을 채운 뒤에 코드를 썼다.</span> <u>→ 8컷 × 8행</u></li>
+          <li><b>§Quality Rules</b><span>CRITICAL 4 / HIGH 4. §04 검수표의 뼈대.</span> <u>→ §04</u></li>
+          <li><b>§Weight Classification</b><span>요소 무게(Heavy/Medium/Light)로 지속시간과 오버슛을 재확인.</span> <u>→ S-06 판정 카드 = Medium</u></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 6. 재사용 ══════════════════ -->
+<section class="section" id="reuse">
+  <div class="wrap">
+    <div class="section__head">
+      <p class="section__no">06 — 실제 수업 자료에 붙이기</p>
+      <h2>세 가지 덱 유형에 그대로 이식된다</h2>
+      <p>
+        모든 값은 CSS 커스텀 프로퍼티 하나로 모여 있다. 토큰 블록만 옮기면
+        레거시 HTML 덱이든 React 덱이든 같은 성격의 모션이 나온다.
+      </p>
+    </div>
+    <div class="reuse">
+      <div class="panel">
+        <h3>레거시 HTML 덱</h3>
+        <p><span class="mono">data/&lt;그룹&gt;/&lt;과목&gt;/&lt;수업&gt;/index.html</span>의
+          <span class="mono">&lt;style&gt;</span>에 토큰 블록과 필요한 <span class="mono">@keyframes</span>만 복사한다.
+          의존성이 없다.</p>
+<pre>:root{
+  --ts:1;
+  --d-quick: calc(260ms * var(--ts));
+  --d-std:   calc(390ms * var(--ts));
+  --d-slow:  calc(580ms * var(--ts));
+  --e-std:  cubic-bezier(.2,0,0,1);
+  --e-emph: cubic-bezier(.05,.7,.1,1);
+  --e-accel:cubic-bezier(.3,0,1,1);
+}</pre>
+      </div>
+      <div class="panel">
+        <h3>네이티브 React 덱</h3>
+        <p>클릭 빌드 단계에 붙일 때는 CSS 그대로. 씬(타임라인) 덱이라면
+          <span class="mono">src/scene</span>의 <span class="mono">useSceneTime()</span> t(초)를
+          같은 곡선의 순수 함수로 옮긴다.</p>
+<pre>// 260ms · MD3 Standard 를 t 함수로
+const p  = clamp01((t - 0.13) / 0.26);
+const y  = interpolate(p, [0,1], [20,0],
+             { easing: bezier(.2,0,0,1) });</pre>
+        <p style="margin-top:.7rem;">스태거는 <span class="mono">delay = 0.065 * i</span>로 동일하게 유지한다.</p>
+      </div>
+      <div class="panel">
+        <h3>라이브 퀴즈 레이어</h3>
+        <p>S-06 판정 컷은 <span class="mono">live/runtime/</span>의 학생 화면 피드백에
+          그대로 얹힌다. 정답은 Playful, 오답은 Corporate — 두 성격을
+          섞지 않는 것이 핵심이다.</p>
+        <p style="margin-top:.7rem;">오답 흔들림 350ms는 <strong>투사 보정을 곱하지 않는다.</strong>
+          학생 기기(모바일)에서는 오히려 0.8배 티어라 더 짧아도 된다.</p>
+      </div>
+      <div class="panel">
+        <h3>모션 축소 대응</h3>
+        <p>애니메이션을 거는 요소에 <span class="mono">.mo</span> 클래스를 함께 붙여 두면,
+          아래 한 블록으로 전체가 안전한 페이드로 내려앉는다.</p>
+<pre>@media (prefers-reduced-motion: reduce){
+  .mo{ animation: rmFade 200ms linear both !important;
+       animation-delay: 0ms !important;
+       transform: none !important;
+       clip-path: none !important; }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong style="font-weight:600;color:var(--ink-2)">스킬 출처</strong> —
+      <a href="https://github.com/LottieFiles/motion-design-skill">github.com/LottieFiles/motion-design-skill</a> (MIT).
+      <span class="mono">.claude/skills/motion-design/</span>에 설치됨.</p>
+    <p>샘플 8컷은 샘플고등학교 수업 자료 허브의 덱에 그대로 이식할 수 있도록 작성되었다.
+      모든 모션은 <span class="mono">transform</span>과 <span class="mono">opacity</span>만 사용한다.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var root = document.documentElement;
+
+  /* ── 모션 축소 감지 (director/context-adaptation.md) ── */
+  var rmq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function syncMotion(){ root.dataset.motion = rmq.matches ? 'reduced' : 'full'; }
+  syncMotion();
+  rmq.addEventListener ? rmq.addEventListener('change', syncMotion) : rmq.addListener(syncMotion);
+
+  /* ── 무대 재생 ── */
+  function play(stage){
+    stage.removeAttribute('data-run');
+    void stage.offsetWidth;                 // 리플로우 강제 — 애니메이션 재시작
+    stage.setAttribute('data-run','');
+    var num = stage.querySelector('[data-count]');
+    if (num) countUp(num, +num.dataset.count, 580 * scale());
+  }
+  function scale(){ return +getComputedStyle(root).getPropertyValue('--ts') || 1; }
+
+  function countUp(el, target, ms){
+    if (root.dataset.motion === 'reduced'){ el.textContent = target; return; }
+    var t0 = null;
+    function tick(now){
+      if (t0 === null) t0 = now;
+      var p = Math.min(1, (now - t0) / ms);
+      var eased = 1 - Math.pow(1 - p, 3);   // ease-out-cubic ≈ MD3 Decelerate
+      el.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  var stages = Array.prototype.slice.call(document.querySelectorAll('[data-stage]'));
+
+  document.querySelectorAll('[data-replay]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      play(btn.closest('.cut__left').querySelector('[data-stage]'));
+    });
+  });
+
+  /* ── 화면에 들어올 때 1회 자동 재생 ── */
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting && e.target.hasAttribute('data-auto')){
+          play(e.target); io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.55 });
+    stages.forEach(function(s){ if (s.hasAttribute('data-auto')) io.observe(s); });
+  } else {
+    stages.forEach(function(s){ if (s.hasAttribute('data-auto')) play(s); });
+  }
+
+  /* ── S-06 퀴즈 피드백 ── */
+  var quiz = document.querySelector('[data-quiz] .qz');
+  var glyphOk = 'M5 12.5 L10 17.5 L19 7';
+  var glyphNo = 'M7 7 L17 17 M17 7 L7 17';
+  document.querySelectorAll('[data-fb-btn]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var mode = btn.dataset.fbBtn;
+      quiz.removeAttribute('data-fb');
+      void quiz.offsetWidth;
+      quiz.querySelector('.qz-glyph').setAttribute('d', mode === 'ok' ? glyphOk : glyphNo);
+      quiz.querySelector('.qz-msg').textContent = mode === 'ok' ? '정답입니다' : '다시 한 번';
+      quiz.querySelector('.qz-sub').textContent = mode === 'ok' ? '순차 구조가 맞아요' : '조건이 언제 참인지 볼까요';
+      quiz.setAttribute('data-fb', mode);
+    });
+  });
+
+  /* ── 재생 속도 ── */
+  document.querySelectorAll('#speed button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('#speed button').forEach(function(b){ b.setAttribute('aria-pressed','false'); });
+      btn.setAttribute('aria-pressed','true');
+      root.style.setProperty('--ts', btn.dataset.speed);
+    });
+  });
+
+  document.getElementById('playAll').addEventListener('click', function(){
+    stages.forEach(function(s){ if (s.hasAttribute('data-auto')) play(s); });
+  });
+
+  /* ── 앰비언트 정지 (quality-checklist.md — 5초 초과 루프) ── */
+  function toggleAmbient(){
+    var off = root.dataset.ambient === 'off';
+    root.dataset.ambient = off ? 'on' : 'off';
+    document.querySelectorAll('#ambToggle, #ambToggle2').forEach(function(b){
+      b.setAttribute('aria-pressed', off ? 'false' : 'true');
+      if (b.id === 'ambToggle') b.textContent = off ? '앰비언트 정지' : '앰비언트 재생';
+      else b.textContent = off ? '정지' : '재생';
+    });
+  }
+  document.querySelectorAll('#ambToggle, #ambToggle2').forEach(function(b){
+    b.addEventListener('click', toggleAmbient);
+  });
+
+  /* ── 테마 ── */
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark'
+      || (!root.hasAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+  });
+})();
+</script>
+</body>
+</html>

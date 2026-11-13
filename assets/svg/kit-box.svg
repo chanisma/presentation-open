@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 440" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 비스듬히 앞에서 본 뚜껑 열린 조립 키트 상자. 안은 칸막이로 두 칸: 왼쪽은 부품 홈이 파인 받침,
+       오른쪽은 설명서를 꽂는 빈 칸. 덱이 왼쪽 칸 위에 부품(플러그), 오른쪽 칸 위에 설명서 두 권을 띄운다
+       (vibe-github-supabase 25장 · 플러그인 = MCP 서버 + 스킬). 앞면 라벨은 비워 두고 덱이 글자를 얹는다.
+       완성도 높은 손그림: 일정한 윤곽선, 평평한 면. 밝은 배경용 잉크 #1f2430. 텍스트 없음.
+       팔레트: ink #1f2430 · lid #6c4cf0 · lidInside #9d86f6 · box #e6d6b8 · boxSide #cdb990 · inside #b59f74 · insideDeep #9c875e · tray #f1e7d2 · label #fbf7ee
+       앵커: 왼쪽 칸 중심 (200,200) · 오른쪽 칸 중심 (424,200) · 앞면 라벨 x 222~402, y 296~360 -->
+
+  <ellipse cx="312" cy="426" rx="270" ry="11" fill="#1f2430" opacity=".08" stroke="none" />
+  <path d="M104 150 L520 150 L548 34 C549 30 547 28 543 28 L134 28 C130 28 128 30 127 34 Z" fill="#6c4cf0" stroke="#1f2430" stroke-width="2.4" />
+  <path d="M120 140 L506 140 L530 44 L144 44 Z" fill="#9d86f6" stroke="#1f2430" stroke-width="1.8" />
+  <path d="M166 58 L330 58" stroke="#ffffff" stroke-width="3" opacity=".35" />
+  <path d="M104 150 L520 150 L562 236 L62 236 Z" fill="#b59f74" stroke="#1f2430" stroke-width="2.4" />
+  <path d="M105 151 L519 151 L527 168 L97 168 Z" fill="#9c875e" stroke="none" />
+  <path d="M304 150 L318 150 L322 236 L300 236 Z" fill="#cdb990" stroke="#1f2430" stroke-width="2" />
+  <path d="M116 176 L292 176 L294 228 L94 228 Z" fill="#f1e7d2" stroke="#1f2430" stroke-width="1.8" />
+  <g fill="#cdb990" stroke="#1f2430" stroke-width="1.5">
+    <rect x="128" y="188" width="66" height="26" rx="10" />
+    <rect x="206" y="188" width="34" height="26" rx="8" />
+    <rect x="250" y="188" width="34" height="26" rx="8" />
+  </g>
+  <path d="M334 176 L512 176 L540 228 L330 228 Z" fill="#9c875e" stroke="#1f2430" stroke-width="1.6" opacity=".55" />
+  <g stroke="#1f2430" stroke-width="1.4" opacity=".4">
+    <path d="M340 192 L518 192" /><path d="M342 210 L528 210" />
+  </g>
+  <path d="M62 236 L562 236 L562 392 C562 398 558 402 552 402 L72 402 C66 402 62 398 62 392 Z" fill="#e6d6b8" stroke="#1f2430" stroke-width="2.4" />
+  <path d="M520 150 L578 214 L578 382 L562 394 L562 236 Z" fill="#cdb990" stroke="#1f2430" stroke-width="2.2" />
+  <path d="M290 236 L334 236 L334 270 L290 270 Z" fill="#f1e7d2" stroke="#1f2430" stroke-width="1.6" />
+  <rect x="222" y="296" width="180" height="64" rx="6" fill="#fbf7ee" stroke="#1f2430" stroke-width="2" />
+  <g stroke="#1f2430" stroke-width="1.3" opacity=".22">
+    <path d="M86 270 L86 380" /><path d="M110 270 L110 380" /><path d="M514 270 L514 380" /><path d="M538 270 L538 380" />
+  </g>
+  <path d="M76 250 L200 250" stroke="#ffffff" stroke-width="3" opacity=".35" />
+</svg>

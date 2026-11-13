@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 정보화부 학교 사업 안내 - 샘플고등학교</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --green-bg: #3aaa5c;
+  --green-dark: #2d8a49;
+  --green-light: #e8f5e9;
+  --green-accent: #43b867;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --red-dot: #ff5f57;
+  --yellow-dot: #ffbd2e;
+  --green-dot: #28c840;
+  --blue-accent: #2196f3;
+  --orange-accent: #ff9800;
+  --purple-accent: #9c27b0;
+  /* Base scale: 1vw at 1920px = 19.2px. We use vw units so everything scales. */
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--green-bg);
+  overflow: hidden;
+  color: var(--gray-900);
+  /* Base font size scales with viewport width, clamped for readability */
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+
+/* Slide container */
+.presentation {
+  width: 100%; height: 100%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2vh 3vw;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Browser window card — fills viewport */
+.browser-card {
+  background: var(--white);
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 1600px;
+  height: 100%;
+  max-height: calc(100vh - 4.4vh);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.browser-topbar {
+  background: var(--gray-100);
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
+.dot.red { background: var(--red-dot); }
+.dot.yellow { background: var(--yellow-dot); }
+.dot.green { background: var(--green-dot); }
+
+.browser-topbar .title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  font-weight: 500;
+  margin-right: 2.5rem;
+}
+
+.browser-content {
+  padding: 2.5rem 3.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Typography — all relative to the scaled html font-size */
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; margin-bottom: 0.5rem; }
+h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 1rem; color: var(--green-dark); }
+h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.6rem; }
+p  { font-size: 1.05rem; line-height: 1.7; color: var(--gray-800); }
+
+.subtitle {
+  font-size: 1.2rem;
+  color: var(--gray-600);
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+}
+
+.school-name {
+  font-size: 1.15rem;
+  color: var(--green-dark);
+  font-weight: 600;
+  margin-top: 0.8rem;
+}
+
+/* Badge / tag */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+.badge.green { background: var(--green-light); color: var(--green-dark); }
+.badge.blue { background: #e3f2fd; color: #1565c0; }
+.badge.orange { background: #fff3e0; color: #e65100; }
+.badge.purple { background: #f3e5f5; color: #7b1fa2; }
+.badge.red { background: #fce4ec; color: #c62828; }
+
+/* Info box */
+.info-box {
+  background: var(--green-light);
+  border-left: 4px solid var(--green-accent);
+  padding: 1rem 1.3rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 1rem 0;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.info-box.blue {
+  background: #e3f2fd;
+  border-left-color: var(--blue-accent);
+}
+
+.info-box.orange {
+  background: #fff3e0;
+  border-left-color: var(--orange-accent);
+}
+
+.info-box.red {
+  background: #fce4ec;
+  border-left-color: #e53935;
+}
+
+/* Grid layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+/* Card items */
+.card-item {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.7rem;
+  padding: 1.2rem;
+}
+
+.card-item .icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-item h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.card-item p {
+  font-size: 0.95rem;
+  color: var(--gray-600);
+  line-height: 1.5;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 1.05rem;
+}
+
+th {
+  background: var(--green-dark);
+  color: var(--white);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+th:first-child { border-radius: 0.5rem 0 0 0; }
+th:last-child { border-radius: 0 0.5rem 0 0; }
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+tr:nth-child(even) td { background: var(--gray-50); }
+tr:last-child td:first-child { border-radius: 0 0 0 0.5rem; }
+tr:last-child td:last-child { border-radius: 0 0 0.5rem 0; }
+
+/* TOC list */
+.toc-list {
+  list-style: none;
+  margin: 1.5rem 0;
+}
+
+.toc-list li {
+  display: flex;
+  align-items: center;
+  padding: 1.3rem 1.5rem;
+  margin-bottom: 0.8rem;
+  background: var(--gray-50);
+  border-radius: 0.8rem;
+  border: 1px solid var(--gray-200);
+  font-size: 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toc-list li:hover {
+  background: var(--green-light);
+  border-color: var(--green-accent);
+  transform: translateX(4px);
+}
+
+.toc-list li .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem; height: 2.5rem;
+  background: var(--green-dark);
+  color: var(--white);
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-right: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Activity list */
+.activity-list {
+  list-style: none;
+}
+
+.activity-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: 1rem;
+}
+
+.activity-list li:last-child { border-bottom: none; }
+
+.activity-list li .emoji {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.activity-list li .details {
+  flex: 1;
+}
+
+.activity-list li .details strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 1.05rem;
+}
+
+.activity-list li .details span {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+}
+
+/* Club grid */
+.club-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+
+.club-card {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.7rem;
+  padding: 1.2rem 0.8rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.club-card:hover {
+  border-color: var(--green-accent);
+  background: var(--green-light);
+}
+
+.club-card .club-emoji { font-size: 2rem; margin-bottom: 0.4rem; }
+.club-card .club-name { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+.club-card .club-desc { font-size: 0.85rem; color: var(--gray-600); }
+
+/* Timeline */
+.timeline {
+  display: flex;
+  gap: 0;
+  margin: 1rem 0;
+}
+
+.timeline-item {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  position: relative;
+  padding-top: 2rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  top: 0.6rem;
+  left: 0; right: 0;
+  height: 3px;
+  background: var(--gray-300);
+}
+
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  top: 0.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1rem; height: 1rem;
+  border-radius: 50%;
+  background: var(--green-accent);
+  border: 2px solid var(--white);
+  box-shadow: 0 0 0 2px var(--green-accent);
+  z-index: 1;
+}
+
+.timeline-item.highlight::after {
+  background: var(--orange-accent);
+  box-shadow: 0 0 0 2px var(--orange-accent);
+}
+
+.timeline-item .month {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-bottom: 0.3rem;
+}
+
+.timeline-item.highlight .month { color: #e65100; }
+
+.timeline-item .event {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  line-height: 1.4;
+  padding: 0 0.2rem;
+}
+
+/* Task boxes */
+.task-box {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.7rem;
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 0.8rem;
+  border-left: 4px solid var(--green-accent);
+}
+
+.task-box .task-num {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.task-box h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.task-box p {
+  font-size: 0.95rem;
+  color: var(--gray-600);
+}
+
+/* QR section */
+.qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.qr-section img {
+  width: 220px;
+  height: 220px;
+  border-radius: 0.8rem;
+  border: 2px solid var(--gray-200);
+}
+
+.qr-label {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--gray-600);
+}
+
+.qr-url {
+  margin-top: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--green-dark);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Cover slide special */
+.cover-content {
+  text-align: center;
+  padding: 2rem 1.5rem;
+}
+
+.cover-content h1 {
+  font-size: 2.8rem;
+  margin-bottom: 0.8rem;
+  color: var(--green-dark);
+}
+
+.cover-content .year-badge {
+  display: inline-block;
+  background: var(--green-dark);
+  color: var(--white);
+  padding: 0.4rem 1.5rem;
+  border-radius: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+}
+
+/* End slide */
+.end-content {
+  text-align: center;
+  padding: 2rem 1.5rem;
+}
+
+.end-content h1 {
+  color: var(--green-dark);
+  margin-bottom: 0.5rem;
+}
+
+.end-content p {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Navigation */
+.nav-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.6rem 1.5rem;
+  z-index: 100;
+}
+
+.nav-btn {
+  width: 2.8rem; height: 2.8rem;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  color: var(--green-dark);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+
+.nav-btn:hover { background: var(--white); transform: scale(1.1); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+
+.slide-counter {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
+  min-width: 4rem;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.8);
+  transition: width 0.4s ease;
+  z-index: 100;
+}
+
+/* Highlight box for emphasis */
+.highlight-box {
+  background: linear-gradient(135deg, var(--green-light), #c8e6c9);
+  border-radius: 0.8rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.highlight-box .big-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--green-dark);
+  margin-bottom: 0.3rem;
+}
+
+.highlight-box .small-text {
+  font-size: 0.95rem;
+  color: var(--gray-600);
+}
+
+/* Deadline callout */
+.deadline-callout {
+  background: #fff3e0;
+  border: 2px solid var(--orange-accent);
+  border-radius: 0.8rem;
+  padding: 1.5rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.deadline-callout .deadline-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.deadline-callout .deadline-date {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #e65100;
+  margin-bottom: 0.3rem;
+}
+.deadline-callout .deadline-desc {
+  font-size: 1rem;
+  color: var(--gray-800);
+  line-height: 1.6;
+}
+
+/* Activity layout (text + photos side by side) */
+.activity-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.activity-layout > div:first-child {
+  flex: 1;
+}
+
+.activity-photos {
+  flex-shrink: 0;
+  width: 40%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* Mobile-only inline photos (hidden on desktop) */
+.mobile-only-photo {
+  display: none;
+}
+
+/* Action button */
+.action-btn {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.8rem;
+  background: #e65100;
+  color: var(--white);
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 2rem;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(230, 81, 0, 0.3);
+}
+
+.action-btn:hover {
+  background: #bf360c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.4);
+}
+
+/* Curriculum table colors */
+.grade-1 { border-left: 3px solid #43b867; }
+.grade-2 { border-left: 3px solid #2196f3; }
+.grade-3 { border-left: 3px solid #9c27b0; }
+
+/* Section divider */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.3rem;
+}
+
+.section-divider .section-icon {
+  width: 2.8rem; height: 2.8rem;
+  border-radius: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--green-light);
+}
+
+.section-divider .section-text h2 {
+  margin-bottom: 0;
+}
+
+.section-divider .section-text .section-sub {
+  font-size: 0.9rem;
+  color: var(--gray-600);
+  font-weight: 400;
+}
+
+/* Cosware cards */
+.cosware-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.8rem;
+  margin: 0.8rem 0;
+}
+
+.cosware-card {
+  border-radius: 0.7rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.cosware-card.elice { background: #e8f5e9; border: 1px solid #a5d6a7; }
+.cosware-card.schoolflat { background: #e3f2fd; border: 1px solid #90caf9; }
+.cosware-card.tabtab { background: #f3e5f5; border: 1px solid #ce93d8; }
+
+.cosware-card .cosware-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.25rem; }
+.cosware-card .cosware-desc { font-size: 0.85rem; color: var(--gray-600); }
+
+/* ===== Responsive: Tablet / small laptop ===== */
+@media (max-width: 1024px) {
+  html, body { font-size: clamp(13px, 1.8vw, 18px); }
+  .browser-content { padding: 2rem 2.5rem; }
+  .club-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ===== Responsive: Mobile ===== */
+@media (max-width: 768px) {
+  html, body { font-size: clamp(13px, 2.8vw, 17px); }
+  .slide { padding: 1vh 2vw; }
+  .browser-card { border-radius: 0.7rem; }
+  .browser-content { padding: 1.5rem 1.5rem; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .club-grid { grid-template-columns: repeat(3, 1fr); }
+  .cosware-grid { grid-template-columns: 1fr; }
+  .cover-content h1 { font-size: 2rem; }
+  .timeline { flex-wrap: wrap; }
+  .timeline-item { flex: 0 0 33.33%; min-width: 0; }
+  .activity-layout { display: block; }
+  .activity-photos { display: none; }
+  .mobile-only-photo {
+    display: block;
+    margin-top: 0.5rem;
+  }
+  .mobile-only-photo img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid var(--gray-200);
+  }
+}
+
+@media (max-width: 480px) {
+  html, body { font-size: clamp(13px, 3.5vw, 16px); }
+  .browser-content { padding: 1.2rem 1rem; }
+  .club-grid { grid-template-columns: repeat(2, 1fr); }
+  .nav-btn { width: 2.4rem; height: 2.4rem; font-size: 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="presentation" id="presentation">
+
+  <!-- Slide 1: 표지 -->
+  <div class="slide active" data-slide="0">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">샘플고등학교 정보화부</div>
+      </div>
+      <div class="browser-content" style="display:flex; align-items:center; justify-content:center; padding: 1.5rem 3.5rem;">
+        <div style="display:flex; gap: 3rem; align-items:center; width:100%; max-width:1100px;">
+
+          <!-- 왼쪽: SVG 일러스트 -->
+          <div style="flex-shrink:0; width:42%;">
+            <svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+              <!-- 배경 원형 장식 -->
+              <circle cx="210" cy="190" r="170" fill="#e8f5e9" opacity="0.6"/>
+              <circle cx="210" cy="190" r="130" fill="#c8e6c9" opacity="0.4"/>
+
+              <!-- 연결선 (신경망) -->
+              <g stroke="#2d8a49" stroke-width="1.5" opacity="0.35">
+                <line x1="210" y1="60" x2="100" y2="150"/>
+                <line x1="210" y1="60" x2="320" y2="150"/>
+                <line x1="100" y1="150" x2="80"  y2="270"/>
+                <line x1="100" y1="150" x2="210" y2="290"/>
+                <line x1="320" y1="150" x2="210" y2="290"/>
+                <line x1="320" y1="150" x2="340" y2="270"/>
+                <line x1="80"  y1="270" x2="210" y2="290"/>
+                <line x1="340" y1="270" x2="210" y2="290"/>
+                <line x1="100" y1="150" x2="320" y2="150"/>
+                <line x1="80"  y1="270" x2="340" y2="270"/>
+                <!-- 추가 연결 -->
+                <line x1="210" y1="60"  x2="80"  y2="270" opacity="0.2"/>
+                <line x1="210" y1="60"  x2="340" y2="270" opacity="0.2"/>
+              </g>
+
+              <!-- 노드들 -->
+              <!-- 상단 중앙: 학교 아이콘 -->
+              <circle cx="210" cy="60" r="32" fill="#2d8a49"/>
+              <text x="210" y="67" text-anchor="middle" font-size="26" fill="white">🏫</text>
+
+              <!-- 좌중단: AI -->
+              <circle cx="100" cy="150" r="26" fill="#43b867"/>
+              <text x="100" y="157" text-anchor="middle" font-size="20" fill="white">🤖</text>
+
+              <!-- 우중단: 디지털 -->
+              <circle cx="320" cy="150" r="26" fill="#43b867"/>
+              <text x="320" y="157" text-anchor="middle" font-size="20" fill="white">💻</text>
+
+              <!-- 좌하단: 동아리 -->
+              <circle cx="80" cy="270" r="22" fill="#66bb6a"/>
+              <text x="80" y="277" text-anchor="middle" font-size="17" fill="white">🔬</text>
+
+              <!-- 우하단: 성과 -->
+              <circle cx="340" cy="270" r="22" fill="#66bb6a"/>
+              <text x="340" y="277" text-anchor="middle" font-size="17" fill="white">📊</text>
+
+              <!-- 하단 중앙: 학생 -->
+              <circle cx="210" cy="290" r="26" fill="#2d8a49"/>
+              <text x="210" y="297" text-anchor="middle" font-size="20" fill="white">🎓</text>
+
+              <!-- 플로팅 배지들 -->
+              <g>
+                <rect x="148" y="10" width="124" height="26" rx="13" fill="#2d8a49" opacity="0.15"/>
+                <text x="210" y="28" text-anchor="middle" font-size="11" fill="#2d8a49" font-weight="600">AI 중점학교 · 선도학교</text>
+              </g>
+
+              <!-- 중앙 레이블들 -->
+              <text x="58"  y="308" text-anchor="middle" font-size="10" fill="#555" font-weight="500">동아리</text>
+              <text x="362" y="308" text-anchor="middle" font-size="10" fill="#555" font-weight="500">성과공유</text>
+              <text x="210" y="330" text-anchor="middle" font-size="10" fill="#555" font-weight="500">학생 성장</text>
+              <text x="72"  y="137" text-anchor="middle" font-size="10" fill="#555" font-weight="500">인공지능</text>
+              <text x="348" y="137" text-anchor="middle" font-size="10" fill="#555" font-weight="500">디지털</text>
+            </svg>
+          </div>
+
+          <!-- 오른쪽: 텍스트 + QR -->
+          <div style="flex:1; text-align:left;">
+            <div class="year-badge" style="margin-bottom: 0.8rem;">2026</div>
+            <h1 style="font-size:2.2rem; color:var(--green-dark); margin-bottom:0.5rem;">정보화부<br>학교 사업 안내</h1>
+            <p class="subtitle" style="margin-bottom:0.3rem;">교사 대상 사업 설명 프레젠테이션</p>
+            <p class="school-name" style="margin-bottom:1.5rem;">샘플고등학교</p>
+
+            <!-- 4대 사업 미니 태그 -->
+            <div style="display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1.5rem;">
+              <span class="badge green">🤖 AI 중점학교</span>
+              <span class="badge blue">🌐 AI·디지털 선도학교</span>
+              <span class="badge purple">👩‍🏫 전문적 학습공동체</span>
+              <span class="badge orange">🔍 소프트웨어 심의</span>
+            </div>
+
+            <div class="qr-section" style="align-items:flex-start; margin:0;">
+              <img src="21omc.png" alt="QR 코드" style="width:130px; height:130px;">
+              <div class="qr-label">이 프레젠테이션에 접속하려면 QR을 스캔하세요</div>
+              <div class="qr-url">https://2026kijunit.netlify.app</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2: 목차 -->
+  <div class="slide" data-slide="1">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">목차</div>
+      </div>
+      <div class="browser-content">
+        <h2>목차</h2>
+        <ul class="toc-list">
+          <li onclick="goToSlide(2)">
+            <span class="num">1</span>
+            <div>
+              <strong>AI 중점학교</strong>
+              <div style="font-size:0.8rem; color:var(--gray-600);">개요 · 학생활동 · 융합동아리</div>
+            </div>
+          </li>
+          <li onclick="goToSlide(5)">
+            <span class="num">2</span>
+            <div>
+              <strong>AI·디지털 활용 선도학교</strong>
+              <div style="font-size:0.8rem; color:var(--gray-600);">개요 · 교사과제 · 연간일정</div>
+            </div>
+          </li>
+          <li onclick="goToSlide(9)">
+            <span class="num">3</span>
+            <div>
+              <strong>소프트웨어 심의</strong>
+              <div style="font-size:0.8rem; color:var(--gray-600);">심의 절차 및 일정 안내</div>
+            </div>
+          </li>
+          <li onclick="goToSlide(7)">
+            <span class="num">4</span>
+            <div>
+              <strong>전문적 학습공동체</strong>
+              <div style="font-size:0.8rem; color:var(--gray-600);">AI·디지털 에듀테크 활용 공동체 운영</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: AI 중점학교 개요 -->
+  <div class="slide" data-slide="2">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">AI 중점학교</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🤖</div>
+          <div class="section-text">
+            <h2>AI 중점학교 개요</h2>
+            <div class="section-sub">2023년~운영 중</div>
+          </div>
+        </div>
+
+        <div class="highlight-box">
+          <div class="big-text">"세상의 따뜻한 변혁을 주도하는 AI 융합 인재 양성"</div>
+          <div class="small-text">샘플고등학교 AI 중점학교 지향점</div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card-item">
+            <div class="icon">🏫</div>
+            <h4>운영 현황</h4>
+            <p>2023년부터 운영<br>AI 교육실 구축 완료</p>
+          </div>
+          <div class="card-item">
+            <div class="icon">💰</div>
+            <h4>예산</h4>
+            <p>연간 <strong>5,000만원</strong></p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <strong>📚 교원 역량 강화</strong><br>
+          학습공동체 운영 · 교원 연수 · 정보 공유 게시판 활용
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: 학생 참여 활동 -->
+  <div class="slide" data-slide="3">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">AI 중점학교 — 학생 활동</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🎯</div>
+          <div class="section-text">
+            <h2>학생 참여 활동</h2>
+            <div class="section-sub">선생님의 적극적인 참여와 안내를 부탁드립니다</div>
+          </div>
+        </div>
+
+        <div class="activity-layout">
+          <div style="flex:1;">
+            <ul class="activity-list">
+              <li>
+                <span class="emoji">🧩</span>
+                <div class="details">
+                  <strong>AI 융합과제 코너스톤 프로젝트</strong>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">💻</span>
+                <div class="details">
+                  <strong>AI/SW 융합 동아리</strong>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">🚀</span>
+                <div class="details">
+                  <strong>AI 스타트업 프로젝트</strong>
+                  <span>사회과 "나도 스타트업 창업자가 될꺼야" 행사 연계</span>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">☀️</span>
+                <div class="details">
+                  <strong><a href="https://drive.google.com/file/d/YOUR_DRIVE_FILE_ID/view?usp=sharing" target="_blank" style="color:inherit; text-decoration:underline; text-underline-offset:3px;">여름방학 AI 융합 캠프</a></strong>
+                  <span>방학 중 특별 프로그램</span>
+                  <div class="mobile-only-photo">
+                    <img src="2.png" alt="여름방학 AI 융합 캠프">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">❄️</span>
+                <div class="details">
+                  <strong><a href="https://drive.google.com/file/d/YOUR_DRIVE_FILE_ID/view?usp=sharing" target="_blank" style="color:inherit; text-decoration:underline; text-underline-offset:3px;">겨울방학 IT 기업 탐방</a></strong>
+                  <span>방학 중 특별 프로그램</span>
+                  <div class="mobile-only-photo">
+                    <img src="1.png" alt="겨울방학 IT 기업 탐방">
+                  </div>
+                </div>
+              </li>
+              <li>
+                <span class="emoji">🎨</span>
+                <div class="details">
+                  <strong><a href="https://2025-1kijunmusicfestival.netlify.app/" target="_blank" style="color:inherit; text-decoration:underline; text-underline-offset:3px;">생성형 AI 전시회 (Suno 음악 생성)</a></strong>
+                  <span>· VR 체험 프로그램</span>
+                </div>
+              </li>
+            </ul>
+
+            <div class="info-box" style="margin-top: 1rem;">
+              <strong>🙏 선생님께 부탁드립니다</strong><br>
+              수업 시간에 관련 활동을 안내해 주시고, 학생들의 참여를 독려해 주세요!
+            </div>
+          </div>
+
+          <div class="activity-photos">
+            <div>
+              <img src="2.png" alt="여름방학 AI 융합 캠프" style="width:100%; border-radius:0.7rem; border:1px solid var(--gray-200);">
+              <div style="text-align:center; font-size:0.8rem; color:var(--gray-600); margin-top:0.3rem;">여름방학 AI 융합 캠프</div>
+            </div>
+            <div>
+              <img src="1.png" alt="겨울방학 IT 기업 탐방" style="width:100%; border-radius:0.7rem; border:1px solid var(--gray-200);">
+              <div style="text-align:center; font-size:0.8rem; color:var(--gray-600); margin-top:0.3rem;">겨울방학 IT 기업 탐방</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: AI 기반 융합 동아리 -->
+  <div class="slide" data-slide="4">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">AI 중점학교 — 융합 동아리</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🔬</div>
+          <div class="section-text">
+            <h2>AI 기반 융합 동아리</h2>
+            <div class="section-sub">교과 연계 AI 융합 동아리 소개</div>
+          </div>
+        </div>
+
+        <div class="club-grid">
+          <div class="club-card">
+            <div class="club-emoji">💻</div>
+            <div class="club-name">두잇 (Do IT)</div>
+            <div class="club-desc">IT 기술 탐구</div>
+          </div>
+          <div class="club-card">
+            <div class="club-emoji">🏗️</div>
+            <div class="club-name">비빌딩</div>
+            <div class="club-desc">건축 + AI</div>
+          </div>
+          <div class="club-card">
+            <div class="club-emoji">📰</div>
+            <div class="club-name">타임즈</div>
+            <div class="club-desc">영어 + AI</div>
+          </div>
+          <div class="club-card">
+            <div class="club-emoji">🔢</div>
+            <div class="club-name">앰엔앰즈</div>
+            <div class="club-desc">수학 + AI</div>
+          </div>
+          <div class="club-card">
+            <div class="club-emoji">🧬</div>
+            <div class="club-name">CPR</div>
+            <div class="club-desc">생명과학 + AI</div>
+          </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 16px;">
+          <strong>👩‍🏫 교사 참여 방법</strong><br>
+          <strong>동아리 조언자</strong>로 참여하거나, 담당 교과와 <strong>융합 프로젝트를 연계</strong>해 주실 수 있습니다. 관심 있으신 선생님은 정보화부로 연락 부탁드립니다!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: 선도학교 개요 -->
+  <div class="slide" data-slide="5">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">AI·디지털 활용 선도학교</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🌐</div>
+          <div class="section-text">
+            <h2>AI·디지털 활용 선도학교</h2>
+            <div class="section-sub">개요 및 목표</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card-item">
+            <div class="icon">🎯</div>
+            <h4>목표</h4>
+            <p>AI·디지털 기반 교육자료 활용 수업 혁신</p>
+          </div>
+          <div class="card-item">
+            <div class="icon">💰</div>
+            <h4>예산</h4>
+            <p>연간 <strong>3,500만원</strong></p>
+          </div>
+        </div>
+
+        <h3 style="margin-top: 20px;">📦 활용 코스웨어</h3>
+        <div class="cosware-grid">
+          <div class="cosware-card elice">
+            <div class="cosware-name">엘리스</div>
+            <div class="cosware-desc">정보 · 프로그래밍</div>
+          </div>
+          <div class="cosware-card schoolflat">
+            <div class="cosware-name">스쿨플랫</div>
+            <div class="cosware-desc">수학</div>
+          </div>
+          <div class="cosware-card tabtab">
+            <div class="cosware-name">기출탭탭</div>
+            <div class="cosware-desc">수능 과목</div>
+          </div>
+        </div>
+
+        <div class="info-box blue">
+          <strong>💡 에듀테크 프로그램 지원사업</strong> 연계 운영
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: 교사 참여 과제 -->
+  <div class="slide" data-slide="6">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">AI·디지털 활용 선도학교 — 교사 과제</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">📋</div>
+          <div class="section-text">
+            <h2>교사 참여 과제</h2>
+            <div class="section-sub">선생님께서 참여해 주실 4가지 과제</div>
+          </div>
+        </div>
+
+        <div class="task-box">
+          <div class="task-num">과제 1</div>
+          <h4>AI·디지털 기반 교수·학습 사례 발굴</h4>
+          <p>AI·디지털 도구를 활용한 수업 사례를 발굴하고 공유합니다.</p>
+        </div>
+
+        <div class="task-box" style="border-left-color: var(--blue-accent);">
+          <div class="task-num" style="color: #1565c0;">과제 2</div>
+          <h4>전문적 학습공동체 중심 수업 혁신</h4>
+          <p>리더그룹 운영을 통해 학습공동체 기반 수업 혁신을 추진합니다.</p>
+        </div>
+
+        <div class="task-box" style="border-left-color: var(--purple-accent);">
+          <div class="task-num" style="color: #7b1fa2;">과제 3</div>
+          <h4>AIEP(인공지능기반 교수학습플랫폼) 활용</h4>
+          <p>인공지능 기반 교수학습 플랫폼을 수업에 적극 활용합니다.</p>
+        </div>
+
+        <div class="task-box" style="border-left-color: var(--orange-accent);">
+          <div class="task-num" style="color: #e65100;">과제 4</div>
+          <h4>효과성 연구 참여</h4>
+          <p>AI·디지털 활용 교육의 효과성 연구에 참여합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: 전문적 학습공동체 -->
+  <div class="slide" data-slide="7">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">전문적 학습공동체</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">👩‍🏫</div>
+          <div class="section-text">
+            <h2>전문적 학습공동체 안내</h2>
+            <div class="section-sub">AI·디지털 에듀테크 활용 학습공동체 운영</div>
+          </div>
+        </div>
+
+        <ul class="activity-list">
+          <li>
+            <span class="emoji">📢</span>
+            <div class="details">
+              <strong>AI·디지털 에듀테크 관련 정보 및 사례 공유</strong>
+              <span>선도학교 중심 운영</span>
+            </div>
+          </li>
+          <li>
+            <span class="emoji">🤖</span>
+            <div class="details">
+              <strong>최신 AI 기술 활용 방법 학습 및 연구</strong>
+              <span>클로드 코딩 · 오픈클로 · 생성형 AI · 개인 업무 자동화 등</span>
+            </div>
+          </li>
+          <li>
+            <span class="emoji">🔄</span>
+            <div class="details">
+              <strong>빠르게 발전하는 기술에 대응하는 교육 방법 탐구</strong>
+            </div>
+          </li>
+          <li>
+            <span class="emoji">📊</span>
+            <div class="details">
+              <strong>학교 데이터 활용 방안 탐구</strong>
+            </div>
+          </li>
+        </ul>
+
+        <h3 style="margin-top: 1.2rem;">💡 이미 만들어진 활용 예시</h3>
+        <div class="grid-2">
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">📱</div>
+            <h4>자습실 활용 어플</h4>
+            <p>학생 자습실 관리 시스템</p>
+            <a href="https://kijunseaton.netlify.app" target="_blank" class="action-btn" style="font-size:0.9rem; padding:0.5rem 1.2rem; background:var(--green-dark);">사이트 방문</a>
+          </div>
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">🏫</div>
+            <h4>학교 플랫폼</h4>
+            <p>생활기록부 작성 도우미 · 분반 도우미 · 선택과목 도우미 등</p>
+            <a href="https://spacekijun.lovable.app" target="_blank" class="action-btn" style="font-size:0.9rem; padding:0.5rem 1.2rem; background:var(--green-dark);">사이트 방문</a>
+          </div>
+        </div>
+
+        <div class="deadline-callout" style="margin-top: 1.2rem;">
+          <div class="deadline-icon">✋</div>
+          <div class="deadline-date">참여 희망 신청: 3월 2주차까지</div>
+          <div class="deadline-desc">관심 있는 선생님의 많은 참여 부탁드립니다!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 9: 연간 일정 -->
+  <div class="slide" data-slide="8">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">AI·디지털 활용 선도학교 — 연간 일정</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">📅</div>
+          <div class="section-text">
+            <h2>연간 일정 및 성과 공유</h2>
+            <div class="section-sub">월별 운영 타임라인</div>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item highlight">
+            <div class="month">3월</div>
+            <div class="event">사업 계획 수립<br>SW 심의</div>
+          </div>
+          <div class="timeline-item">
+            <div class="month">4월</div>
+            <div class="event">코스웨어 도입<br>학습공동체 구성</div>
+          </div>
+          <div class="timeline-item">
+            <div class="month">5-6월</div>
+            <div class="event">수업 적용<br>사례 발굴</div>
+          </div>
+          <div class="timeline-item">
+            <div class="month">7-8월</div>
+            <div class="event">연수·캠프<br>중간 점검</div>
+          </div>
+          <div class="timeline-item">
+            <div class="month">9-10월</div>
+            <div class="event">공개수업<br>수업나눔</div>
+          </div>
+          <div class="timeline-item">
+            <div class="month">11-12월</div>
+            <div class="event">사례집 제작<br>성과 보고</div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 20px;">
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">📸</div>
+            <h4>공개수업</h4>
+            <p>AI·디지털 활용 수업 공개 및 참관</p>
+          </div>
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">🤝</div>
+            <h4>수업나눔</h4>
+            <p>교사 간 수업 사례 공유 및 피드백</p>
+          </div>
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">📚</div>
+            <h4>사례집 제작</h4>
+            <p>연간 우수 수업 사례 모음 발간</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: 소프트웨어 심의 -->
+  <div class="slide" data-slide="9">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">소프트웨어 심의</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="section-icon">🔍</div>
+          <div class="section-text">
+            <h2>소프트웨어 심의 안내</h2>
+            <div class="section-sub">AI·디지털 활용 선도학교 SW 심의 절차</div>
+          </div>
+        </div>
+
+        <p style="margin-bottom: 16px;">
+          AI·디지털 활용 선도학교 사업에서 사용할 소프트웨어에 대해 <strong>심의 위원회</strong>를 통해 심의를 진행합니다. 1학기 중 심의가 완료되며, 최종 확정 후 안내드립니다.
+        </p>
+
+        <div class="deadline-callout">
+          <div class="deadline-icon">⏰</div>
+          <div class="deadline-date">3월 2주차 금요일까지</div>
+          <div class="deadline-desc">
+            수업에 필요한 소프트웨어를 입력해 주세요!<br>
+            입력된 소프트웨어를 취합하여 심의를 진행합니다.
+          </div>
+          <a href="https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_DOC_ID/edit?usp=sharing" target="_blank" class="action-btn">📋 소프트웨어 입력하기</a>
+        </div>
+
+        <div class="info-box orange">
+          <strong>📝 안내 사항</strong><br>
+          • 위 버튼을 클릭하여 구글 스프레드시트에 소프트웨어를 입력해 주세요<br>
+          • 마감 후 심의 위원회에서 검토 및 승인 절차를 진행합니다<br>
+          • 최종 확정된 소프트웨어 목록은 추후 공지됩니다
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 11: 마무리 -->
+  <div class="slide" data-slide="10">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <div class="title">감사합니다</div>
+      </div>
+      <div class="browser-content">
+        <div class="end-content">
+          <h1>감사합니다 🙇</h1>
+          <p>선생님들의 적극적인 참여가<br>학생들의 미래를 만듭니다.</p>
+
+          <div class="highlight-box" style="margin: 24px 0;">
+            <div class="big-text" style="font-size: 1.1rem;">AI 중점학교 · AI·디지털 선도학교 · SW 심의</div>
+            <div class="small-text">2026년도 정보화부 학교 사업에 많은 관심 부탁드립니다</div>
+          </div>
+
+          <div class="qr-section">
+            <img src="21omc.png" alt="QR 코드">
+            <div class="qr-label">프레젠테이션 다시 보기</div>
+            <div class="qr-url">https://2026kijunit.netlify.app</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="homeBtn" onclick="goToSlide(0)" aria-label="처음으로">⏮</button>
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" aria-label="이전 슬라이드">◀</button>
+  <div class="slide-counter" id="slideCounter">1 / 11</div>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">▶</button>
+</div>
+
+<script>
+  // Slide navigation
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const progressBar = document.getElementById('progressBar');
+  const slideCounter = document.getElementById('slideCounter');
+  const homeBtn = document.getElementById('homeBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function updateSlide(direction) {
+    const oldSlide = slides[currentSlide];
+    oldSlide.classList.remove('active');
+
+    if (direction === 'next') {
+      currentSlide++;
+    } else {
+      currentSlide--;
+    }
+
+    const newSlide = slides[currentSlide];
+    newSlide.classList.add('active');
+    updateUI();
+  }
+
+  function goToSlide(index) {
+    if (index < 0 || index >= totalSlides || index === currentSlide) return;
+    const direction = index > currentSlide ? 'next' : 'prev';
+    slides[currentSlide].classList.remove('active', 'exit-left');
+    currentSlide = index;
+    slides[currentSlide].classList.add('active');
+    updateUI();
+  }
+
+  function nextSlide() {
+    if (currentSlide < totalSlides - 1) updateSlide('next');
+  }
+
+  function prevSlide() {
+    if (currentSlide > 0) updateSlide('prev');
+  }
+
+  function updateUI() {
+    const progress = ((currentSlide + 1) / totalSlides) * 100;
+    progressBar.style.width = progress + '%';
+    slideCounter.textContent = (currentSlide + 1) + ' / ' + totalSlides;
+    homeBtn.disabled = currentSlide === 0;
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide === totalSlides - 1;
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      prevSlide();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      goToSlide(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      goToSlide(totalSlides - 1);
+    }
+  });
+
+  // Touch/swipe navigation
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextSlide();
+      else prevSlide();
+    }
+  }, { passive: true });
+
+  // Init
+  updateUI();
+</script>
+
+  <script type="module" src="../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

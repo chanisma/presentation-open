@@ -1,0 +1,5 @@
+notebook: 863ff26a-8cbe-4ca6-b1db-b6929f2bbad7
+main_original(26요청→21장): 4c976ed5-14fc-4f62-ad6e-23a80bfe314f
+main_fixed(슬라이드6 A² 수정): c8d94cda-1ef3-4c98-8c78-5b11a621cfe8   ← 최종 1~21장
+project(22~26장 5장): 0e63bdba-74f2-44d1-a20d-aafa9b7feca5              ← 최종 22~26장
+최종 = main_fixed(21) + project(5) = 26장 병합

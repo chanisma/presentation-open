@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 320" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 옆에서 본 고전 영화 카메라(필름 매거진 릴 두 개)가 삼각대 위에 올라간 모습. 렌즈는 오른쪽을 본다.
+       촬영장·카메라 지시(고정 숏·돌리·줌)를 설명하는 장의 안내 소품. 텍스트 없음.
+       팔레트: ink #1d1b22 · body #3b3846 · bodyTop #55516a · reel #6d6880 · reelHub #b8b2c4 · lensRing #2b2933 · glass #8fb7d6 · leg #a07a52 · legDark #82603e · head #2b2933
+       앵커: 렌즈 끝 (266, 108) · 삼각대 머리 (140, 170) · 다리 끝 y≈304 -->
+  <path d="M40 310 C110 316 190 316 262 310" stroke="#1d1b22" stroke-width="8" opacity=".07" />
+  <!-- 삼각대 다리: 뒤 다리 먼저 -->
+  <path d="M140 178 L140 298" stroke="#1d1b22" stroke-width="12" /><path d="M140 178 L140 298" stroke="#82603e" stroke-width="7.4" />
+  <path d="M132 178 L60 300" stroke="#1d1b22" stroke-width="13" /><path d="M132 178 L60 300" stroke="#a07a52" stroke-width="8.4" />
+  <path d="M148 178 L220 300" stroke="#1d1b22" stroke-width="13" /><path d="M148 178 L220 300" stroke="#a07a52" stroke-width="8.4" />
+  <g stroke="#ffffff" stroke-width="2" opacity=".3"><path d="M128 190 L72 286" /><path d="M152 190 L208 286" /></g>
+  <!-- 다리 고정 띠 -->
+  <path d="M96 238 L184 238" stroke="#1d1b22" stroke-width="5" /><path d="M96 238 L184 238" stroke="#55516a" stroke-width="2" />
+  <!-- 발 -->
+  <g fill="#2b2933" stroke="#1d1b22" stroke-width="2"><rect x="50" y="296" width="20" height="9" rx="3" /><rect x="210" y="296" width="20" height="9" rx="3" /><rect x="131" y="294" width="18" height="9" rx="3" /></g>
+  <!-- 삼각대 머리와 손잡이 -->
+  <path d="M110 158 L170 158 L162 182 L118 182 Z" fill="#2b2933" stroke="#1d1b22" stroke-width="2.2" />
+  <path d="M116 168 L66 190" stroke="#1d1b22" stroke-width="8" /><path d="M116 168 L66 190" stroke="#55516a" stroke-width="4" />
+  <!-- 필름 매거진 릴 두 개 -->
+  <circle cx="98" cy="54" r="34" fill="#6d6880" stroke="#1d1b22" stroke-width="2.4" />
+  <circle cx="98" cy="54" r="10" fill="#b8b2c4" stroke="#1d1b22" stroke-width="2" />
+  <g stroke="#1d1b22" stroke-width="1.6" opacity=".45"><path d="M98 28 L98 42" /><path d="M76 67 L88 60" /><path d="M120 67 L108 60" /></g>
+  <circle cx="166" cy="58" r="30" fill="#6d6880" stroke="#1d1b22" stroke-width="2.4" />
+  <circle cx="166" cy="58" r="9" fill="#b8b2c4" stroke="#1d1b22" stroke-width="2" />
+  <g stroke="#1d1b22" stroke-width="1.6" opacity=".45"><path d="M166 36 L166 48" /><path d="M147 69 L157 63" /><path d="M185 69 L175 63" /></g>
+  <path d="M76 38 C84 28 96 24 108 26" stroke="#ffffff" stroke-width="2.6" opacity=".35" />
+  <!-- 카메라 몸통 -->
+  <path d="M68 84 L206 84 C212 84 216 88 216 94 L216 148 C216 154 212 158 206 158 L68 158 C62 158 58 154 58 148 L58 94 C58 88 62 84 68 84 Z"
+        fill="#3b3846" stroke="#1d1b22" stroke-width="2.4" />
+  <path d="M60 86 C60 85 61 84 62 84 L212 84 C213 84 214 85 214 86 L214 100 L60 100 Z" fill="#55516a" stroke="#1d1b22" stroke-width="2" />
+  <path d="M74 110 L124 110" stroke="#ffffff" stroke-width="2.6" opacity=".22" />
+  <g stroke="#1d1b22" stroke-width="1.4" opacity=".45"><path d="M150 114 L150 146" /><path d="M158 114 L158 146" /><path d="M166 114 L166 146" /></g>
+  <circle cx="94" cy="130" r="9" fill="#2b2933" stroke="#1d1b22" stroke-width="2" />
+  <!-- 뷰파인더 -->
+  <path d="M58 104 L34 108 L30 128 L58 132 Z" fill="#2b2933" stroke="#1d1b22" stroke-width="2.2" />
+  <circle cx="35" cy="118" r="5" fill="#55516a" stroke="#1d1b22" stroke-width="1.6" />
+  <!-- 렌즈 -->
+  <path d="M216 98 L238 92 L238 126 L216 120 Z" fill="#2b2933" stroke="#1d1b22" stroke-width="2.2" />
+  <rect x="238" y="86" width="24" height="44" rx="4" fill="#2b2933" stroke="#1d1b22" stroke-width="2.2" />
+  <g stroke="#6d6880" stroke-width="1.8"><path d="M245 89 L245 127" /><path d="M252 89 L252 127" /></g>
+  <ellipse cx="264" cy="108" rx="6" ry="19" fill="#8fb7d6" stroke="#1d1b22" stroke-width="2" />
+  <path d="M263 95 L263 104" stroke="#ffffff" stroke-width="2.2" opacity=".6" />
+</svg>

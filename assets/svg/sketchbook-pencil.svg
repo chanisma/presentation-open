@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 320" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 정면에서 약간 내려다본 스프링 스케치북(위쪽 링 제본)과 오른쪽 아래에 비스듬히 놓인 연필.
+       종이 면은 비워 두었다 - 덱이 그 위에 선 그림·물음표를 그린다. 텍스트 없음.
+       팔레트: ink #1d1b22 · cover #2f6f68 · coverDark #24564f · paper #fbf8f1 · paperShade #ece5d6 · ring #9a97a3 · pencil #e8b33a · pencilShade #c9922a · wood #e9c99a · lead #3a3740 · eraser #e58b84 · ferrule #b8b2c4
+       앵커: 그림 그릴 종이 면 x 40~380, y 56~256 (연필은 오른쪽 아래 모서리 밖으로 걸친다) -->
+  <path d="M34 302 C140 308 280 308 392 300" stroke="#1d1b22" stroke-width="8" opacity=".07" />
+  <!-- 뒤표지 -->
+  <path d="M26 30 L394 30 C400 30 404 34 404 40 L404 284 C404 291 399 296 392 296 L28 296 C21 296 16 291 16 284 L16 40 C16 34 20 30 26 30 Z"
+        fill="#2f6f68" stroke="#1d1b22" stroke-width="2.4" />
+  <path d="M16 272 L16 284 C16 291 21 296 28 296 L392 296 C399 296 404 291 404 284 L404 272 Z" fill="#24564f" stroke="#1d1b22" stroke-width="2.2" />
+  <!-- 아래 종이 두께 -->
+  <path d="M36 279 L384 279" stroke="#ece5d6" stroke-width="6" />
+  <path d="M36 282 L384 282" stroke="#1d1b22" stroke-width="1.3" opacity=".35" />
+  <!-- 맨 위 종이 -->
+  <path d="M34 42 L386 42 L386 270 C386 273 384 275 381 275 L39 275 C36 275 34 273 34 270 Z"
+        fill="#fbf8f1" stroke="#1d1b22" stroke-width="2.2" />
+  <path d="M38 262 L382 262" stroke="#ece5d6" stroke-width="10" opacity=".7" />
+  <path d="M52 62 L150 62" stroke="#ffffff" stroke-width="3" opacity=".6" />
+  <!-- 제본 구멍 -->
+  <g fill="#1d1b22">
+    <circle cx="64" cy="52" r="3.4" /><circle cx="100" cy="52" r="3.4" /><circle cx="136" cy="52" r="3.4" /><circle cx="172" cy="52" r="3.4" />
+    <circle cx="208" cy="52" r="3.4" /><circle cx="244" cy="52" r="3.4" /><circle cx="280" cy="52" r="3.4" /><circle cx="316" cy="52" r="3.4" /><circle cx="352" cy="52" r="3.4" />
+  </g>
+  <!-- 스프링 링 (윤곽 + 금속) -->
+  <g stroke="#1d1b22" stroke-width="7.4">
+    <path d="M64 52 C58 36 66 20 78 24 C84 26 82 32 80 34" /><path d="M100 52 C94 36 102 20 114 24 C120 26 118 32 116 34" />
+    <path d="M136 52 C130 36 138 20 150 24 C156 26 154 32 152 34" /><path d="M172 52 C166 36 174 20 186 24 C192 26 190 32 188 34" />
+    <path d="M208 52 C202 36 210 20 222 24 C228 26 226 32 224 34" /><path d="M244 52 C238 36 246 20 258 24 C264 26 262 32 260 34" />
+    <path d="M280 52 C274 36 282 20 294 24 C300 26 298 32 296 34" /><path d="M316 52 C310 36 318 20 330 24 C336 26 334 32 332 34" />
+    <path d="M352 52 C346 36 354 20 366 24 C372 26 370 32 368 34" />
+  </g>
+  <g stroke="#9a97a3" stroke-width="3.6">
+    <path d="M64 52 C58 36 66 20 78 24 C84 26 82 32 80 34" /><path d="M100 52 C94 36 102 20 114 24 C120 26 118 32 116 34" />
+    <path d="M136 52 C130 36 138 20 150 24 C156 26 154 32 152 34" /><path d="M172 52 C166 36 174 20 186 24 C192 26 190 32 188 34" />
+    <path d="M208 52 C202 36 210 20 222 24 C228 26 226 32 224 34" /><path d="M244 52 C238 36 246 20 258 24 C264 26 262 32 260 34" />
+    <path d="M280 52 C274 36 282 20 294 24 C300 26 298 32 296 34" /><path d="M316 52 C310 36 318 20 330 24 C336 26 334 32 332 34" />
+    <path d="M352 52 C346 36 354 20 366 24 C372 26 370 32 368 34" />
+  </g>
+  <!-- 연필 -->
+  <g transform="rotate(-22 340 280)">
+    <path d="M262 270 L392 270 L392 290 L262 290 Z" fill="#e8b33a" stroke="#1d1b22" stroke-width="2.2" />
+    <path d="M263 276.5 L391 276.5" stroke="#c9922a" stroke-width="2" />
+    <path d="M263 284 L391 284" stroke="#ffffff" stroke-width="1.6" opacity=".35" />
+    <path d="M262 270 L234 280 L262 290 Z" fill="#e9c99a" stroke="#1d1b22" stroke-width="2.2" />
+    <path d="M243 276.8 L234 280 L243 283.2 Z" fill="#3a3740" stroke="#1d1b22" stroke-width="1.6" />
+    <path d="M392 268 L408 268 L408 292 L392 292 Z" fill="#b8b2c4" stroke="#1d1b22" stroke-width="2.2" />
+    <path d="M398 268 L398 292 M403 268 L403 292" stroke="#1d1b22" stroke-width="1.2" opacity=".4" />
+    <path d="M408 269 L420 269 C424 269 426 273 426 280 C426 287 424 291 420 291 L408 291 Z" fill="#e58b84" stroke="#1d1b22" stroke-width="2.2" />
+  </g>
+</svg>

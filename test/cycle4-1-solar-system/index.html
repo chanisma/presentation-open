@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>태양계 탐험: 행성과 우주의 신비</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #0F0F2D;
+      --style-primary: #A78BFA;
+      --style-accent: #67E8F9;
+      --style-text: #FFFFFF;
+      --style-text-secondary: #E0E0F0;
+      --glass-bg: rgba(255,255,255,0.12);
+      --glass-border: rgba(255,255,255,0.2);
+      --white: #FFFFFF;
+      --gray-200: rgba(255,255,255,0.15);
+      --gray-600: #B0B0D0;
+      --gray-700: #9090B0;
+      --main: #A78BFA;
+      --light: rgba(167,139,250,0.15);
+    }
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.7;
+      overflow: hidden;
+      height: 100%;
+    }
+    h1, h2, h3 { font-family: 'Noto Sans KR', sans-serif; color: var(--style-text); }
+    h1 { font-size: 2.4rem; font-weight: 800; }
+    h2 { font-size: 1.5rem; font-weight: 700; }
+    h3 { font-size: 1.15rem; font-weight: 600; }
+    p { font-size: 1rem; line-height: 1.7; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-primary); color: #fff; padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; border-radius: 0 0 4px 0; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-contrast: high) {
+      :root { --style-primary: #0000ff; --style-text: #000; --style-bg: #fff; }
+      .browser-card { border: 2px solid #000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* Background glow blobs */
+    body::before, body::after {
+      content: ''; position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.4; z-index: 0; pointer-events: none;
+    }
+    body::before { width: 500px; height: 500px; background: #A78BFA; top: -100px; right: -100px; }
+    body::after { width: 400px; height: 400px; background: #67E8F9; bottom: -80px; left: -80px; }
+
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--style-primary), var(--style-accent)); z-index: 1000; transition: width 0.3s ease; will-change: width; }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; z-index: 1; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0.8rem 1.2rem; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .browser-content { animation: slideIn 0.35s ease both; }
+
+    /* Glassmorphism Browser Card */
+    .browser-card {
+      width: 100%; max-width: 1200px; max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border); border-radius: 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .browser-topbar { display: flex; align-items: center; padding: 0.5rem 1rem; border-bottom: 1px solid var(--glass-border); position: relative; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title { font-size: 0.82rem; color: var(--style-text-secondary); font-weight: 400; letter-spacing: 0.05em; position: absolute; left: 50%; transform: translateX(-50%); }
+    .browser-content { flex: 1; overflow-y: auto; padding: 1.2rem 2rem 1rem; }
+
+    /* Cover */
+    .cover-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 60vh; position: relative; }
+    .cover-bg { position: absolute; inset: 0; z-index: 0; }
+    .cover-bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.25; border-radius: 0 0 1rem 1rem; }
+    .cover-content { position: relative; z-index: 1; }
+    .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 600; }
+    .main-badge { background: var(--style-primary); color: #fff; margin-bottom: 0.8rem; }
+    .cover-title { margin-bottom: 0.3rem; background: linear-gradient(135deg, var(--style-accent), var(--style-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .cover-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-bottom: 1rem; }
+    .cover-divider { width: 60px; height: 3px; background: linear-gradient(90deg, var(--style-primary), var(--style-accent)); margin: 0.8rem auto; border-radius: 2px; }
+    .cover-meta { font-size: 0.88rem; color: var(--style-text-secondary); display: flex; gap: 0.5rem; justify-content: center; }
+
+    /* Section header */
+    .section-header { margin-bottom: 0.6rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text-secondary); margin-top: 0.2rem; }
+
+    /* Highlight box */
+    .highlight-box { background: rgba(167,139,250,0.1); border-left: 4px solid var(--style-primary); padding: 0.6rem 1rem; border-radius: 0 0.5rem 0.5rem 0; margin: 0.6rem 0; font-size: 0.95rem; }
+
+    /* Key points list */
+    .key-points { list-style: none; padding: 0; }
+    .key-points li { padding: 0.5rem 0.8rem; margin-bottom: 0.4rem; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 0.5rem; font-size: 0.95rem; backdrop-filter: blur(10px); }
+
+    /* Image Focus */
+    .image-focus { text-align: center; margin: 0.5rem 0; }
+    .image-container { max-width: 75%; margin: 0 auto; border-radius: 0.8rem; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.3); border: 1px solid var(--glass-border); }
+    .image-container img { width: 100%; height: auto; display: block; }
+    .image-caption { margin-top: 0.5rem; font-size: 0.88rem; color: var(--style-text-secondary); font-style: italic; }
+    .image-placeholder { display: none; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; background: rgba(255,255,255,0.05); border: 2px dashed var(--glass-border); border-radius: 0.5rem; color: var(--style-text-secondary); }
+    .placeholder-icon { font-size: 2rem; }
+    .placeholder-text { font-size: 0.85rem; margin-top: 0.3rem; }
+
+    /* Card Grid */
+    .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.6rem; }
+    .card { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); border-radius: 0.8rem; padding: 0.7rem; text-align: center; }
+    .card-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 0.95rem; margin-bottom: 0.15rem; color: var(--style-accent); }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); }
+    .card-img { width: 100%; height: 100px; object-fit: cover; border-radius: 0.5rem; margin-bottom: 0.4rem; }
+
+    /* Stat Grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin: 0.6rem 0; }
+    .stat-item { text-align: center; background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); border-radius: 0.8rem; padding: 0.8rem 0.5rem; }
+    .stat-number { font-size: 1.8rem; font-weight: 800; display: block; background: linear-gradient(135deg, var(--style-accent), var(--style-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .stat-label { font-size: 0.82rem; color: var(--style-text-secondary); }
+
+    /* Timeline */
+    .timeline { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.6rem; position: relative; padding-left: 1.5rem; }
+    .timeline::before { content: ''; position: absolute; left: 0.4rem; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, var(--style-primary), var(--style-accent)); }
+    .timeline-item { position: relative; background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); border-radius: 0.6rem; padding: 0.5rem 0.8rem; }
+    .timeline-marker { position: absolute; left: -1.35rem; top: 50%; transform: translateY(-50%); width: 10px; height: 10px; background: var(--style-primary); border-radius: 50%; border: 2px solid var(--style-accent); }
+    .timeline-date { font-size: 0.82rem; color: var(--style-accent); font-weight: 600; }
+    .timeline-title { font-size: 0.95rem; }
+    .timeline-desc { font-size: 0.85rem; color: var(--style-text-secondary); }
+
+    /* Two Column */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: start; margin-top: 0.5rem; }
+    .col-image { width: 100%; max-height: 320px; object-fit: cover; border-radius: 0.8rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid var(--glass-border); }
+    .col-list { list-style: none; padding: 0; }
+    .col-list li { font-size: 0.95rem; padding: 0.35rem 0; border-bottom: 1px solid var(--glass-border); padding-left: 1em; position: relative; }
+    .col-list li::before { content: ''; position: absolute; left: 0; top: 50%; width: 6px; height: 6px; background: var(--style-accent); border-radius: 50%; transform: translateY(-50%); }
+
+    /* End Slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 55vh; }
+    .end-title { font-size: 1.8rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--style-accent), var(--style-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .end-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-top: 0.8rem; }
+    .end-summary { text-align: left; max-width: 500px; margin-top: 1rem; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 0.25rem 0; font-size: 0.95rem; }
+
+    /* Animations */
+    @keyframes popUp { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .key-points li { animation: popUp 0.4s ease-out both; }
+    .slide.active .key-points li:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .key-points li:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .key-points li:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .stat-item { animation: popUp 0.4s ease-out both; }
+    .slide.active .stat-item:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .stat-item:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .stat-item:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .timeline-item { animation: popUp 0.4s ease-out both; }
+    .slide.active .timeline-item:nth-child(2) { animation-delay: 0.1s; }
+    .slide.active .timeline-item:nth-child(3) { animation-delay: 0.2s; }
+    .slide.active .timeline-item:nth-child(4) { animation-delay: 0.3s; }
+
+    /* Nav Bar - Glassmorphism dark */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.35rem 1.5rem; background: rgba(15,15,45,0.85); backdrop-filter: blur(10px);
+      border-top: 1px solid var(--glass-border); z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--glass-border); border-radius: 50%; background: rgba(255,255,255,0.08);
+      cursor: pointer; font-size: 0; color: var(--style-text-secondary); transition: all 0.2s; padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-accent); background: var(--style-primary); }
+    .nav-btn:hover:not(:disabled) svg { fill: #fff; }
+    .nav-btn:focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter { font-size: 13px; font-weight: 700; color: var(--gray-600); min-width: 3rem; text-align: center; display: flex; align-items: center; gap: 0.15rem; line-height: 1; }
+    .slide-input { width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent; background: transparent; font-size: 13px; font-weight: 700; color: var(--style-text-secondary); font-family: inherit; padding: 0; outline: none; cursor: pointer; transition: border-color 0.2s; line-height: 1; }
+    .slide-input:hover { border-bottom-color: var(--style-accent); }
+    .slide-input:focus { border-bottom-color: var(--style-accent); background: var(--light); border-radius: 4px; }
+
+    /* Responsive */
+    @media (max-width: 1024px) { html, body { font-size: clamp(15px, 2vw, 22px); } .slide { padding: 1.5rem; } .browser-card { border-radius: 0.8rem; } }
+    @media (max-width: 768px) { html, body { font-size: clamp(14px, 3vw, 20px); } .card-grid, .two-col { grid-template-columns: 1fr; } .stat-grid { grid-template-columns: repeat(2, 1fr); } .timeline { flex-direction: column; } h1 { font-size: 2rem; } h2 { font-size: 1.3rem; } }
+    @media (max-width: 480px) { html, body { font-size: clamp(14px, 3.5vw, 18px); } .nav-btn { width: 1.5rem; height: 1.5rem; } .nav-bar { padding: 0.25rem 0.75rem; } .stat-grid { grid-template-columns: repeat(2, 1fr); } h1 { font-size: 1.7rem; } h2 { font-size: 1.2rem; } .browser-content { padding: 0.8rem; } }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="10" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 태양계 탐험">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">SOLAR SYSTEM</span>
+        </div>
+        <div class="browser-content cover-slide" style="position:relative; overflow:hidden;">
+          <div class="cover-bg">
+            <img src="../cycle4-images/img-1-1-solar-system-cover.jpg" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="image-placeholder"><span class="placeholder-icon">🌌</span></div>
+          </div>
+          <div class="cover-content">
+            <div class="badge main-badge">2026 과학 탐구</div>
+            <h1 class="cover-title">태양계 탐험</h1>
+            <p class="cover-subtitle">행성과 우주의 신비를 찾아서</p>
+            <div class="cover-divider" aria-hidden="true"></div>
+            <div class="cover-meta">
+              <span>고등학교 지구과학</span>
+              <span aria-hidden="true">&middot;</span>
+              <span><time datetime="2026-03">2026년 3월</time></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 학습 목표 (key-points) -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 학습 목표">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">학습 목표</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🎯</span> 학습 목표</h2>
+          </div>
+          <ul class="key-points" role="list">
+            <li role="listitem">태양계를 구성하는 행성의 종류와 특징을 설명할 수 있다</li>
+            <li role="listitem">내행성과 외행성의 차이점을 비교하고 분류할 수 있다</li>
+            <li role="listitem">태양계 탐사의 역사와 최신 탐사 성과를 이해한다</li>
+            <li role="listitem">우주 탐사의 과학적 의의와 미래 가능성을 토론할 수 있다</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 태양계의 구조 (image-focus) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 태양계의 구조">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">태양계 구조</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🪐</span> 태양계의 구조</h2>
+            <p class="section-subtitle">태양을 중심으로 8개의 행성이 공전합니다</p>
+          </div>
+          <div class="image-focus">
+            <div class="image-container">
+              <img src="../cycle4-images/img-1-3-solar-system-diagram.png" alt="태양계 행성 배열도 - 수성부터 해왕성까지" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder"><span class="placeholder-icon">🌍</span><span class="placeholder-text">태양계 구조도</span></div>
+            </div>
+            <p class="image-caption">태양계 행성의 상대적 크기와 배열 순서 (출처: Wikimedia Commons)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 내행성 (grid-cards) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 내행성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">내행성</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🌎</span> 내행성: 수성, 금성, 지구, 화성</h2>
+            <p class="section-subtitle">태양에 가까운 암석형 행성들</p>
+          </div>
+          <div class="card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">☿</span>
+              <h3 class="card-title">수성 (Mercury)</h3>
+              <p class="card-desc">태양에서 가장 가까운 행성. 대기가 거의 없으며 표면 온도 차이가 극심함 (-180~430도)</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">♀</span>
+              <h3 class="card-title">금성 (Venus)</h3>
+              <p class="card-desc">두꺼운 이산화탄소 대기로 온실효과가 극대화. 표면 온도 약 465도로 가장 뜨거운 행성</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">🌍</span>
+              <h3 class="card-title">지구 (Earth)</h3>
+              <p class="card-desc">생명체가 존재하는 유일한 행성. 액체 상태의 물과 적절한 대기 조건을 갖춤</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">♂</span>
+              <h3 class="card-title">화성 (Mars)</h3>
+              <p class="card-desc">붉은 행성. 극관에 얼음이 존재하며 과거 물이 흘렀던 흔적이 발견됨</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 외행성 (grid-cards) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 외행성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">외행성</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🪐</span> 외행성: 목성, 토성, 천왕성, 해왕성</h2>
+            <p class="section-subtitle">거대 가스/얼음 행성들</p>
+          </div>
+          <div class="card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">♃</span>
+              <h3 class="card-title">목성 (Jupiter)</h3>
+              <p class="card-desc">태양계 최대 행성. 대적반(거대 폭풍)이 300년 넘게 지속. 79개 이상의 위성 보유</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">♄</span>
+              <h3 class="card-title">토성 (Saturn)</h3>
+              <p class="card-desc">아름다운 고리가 특징. 밀도가 물보다 낮아 물에 뜰 수 있을 정도로 가벼운 행성</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">⛢</span>
+              <h3 class="card-title">천왕성 (Uranus)</h3>
+              <p class="card-desc">자전축이 98도 기울어진 독특한 행성. 메탄 대기로 인해 청록색을 띔</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-icon" aria-hidden="true">♆</span>
+              <h3 class="card-title">해왕성 (Neptune)</h3>
+              <p class="card-desc">태양계에서 가장 강한 바람이 부는 행성. 풍속이 시속 2,100km에 달함</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 행성의 크기 비교 (stat-highlight) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 행성의 크기 비교">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">크기 비교</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📊</span> 행성의 크기 비교</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="목성 지름 약 14만 킬로미터">142,984</span>
+              <span class="stat-label">목성 지름 (km)</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="토성 지름 약 12만 킬로미터">120,536</span>
+              <span class="stat-label">토성 지름 (km)</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="지구 지름 약 1만3천 킬로미터">12,756</span>
+              <span class="stat-label">지구 지름 (km)</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="수성 지름 약 4천9백 킬로미터">4,879</span>
+              <span class="stat-label">수성 지름 (km)</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            목성은 지구보다 약 11배 큰 지름을 가지며, 태양계 전체 행성 질량의 약 70%를 차지합니다. 만약 목성이 80배 더 무거웠다면, 스스로 핵융합을 시작해 항성이 될 수 있었습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 태양계 탐사 역사 (timeline) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 태양계 탐사 역사">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">탐사 역사</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🚀</span> 태양계 탐사 역사</h2>
+          </div>
+          <div class="timeline" role="list" aria-label="탐사 역사 타임라인">
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="1957">1957</time></span>
+                <h3 class="timeline-title">스푸트니크 1호 발사</h3>
+                <p class="timeline-desc">소련이 세계 최초의 인공위성 발사에 성공</p>
+              </div>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="1969">1969</time></span>
+                <h3 class="timeline-title">아폴로 11호 달 착륙</h3>
+                <p class="timeline-desc">닐 암스트롱이 인류 최초로 달 표면을 밟음</p>
+              </div>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="1977">1977</time></span>
+                <h3 class="timeline-title">보이저 1호, 2호 발사</h3>
+                <p class="timeline-desc">외행성 탐사 후 현재 태양계 밖으로 향하는 중</p>
+              </div>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="2021">2021</time></span>
+                <h3 class="timeline-title">퍼서비어런스 로버 화성 착륙</h3>
+                <p class="timeline-desc">NASA의 화성 탐사 로버가 생명 흔적 탐색 시작</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 화성 탐사 (two-column) -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 화성 탐사">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">화성 탐사</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">🔬</span> 화성 탐사: 퍼서비어런스 로버</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <img src="../cycle4-images/img-1-8-perseverance-rover.jpg" alt="NASA 퍼서비어런스 로버의 화성 착륙 장면" class="col-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="image-placeholder"><span class="placeholder-icon">🤖</span><span class="placeholder-text">퍼서비어런스 로버</span></div>
+            </div>
+            <div class="col-right">
+              <h3>주요 임무</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">고대 미생물 생명체 흔적 탐색</li>
+                <li role="listitem">화성 암석 및 토양 샘플 수집</li>
+                <li role="listitem">인제뉴이티 헬리콥터 비행 시험</li>
+                <li role="listitem">이산화탄소에서 산소 생성 실험 (MOXIE)</li>
+                <li role="listitem">미래 유인 탐사를 위한 환경 데이터 수집</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: 핵심 정리 (key-points) -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 핵심 정리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">핵심 정리</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📝</span> 핵심 정리</h2>
+          </div>
+          <ul class="key-points" role="list">
+            <li role="listitem">태양계는 태양과 8개의 행성, 왜소행성, 소행성, 혜성 등으로 구성됨</li>
+            <li role="listitem">내행성(수금지화)은 암석형, 외행성(목토천해)은 가스/얼음형으로 분류됨</li>
+            <li role="listitem">행성 간 크기와 특성의 차이는 형성 과정과 태양으로부터의 거리에 기인함</li>
+            <li role="listitem">현재 화성 탐사가 활발히 진행되며, 미래 유인 탐사를 준비 중</li>
+          </ul>
+          <div class="highlight-box" role="note">
+            다음 시간에는 별과 은하, 우주의 구조에 대해 학습합니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: 질문과 토론 (closing) -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 질문과 토론">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Q&A</span>
+        </div>
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <span style="font-size:2.5rem;" aria-hidden="true">🌌</span>
+            <h1 class="end-title">질문과 토론</h1>
+            <p class="end-subtitle">우주에 대해 궁금한 점을 자유롭게 이야기해봅시다</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="토론 주제">
+            <h2 class="summary-title" style="font-size:1.1rem; margin-bottom:0.3rem;">토론 주제</h2>
+            <ul class="summary-list" role="list">
+              <li role="listitem">인류는 화성에 정착할 수 있을까?</li>
+              <li role="listitem">태양계 밖에도 생명체가 존재할 가능성은?</li>
+              <li role="listitem">우주 탐사에 투자하는 것은 가치가 있는가?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력 (Enter로 이동)" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">10</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '\uC2AC\uB77C\uC774\uB4DC ' + (current + 1) + ' / ' + total;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      const current = slides[currentSlide];
+      const next = slides[index];
+      current.classList.add('will-animate');
+      next.classList.add('will-animate');
+      current.classList.remove('active');
+      currentSlide = index;
+      next.classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      setTimeout(() => { current.classList.remove('will-animate'); next.classList.remove('will-animate'); }, 400);
+      const content = next.querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { if (diff < 0) nextSlide(); else prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); else slideInput.value = currentSlide + 1; });
+
+    updateNav();
+  </script>
+</body>
+</html>

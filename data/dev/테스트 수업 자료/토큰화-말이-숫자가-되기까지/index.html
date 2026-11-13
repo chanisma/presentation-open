@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<title>말이 숫자가 되기까지 — 토큰화·임베딩 3D 모형</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ① 색 토큰 — 이번 모형은 "숫자·데이터" 느낌의 다크 네이비 무대 + 밝은 카드. 액센트는 인디고. */
+:root{--ink:#0f172a;--muted:#5b6474;--line:#cbd3de;--paper:rgba(248,250,252,.9);--accent:#4f46e5;--bg:#0f172a;--stage:radial-gradient(120% 90% at 50% 45%,#1e293b 0%,#0f172a 65%,#080d1a 100%);--btn:rgba(255,255,255,.75);--btn-line:#c3cbd3;--on-dark:#e2e8f0}
+/* ② 골격 */
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Segoe UI',sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;color:var(--ink);border:1px solid var(--btn-line);background:var(--btn);border-radius:3px;min-height:30px;padding:4px 10px;white-space:nowrap;font-size:12px;letter-spacing:.02em;font-weight:500}
+button:hover{border-color:var(--ink)}
+button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.accent[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+select,input[type=text]{border:1px solid var(--btn-line);background:#fff;border-radius:3px;min-height:30px;padding:2px 8px;font-size:12px;color:var(--ink)}
+#stage{position:absolute;inset:0;touch-action:none;background:var(--stage)}
+#stage canvas{width:100%;height:100%;display:block;outline:none}
+#ui{position:absolute;inset:0;pointer-events:none}
+#artboard{position:absolute;left:50%;top:50%;width:1672px;height:941px;transform:translate(-50%,-50%) scale(var(--scale,1));transform-origin:center;pointer-events:none}
+#artboard>*{pointer-events:auto}
+#callouts{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.callout-line{fill:none;stroke:#a5b4fc;stroke-width:1;opacity:.8}
+.callout-back{fill:rgba(15,23,42,.72);stroke:rgba(165,180,252,.45);stroke-width:.8}
+.callout-text{font-weight:700;font-size:13px;fill:#e2e8f0}
+.callout-small{font-size:10px;letter-spacing:.12em;fill:#a5b4fc}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;padding:2px 7px;border-radius:4px;background:rgba(248,250,252,.95);border:1.5px solid rgba(15,23,42,.25);font-size:15px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35);transition:opacity .15s}
+.lbl.syl{font-size:15px;padding:2px 6px}
+.lbl.tok{font-size:11px;font-weight:700;padding:2px 7px;border-color:transparent;color:#fff;background:rgba(79,70,229,.92)}
+.lbl.tok.unk{background:rgba(100,116,139,.9);border:1px dashed #cbd5e1}
+.lbl.tok.on{box-shadow:0 0 0 3px rgba(250,204,21,.85),0 2px 8px rgba(0,0,0,.35)}
+.lbl.dot{font-size:10.5px;font-weight:700;padding:1px 6px;background:rgba(15,23,42,.78);color:#e2e8f0;border:1px solid rgba(255,255,255,.2);pointer-events:none}
+.lbl.axis{font-size:10px;letter-spacing:.08em;padding:1px 5px;background:transparent;border:none;color:#94a3b8;box-shadow:none;pointer-events:none}
+.lbl.res{background:#facc15;color:#1a1200;border-color:#facc15}
+.title{position:absolute;left:48px;top:38px;width:520px;pointer-events:none;color:var(--on-dark)}
+.kicker{font-size:11px;letter-spacing:.22em;color:#a5b4fc;font-weight:700}
+.title h1{margin:4px 0 6px;font-size:34px;line-height:1.1;font-weight:900;letter-spacing:-.02em;white-space:nowrap;color:#fff}
+.micro{font-size:11px;letter-spacing:.08em;color:#94a3b8}
+.subtle{font-weight:400;letter-spacing:.02em;color:var(--muted)}
+.subtle b{color:var(--ink);font-weight:700}
+.card{padding:12px 13px;background:var(--paper);border:1px solid var(--line);backdrop-filter:blur(6px);border-radius:4px}
+.card-title{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.14em}
+.card-title .subtle{letter-spacing:.02em;font-size:11px}
+.note{margin:8px 0 0;font-size:11px;line-height:1.55;color:#475569;word-break:keep-all}
+.note.faint{color:#8a94a0;margin-top:6px}
+.control-label{font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:700;margin:6px 0 4px}
+.control-label:first-child{margin-top:0}
+.control-row{display:flex;flex-wrap:wrap;gap:5px}
+.control-row button{flex:1 1 auto}
+.transport{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);width:760px;padding:10px 12px}
+.transport-buttons{display:flex;gap:6px}
+.transport-buttons button{flex:1;height:34px;font-weight:700}
+.scrub-row{display:flex;gap:8px;align-items:center;margin-top:9px}
+.scrub-row input[type=range]{flex:1;accent-color:var(--accent);height:26px}
+.range-label{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:10px;letter-spacing:.06em;color:var(--muted);margin-top:2px;padding:0 12px;text-align:center}
+.mode-switch{position:absolute;right:48px;bottom:40px;display:flex;gap:6px}
+.hints{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:10px;letter-spacing:.1em;color:#94a3b8;white-space:nowrap}
+#restore{position:absolute;right:16px;bottom:16px;display:none;z-index:5}
+.hidden-overlays #ui{display:none}.hidden-overlays #restore{display:block}
+.loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);z-index:9;font-size:13px;color:#94a3b8}
+.loading b{font-size:20px;color:#fff;font-weight:900}
+.loading[hidden]{display:none}
+/* ③ 모형 고유 카드 */
+.input-card{position:absolute;left:48px;top:150px;width:300px}
+.input-row{display:flex;gap:5px;margin-top:8px}
+.input-row input{flex:1;min-width:0}
+.stats{display:flex;gap:10px;margin-top:8px;font-size:11px;color:#475569}
+.stats b{font-size:16px;color:var(--ink);font-weight:900;margin-right:2px}
+.tokens-card{position:absolute;left:48px;top:300px;width:300px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:26px}
+.chip{font-size:11.5px;font-weight:700;padding:3px 7px;border-radius:4px;color:#fff;background:#64748b;cursor:pointer;border:1.5px solid transparent}
+.chip.on{border-color:#facc15;box-shadow:0 0 0 2px rgba(250,204,21,.5)}
+.chip.unk{background:#94a3b8;border:1px dashed #e2e8f0}
+.chip small{font-weight:500;opacity:.85;margin-left:3px}
+.merges{margin-top:8px;font-size:10.5px;line-height:1.5;color:#475569;font-variant-numeric:tabular-nums;max-height:118px;overflow:hidden}
+.merges div{display:flex;justify-content:space-between;gap:6px;padding:0 4px;border-radius:2px}
+.merges div.done{background:rgba(79,70,229,.14);color:var(--ink)}
+.merges div.now{background:rgba(250,204,21,.45);color:var(--ink)}
+.legend-card{position:absolute;left:48px;top:668px;width:300px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:6px;font-size:11px;color:#334155}
+.legend span::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--c);margin-right:4px;vertical-align:-1px}
+.right-col{position:absolute;right:48px;top:38px;width:330px;display:flex;flex-direction:column;gap:12px}
+.vec{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;margin-top:8px}
+.vec .cell{height:26px;border-radius:3px;border:1px solid rgba(15,23,42,.15)}
+.vec .val{font-size:8.5px;text-align:center;color:#334155;font-variant-numeric:tabular-nums;margin-top:2px}
+.vec .feat{font-size:8px;text-align:center;color:#64748b;letter-spacing:-.02em;line-height:1.1;margin-top:2px;word-break:keep-all}
+.neighbors{margin-top:8px;font-size:11px;color:#334155;line-height:1.6}
+.neighbors b{color:var(--ink)}
+.arith{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:4px;align-items:center;margin-top:8px;font-weight:900;font-size:14px;text-align:center}
+.arith select{width:100%;padding:2px 4px;font-size:11px}
+.arith-result{margin-top:8px;font-size:12px;color:#334155;line-height:1.6}
+.arith-result b{font-size:15px;color:var(--ink);background:linear-gradient(transparent 55%,rgba(250,204,21,.65) 55%)}
+.badge{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.08em;padding:1px 6px;border-radius:2px;background:#e0e7ff;color:#3730a3;margin-left:6px}
+.badge.gray{background:#e2e8f0;color:#475569}
+@media(max-width:700px){html,body{overflow:auto;height:auto;min-height:100%}#stage{height:58vh;position:fixed}#ui{position:relative;top:0;height:auto;padding:14px;pointer-events:auto}#artboard{position:static;width:auto;height:auto;transform:none!important;display:flex;flex-direction:column;gap:10px;padding-top:58vh}.title{position:fixed;top:12px;left:14px;width:auto;pointer-events:none}.title h1{font-size:22px}.card,.right-col,.transport,.mode-switch{position:static;width:auto;transform:none}.hints,#callouts,#labels{display:none}}
+</style>
+</head>
+<body data-deck-title="말이 숫자가 되기까지 — 토큰화·임베딩 3D 모형" data-subject="인공지능 기초">
+<main id="stage" aria-label="토큰화와 임베딩 3D 모형. 문장을 입력하면 조각으로 잘리고, 조각마다 벡터를 표에서 꺼내 뜻 공간에 놓습니다."></main>
+<div id="ui"><div id="artboard">
+
+<header class="title">
+  <div class="kicker">LARGE LANGUAGE MODEL · TOKENIZE &amp; EMBED</div>
+  <h1>말이 숫자가 되기까지</h1>
+  <div class="micro">BPE 토큰화(말뭉치 <span id="corpus-n">49</span>문장으로 즉석 학습) · 임베딩 표 조회 · 9차원 벡터 · 주성분 3축으로 본 뜻 공간 · 장난감 벡터</div>
+</header>
+
+<section class="card input-card">
+  <div class="card-title">입력 문장 <span class="subtle">Enter로 자르기</span></div>
+  <div class="input-row"><input type="text" id="sentence" maxlength="40" value="고양이가 사과를 먹었다" aria-label="입력 문장"><button id="go" class="accent">자르기</button></div>
+  <div class="control-row" id="example-controls" style="margin-top:6px"></div>
+  <div class="stats"><span><b id="stat-chars">0</b>글자</span><span><b id="stat-tokens">0</b>토큰</span><span><b id="stat-ratio">0</b>글자/토큰</span><span><b id="stat-unk">0</b>낯선 조각</span></div>
+</section>
+
+<section class="card tokens-card">
+  <div class="card-title">토큰과 번호 <span class="subtle">어휘 <b id="vocab-n">0</b>개 · 병합 규칙 <b id="merge-n">0</b>개</span></div>
+  <div class="chips" id="chips"></div>
+  <div class="control-label" style="margin-top:8px">이 문장에 적용된 병합 규칙 · 배운 순서대로</div>
+  <div class="merges" id="merges"></div>
+  <p class="note faint">절단 규칙은 이 페이지 안의 작은 말뭉치로 방금 학습한 것입니다. 실제 모델은 수백 GB의 글로 수만 개 규칙을 배우지만, 방법(자주 붙어 다니는 글자 쌍을 합친다)은 같습니다. 낯선 글자는 실제 모델에서 바이트 단위로 쪼개 처리합니다.</p>
+</section>
+
+<section class="card legend-card">
+  <div class="card-title">뜻 공간 <span class="subtle">주성분 3축이 분산의 <b id="pca-var">0</b>% 보존</span></div>
+  <div class="legend" id="legend"></div>
+  <p class="note">9차원 벡터를 주성분 분석으로 3차원에 눌러 본 그림자입니다. 색은 낱말의 부류이고, 비슷한 뜻은 가까이 모입니다.</p>
+</section>
+
+<aside class="right-col">
+  <section class="card">
+    <div class="card-title">벡터 · 표에서 꺼낸 숫자 9개 <span class="subtle" id="vec-sub"></span></div>
+    <div class="vec" id="vec-cells"></div>
+    <div class="vec" id="vec-vals"></div>
+    <div class="vec" id="vec-feats"></div>
+    <div class="neighbors" id="neighbors"></div>
+    <p class="note faint" id="vec-note">낱말 41개와 조사의 벡터는 뜻 성분으로 손으로 설계했고, 나머지 조각은 무작위값입니다. 실제 모델은 수천 차원을 학습으로 정합니다.</p>
+  </section>
+  <section class="card">
+    <div class="card-title">벡터 산술 <span class="subtle">뜻이 숫자라서 더하고 뺄 수 있다</span></div>
+    <div class="arith"><select id="ar-a"></select><span>−</span><select id="ar-b"></select><span>+</span><select id="ar-c"></select></div>
+    <div class="control-row" id="arith-presets" style="margin-top:6px"></div>
+    <div class="arith-result" id="arith-result"></div>
+  </section>
+  <section class="card">
+    <div class="control-row"><button id="trained-toggle" class="accent" aria-pressed="true">학습 후 · 뜻 있는 벡터</button><button id="arith-toggle" aria-pressed="true">산술 화살표</button></div>
+    <div class="control-label">카메라</div><div class="control-row" id="camera-controls"></div>
+    <div class="control-label">표시</div><div class="control-row" id="overlay-controls"></div>
+  </section>
+</aside>
+
+<section class="card transport">
+  <div class="transport-buttons">
+    <button id="play" class="accent" aria-pressed="true">▶ 재생</button>
+    <select id="speed" aria-label="재생 속도"><option value="9">느리게 · 9초</option><option value="6" selected>보통 · 6초</option><option value="3">빠르게 · 3초</option></select>
+  </div>
+  <div class="scrub-row"><input type="range" id="t-range" min="0" max="1000" step="1" value="0" aria-label="진행도"></div>
+  <div class="range-label"><span>① 자르기 · 자주 붙는 글자를 합친다</span><span>② 표에서 꺼내기 · 번호 → 숫자 9개</span><span>③ 뜻 공간으로 · 이웃이 보인다</span></div>
+</section>
+<div class="mode-switch"><button id="interactive-mode" aria-pressed="true">인터랙티브</button><button id="demo-mode" aria-pressed="false">↻ 자동 시연</button></div>
+<div class="hints">문장 입력 후 Enter · 토큰 라벨 클릭 = 벡터 보기 · 드래그 회전 · 휠 확대 · Space 재생 · ← → 진행 · H 오버레이 숨김</div>
+<svg id="callouts" viewBox="0 0 1672 941" aria-hidden="true"></svg>
+<div id="labels"></div>
+</div></div>
+<button id="restore">오버레이 표시 · H</button>
+<div class="loading" id="loading"><b>말이 숫자가 되기까지</b><span id="loading-msg">말뭉치로 절단 규칙을 학습하는 중…</span></div>
+
+<script>
+setTimeout(function(){var l=document.getElementById('loading');if(l&&!l.hidden&&!window.tokenApp){document.getElementById('loading-msg').innerHTML='3D 라이브러리를 불러오지 못했습니다.<br>이 페이지는 허브(웹 서버)에서 열어야 합니다. 파일을 직접 두 번 클릭해 열면 동작하지 않습니다.';}},8000);
+</script>
+<script type="module">
+import * as THREE from '../../../../assets/vendor/three/three.module.min.js';
+const APP='tokenApp';
+const PI=Math.PI,TAU=PI*2,DEG=PI/180,DIM=9;
+const $=id=>document.getElementById(id);
+const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp,smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
+const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
+const fmt=(v,d=2)=>(v<0?'−':'')+Math.abs(v).toFixed(d);
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hash(s){let h=2166136261;for(const ch of s){h^=ch.codePointAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+
+// ───────────────────────── DATA ① 말뭉치 — 절단 규칙(BPE)은 이것으로 즉석 학습한다 ─────────────────────────
+// 조사 분포를 고르게 둔다 — 같은 낱말+조사 쌍이 3번 이상 나오면 BPE가 낱말보다 먼저 합쳐 버린다 (실제 토크나이저에서도 일어나는 일)
+const CORPUS=`고양이가 사과를 먹었다|강아지는 빵을 좋아한다|토끼가 딸기를 먹었다|사자는 운동장에서 달렸다|호랑이가 학교에 왔다|선생님은 도서관에서 책을 읽었다|학생이 교실에서 책도 읽었다|친구와 학교로 갔다|엄마는 바나나를 좋아한다|아빠가 포도를 먹었다|할머니는 집에서 빵과 사과를 먹었다|할아버지가 도서관에 갔다|왕은 공주를 좋아한다|여왕이 왕자와 집에 왔다|왕자는 사자를 좋아한다|공주가 토끼와 달렸다|남자도 운동장에서 달렸다|여자의 친구가 학교에서 책을 읽었다|소년은 강아지와 집으로 갔다|소녀가 고양이를 좋아한다|고양이는 집에서 물을 먹었다|강아지가 운동장을 달렸다|토끼는 포도를 좋아한다|사자가 호랑이와 달렸다|호랑이는 물도 먹었다|사과와 바나나를 먹었다|딸기는 엄마가 좋아한다|빵과 물을 학생은 먹었다|학교의 도서관으로 갔다|교실로 선생님이 왔다|도서관에서 학생이 달렸다|운동장에 소년과 소녀가 왔다|집으로 할머니와 할아버지가 왔다|선생님이 학생을 좋아한다|친구는 교실에서 사과도 먹었다|엄마와 아빠가 학교에 갔다|왕이 여왕과 도서관으로 갔다|공주가 왕자를 좋아한다|남자와 여자가 빵도 먹었다|소년이 책도 읽었다|소녀는 바나나와 딸기를 먹었다|고양이와 강아지가 집에 왔다|토끼와 사자도 운동장에 갔다|호랑이가 사자에게 갔다|할아버지는 책과 빵을 좋아한다|할머니가 포도와 사과도 먹었다|아빠는 물과 빵을 좋아한다|여왕은 교실에 왔다|친구가 고양이와 왔다|남자의 강아지는 도서관에 갔다|소년이 여자에게 갔다|소녀는 친구에게 갔다|선생님은 학생에게 왔다|엄마가 아빠에게 갔다|할아버지도 고양이를 좋아한다|할아버지와 할머니가 왔다`.split('|');
+// ───────────────────────── DATA ② 설계한 벡터 — 뜻 성분 9개 [생물, 사람, 동물, 음식, 장소, 왕족, 여성(+)·남성(−), 어른(+)·아이(−), 행동] ─────────────────────────
+const FEATURES=['생물','사람','동물','음식','장소','왕족','여성·남성','어른·아이','행동'];
+const CLUSTERS={동물:'#f59e0b',음식:'#ef4444',장소:'#10b981',사람:'#3b82f6',왕족:'#a855f7',행동:'#14b8a6',사물:'#d97706',문법:'#94a3b8'};
+const DESIGNED=[
+  ['▁고양이',[1,0,1,0,0,0,0,0,0],'동물'],['▁강아지',[1,0,1,0,0,0,0,-.5,.1],'동물'],['▁토끼',[1,0,1,0,0,0,0,-.3,0],'동물'],['▁사자',[1,0,1,0,0,.2,0,.4,.1],'동물'],['▁호랑이',[1,0,1,0,0,.1,0,.4,.1],'동물'],
+  ['▁사과',[0,0,0,1,0,0,0,0,0],'음식'],['▁바나나',[0,0,0,1,0,0,0,0,0],'음식'],['▁포도',[0,0,0,1,0,0,0,0,0],'음식'],['▁딸기',[0,0,0,1,0,0,0,0,0],'음식'],['▁빵',[0,0,0,1,0,0,0,0,0],'음식'],['▁물',[0,0,0,.7,0,0,0,0,0],'음식'],
+  ['▁학교',[0,0,0,0,1,0,0,0,0],'장소'],['▁교실',[0,0,0,0,1,0,0,0,0],'장소'],['▁도서관',[0,0,0,0,1,0,0,0,0],'장소'],['▁운동장',[0,0,0,0,1,0,0,0,.2],'장소'],['▁집',[0,0,0,0,1,0,0,0,0],'장소'],
+  ['▁선생님',[1,1,0,0,.2,0,0,.6,0],'사람'],['▁학생',[1,1,0,0,.2,0,0,-.6,0],'사람'],['▁친구',[1,1,0,0,0,0,0,-.3,0],'사람'],['▁엄마',[1,1,0,0,0,0,1,.6,0],'사람'],['▁아빠',[1,1,0,0,0,0,-1,.6,0],'사람'],['▁할머니',[1,1,0,0,0,0,1,1,0],'사람'],['▁할아버지',[1,1,0,0,0,0,-1,1,0],'사람'],
+  ['▁남자',[1,1,0,0,0,0,-1,0,0],'사람'],['▁여자',[1,1,0,0,0,0,1,0,0],'사람'],['▁소년',[1,1,0,0,0,0,-1,-1,0],'사람'],['▁소녀',[1,1,0,0,0,0,1,-1,0],'사람'],
+  ['▁왕',[1,1,0,0,0,1,-1,.8,0],'왕족'],['▁여왕',[1,1,0,0,0,1,1,.8,0],'왕족'],['▁왕자',[1,1,0,0,0,1,-1,-.6,0],'왕족'],['▁공주',[1,1,0,0,0,1,1,-.6,0],'왕족'],
+  ['▁먹었다',[0,0,0,.4,0,0,0,0,1],'행동'],['▁읽었다',[0,0,0,0,.3,0,0,0,1],'행동'],['▁달렸다',[0,0,.2,0,.3,0,0,0,1],'행동'],['▁좋아한다',[.2,.2,0,0,0,0,0,0,1],'행동'],['▁갔다',[0,0,0,0,.4,0,0,0,1],'행동'],['▁왔다',[0,0,0,0,.4,0,0,0,1],'행동'],
+  ['▁책',[0,0,0,0,.3,0,0,0,0],'사물'],
+  ...['가','이','는','은','을','를','의','도','와','과','에','에서','으로','로','에게'].map(p=>[p,[0,0,0,0,0,0,0,0,0],'문법']),
+];
+function jitter(token,scale){const r=mulberry32(hash('j'+token));return Array.from({length:DIM},()=>(r()-.5)*2*scale);}
+function randomVec(token,seedTag){const r=mulberry32(hash(seedTag+token));const out=[];for(let i=0;i<DIM;i++){const u1=Math.max(r(),1e-12),u2=r();out.push(clamp(Math.sqrt(-2*Math.log(u1))*Math.cos(TAU*u2)*.4,-1,1));}return out;}
+const designedMap=new Map(DESIGNED.map(([t,v,c])=>[t,{vec:v.map((x,i)=>clamp(x+jitter(t,.06)[i],-1,1)),cluster:c}]));
+
+// ───────────────────────── BPE — 자주 붙는 글자 쌍을 합친다 (실제 알고리즘, 작은 말뭉치) ─────────────────────────
+function trainBPE(corpus,maxMerges=160,minCount=3){
+  const words=new Map();
+  for(const s of corpus)for(const w of s.trim().split(/\s+/)){if(!w)continue;const syl=[...w];syl[0]='▁'+syl[0];const key=syl.join(' ');words.set(key,(words.get(key)||0)+1);}
+  const base=[];const seen=new Set();for(const k of words.keys())for(const s of k.split(' '))if(!seen.has(s)){seen.add(s);base.push(s);}
+  const vocab=[...base],merges=[];
+  const entries=[...words.entries()].map(([k,c])=>({syms:k.split(' '),count:c}));
+  for(let m=0;m<maxMerges;m++){
+    const pairs=new Map();
+    for(const e of entries)for(let i=0;i<e.syms.length-1;i++){const p=JSON.stringify([e.syms[i],e.syms[i+1]]);pairs.set(p,(pairs.get(p)||0)+e.count);}
+    let best=null,bc=0;for(const [p,c] of pairs)if(c>bc||(c===bc&&p<best)){best=p;bc=c;}
+    if(!best||bc<minCount)break;
+    const [a,b]=JSON.parse(best);merges.push({rank:merges.length,a,b,ab:a+b,count:bc});vocab.push(a+b);
+    for(const e of entries){const out=[];for(let i=0;i<e.syms.length;i++){if(i<e.syms.length-1&&e.syms[i]===a&&e.syms[i+1]===b){out.push(a+b);i++;}else out.push(e.syms[i]);}e.syms=out;}
+  }
+  return{base,vocab,merges,index:new Map(vocab.map((t,i)=>[t,i]))};
+}
+const BPE=trainBPE(CORPUS);
+function tokenizeText(text){
+  const words=[];
+  for(const w of text.trim().split(/\s+/)){if(!w)continue;let syms=[...w];syms[0]='▁'+syms[0];const syl=[...syms];const steps=[];
+    for(const m of BPE.merges){let changed=false;const next=[];for(let i=0;i<syms.length;i++){if(i<syms.length-1&&syms[i]===m.a&&syms[i+1]===m.b){next.push(m.ab);i++;changed=true;}else next.push(syms[i]);}if(changed){syms=next;steps.push(m);}}
+    words.push({word:w,syl,syms,steps});}
+  const tokens=[];let tileIndex=0;
+  for(const wd of words)for(const s of wd.syms){const len=s.replace('▁','').length;const id=BPE.index.has(s)?BPE.index.get(s):-1;tokens.push({text:s,id,tiles:Array.from({length:len},(_,i)=>tileIndex+i),designed:designedMap.has(s),cluster:designedMap.has(s)?designedMap.get(s).cluster:null});tileIndex+=len;}
+  return{words,tokens,tiles:words.flatMap(w=>w.syl.map(s=>s.replace('▁','')))};
+}
+
+// ───────────────────────── 임베딩 표 · PCA · 이웃 · 산술 ─────────────────────────
+const TABLE={trained:BPE.vocab.map(t=>designedMap.has(t)?designedMap.get(t).vec:randomVec(t,'r')),untrained:BPE.vocab.map(t=>randomVec(t,'u'))};
+const vecOfId=(id,trained)=>id>=0?(trained?TABLE.trained:TABLE.untrained)[id]:null;
+function vecOfToken(tok,trained){return tok.id>=0?vecOfId(tok.id,trained):randomVec(tok.text,'unk');}
+const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),norm=a=>Math.sqrt(dot(a,a))||1e-9,cos=(a,b)=>dot(a,b)/(norm(a)*norm(b));
+function pca(vectors){const n=vectors.length,mean=Array(DIM).fill(0);for(const v of vectors)for(let i=0;i<DIM;i++)mean[i]+=v[i]/n;
+  const C=Array.from({length:DIM},()=>Array(DIM).fill(0));for(const v of vectors)for(let i=0;i<DIM;i++)for(let j=0;j<DIM;j++)C[i][j]+=(v[i]-mean[i])*(v[j]-mean[j])/n;
+  let total=0;for(let i=0;i<DIM;i++)total+=C[i][i];const comps=[],vals=[];
+  for(let k=0;k<3;k++){let x=Array.from({length:DIM},(_,i)=>Math.cos(i+k*1.3));for(let it=0;it<300;it++){const y=C.map(row=>dot(row,x));const l=norm(y);x=y.map(v=>v/l);}
+    const lam=dot(x,C.map(row=>dot(row,x)));comps.push(x);vals.push(lam);for(let i=0;i<DIM;i++)for(let j=0;j<DIM;j++)C[i][j]-=lam*x[i]*x[j];}
+  return{mean,comps,vals,total,ratio:total>0?vals.reduce((a,b)=>a+b,0)/total:0};}
+// 설계한 낱말이 말뭉치에서 하나의 토큰으로 병합되지 못하면(등장 3회 미만) 뜻 공간에서 뺀다 — 검수 snapshot의 missingDesigned로 잡힌다
+const MISSING_DESIGNED=DESIGNED.map(d=>d[0]).filter(t=>!BPE.index.has(t));
+if(MISSING_DESIGNED.length)console.warn('어휘에 없는 설계 낱말:',MISSING_DESIGNED.join(' '));
+for(const t of MISSING_DESIGNED)DESIGNED.splice(DESIGNED.findIndex(d=>d[0]===t),1);
+const DESIGNED_TOKENS=DESIGNED.map(d=>d[0]);
+const SPACE={trained:null,untrained:null};
+function buildSpace(){for(const key of ['trained','untrained']){const vecs=DESIGNED_TOKENS.map(t=>TABLE[key][BPE.index.get(t)]);const P=pca(vecs);let mx=1e-6;const pts=vecs.map(v=>{const p=P.comps.map(c=>dot(v.map((x,i)=>x-P.mean[i]),c));mx=Math.max(mx,...p.map(Math.abs));return p;});const s=2.1/mx;SPACE[key]={pca:P,scale:s,points:pts.map(p=>p.map(x=>x*s))};}}
+function projectVec(v,trained){const S=SPACE[trained?'trained':'untrained'];return S.pca.comps.map(c=>dot(v.map((x,i)=>x-S.pca.mean[i]),c)*S.scale);}
+function nearest(v,trained,exclude=[],k=3){const out=[];for(const t of DESIGNED_TOKENS){if(exclude.includes(t))continue;const tv=TABLE[trained?'trained':'untrained'][BPE.index.get(t)];out.push({token:t,cos:cos(v,tv)});}return out.sort((a,b)=>b.cos-a.cos).slice(0,k);}
+function arithmetic(a,b,c,trained){const T=TABLE[trained?'trained':'untrained'],va=T[BPE.index.get(a)],vb=T[BPE.index.get(b)],vc=T[BPE.index.get(c)];const mid=va.map((x,i)=>x-vb[i]),res=mid.map((x,i)=>x+vc[i]);return{va,vb,vc,mid,res,nearest:nearest(res,trained,[a,b,c],3)};}
+buildSpace();
+
+// ───────────────────────── 상태 ─────────────────────────
+const params=new URLSearchParams(location.search);
+const EXAMPLES=['고양이가 사과를 먹었다','코뿔소가 학교에 갔다','여왕은 도서관에서 책을 읽었다'];
+const state={t:0,playing:true,speed:6,camera:'HERO',mode:'interactive',overlays:{CALLOUTS:true,CHARTS:true,LABELS:true},sentence:EXAMPLES[0],trained:true,selected:0,arith:{a:'▁왕',b:'▁남자',c:'▁여자'},showArith:true};
+if(params.has('sentence'))state.sentence=params.get('sentence').slice(0,40);
+if(params.has('t'))state.t=clamp(Number(params.get('t')),0,1);
+if(params.get('paused')==='1')state.playing=false;
+if(params.get('mode')==='demo')state.mode='demo';
+if(params.get('trained')==='0')state.trained=false;
+
+// ───────────────────────── 렌더러·환경·조명·바닥 ─────────────────────────
+const stage=$('stage');let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:true});}
+catch(e){$('loading-msg').innerHTML='<b>WebGL을 사용할 수 없습니다.</b><br>브라우저의 하드웨어 가속을 켜고 다시 열어 주세요.';console.error(e);throw e;}
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setClearColor(0x0f172a,0);
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.domElement.tabIndex=0;stage.append(renderer.domElement);
+const canvas=renderer.domElement,scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(32,16/9,.05,120);
+const target=V(0,1.7,0),targetGoal=target.clone(),spherical=new THREE.Spherical(),sphericalGoal=new THREE.Spherical();
+{ const studio=new THREE.Scene();studio.background=new THREE.Color(0x1e293b);
+  studio.add(new THREE.Mesh(new THREE.BoxGeometry(26,20,26),new THREE.MeshBasicMaterial({color:0x111827,side:THREE.BackSide})));
+  for(const [x,y,z,w,h,k] of [[-6,7,4,5,9,3.2],[6,6,-2,4,8,2.6],[0,10,-5,9,4,2.4],[2,2,9,3,6,1.4]]){const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(0xdbeafe).multiplyScalar(k),side:THREE.DoubleSide}));p.position.set(x,y,z);p.lookAt(0,.5,0);studio.add(p);}
+  const pmrem=new THREE.PMREMGenerator(renderer),env=pmrem.fromScene(studio,.02,.1,60);scene.environment=env.texture;pmrem.dispose();studio.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});}
+scene.add(new THREE.HemisphereLight(0xdbeafe,0x1e293b,1.3));
+const keyLight=new THREE.DirectionalLight(0xffffff,2.2);keyLight.position.set(-6,12,7);keyLight.castShadow=true;
+keyLight.shadow.mapSize.set(2048,2048);Object.assign(keyLight.shadow.camera,{left:-9,right:9,top:9,bottom:-9,near:.5,far:40});keyLight.shadow.bias=-.0004;keyLight.shadow.normalBias=.02;
+scene.add(keyLight,keyLight.target);
+const fill=new THREE.DirectionalLight(0xa5b4fc,.8);fill.position.set(7,5,-5);scene.add(fill);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.25}));floor.rotation.x=-PI/2;floor.position.y=-.141;floor.receiveShadow=true;scene.add(floor);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(40,24),new THREE.MeshStandardMaterial({color:0x162032,roughness:.9,metalness:0}));ground.rotation.x=-PI/2;ground.position.y=-.15;ground.receiveShadow=true;scene.add(ground);
+
+// ───────────────────────── 카메라 ─────────────────────────
+const preset={HERO:{radius:22,phi:58,theta:12,target:[.6,1.7,0]},BENCH:{radius:9.5,phi:60,theta:0,target:[0,.5,2.3]},TABLE:{radius:7.5,phi:72,theta:-8,target:[-3.9,2.3,-2.4]},SPACE:{radius:9.8,phi:60,theta:28,target:[3.6,2.5,-1.9]}};
+function setCamera(name,immediate=false){state.camera=name;const p=preset[name];targetGoal.set(...p.target);sphericalGoal.set(p.radius,p.phi*DEG,p.theta*DEG);if(immediate){target.copy(targetGoal);spherical.copy(sphericalGoal);moveCamera(0,true);}syncControls();}
+function moveCamera(dt=0,immediate=false){const k=immediate?1:1-Math.exp(-dt*6);target.lerp(targetGoal,k);spherical.radius+=(sphericalGoal.radius-spherical.radius)*k;spherical.phi+=(sphericalGoal.phi-spherical.phi)*k;const delta=((sphericalGoal.theta-spherical.theta+PI)%TAU+TAU)%TAU-PI;spherical.theta+=delta*k;camera.position.setFromSpherical(spherical).add(target);camera.lookAt(target);camera.updateMatrixWorld();}
+let pointer=null,moved=0;const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;manual();canvas.setPointerCapture(e.pointerId);pointer={x:e.clientX,y:e.clientY};moved=0;sphericalGoal.copy(spherical);targetGoal.copy(target);});
+canvas.addEventListener('pointermove',e=>{if(!pointer)return;const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;moved+=Math.abs(dx)+Math.abs(dy);sphericalGoal.theta-=dx*.006;sphericalGoal.phi=clamp(sphericalGoal.phi-dy*.006,.05,PI/2-.02);pointer={x:e.clientX,y:e.clientY};});
+canvas.addEventListener('pointerup',e=>{if(pointer&&moved<6){const r=canvas.getBoundingClientRect();ndc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);raycaster.setFromCamera(ndc,camera);pick(raycaster);}pointer=null;});
+for(const n of ['pointercancel','lostpointercapture'])canvas.addEventListener(n,()=>pointer=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();manual();sphericalGoal.radius=clamp(sphericalGoal.radius*Math.exp(e.deltaY*.001),4,40);},{passive:false});
+
+// ───────────────────────── 투영·SVG·라벨·콜아웃 헬퍼 ─────────────────────────
+let artScale=1,viewport={width:1,height:1};
+function project(v){const p=v.clone().project(camera);return{x:((p.x+1)*viewport.width/2-(viewport.width-1672*artScale)/2)/artScale,y:((-p.y+1)*viewport.height/2-(viewport.height-941*artScale)/2)/artScale};}
+function resize(){const r=stage.getBoundingClientRect();viewport.width=r.width;viewport.height=r.height;renderer.setSize(r.width,r.height);camera.aspect=r.width/r.height;artScale=Math.min(innerWidth/1672,innerHeight/941);camera.fov=r.width<700?54:2*Math.atan(Math.tan(16*DEG)*r.height/(941*artScale))/DEG;camera.updateProjectionMatrix();document.documentElement.style.setProperty('--scale',artScale);}
+addEventListener('resize',resize);resize();
+const xmlns='http://www.w3.org/2000/svg';
+function el(tag,attrs={},parent){const o=document.createElementNS(xmlns,tag);for(const [k,v] of Object.entries(attrs))o.setAttribute(k,v);if(parent)parent.append(o);return o;}
+const textEl=(parent,x,y,text,attrs={})=>{const o=el('text',{x,y,...attrs},parent);o.textContent=text;return o;};
+const labels=[];
+function addLabel(text,point,cls='',onClick){const d=document.createElement('div');d.className='lbl '+cls;d.textContent=text;if(onClick)d.onclick=onClick;$('labels').append(d);const L={el:d,point,visible:()=>true};labels.push(L);return L;}
+function clearLabels(){labels.length=0;$('labels').innerHTML='';}
+function updateLabels(){const on=state.overlays.LABELS;$('labels').style.display=on?'':'none';if(!on)return;for(const L of labels){const vis=L.visible();L.el.style.display=vis?'':'none';if(!vis)continue;const p=project(L.point());L.el.style.left=`${p.x}px`;L.el.style.top=`${p.y}px`;if(L.opacity)L.el.style.opacity=L.opacity();}}
+let calloutNodes=[];
+function buildCallouts(specs){$('callouts').innerHTML='';calloutNodes=specs.map(s=>{const g=el('g',{},$('callouts'));const back=el('rect',{class:'callout-back',rx:3},g);return{spec:s,group:g,back,line:el('path',{class:'callout-line'},g),dot:el('circle',{r:2.4,fill:'#a5b4fc'},g),text:textEl(g,s.label[0],s.label[1],s.text,{class:'callout-text'}),small:textEl(g,s.label[0],s.label[1]+15,s.detail,{class:'callout-small'}),sized:false,underY:s.label[1]+21};});}
+function updateCallouts(){const on=state.overlays.CALLOUTS;$('callouts').style.display=on?'':'none';if(!on)return;
+  for(const n of calloutNodes){const pt=n.spec.point(),[lx,ly]=n.spec.label;n.group.style.display=pt?'':'none';if(!pt)continue;
+    if(!n.sized){try{const b1=n.text.getBBox(),b2=n.small.getBBox();const x=Math.min(b1.x,b2.x)-7,y=b1.y-4,w=Math.max(b1.width,b2.width)+14,h=b2.y+b2.height-b1.y+8;if(w>14){n.back.setAttribute('x',x);n.back.setAttribute('y',y);n.back.setAttribute('width',w);n.back.setAttribute('height',h);n.underY=y+h+2;n.sized=true;}}catch(e){}}
+    const p=project(pt);n.dot.setAttribute('cx',p.x);n.dot.setAttribute('cy',p.y);n.line.setAttribute('d',`M${p.x.toFixed(1)} ${p.y.toFixed(1)} L${lx-14} ${n.underY} H${lx+150}`);}}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ▼▼ 모형 고유 ▼▼  무대 세 구역: 절단대(앞) · 임베딩 표 벽(뒤 왼쪽) · 뜻 공간(뒤 오른쪽)
+// ═══════════════════════════════════════════════════════════════════════════
+const BENCH_Z=2.3,WALL={x0:-6.15,ytop:3.5,z:-2.4,cols:4,pitch:.08,colPitch:9*.08+.24},ZONE=V(3.1,2.3,-1.9);
+const stageGroup=new THREE.Group();scene.add(stageGroup);
+const valueColor=(v,out=new THREE.Color())=>{const t=clamp(v,-1,1);return t<0?out.set(0x2b7de9).lerp(new THREE.Color(0xf1f5f9),1+t):out.set(0xf97316).lerp(new THREE.Color(0xf1f5f9),1-t);};
+// ── 표 벽 (어휘 × 9칸) ──
+const rowsPerCol=Math.ceil(BPE.vocab.length/WALL.cols);
+const cellPos=(id,d)=>V(WALL.x0+Math.floor(id/rowsPerCol)*WALL.colPitch+d*WALL.pitch,WALL.ytop-(id%rowsPerCol)*WALL.pitch,WALL.z);
+const rowCenter=id=>cellPos(id,4);
+let wallCells,rowFrame;
+function buildWall(){
+  const n=BPE.vocab.length;wallCells=new THREE.InstancedMesh(new THREE.BoxGeometry(.068,.068,.05),new THREE.MeshStandardMaterial({roughness:.55,metalness:.05,envMapIntensity:.6}),n*DIM);
+  const m=new THREE.Matrix4();for(let id=0;id<n;id++)for(let d=0;d<DIM;d++){m.makeTranslation(...cellPos(id,d).toArray());wallCells.setMatrixAt(id*DIM+d,m);}
+  wallCells.instanceMatrix.needsUpdate=true;wallCells.castShadow=false;stageGroup.add(wallCells);colorWall();
+  const back=new THREE.Mesh(new THREE.BoxGeometry(WALL.cols*WALL.colPitch+.1,rowsPerCol*WALL.pitch+.3,.06),new THREE.MeshStandardMaterial({color:0x1e293b,roughness:.8}));back.position.set(WALL.x0+(WALL.cols*WALL.colPitch)/2-.15,WALL.ytop-(rowsPerCol*WALL.pitch)/2+.05,WALL.z-.06);back.receiveShadow=true;stageGroup.add(back);
+  rowFrame=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(9*WALL.pitch+.04,.11,.09)),new THREE.LineBasicMaterial({color:0xfacc15}));rowFrame.visible=false;stageGroup.add(rowFrame);
+}
+function colorWall(){const T=state.trained?TABLE.trained:TABLE.untrained,c=new THREE.Color();for(let id=0;id<BPE.vocab.length;id++)for(let d=0;d<DIM;d++)wallCells.setColorAt(id*DIM+d,valueColor(T[id][d],c));wallCells.instanceColor.needsUpdate=true;}
+// ── 뜻 공간: 축 + 설계한 낱말 점 ──
+let dots,axes=[];const D=DESIGNED_TOKENS.length;
+function buildSpaceStage(){
+  for(const [dir,col] of [[V(1,0,0),0x94a3b8],[V(0,1,0),0x94a3b8],[V(0,0,1),0x94a3b8]]){const g=new THREE.BufferGeometry().setFromPoints([ZONE.clone().add(dir.clone().multiplyScalar(-2.4)),ZONE.clone().add(dir.clone().multiplyScalar(2.4))]);const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.55}));stageGroup.add(l);axes.push(l);}
+  const grid=new THREE.GridHelper(4.8,8,0x334155,0x1e293b);grid.position.copy(ZONE).add(V(0,-2.45,0));stageGroup.add(grid);
+  dots=new THREE.InstancedMesh(new THREE.SphereGeometry(.085,16,12),new THREE.MeshStandardMaterial({roughness:.35,metalness:.05,envMapIntensity:.8}),D);
+  const c=new THREE.Color();DESIGNED.forEach(([t,,cl],i)=>dots.setColorAt(i,c.set(CLUSTERS[cl])));dots.instanceColor.needsUpdate=true;dots.castShadow=false;stageGroup.add(dots);
+  ['주성분 1','주성분 2','주성분 3'].forEach((t,i)=>{const dir=[V(1,0,0),V(0,1,0),V(0,0,1)][i];addLabel(t,()=>ZONE.clone().add(dir.clone().multiplyScalar(2.65)),'axis');});
+}
+let trainedAmount=1;
+const dotPos=i=>{const a=SPACE.untrained.points[i],b=SPACE.trained.points[i];return ZONE.clone().add(V(lerp(a[0],b[0],trainedAmount),lerp(a[1],b[1],trainedAmount),lerp(a[2],b[2],trainedAmount)));};
+const tokenTarget=tok=>{const v=vecOfToken(tok,true),u=vecOfToken(tok,false),a=projectVec(u,false),b=projectVec(v,true);return ZONE.clone().add(V(lerp(a[0],b[0],trainedAmount),lerp(a[1],b[1],trainedAmount),lerp(a[2],b[2],trainedAmount)));};
+function updateDots(scale){const m=new THREE.Matrix4();for(let i=0;i<D;i++){m.makeScale(scale,scale,scale).setPosition(dotPos(i));dots.setMatrixAt(i,m);}dots.instanceMatrix.needsUpdate=true;}
+// ── 산술 화살표 ──
+let arithLine,arithMarker,arithLabel;
+function buildArith(){const g=new THREE.BufferGeometry().setFromPoints([V(),V(),V()]);arithLine=new THREE.Line(g,new THREE.LineBasicMaterial({vertexColors:true}));g.setAttribute('color',new THREE.Float32BufferAttribute([1,.3,.3,1,.3,.3,.3,1,.4],3));stageGroup.add(arithLine);
+  arithMarker=new THREE.Mesh(new THREE.OctahedronGeometry(.13),new THREE.MeshStandardMaterial({color:0xfacc15,emissive:0xfacc15,emissiveIntensity:.35}));stageGroup.add(arithMarker);
+  arithLabel=addLabel('',()=>arithMarker.position.clone().add(V(0,.3,0)),'res');arithLabel.visible=()=>arithMarker.visible;}
+let ARITH=null;
+function updateArith(){ARITH=arithmetic(state.arith.a,state.arith.b,state.arith.c,state.trained);
+  const P=[ARITH.va,ARITH.mid,ARITH.res].map(v=>ZONE.clone().add(V(...projectVec(v,state.trained))));
+  arithLine.geometry.setFromPoints(P);arithMarker.position.copy(P[2]);arithLabel.el.textContent=`≈ ${ARITH.nearest[0].token.replace('▁','')}`;}
+// ── 절단대: 글자 타일 · 토큰 라벨 · 벡터 띠 · 조회 선 ──
+let TOK=null,tiles=[],strips=[],lines=[],tokLabels=[],sylLabels=[],apps=[],layouts=[],tileSize=.52,selMarker;
+const tileGeom=new THREE.BoxGeometry(1,.46,.72),stripGeom=new THREE.BoxGeometry(.085,.085,.085);
+function layoutFor(groups){ // groups: 낱말별 심볼 길이 배열 → 타일 x 좌표
+  const GAP_S=.16,GAP_W=.5,T=tileSize,xs=[];let cur=0;
+  for(const g of groups){for(const len of g){for(let i=0;i<len;i++)xs.push(cur+i*(T+.02));cur+=len*(T+.02)+GAP_S;}cur+=GAP_W-GAP_S;}
+  const w=cur-GAP_W+T;return xs.map(x=>x-w/2+T/2);}
+function groupsAt(rankLimit){return TOK.words.map(wd=>{let syms=[...wd.syl];for(const m of wd.steps){if(m.rank>rankLimit)break;const next=[];for(let i=0;i<syms.length;i++){if(i<syms.length-1&&syms[i]===m.a&&syms[i+1]===m.b){next.push(m.ab);i++;}else next.push(syms[i]);}syms=next;}return syms.map(s=>s.replace('▁','').length);});}
+function disposeBench(){for(const o of [...tiles,...strips,...lines].filter(Boolean)){stageGroup.remove(o);o.traverse?.(c=>{if(c.isMesh){c.material.dispose();}});if(o.geometry&&o.geometry!==tileGeom)o.geometry.dispose();}tiles=[];strips=[];lines=[];}
+function buildBench(){
+  disposeBench();TOK=tokenizeText(state.sentence);const n=TOK.tiles.length;tileSize=clamp(9.6/(n*1.32),.3,.52);
+  apps=TOK.words.flatMap(wd=>wd.steps.map(m=>m.rank)).sort((a,b)=>a-b);
+  layouts=[layoutFor(groupsAt(-1))];for(const r of apps)layouts.push(layoutFor(groupsAt(r)));
+  for(let i=0;i<n;i++){const m=new THREE.Mesh(tileGeom,new THREE.MeshStandardMaterial({color:0xe2e8f0,roughness:.5,envMapIntensity:.6}));m.scale.set(tileSize,1,tileSize/.52*.9);m.position.set(layouts[0][i],.23,BENCH_Z);m.castShadow=m.receiveShadow=true;stageGroup.add(m);tiles.push(m);}
+  for(let k=0;k<TOK.tokens.length;k++){const tok=TOK.tokens[k];
+    const s=new THREE.Group();const v=vecOfToken(tok,state.trained);const c=new THREE.Color();for(let d=0;d<DIM;d++){const b=new THREE.Mesh(stripGeom,new THREE.MeshStandardMaterial({color:valueColor(v[d],c),roughness:.45,envMapIntensity:.7}));b.position.x=(d-4)*.1;b.castShadow=true;s.add(b);}s.visible=false;stageGroup.add(s);strips.push(s);
+    let line=null;if(tok.id>=0){const g=new THREE.BufferGeometry().setFromPoints(new THREE.LineCurve3(V(0,.75,BENCH_Z),rowCenter(tok.id)).getPoints(24));line=new THREE.Line(g,new THREE.LineBasicMaterial({color:0xa5b4fc,transparent:true,opacity:.9}));line.frustumCulled=false;line.visible=false;stageGroup.add(line);}lines.push(line);
+  }
+  if(!selMarker){selMarker=new THREE.Mesh(new THREE.TorusGeometry(.32,.018,8,40),new THREE.MeshBasicMaterial({color:0xfacc15}));stageGroup.add(selMarker);}
+  state.selected=clamp(state.selected,0,TOK.tokens.length-1);if(!TOK.tokens[state.selected].designed){const i=TOK.tokens.findIndex(t=>t.designed&&t.cluster!=='문법');if(i>=0)state.selected=i;}
+  rebuildLabels();
+}
+function tokenCenterX(k,layoutIdx){const L=layouts[layoutIdx],tk=TOK.tokens[k];let s=0;for(const i of tk.tiles)s+=L[i];return s/tk.tiles.length;}
+function rebuildLabels(){
+  clearLabels();sylLabels=[];tokLabels=[];
+  TOK.tiles.forEach((s,i)=>{const L=addLabel(s,()=>tiles[i].position.clone().add(V(0,.03,tileSize/.52*.36)),'syl');L.opacity=()=>1;sylLabels.push(L);});
+  TOK.tokens.forEach((tok,k)=>{const L=addLabel(`${tok.text} ${tok.id>=0?'#'+tok.id:'#?'}`,()=>V(tokenCenterX(k,layouts.length-1),.95,BENCH_Z),'tok'+(tok.id<0?' unk':''),()=>{manual();state.selected=k;uiDirty=true;});L.visible=()=>phaseOf(state.t).a>=.9;tokLabels.push(L);});
+  buildSpaceStage();buildArith();
+  for(let i=0;i<8;i++){const L=addLabel('',()=>V(),'dot');L.visible=()=>false;dotLabels.push(L);}
+  buildCallouts([
+    {text:'절단대 · 자주 붙는 글자를 합친다',detail:'조각마다 번호가 붙는다',label:[560,86],point:()=>phaseOf(state.t).a<1?V(0,.8,BENCH_Z):null},
+    {text:'임베딩 표 · 조각 번호 → 숫자 9개',detail:`어휘 ${BPE.vocab.length}개 × 9칸`,label:[820,86],point:()=>V(WALL.x0+WALL.cols*WALL.colPitch/2-.15,WALL.ytop+.25,WALL.z)},
+    {text:'뜻 공간 · 이웃이 보인다',detail:'9차원을 3차원으로 눌러 본 그림자',label:[1080,86],point:()=>ZONE.clone().add(V(0,2.55,0))},
+  ]);
+}
+let dotLabels=[];
+// 끝값은 명시적으로 1로 둔다 — (1−.67)/.33 = 0.9999999999999998 이라 c>=1 판정이 어긋난다
+const phaseOf=t=>({a:t>=.34?1:clamp(t/.34,0,1),b:t>=.67?1:clamp((t-.34)/.33,0,1),c:t>=1?1:clamp((t-.67)/.33,0,1)});
+const tmpC=new THREE.Color();
+function updateStage(){
+  if(!TOK)return;const {a,b,c}=phaseOf(state.t),n=TOK.tokens.length,S=apps.length;
+  // ① 자르기: 병합이 하나씩 적용되며 타일이 붙는다
+  const g=clamp(a/.85,0,1)*S,k=Math.min(Math.floor(g),S),frac=smooth(g-k),L0=layouts[k],L1=layouts[Math.min(k+1,S)];
+  tiles.forEach((tile,i)=>{tile.position.x=lerp(L0[i],L1[i],frac);});
+  const tint=clamp((a-.85)/.15,0,1);
+  TOK.tokens.forEach((tok,ki)=>{const col=tok.cluster?CLUSTERS[tok.cluster]:'#94a3b8';for(const i of tok.tiles){tiles[i].material.color.set(0xe2e8f0).lerp(tmpC.set(col),tint*.55);}});
+  // ② 표에서 꺼내기 · ③ 뜻 공간으로 (토큰마다 시간차)
+  let activeRow=-1;
+  TOK.tokens.forEach((tok,ki)=>{
+    const strip=strips[ki],line=lines[ki],x=tokenCenterX(ki,S),above=V(x,1.55,BENCH_Z);
+    const u=clamp((b-(.05+ki/n*.55))/.4,0,1),w=clamp((c-ki/n*.5)/.5,0,1);
+    if(b<=0||u<=0){strip.visible=false;if(line)line.visible=false;return;}
+    if(line){line.visible=u<1&&c<=0;line.geometry.setDrawRange(0,Math.max(2,Math.round(25*clamp(u/.35,0,1))));if(u>.25&&u<1)activeRow=tok.id;}
+    strip.visible=true;
+    if(c<=0){const from=tok.id>=0?rowCenter(tok.id).clone().add(V(0,0,.12)):above.clone().add(V(0,1.2,0));const p=smooth(clamp((u-.35)/.65,0,1));strip.position.lerpVectors(from,above,p);strip.scale.setScalar(u<.35?1.4:lerp(1.4,1,p));}
+    else{const to=tokenTarget(tok),mid=above.clone().lerp(to,.5).add(V(0,2.2,0)),p=smooth(w);const q=new THREE.QuadraticBezierCurve3(above,mid,to).getPoint(p);strip.position.copy(q);strip.scale.setScalar(lerp(1,.8,p));}
+  });
+  rowFrame.visible=activeRow>=0;if(activeRow>=0)rowFrame.position.copy(rowCenter(activeRow)).add(V(0,0,.02));
+  updateDots(c);
+  const sel=strips[state.selected];selMarker.visible=c>=1&&!!sel;if(sel)selMarker.position.copy(sel.position);
+  const showA=c>=1&&state.showArith&&state.trained;arithLine.visible=showA;arithMarker.visible=showA;
+  stageGroup.updateMatrixWorld(true);
+}
+// 뜻 공간 낱말 이름: 선택 토큰의 이웃 + 산술 낱말만
+function updateDotLabels(){const {c}=phaseOf(state.t);const names=[];if(c>=1&&TOK){const tok=TOK.tokens[state.selected];if(tok){for(const nb of nearest(vecOfToken(tok,state.trained),state.trained,[],4))names.push(nb.token);}if(state.showArith&&state.trained)names.push(state.arith.a,state.arith.b,state.arith.c);}
+  dotLabels.forEach((L,i)=>{const t=names[i];if(!t){L.visible=()=>false;return;}const idx=DESIGNED_TOKENS.indexOf(t);L.el.textContent=t.replace('▁','');L.point=()=>dotPos(idx).add(V(0,.2,0));L.visible=()=>true;});}
+// ── 2D 카드 ──
+function updateUI(){
+  if(!TOK)return;const {a,b,c}=phaseOf(state.t),tok=TOK.tokens[state.selected],trained=state.trained;
+  $('stat-chars').textContent=TOK.tiles.length;$('stat-tokens').textContent=TOK.tokens.length;$('stat-ratio').textContent=(TOK.tiles.length/Math.max(1,TOK.tokens.length)).toFixed(1);$('stat-unk').textContent=TOK.tokens.filter(t=>t.id<0).length;
+  $('vocab-n').textContent=BPE.vocab.length;$('merge-n').textContent=BPE.merges.length;$('corpus-n').textContent=CORPUS.length;
+  const chips=$('chips');if(chips.dataset.key!==state.sentence){chips.dataset.key=state.sentence;chips.innerHTML='';TOK.tokens.forEach((t,k)=>{const d=document.createElement('span');d.className='chip'+(t.id<0?' unk':'');d.style.background=t.cluster?CLUSTERS[t.cluster]:(t.id<0?'#94a3b8':'#64748b');d.innerHTML=`${t.text}<small>${t.id>=0?'#'+t.id:'#?'}</small>`;d.onclick=()=>{manual();state.selected=k;uiDirty=true;};chips.append(d);});}
+  [...chips.children].forEach((d,k)=>d.classList.toggle('on',k===state.selected));
+  const applied=Math.floor(clamp(a/.85,0,1)*apps.length);const mg=$('merges');if(mg.dataset.key!==state.sentence){mg.dataset.key=state.sentence;mg.innerHTML='';apps.forEach(r=>{const m=BPE.merges[r];const d=document.createElement('div');d.innerHTML=`<span>${m.a} + ${m.b} → <b>${m.ab}</b></span><span>${m.count}회</span>`;mg.append(d);});if(!apps.length){const d=document.createElement('div');d.textContent='적용된 병합 규칙이 없습니다 (모두 낱글자)';mg.append(d);}}
+  [...mg.children].forEach((d,i)=>{d.classList.toggle('done',i<applied);d.classList.toggle('now',i===applied-1&&a<.85);});
+  // 벡터 카드
+  const v=vecOfToken(tok,trained);$('vec-sub').innerHTML=`${tok.text} ${tok.id>=0?'#'+tok.id:'#?'}<span class="badge${tok.designed?'':' gray'}">${tok.id<0?'낯선 조각':tok.designed?(trained?'설계함':'학습 전 · 무작위'):'무작위'}</span>`;
+  const cells=$('vec-cells'),vals=$('vec-vals'),feats=$('vec-feats');if(!cells.children.length){for(let i=0;i<DIM;i++){cells.append(Object.assign(document.createElement('div'),{className:'cell'}));vals.append(Object.assign(document.createElement('div'),{className:'val'}));const f=document.createElement('div');f.className='feat';f.textContent=FEATURES[i];feats.append(f);}}
+  for(let i=0;i<DIM;i++){cells.children[i].style.background='#'+valueColor(v[i],tmpC).getHexString();vals.children[i].textContent=fmt(v[i],1);}
+  const nb=nearest(v,trained,[tok.text],3);$('neighbors').innerHTML=`가까운 낱말(코사인): ${nb.map(x=>`<b>${x.token.replace('▁','')}</b> ${x.cos.toFixed(2)}`).join(' · ')}`;
+  // 산술
+  updateArith();$('arith-result').innerHTML=`${state.arith.a.replace('▁','')} − ${state.arith.b.replace('▁','')} + ${state.arith.c.replace('▁','')} ≈ <b>${ARITH.nearest[0].token.replace('▁','')}</b> ${ARITH.nearest[0].cos.toFixed(2)} <span class="subtle">· ${ARITH.nearest.slice(1).map(x=>`${x.token.replace('▁','')} ${x.cos.toFixed(2)}`).join(' · ')}</span>${state.trained?'':'<br><span class="subtle">학습 전이라 결과에 뜻이 없습니다</span>'}`;
+  $('pca-var').textContent=Math.round(SPACE[trained?'trained':'untrained'].pca.ratio*100);
+  updateDotLabels();
+}
+function buildStaticUI(){
+  const lg=$('legend');Object.entries(CLUSTERS).forEach(([k,c])=>{const s=document.createElement('span');s.style.setProperty('--c',c);s.textContent=k;lg.append(s);});
+  const opts=DESIGNED.filter(d=>d[2]!=='문법').map(d=>`<option value="${d[0]}">${d[0].replace('▁','')}</option>`).join('');
+  for(const id of ['ar-a','ar-b','ar-c']){$(id).innerHTML=opts;$(id).onchange=()=>{manual();state.arith={a:$('ar-a').value,b:$('ar-b').value,c:$('ar-c').value};uiDirty=true;};}
+  const presets=[['▁왕','▁남자','▁여자'],['▁왕자','▁남자','▁여자'],['▁할아버지','▁남자','▁여자'],['▁학생','▁사람','▁동물']];
+  presets.slice(0,3).forEach(([a,b,c])=>{const btn=document.createElement('button');btn.textContent=`${a.replace('▁','')} − ${b.replace('▁','')} + ${c.replace('▁','')}`;btn.onclick=()=>{manual();state.arith={a,b,c};syncControls();uiDirty=true;};$('arith-presets').append(btn);});
+  EXAMPLES.forEach(s=>{const btn=document.createElement('button');btn.textContent=s;btn.onclick=()=>{manual();$('sentence').value=s;setSentence(s);};$('example-controls').append(btn);});
+  $('go').onclick=()=>{manual();setSentence($('sentence').value);};
+  $('sentence').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();manual();setSentence($('sentence').value);}});
+  $('trained-toggle').onclick=()=>{manual();state.trained=!state.trained;onTrainedChange();syncControls();};
+  $('arith-toggle').onclick=()=>{manual();state.showArith=!state.showArith;syncControls();uiDirty=true;};
+}
+function setSentence(s){s=(s||'').trim().slice(0,40);if(!s)return;state.sentence=s;state.t=0;state.playing=true;buildBench();uiDirty=true;syncControls();}
+function onTrainedChange(){colorWall();strips.forEach((s,k)=>{const v=vecOfToken(TOK.tokens[k],state.trained);s.children.forEach((b,d)=>b.material.color.copy(valueColor(v[d],tmpC)));});uiDirty=true;}
+function pick(ray){if(!TOK)return;const hit=ray.intersectObjects(tiles,false)[0];if(hit){const i=tiles.indexOf(hit.object);const k=TOK.tokens.findIndex(t=>t.tiles.includes(i));if(k>=0){state.selected=k;uiDirty=true;}}}
+function extraSnapshot(){const tok=TOK.tokens[state.selected],v=vecOfToken(tok,state.trained);return{sentence:state.sentence,tokens:TOK.tokens.map(t=>({text:t.text,id:t.id,designed:t.designed,cluster:t.cluster})),stats:{chars:TOK.tiles.length,tokens:TOK.tokens.length,unknown:TOK.tokens.filter(t=>t.id<0).length},vocabSize:BPE.vocab.length,mergeCount:BPE.merges.length,missingDesigned:MISSING_DESIGNED,pcaVariance:+SPACE[state.trained?'trained':'untrained'].pca.ratio.toFixed(3),trained:state.trained,selected:{text:tok.text,neighbors:nearest(v,state.trained,[tok.text],3).map(x=>({token:x.token,cos:+x.cos.toFixed(3)}))},arithmetic:{...state.arith,nearest:arithmetic(state.arith.a,state.arith.b,state.arith.c,state.trained).nearest.map(x=>({token:x.token,cos:+x.cos.toFixed(3)}))},merges:BPE.merges.slice(0,12).map(m=>`${m.a}+${m.b}→${m.ab}(${m.count})`)};}
+function applyState(p){if(p.sentence!==undefined&&p.sentence!==state.sentence){state.sentence=String(p.sentence).slice(0,40);$('sentence').value=state.sentence;buildBench();}
+  if(p.trained!==undefined&&Boolean(p.trained)!==state.trained){state.trained=Boolean(p.trained);trainedAmount=state.trained?1:0;onTrainedChange();}
+  if(p.selected!==undefined)state.selected=clamp(Number(p.selected),0,TOK.tokens.length-1);
+  if(p.arith)state.arith={...state.arith,...p.arith};if(p.showArith!==undefined)state.showArith=Boolean(p.showArith);}
+const demo={hold:0,step:0};
+function startDemo(){state.mode='demo';demo.hold=0;demo.step=0;state.trained=true;trainedAmount=1;onTrainedChange();setSentence(EXAMPLES[0]);setCamera('HERO');syncControls();}
+function demoTick(dt){if(state.camera==='HERO')sphericalGoal.theta+=dt*.03;if(state.playing)return;demo.hold+=dt;if(demo.hold<2.2)return;demo.hold=0;demo.step++;
+  const seq=[['BENCH',null],['TABLE',null],['SPACE',null],['HERO',EXAMPLES[1]],['SPACE',null],['HERO',EXAMPLES[2]],['SPACE',null]];const [cam,sent]=seq[demo.step%seq.length];
+  if(sent){setSentence(sent);}else{state.t=0;state.playing=true;}setCamera(cam);syncControls();}
+// ═══════════════════════════════════════════════════════════════════════════
+// ▲▲ 모형 고유 ▲▲
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ───────────────────────── 조작·재생·키보드 (공용) ─────────────────────────
+function controls(container,items,onClick){for(const it of items){const b=document.createElement('button');b.textContent=it.label;b.dataset.value=it.value;b.setAttribute('aria-pressed','false');if(it.cls)b.classList.add(it.cls);b.onclick=()=>{manual();onClick(it.value);syncControls();};$(container).append(b);}}
+controls('camera-controls',[['HERO','전체'],['BENCH','절단대'],['TABLE','임베딩 표'],['SPACE','뜻 공간']].map(([value,label])=>({value,label})),v=>setCamera(v));
+controls('overlay-controls',[['LABELS','라벨'],['CALLOUTS','콜아웃'],['CHARTS','카드']].map(([value,label])=>({value,label})),v=>{state.overlays[v]=!state.overlays[v];applyVisibility();});
+function applyVisibility(){for(const c of document.querySelectorAll('.tokens-card,.legend-card'))c.style.visibility=state.overlays.CHARTS?'visible':'hidden';$('callouts').style.display=state.overlays.CALLOUTS?'':'none';$('labels').style.display=state.overlays.LABELS?'':'none';}
+function syncControls(){for(const b of $('camera-controls').children)b.setAttribute('aria-pressed',b.dataset.value===state.camera);for(const b of $('overlay-controls').children)b.setAttribute('aria-pressed',!!state.overlays[b.dataset.value]);
+  $('play').setAttribute('aria-pressed',state.playing);$('play').textContent=state.playing?'Ⅱ 정지':(state.t>=1?'↺ 다시 재생':'▶ 재생');$('demo-mode').setAttribute('aria-pressed',state.mode==='demo');$('interactive-mode').setAttribute('aria-pressed',state.mode==='interactive');$('speed').value=String(state.speed);
+  $('trained-toggle').setAttribute('aria-pressed',state.trained);$('trained-toggle').textContent=state.trained?'학습 후 · 뜻 있는 벡터':'학습 전 · 무작위 벡터';$('arith-toggle').setAttribute('aria-pressed',state.showArith);
+  $('ar-a').value=state.arith.a;$('ar-b').value=state.arith.b;$('ar-c').value=state.arith.c;}
+const range=$('t-range');let scrubbing=false,uiDirty=true;
+function manual(){state.mode='interactive';}
+$('play').onclick=()=>{manual();if(state.playing)state.playing=false;else{if(state.t>=1)state.t=0;state.playing=true;}syncControls();};
+$('speed').onchange=e=>{manual();state.speed=Number(e.target.value);};
+range.addEventListener('pointerdown',()=>{scrubbing=true;manual();state.playing=false;syncControls();});
+range.addEventListener('input',()=>{state.t=Number(range.value)/1000;uiDirty=true;});
+for(const n of ['pointerup','pointercancel','blur'])range.addEventListener(n,()=>scrubbing=false);
+function hideUI(){document.body.classList.toggle('hidden-overlays');}$('restore').onclick=hideUI;
+addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;const key=e.key.toLowerCase();
+  if(key==='h')hideUI();else if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();$('play').click();}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();manual();state.playing=false;state.t=clamp(state.t+(e.key==='ArrowRight'?.04:-.04),0,1);uiDirty=true;syncControls();}});
+$('demo-mode').onclick=startDemo;$('interactive-mode').onclick=()=>{manual();syncControls();};
+
+// ───────────────────────── 프레임 루프 ─────────────────────────
+const frameDurations=[];let previous=performance.now(),uiElapsed=0,renderCount=0;
+function renderFrame(now){const raw=(now-previous)/1000,dt=Math.min(raw,.1);previous=now;if(document.hidden){requestAnimationFrame(renderFrame);return;}
+  if(state.mode==='demo')demoTick(dt);
+  if(state.playing){const nt=clamp(state.t+dt/state.speed,0,1);if(nt!==state.t){state.t=nt;uiDirty=true;}if(nt>=1){state.playing=false;syncControls();}}
+  const tg=state.trained?1:0;if(Math.abs(trainedAmount-tg)>1e-3){trainedAmount+=(tg-trainedAmount)*(1-Math.exp(-dt*5));uiDirty=true;}else trainedAmount=tg;
+  updateStage();moveCamera(dt);updateLabels();
+  uiElapsed+=dt;if(uiElapsed>.05){if(uiDirty){updateUI();if(!scrubbing)range.value=String(Math.round(state.t*1000));uiDirty=false;}updateCallouts();uiElapsed=0;}
+  renderer.render(scene,camera);if(raw>0&&raw<1){frameDurations.push(raw*1000);if(frameDurations.length>180)frameDurations.shift();}renderCount++;requestAnimationFrame(renderFrame);}
+
+// ───────────────────────── 자가 점검 API ─────────────────────────
+function bounds(){const b=new THREE.Box3().setFromObject(stageGroup),pts=[];for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z]){const p=V(x,y,z).project(camera);pts.push([(p.x+1)*viewport.width/2,(-p.y+1)*viewport.height/2]);}return{minX:Math.min(...pts.map(p=>p[0])),maxX:Math.max(...pts.map(p=>p[0])),minY:Math.min(...pts.map(p=>p[1])),maxY:Math.max(...pts.map(p=>p[1]))};}
+function snapshot(){return{state:JSON.parse(JSON.stringify(state)),...extraSnapshot(),renderer:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frames:renderCount,meanFrameMs:frameDurations.length?frameDurations.reduce((a,b)=>a+b)/frameDurations.length:0,dpr:renderer.getPixelRatio()},camera:{position:camera.position.toArray(),target:target.toArray()},bounds:bounds()};}
+function refresh(){updateStage();updateUI();updateLabels();updateCallouts();syncControls();renderer.render(scene,camera);}
+window[APP]={snapshot,tokenize:t=>tokenizeText(t).tokens.map(x=>({text:x.text,id:x.id})),
+  setState(p={}){if(p.t!==undefined)state.t=clamp(Number(p.t),0,1);if(p.playing!==undefined)state.playing=Boolean(p.playing);if(p.speed!==undefined)state.speed=Number(p.speed);
+    if(p.overlays)for(const k of Object.keys(state.overlays))if(p.overlays[k]!==undefined)state.overlays[k]=Boolean(p.overlays[k]);if(['demo','interactive'].includes(p.mode))state.mode=p.mode;
+    applyState(p);applyVisibility();if(p.camera in preset)setCamera(p.camera,true);else setCamera(state.camera,true);refresh();return snapshot();},
+  advance(seconds){if(state.playing)state.t=clamp(state.t+seconds/state.speed,0,1);refresh();return snapshot();},
+  capture(){renderer.render(scene,camera);return canvas.toDataURL('image/png');}};
+
+// ───────────────────────── 시작 ─────────────────────────
+buildWall();buildStaticUI();$('sentence').value=state.sentence;buildBench();trainedAmount=state.trained?1:0;applyVisibility();setCamera('HERO',true);refresh();
+$('loading').hidden=true;if(state.mode==='demo')startDemo();requestAnimationFrame(renderFrame);
+</script>
+</body>
+</html>

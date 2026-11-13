@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 240" fill="none">
+  <!-- 손그림 비서 로봇 — 잉크 스케치. 의도: 클로드 코드를 '나비넥타이를 맨
+       비서'로 의인화. 회화성: 열린 선·겹쳐 그은 보조 스트로크·불균일 굵기.
+       다크 덱 배경용 앰버 선 (#ffd9a8). asset-library manifest 등록됨. -->
+  <g stroke="#ffd9a8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- 머리: 비정형 원 + 겹쳐 그은 흐린 보조선 -->
+    <path d="M62 80 C57 46 95 25 124 29 C158 34 173 62 167 93 C161 121 129 133 100 129 C73 125 60 105 62 82" stroke-width="3.4"/>
+    <path d="M67 73 C69 51 96 33 121 35" stroke-width="1.7" opacity="0.45"/>
+    <!-- 안테나: 살짝 기운 -->
+    <path d="M117 28 C119 19 125 13 133 11" stroke-width="3"/>
+    <circle cx="137" cy="9" r="4.5" stroke-width="2.6"/>
+    <!-- 웃는 눈 두 개 -->
+    <path d="M87 78 C91 71 100 71 104 77" stroke-width="3.3"/>
+    <path d="M124 78 C128 71 137 71 141 77" stroke-width="3.3"/>
+    <!-- 볼 터치 -->
+    <path d="M78 92 C81 91 84 91 86 92" stroke-width="2" opacity="0.55"/>
+    <path d="M142 92 C145 91 148 91 150 92" stroke-width="2" opacity="0.55"/>
+    <!-- 입: 크게 웃음 -->
+    <path d="M99 100 C107 109 123 109 131 99" stroke-width="3"/>
+    <!-- 몸통: 열린 스트로크 둘 -->
+    <path d="M85 131 C80 156 82 177 89 197 C105 205 131 205 147 195 C153 173 153 153 146 133" stroke-width="3.4"/>
+    <path d="M92 199 C96 201 102 202 108 203" stroke-width="1.8" opacity="0.45"/>
+    <!-- 나비넥타이 -->
+    <path d="M99 141 L114 149 L99 158 Z" stroke-width="2.8"/>
+    <path d="M129 141 L114 149 L129 158 Z" stroke-width="2.8"/>
+    <circle cx="114" cy="149" r="3" stroke-width="2.2"/>
+    <!-- 왼팔: 손 흔들며 인사 -->
+    <path d="M85 143 C66 139 52 127 46 111" stroke-width="3.2"/>
+    <path d="M46 111 C43 104 44 97 49 92" stroke-width="3"/>
+    <path d="M49 92 C51 89 54 87 58 87" stroke-width="2.4"/>
+    <!-- 오른팔: 살짝 내림 -->
+    <path d="M147 145 C161 151 169 161 171 174" stroke-width="3.2"/>
+    <!-- 가슴의 프롬프트 마크: > _ -->
+    <path d="M103 170 L112 177 L103 184" stroke-width="3"/>
+    <path d="M119 184 L133 184" stroke-width="3"/>
+  </g>
+</svg>

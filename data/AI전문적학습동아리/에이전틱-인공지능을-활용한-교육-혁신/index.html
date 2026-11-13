@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>에이전틱 인공지능을 활용한 교육 혁신</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 1. Reset & Professional Blue Theme Variables */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --style-bg: #F8FAFC;
+      --style-primary: #0055FF; /* Professional Blue */
+      --style-accent: #00D1FF;  /* Innovation Cyan */
+      --style-text: #0F172A;    /* Dark Slate */
+      --style-text-secondary: #475569;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(0, 85, 255, 0.1);
+      --card-bg: #FFFFFF;
+    }
+
+    /* 2. Base Typography */
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      overflow: hidden;
+      font-size: clamp(16px, 1.5vw, 28px);
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, .font-heading { font-family: 'Montserrat', 'Noto Sans KR', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+    h1 { font-size: 2.4rem; line-height: 1.2; margin-bottom: 0.4rem; color: #0F172A; }
+    h2 { font-size: 1.6rem; font-weight: 700; color: var(--style-primary); }
+    h3 { font-size: 1.2rem; font-weight: 700; color: var(--style-text); }
+    p { font-size: 0.95rem; color: var(--style-text-secondary); font-weight: 400; }
+
+    /* 3. Slide Container & Navigation */
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.6rem 1rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* 4. Browser Card Chrome (Clean Glass Style) */
+    .browser-card {
+      background: var(--card-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      width: 100%; max-width: 1400px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+    }
+    .browser-topbar {
+      background: #F1F5F9;
+      padding: 0.5rem 1.2rem;
+      display: flex; align-items: center; gap: 0.6rem;
+      border-bottom: 1px solid #E2E8F0;
+      flex-shrink: 0;
+    }
+    .dot { width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title {
+      flex: 1; text-align: center; margin-right: 2.1rem;
+      font-size: 0.75rem; color: #64748B; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .browser-content { flex: 1; overflow-y: auto; padding: 1rem 2rem 2rem; position: relative; }
+
+    /* 5. Components */
+    .section-header { margin-bottom: 0.8rem; border-left: 5px solid var(--style-primary); padding-left: 1.2rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { font-size: 0.85rem; color: var(--style-text-secondary); margin-top: 0.1rem; font-weight: 500; }
+
+    .highlight-box {
+      background: linear-gradient(135deg, #F0F7FF, #E0EBFF);
+      border: 1px solid rgba(0, 85, 255, 0.1);
+      border-radius: 1rem; padding: 1.2rem; margin: 0.6rem 0;
+      text-align: center;
+    }
+    .highlight-box strong { color: var(--style-primary); font-size: 1.15rem; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 0.8rem 0; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 0.8rem 0; }
+
+    .card {
+      background: #FFFFFF; border: 1px solid #E2E8F0;
+      border-radius: 1rem; padding: 0.8rem 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+    .card:hover { transform: translateY(-4px); border-color: var(--style-primary); box-shadow: 0 12px 20px rgba(0, 85, 255, 0.06); }
+    .card-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; color: var(--style-primary); }
+    .card-desc { font-size: 0.9rem; line-height: 1.5; color: var(--style-text-secondary); }
+
+    .badge {
+      display: inline-block; padding: 0.3rem 1rem; border-radius: 2rem;
+      font-size: 0.8rem; font-weight: 800; margin-right: 0.4rem;
+      background: var(--style-primary); color: white;
+    }
+
+    /* 6. Navigation Bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      padding: 0.4rem 1.5rem; background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px); border-top: 1px solid #E2E8F0;
+      z-index: 999;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 2rem; height: 2rem; border: 1px solid #E2E8F0;
+      border-radius: 50%; background: #FFF;
+      cursor: pointer; color: #64748B; transition: all 0.2s;
+    }
+    .nav-btn svg { width: 0.6rem; height: 0.6rem; fill: currentColor; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: var(--style-primary); color: #FFF; }
+    .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+    .nav-counter { font-size: 13px; font-weight: 700; color: #64748B; min-width: 3.5rem; text-align: center; }
+    .slide-input {
+      width: 1.6rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .slide-input:focus { border-bottom-color: var(--style-primary); }
+
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--style-primary), var(--style-accent)); transition: width 0.4s ease; z-index: 1000; }
+
+    /* 7. Animations */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .stagger-item { animation: fadeIn 0.5s ease-out both; }
+    .slide.active .stagger-item:nth-child(1) { animation-delay: 0.1s; }
+    .slide.active .stagger-item:nth-child(2) { animation-delay: 0.2s; }
+    .slide.active .stagger-item:nth-child(3) { animation-delay: 0.3s; }
+    .slide.active .stagger-item:nth-child(4) { animation-delay: 0.4s; }
+
+    /* Download Button Style */
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: var(--style-primary);
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-top: 0.6rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .download-btn:hover {
+      background: #0044CC;
+      transform: translateY(-2px);
+    }
+    .download-btn svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
+
+    /* Cover Specific */
+    .cover-content { text-align: center; padding: 0.5rem 0; }
+    .cover-title { font-size: 2.8rem; color: #0F172A; font-weight: 900; }
+    .cover-title span { color: var(--style-primary); }
+    .cover-pills { display: flex; gap: 0.6rem; justify-content: center; margin-top: 1.5rem; }
+    .cover-pill { padding: 0.4rem 1.2rem; border-radius: 2rem; border: 1px solid #E2E8F0; background: #F8FAFC; font-size: 0.85rem; font-weight: 700; color: #64748B; }
+
+    /* TOC */
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .toc-item {
+      display: flex; align-items: center; padding: 0.6rem 1.2rem;
+      background: #F8FAFC; border: 1px solid #E2E8F0;
+      border-radius: 0.8rem; cursor: pointer; transition: all 0.2s;
+    }
+    .toc-item:hover { border-color: var(--style-primary); background: #F0F7FF; transform: translateX(8px); }
+    .toc-num { font-family: 'Montserrat'; font-size: 1.2rem; color: var(--style-primary); margin-right: 1.2rem; width: 1.5rem; }
+    .toc-text { font-weight: 700; font-size: 1.05rem; }
+
+    /* Step Boxes */
+    .step-box { border-left: 4px solid var(--style-accent); padding-left: 1.2rem; margin-bottom: 1.2rem; }
+    .step-num { font-family: 'Montserrat'; color: var(--style-primary); font-size: 1rem; display: block; margin-bottom: 0.2rem; }
+
+    /* Code Block */
+    code { background: #F1F5F9; padding: 0.2rem 0.4rem; border-radius: 0.3rem; font-family: monospace; font-weight: 600; color: #E11D48; }
+
+    /* Decoration */
+    .bg-deco { position: absolute; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.4; }
+    .bg-deco--1 { top: -10%; right: -10%; width: 300px; height: 300px; background: rgba(0, 85, 255, 0.1); }
+    .bg-deco--2 { bottom: -10%; left: -10%; width: 250px; height: 250px; background: rgba(0, 209, 255, 0.1); }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .cover-title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="bg-deco bg-deco--1"></div>
+  <div class="bg-deco bg-deco--2"></div>
+
+  <div class="presentation" id="presentation">
+    
+    <!-- SLIDE 1: Cover -->
+    <div class="slide active" data-slide="0">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Professional Education Series</span>
+        </div>
+        <div class="browser-content">
+          <div class="cover-content">
+            <div class="badge">2026 AI 전문적학습동아리</div>
+            <h1 class="cover-title">에이전틱 <span>인공지능</span>과<br>교육 혁신</h1>
+            <p class="subtitle" style="font-size: 1.1rem; margin-top: 0.5rem;">스스로 계획하고 실행하는 AI와 교사의 새로운 파트너십</p>
+            <div class="cover-pills">
+              <span class="cover-pill" style="background: var(--style-primary); color: #fff; border-color: var(--style-primary);">🔗 joo.is/2026ait</span>
+              <span class="cover-pill">AGENTIC AI</span>
+              <span class="cover-pill">EDUCATION 4.0</span>
+              <span class="cover-pill">WORKFLOW</span>
+            </div>
+            <div class="highlight-box" style="max-width: 700px; margin: 1.2rem auto 0; padding: 1rem;">
+              <p style="color: #0F172A; font-size: 1.05rem;">단순한 답변 생성을 넘어, <strong>목표를 스스로 이해하고 실행하는 AI</strong>와 함께<br>교육 업무의 새로운 가능성을 발견합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Encouragement -->
+    <div class="slide" data-slide="1">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Warm Welcome</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🌟</span> 선생님, 두려워하지 마세요</h2>
+            <p class="section-subtitle">인공지능은 선생님의 전문성을 돕는 가장 따뜻한 도구입니다.</p>
+          </div>
+          <div class="grid-2" style="align-items: center;">
+            <div class="stagger-item">
+              <img src="warm-welcome.jpg" alt="Smiling teacher helping students" style="width: 100%; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            </div>
+            <div class="stagger-item">
+              <h3 style="font-size: 1.4rem; line-height: 1.4; color: var(--style-primary); margin-bottom: 1.2rem;">"기술은 차갑지만,<br>교육은 따뜻합니다."</h3>
+              <p style="font-size: 1.05rem; line-height: 1.8;">
+                에이전틱 AI는 선생님을 밀어내는 것이 아니라,<br>
+                복잡하고 반복적인 업무를 대신 짊어짐으로써<br>
+                선생님이 <strong>학생들의 눈을 한 번 더 맞출 수 있는 시간</strong>을<br>
+                선물해 드리고자 합니다.<br><br>
+                이 여정은 완벽함이 아닌 '시도'에서 시작됩니다.<br>
+                함께 설레는 마음으로 시작해 볼까요?
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: TOC -->
+    <div class="slide" data-slide="2">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Roadmap</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2>주요 학습 내용</h2>
+            <p class="section-subtitle">동아리 연수 로드맵</p>
+          </div>
+          <ul class="toc-list">
+            <li class="toc-item" onclick="goToSlide(3)">
+              <span class="toc-num">01</span>
+              <span class="toc-text">에이전틱 AI(Agentic AI)의 개념 이해</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(4)">
+              <span class="toc-num">02</span>
+              <span class="toc-text">교육 현장의 에이전틱 혁신 사례</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(5)">
+              <span class="toc-num">03</span>
+              <span class="toc-text">핵심 가치: 에이전트를 다루는 역량</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(6)">
+              <span class="toc-num">04</span>
+              <span class="toc-text">필수 환경 구성 상세 가이드 (4단계)</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(12)">
+              <span class="toc-num">05</span>
+              <span class="toc-text">첫 번째 실습: AI 기반 프레젠테이션 자동화</span>
+            </li>
+            <li class="toc-item" onclick="goToSlide(17)">
+              <span class="toc-num">06</span>
+              <span class="toc-text">AI 교사 동아리 협업 보드 및 결과 공유</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Concept -->
+    <div class="slide" data-slide="3">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">01. Concept</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🧠</span> 에이전틱 AI란 무엇인가?</h2>
+            <p class="section-subtitle">챗봇을 넘어선 능동적인 인공지능 에이전트</p>
+          </div>
+          <div class="grid-2">
+            <div class="card stagger-item">
+              <span class="card-icon">💬</span>
+              <h3 class="card-title">수동적 AI (LLM)</h3>
+              <p class="card-desc">사용자의 질문에 답변만 생성합니다. 결과물을 직접 복사해서 활용해야 하는 수동적인 단계입니다.</p>
+            </div>
+            <div class="card stagger-item" style="border-color: var(--style-primary); background: #F0F7FF;">
+              <span class="card-icon">🎯</span>
+              <h3 class="card-title">에이전틱 AI (Agentic AI)</h3>
+              <p class="card-desc">목표를 주면 스스로 계획을 세웁니다. 내 컴퓨터의 파일을 직접 읽고 쓰며 문제를 해결합니다.</p>
+            </div>
+          </div>
+          <div class="highlight-box stagger-item">
+            <strong>패러다임의 변화</strong>: 이제 AI는 '대화하는 도구'가 아니라 <strong>'일을 맡기는 비서'</strong>가 됩니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Education Cases -->
+    <div class="slide" data-slide="4">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">02. Cases</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🏫</span> 교육 현장의 에이전틱 혁신</h2>
+            <p class="section-subtitle">교사의 시간을 확보해주는 자동화 사례</p>
+          </div>
+          <div class="grid-2">
+            <div class="card stagger-item">
+              <h3 class="card-title">수업 자료 자동 제작</h3>
+              <p class="card-desc">학습 주제만 전달하면 관련 자료를 검색하고 구조화된 발표 자료를 폴더에 직접 생성합니다.</p>
+            </div>
+            <div class="card stagger-item">
+              <h3 class="card-title">성적 데이터 분석</h3>
+              <p class="card-desc">엑셀 성적표를 읽고, 각 학생별 강약점을 분석하여 개인별 맞춤 피드백 문서를 수십 건 일괄 작성합니다.</p>
+            </div>
+            <div class="card stagger-item">
+              <h3 class="card-title">평가 기록 지원</h3>
+              <p class="card-desc">수행평가 관찰 기록을 분석하여 학교생활기록부 기재 요령에 맞는 초안을 자동으로 제안합니다.</p>
+            </div>
+            <div class="card stagger-item">
+              <h3 class="card-title">행정 업무 간소화</h3>
+              <p class="card-desc">기존 공문 파일을 학습하여 새로운 학교 사업 안내장이나 기안문 뼈대를 즉시 구성합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Core Competency -->
+    <div class="slide" data-slide="5">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">03. Core Competency</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🎯</span> 이번 연수의 진짜 목적</h2>
+            <p class="section-subtitle">단순한 결과물 생성을 넘어선 '에이전트 제어 역량'</p>
+          </div>
+          <div class="highlight-box" style="padding: 2rem;">
+            <h1 style="color: var(--style-primary); margin-bottom: 0.8rem;">결과물보다 '에이전트를 다루는 힘'이 핵심입니다.</h1>
+            <p style="font-size: 1.1rem; color: #0F172A;">에이전틱 AI에게 명확한 목표를 부여하고, 적절한 도구(Skill)를 제공하며,<br><strong>협업의 과정을 주도적으로 조율하는 역량</strong>을 기르는 것이 진짜 목표입니다.</p>
+          </div>
+          <div class="card stagger-item" style="margin-top: 1rem; border-left: 5px solid var(--style-accent);">
+            <p style="text-align: center; font-size: 1rem;">단순히 AI가 만들어준 PPT 한 벌을 얻는 것은 중요하지 않습니다.<br>문제 해결을 위해 AI 에이전트를 어떻게 활용하고 제어할 것인지에 대한<br><strong>'에이전틱 오케스트레이션'</strong> 감각을 익히는 것이 선생님의 미래 역량이 됩니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Setup Intro -->
+    <div class="slide" data-slide="6">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">04. Setup</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🛠️</span> 에이전틱 작업실 구축 (4단계)</h2>
+            <p class="section-subtitle">선생님과 AI가 함께 일할 공간을 준비합니다</p>
+          </div>
+          <div class="grid-2">
+            <div class="card stagger-item">
+              <span class="badge">STEP 1</span>
+              <h3 class="card-title">VS Code (편집기)</h3>
+              <p class="card-desc">모든 작업이 이루어지는 기본 공간입니다. 코드와 결과물을 즉시 확인합니다.</p>
+            </div>
+            <div class="card stagger-item">
+              <span class="badge">STEP 2</span>
+              <h3 class="card-title">Git & GitHub</h3>
+              <p class="card-desc">파일의 변화를 기록하고, 실수해도 언제든 원래대로 되돌리는 안전장치입니다.</p>
+            </div>
+            <div class="card stagger-item">
+              <span class="badge">STEP 3</span>
+              <h3 class="card-title">Claude Code AI</h3>
+              <p class="card-desc">명령창에서 내 지시를 받아 직접 파일을 생성하고 수정하는 실행 에이전트입니다.</p>
+            </div>
+            <div class="card stagger-item">
+              <span class="badge">STEP 4</span>
+              <h3 class="card-title">Presentation Skill</h3>
+              <p class="card-desc">AI에게 '학교 수업용 PPT 만드는 전문 지식'을 주입하는 과정입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: STEP 1 Details -->
+    <div class="slide" data-slide="7">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Step 1. VS Code</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🖥️</span> 1단계: VS Code 설치 및 설정</h2>
+            <p class="section-subtitle">우리의 메인 작업 도구를 준비합니다</p>
+          </div>
+          <div class="step-box stagger-item">
+            <span class="step-num">Step 1.1</span>
+            <h3>프로그램 설치</h3>
+            <p>공식 홈페이지에서 설치 프로그램을 내려받아 실행합니다.</p>
+            <a href="https://code.visualstudio.com/" target="_blank" class="download-btn">
+              <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              VS Code 다운로드
+            </a>
+          </div>
+          <div class="step-box stagger-item">
+            <span class="step-num">Step 1.2</span>
+            <h3>한국어 팩 및 Live Server</h3>
+            <p>1. 왼쪽 네모 아이콘 클릭 ➔ <strong>"Korean"</strong> 검색 후 설치 ➔ 재시작<br>2. 같은 메뉴에서 <strong>"Live Server"</strong> 검색 후 설치 (PPT 확인용)</p>
+          </div>
+          <div class="card stagger-item" style="border-left: 5px solid var(--style-primary);">
+            <p>💡 <strong>팁</strong>: 상단 메뉴 [터미널 ➔ 새 터미널]을 누르면 나타나는 아래쪽 창이 AI에게 명령을 내릴 공간입니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: STEP 2 Details -->
+    <div class="slide" data-slide="8">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Step 2. Git</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🌿</span> 2단계: Git & GitHub Desktop</h2>
+            <p class="section-subtitle">안전한 기록 관리를 위한 토대 마련</p>
+          </div>
+          <div class="grid-2">
+            <div class="step-box stagger-item">
+              <span class="step-num">2.1 Git 설치</span>
+              <h3>Git 엔진 설치</h3>
+              <p>기본 옵션(Next)으로 설치를 완료합니다.</p>
+              <a href="https://git-scm.com/" target="_blank" class="download-btn">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Git 다운로드
+              </a>
+            </div>
+            <div class="step-box stagger-item">
+              <span class="step-num">2.2 GitHub Desktop</span>
+              <h3>조종석 설치</h3>
+              <p>설치 후 구글/GitHub 계정으로 로그인합니다.</p>
+              <a href="https://desktop.github.com/" target="_blank" class="download-btn">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                GitHub Desktop 다운로드
+              </a>
+            </div>
+          </div>
+          <div class="card stagger-item">
+            <h3 class="card-title">내 프로젝트 폴더 생성</h3>
+            <p class="card-desc">GitHub Desktop에서 [File ➔ New repository]를 선택하고 <code>ai-education</code>이라는 이름으로 새 폴더를 만듭니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: STEP 3 Details -->
+    <div class="slide" data-slide="9">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Step 3. Node.js 설치 &amp; Claude Code 설치</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🟩</span> 3단계: Node.js 설치 후 Claude Code 설치</h2>
+            <p class="section-subtitle">Claude Code를 npm으로 설치하려면 Node.js가 먼저 필요합니다</p>
+          </div>
+          <div class="grid-2">
+            <div class="step-box stagger-item">
+              <span class="step-num">Node.js 설치 순서</span>
+              <h3>📥 nodejs.org에서 설치</h3>
+              <ol style="padding-left: 1.2rem; line-height: 2;">
+                <li>브라우저에서 <code>nodejs.org</code> 접속</li>
+                <li>초록색 <strong>LTS 버전</strong> 다운로드 클릭</li>
+                <li>설치 파일 실행 → <strong>Next</strong> 계속 클릭</li>
+                <li>설치 완료 후 <strong>터미널을 새로 열기</strong></li>
+              </ol>
+            </div>
+            <div class="step-box stagger-item">
+              <span class="step-num">Claude Code 설치</span>
+              <h3>⚡ 터미널(커맨드창)에서 실행</h3>
+              <code style="background: #FFF; padding: 0.8rem; border-radius: 0.5rem; display: block; border: 1px solid #E2E8F0; font-size: 0.9rem; margin: 0.5rem 0;">npm install -g @anthropic-ai/claude-code</code>
+              <p style="font-size: 0.85rem; color: #475569; margin-top: 0.4rem;">💡 <strong>-g</strong>: 컴퓨터 전체에 설치(global) — 어느 폴더에서든 <code>claude</code> 명령어 사용 가능</p>
+              <div style="margin-top: 0.6rem; background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 0.4rem; padding: 0.5rem 0.8rem; font-size: 0.85rem;">
+                설치 확인: <code>claude --version</code> → 버전 번호 출력 시 성공!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: Troubleshooting -->
+    <div class="slide" data-slide="10">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Troubleshooting</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">⚠️</span> 트러블슈팅: 환경변수(PATH) 수동 추가</h2>
+            <p class="section-subtitle">명령어를 입력해도 '인식할 수 없는 명령어'라고 뜰 때 해결법</p>
+          </div>
+          <div class="grid-2">
+            <div class="step-box stagger-item">
+              <span class="step-num">Step 1</span>
+              <h3>시스템 환경 변수 검색</h3>
+              <p>윈도우 검색창에 <strong>'환경 변수'</strong>를 입력하고 ➔ <strong>'시스템 환경 변수 편집'</strong>을 실행합니다.</p>
+            </div>
+            <div class="step-box stagger-item">
+              <span class="step-num">Step 2</span>
+              <h3>변수 편집 창 진입</h3>
+              <p>하단의 <strong>[환경 변수]</strong> 버튼 클릭 ➔ '사용자 변수' 목록에서 <strong>'Path'</strong> 선택 ➔ <strong>[편집]</strong> 클릭</p>
+            </div>
+            <div class="step-box stagger-item">
+              <span class="step-num">Step 3</span>
+              <h3>경로 추가</h3>
+              <p><strong>[새로 만들기]</strong> 버튼 클릭 ➔ 아래 경로를 복사하여 붙여넣습니다.<br><code>%AppData%\npm</code></p>
+            </div>
+            <div class="step-box stagger-item">
+              <span class="step-num">Step 4</span>
+              <h3>완료 및 재시작</h3>
+              <p>모든 창의 <strong>[확인]</strong> 버튼을 누르고 ➔ <strong>반드시 VS Code를 껐다가 다시 켭니다.</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: STEP 4 Details -->
+    <div class="slide" data-slide="11">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Step 4. Skills</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">📊</span> 4단계: 전문 스킬(Skill) 부여</h2>
+            <p class="section-subtitle">AI에게 선생님의 업무 방식을 학습시킵니다</p>
+          </div>
+          <div class="grid-2">
+            <div class="step-box stagger-item">
+              <span class="step-num">4.1 파일 복사</span>
+              <h3>지침서 준비</h3>
+              <p>아래 버튼을 눌러 스킬 파일을 다운로드하고 압축을 풉니다. 압축 해제된 <strong>모든 파일과 폴더</strong>를 복사(Ctrl+C)하세요.</p>
+              <a href="https://drive.google.com/file/d/YOUR_DRIVE_FILE_ID/view?usp=sharing" class="download-btn" target="_blank">
+                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                Skill 파일(.zip) 다운로드
+              </a>
+            </div>
+            <div class="step-box stagger-item">
+              <span class="step-num">4.2 프로젝트 폴더에 붙여넣기</span>
+              <h3>GitHub Desktop에서 폴더 열기</h3>
+              <ol style="padding-left: 1.2rem; line-height: 2; margin: 0.4rem 0;">
+                <li>GitHub Desktop 실행</li>
+                <li>상단 메뉴 <strong>Repository</strong> 클릭</li>
+                <li><strong>Show in Explorer</strong> 클릭</li>
+                <li>열린 탐색기에서 <code>.claude</code> → <code>commands</code> 폴더로 이동</li>
+                <li>폴더가 없으면 <strong>직접 만들기</strong> (마우스 오른쪽 클릭 → 새 폴더)</li>
+                <li>해당 폴더에 <strong>붙여넣기 (Ctrl+V)</strong></li>
+              </ol>
+              <div style="margin-top: 0.5rem; background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 0.4rem; padding: 0.5rem 0.8rem; font-size: 0.85rem; color: #0369A1;">
+                📁 경로: <code>프로젝트폴더 / .claude / commands</code>
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box stagger-item" style="background: #FFFBEB; border-color: #FDE68A;">
+            <p style="color: #92400E;">💡 <strong>참고</strong>: 폴더가 보이지 않는다면 탐색기 상단 [보기 ➔ 숨긴 항목]을 체크해 주세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: Practice -->
+    <div class="slide" data-slide="12">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Let's Try</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🚀</span> 첫 번째 에이전틱 실습</h2>
+            <p class="section-subtitle">방금 구축한 환경으로 직접 PPT를 생성해봅시다</p>
+          </div>
+          <div class="highlight-box stagger-item" style="background: #0F172A; text-align: left; padding: 1.5rem;">
+            <p style="color: var(--style-accent); font-weight: 800; font-size: 0.8rem; margin-bottom: 0.5rem; text-transform: uppercase;">Command to type:</p>
+            <p style="color: #F8FAFC; font-size: 1.05rem; line-height: 1.5; font-family: monospace;">claude<br>/presentation-builder 정보 수업을 위한 'AI 윤리' 자료를 만들어줘. 중학생 대상이고 시각적으로 세련되게 10장 정도로 구성해줘.</p>
+          </div>
+          <div class="card stagger-item" style="margin-top: 1rem; border-color: var(--style-primary); border-width: 2px;">
+            <p style="text-align: center; font-weight: 700; color: var(--style-text);">명령어 한 줄로 AI가 기획부터 제작까지 수행하는<br><span style="color: var(--style-primary);">진정한 에이전틱 인공지능</span>을 경험해 보세요!</p>
+            <div style="text-align: center; margin-top: 1.2rem;">
+              <a href="../../../test/index.html" class="download-btn" style="background: var(--style-accent); color: #0F172A !important;">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                테스트 수업 자료 보기
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: Claude Skill Concept -->
+    <div class="slide" data-slide="13">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Claude Skill Concept</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🧩</span> Claude Skill이란 무엇인가?</h2>
+            <p class="section-subtitle">AI의 능력을 확장하는 '업무 지침서'</p>
+          </div>
+          <div class="grid-2">
+            <div class="card stagger-item">
+              <h3 class="card-title">지식과 도구의 결합</h3>
+              <p class="card-desc">AI에게 특정 작업을 수행하는 데 필요한 <strong>전문 지식</strong>과 사용할 수 있는 <strong>도구(파일 읽기, 명령어 등)</strong>를 정의한 파일입니다.</p>
+            </div>
+            <div class="card stagger-item" style="border-color: var(--style-accent);">
+              <h3 class="card-title">직관적인 비유</h3>
+              <p class="card-desc">요리사에게 주는 <strong>'특별 레시피'</strong> 또는 신입 사원에게 건네주는 상세한 <strong>'업무 매뉴얼'</strong>과 같습니다.</p>
+            </div>
+          </div>
+          <div class="highlight-box stagger-item">
+            <p>방금 설치한 <code>presentation-builder.md</code>는 Claude에게 <strong>"한국 교육 현장에 딱 맞는 세련된 프레젠테이션을 만드는 법"</strong>을 가르친 맞춤형 스킬입니다.</p>
+          </div>
+          <div class="card stagger-item" style="margin-top: 0.5rem; background: #F0F7FF;">
+            <p style="text-align: center; font-size: 0.95rem;">스킬을 통해 우리는 AI의 행동을 <strong>표준화</strong>하고, 복잡한 작업을 <strong>명령어 한 줄</strong>로 해결할 수 있습니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15: Presentation Builder Logic & Teaching Skills -->
+    <div class="slide" data-slide="14">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Skill Architecture</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">✨</span> Presentation Builder & Skill 확장</h2>
+            <p class="section-subtitle">에이전트의 능력을 이해하고 나만의 노하우 전수하기</p>
+          </div>
+          <div class="grid-2">
+            <div>
+              <h3 style="color: var(--style-primary); margin-bottom: 1rem;">📏 스킬에 포함된 내용 예시</h3>
+              <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                <div class="card stagger-item" style="padding: 0.8rem 1rem;">
+                  <strong style="color: var(--style-primary);">🎯 대상별 최적화</strong>
+                  <p style="font-size: 0.85rem; margin-top: 0.2rem;">초/중/고 학생, 교사 등 청중에 맞춘 어휘와 정중한 문체 적용</p>
+                </div>
+                <div class="card stagger-item" style="padding: 0.8rem 1rem;">
+                  <strong style="color: var(--style-primary);">📽️ 빔 가독성 표준</strong>
+                  <p style="font-size: 0.85rem; margin-top: 0.2rem;">투사 환경을 고려한 폰트 크기(22px+)와 명확한 색상 대비 준수</p>
+                </div>
+                <div class="card stagger-item" style="padding: 0.8rem 1rem;">
+                  <strong style="color: var(--style-primary);">🏗️ 구조적 배치 로직</strong>
+                  <p style="font-size: 0.85rem; margin-top: 0.2rem;">정보의 특성에 맞춰 타임라인, 비교표, 스텝박스 등 자동 선택</p>
+                </div>
+                <div class="card stagger-item" style="padding: 0.8rem 1rem;">
+                  <strong style="color: var(--style-primary);">💎 미학적 절제미</strong>
+                  <p style="font-size: 0.85rem; margin-top: 0.2rem;">이모지 예산제(슬라이드당 3개)로 깔끔하고 전문적인 레이아웃 유지</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 style="color: var(--style-accent); margin-bottom: 1rem;">👨‍🏫 나만의 노하우 가르치기</h3>
+              <p style="margin-bottom: 1rem; font-size: 0.9rem;">선생님의 노하우를 전달하여 <strong>AI의 업무 지침을 실시간으로 업데이트</strong>하세요.</p>
+              <div class="card stagger-item" style="background: #F8FAFC; border-color: #E2E8F0; border-left: 4px solid var(--style-accent);">
+                <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--style-text);">실전 프롬프트 예시</h4>
+                <div style="font-size: 0.85rem; line-height: 1.6; color: #475569; font-family: monospace;">
+                  • "로고 이미지를 모든 슬라이드 우측 상단에 배치해줘"<br>
+                  • "@[파일명]의 5~7 페이지에 있는 내용을 바탕으로 프레젠테이션을 만들어줘"<br>
+                  • "새로운 스킬 생성: 사용자가 입력한 지문과 요구사항을 바탕으로 문제지를 만들어주는 스킬"<br>
+                  • "@[저장한 이미지]의 스타일 디자인을 스킬에 추가해줘"<br>
+                  • "10페이지 'XYZ'에 내용을 가리는 빈 칸을 만들고 클릭하면 사라지게 해줘"<br>
+                  • "13페이지에 오늘 배운 내용을 바탕으로 카드 뒤집기 게임을 만들어줘"
+                </div>
+              </div>
+              <div class="info-box blue" style="margin-top: 1rem; font-size: 0.85rem; padding: 0.8rem;">
+                💡 에이전트와 대화하며 스킬을 다듬는 과정 자체가 선생님의 <strong>'AI 오케스트레이션 역량'</strong>이 됩니다.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 16: GitHub Publishing Steps -->
+    <div class="slide" data-slide="15">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Publishing Guide</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">🌐</span> 프레젠테이션 웹에 공유하기</h2>
+            <p class="section-subtitle">생성된 결과물을 전 세계 어디서든 볼 수 있게 웹 사이트로 배포합니다.</p>
+          </div>
+          <div class="grid-2">
+            <div>
+              <h3 style="color: var(--style-primary); margin-bottom: 1rem;">🚀 1단계: 코드 업로드</h3>
+              <div class="step-box stagger-item">
+                <span class="step-num">GitHub Desktop</span>
+                <p style="font-size: 0.85rem; line-height: 1.5;">
+                  1. 왼쪽 하단 <strong>Summary</strong> 칸에 "Create Slide" 입력<br>
+                  2. 파란색 <strong>Commit to main</strong> 버튼 클릭 (내 컴퓨터에 저장)<br>
+                  3. 상단 <strong>Push origin</strong> 클릭 (GitHub 서버로 전송)
+                </p>
+              </div>
+              <div class="info-box blue" style="font-size: 0.85rem;">
+                💡 <strong>커밋(Commit)</strong>은 '현재 상태 기록', <strong>푸시(Push)</strong>는 '서버 업로드'입니다.
+              </div>
+            </div>
+            <div>
+              <h3 style="color: var(--style-accent); margin-bottom: 1rem;">🌍 2단계: 웹 사이트로 활성화</h3>
+              <div class="step-box stagger-item" style="border-color: var(--style-accent);">
+                <span class="step-num">Settings ➔ Pages 설정</span>
+                <p style="font-size: 0.85rem; line-height: 1.5;">
+                  1. GitHub 저장소 상단 <strong>Settings</strong> ➔ 왼쪽 <strong>Pages</strong> 메뉴 클릭<br>
+                  2. Branch 섹션에서 None을 <strong>main</strong>으로 변경 후 <strong>Save</strong> 클릭<br>
+                  3. <strong>(필수)</strong> 저장소가 Private인 경우 <strong>General</strong> 메뉴 최하단 <strong>Change visibility</strong>에서 <strong>Public</strong>으로 변경해야 접속이 가능합니다.
+                </p>
+              </div>
+              <div class="card stagger-item" style="background: #F8FAFC; padding: 0.8rem; border-left: 4px solid var(--style-primary);">
+                <h4 style="font-size: 0.9rem; color: var(--style-primary); margin-bottom: 0.3rem;">🔗 내 웹 사이트 대표 주소</h4>
+                <p style="font-family: Montserrat, sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--style-primary); letter-spacing: 0;">
+                  https://[GitHub-ID].github.io
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 17: Claude Code Tips -->
+    <div class="slide" data-slide="16">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Claude Code Pro Tips</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">💡</span> 부록: 클로드 코드 활용 팁</h2>
+            <p class="section-subtitle">더 빠르고 스마트하게 AI 에이전트를 사용하는 방법</p>
+          </div>
+          <div class="grid-2">
+            <div>
+              <h3 style="color: var(--style-primary); margin-bottom: 1rem;">⌨️ 입력 및 실행 팁</h3>
+              <div class="step-box stagger-item">
+                <span class="step-num">Ctrl + Enter</span>
+                <p style="font-size: 0.85rem;">프롬프트를 작성할 때 줄을 띄우고 싶다면 사용하세요. 더 구조적인 명령이 가능해집니다.</p>
+              </div>
+              <div class="step-box stagger-item">
+                <span class="step-num">claude -c</span>
+                <p style="font-size: 0.85rem;">이전 작업의 맥락을 유지한 채 실행합니다. (Compact mode)</p>
+              </div>
+              <div class="step-box stagger-item">
+                <span class="step-num">Tab 키 활용</span>
+                <p style="font-size: 0.85rem;">파일 경로를 입력할 때 <strong>Tab</strong>을 누르면 자동으로 완성되어 오타를 줄여줍니다.</p>
+              </div>
+            </div>
+            <div>
+              <h3 style="color: var(--style-accent); margin-bottom: 1rem;">🛠️ 고급 기능 활용</h3>
+              <div class="step-box stagger-item" style="border-color: var(--style-accent);">
+                <span class="step-num">@ 기호 활용</span>
+                <p style="font-size: 0.85rem;"><code>@파일명</code> 또는 <code>@폴더명</code>을 입력하여 AI가 특정 자료를 집중적으로 참고하게 만드세요.</p>
+              </div>
+              <div class="step-box stagger-item" style="border-color: var(--style-accent);">
+                <span class="step-num">/plugins & 스킬</span>
+                <p style="font-size: 0.85rem;"><code>/plugins</code>로 새로운 기능을 탐색하거나, <code>pptx</code>와 같은 기능을 추가해서 활용하세요.</p>
+              </div>
+              <div class="info-box blue" style="font-size: 0.85rem;">
+                🔍 <strong>모를 땐 /help</strong>: 터미널에 <code>/help</code>를 입력하면 사용 가능한 모든 명령어 목록을 볼 수 있습니다.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 18: Collaboration Board -->
+    <div class="slide" data-slide="17">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">Collaboration Board</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon">📋</span> AI 교사 동아리 협업 보드 안내</h2>
+            <p class="section-subtitle">우리들의 결과물을 함께 나누고 소통하는 공간입니다.</p>
+          </div>
+          <div class="grid-2" style="align-items: center;">
+            <div class="stagger-item">
+              <img src="collaboration-board.png" alt="Collaboration Board" style="width: 100%; border-radius: 0.8rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            </div>
+            <div class="stagger-item">
+              <h3 style="color: var(--style-primary); margin-bottom: 1rem;">🌐 접속 및 공유 방법</h3>
+              <div class="step-box">
+                <span class="step-num">Step 1</span>
+                <p style="font-size: 0.9rem;"><strong>Spacekijun</strong> 접속<br>
+                  <a href="https://spacekijun.lovable.app" target="_blank" class="download-btn" style="background: var(--style-accent); color: #0F172A !important; margin-top: 0.4rem;">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    Spacekijun 바로가기
+                  </a>
+                </p>
+              </div>
+              <div class="step-box">
+                <span class="step-num">Step 2</span>
+                <p style="font-size: 0.9rem;"><strong>[협업 보드]</strong> 메뉴 ➔ <strong>[AI 교사 동아리]</strong> 보드 입장</p>
+              </div>
+              <div class="step-box" style="border-color: var(--style-accent);">
+                <span class="step-num">Step 3. 과제 제출</span>
+                <p style="font-size: 0.9rem;"><strong>"생성한 수업 페이지 공유"</strong> 노트에 댓글로 본인의 수업 페이지 주소를 올려주세요!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 19: End -->
+    <div class="slide" data-slide="18">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">The End</span>
+        </div>
+        <div class="browser-content" style="text-align: center; padding-top: 2rem;">
+          <h1 class="cover-title">경청해 주셔서 <span>감사합니다</span></h1>
+          <p style="font-size: 1.2rem; color: var(--style-text-secondary); margin-top: 0.5rem;">선생님의 혁신적인 AI 파트너십을 응원합니다.</p>
+          <div class="grid-2" style="max-width: 800px; margin: 1.5rem auto 0; text-align: left;">
+            <div class="card">
+              <h3 class="card-title">💡 기억하세요</h3>
+              <p class="card-desc">AI는 단순한 검색기가 아닌 유능한 조교입니다. 명확하게 지시하고 계속해서 피드백을 주세요.</p>
+            </div>
+            <div class="card">
+              <h3 class="card-title">📌 다음 단계</h3>
+              <p class="card-desc">수업 자료를 넘어 데이터 분석, 복잡한 행정 문서 등 반복 업무를 AI에게 맡겨보세요.</p>
+            </div>
+          </div>
+          <p style="margin-top: 2rem; color: var(--style-primary); font-weight: 800; letter-spacing: 0.1em;">샘플고등학교 AI 전문적학습동아리</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+    <span class="nav-counter"><input type="text" class="slide-input" id="slideInput" value="1"> / <span id="totalSlides">19</span></span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg></button>
+  </nav>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlidesCount = slides.length;
+    const progressBar = document.getElementById('progressBar');
+    const slideInput = document.getElementById('slideInput');
+    const totalSlidesEl = document.getElementById('totalSlides');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    totalSlidesEl.textContent = totalSlidesCount;
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlidesCount || index === currentSlide) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateUI();
+    }
+    function nextSlide() { if (currentSlide < totalSlidesCount - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+    function updateUI() {
+      const progress = ((currentSlide + 1) / totalSlidesCount) * 100;
+      progressBar.style.width = progress + '%';
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlidesCount - 1;
+    }
+
+    slideInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const n = parseInt(slideInput.value);
+        if (!isNaN(n) && n >= 1 && n <= totalSlidesCount) goToSlide(n - 1);
+        else slideInput.value = currentSlide + 1;
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      if (['ArrowRight', 'ArrowDown', ' '].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'ArrowUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlidesCount - 1); }
+    });
+
+    updateUI();
+  </script>
+  <script type="module" src="../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>글쓰기 프롬프트 설계 — 생활기록부 교과세특 AI 작성법</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── 1. Reset & CSS Variables (디지털 교과서 스타일) ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #FFFFFF;
+      --style-primary: #F27321;
+      --style-accent: #1B7ED4;
+      --style-text: #222222;
+      --style-text-secondary: #666666;
+      --cell-radius: 0.5rem;
+      --cell-gap: 0.6rem;
+    }
+
+    /* ── 2. Base Typography ── */
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Noto Sans KR', 'Inter', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      overflow: hidden;
+      height: 100%;
+    }
+    h1 { font-family: 'Noto Sans KR', 'Inter', sans-serif; font-size: 2.4rem; font-weight: 800; line-height: 1.2; }
+    h2 { font-family: 'Noto Sans KR', 'Inter', sans-serif; font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+    h3 { font-family: 'Noto Sans KR', 'Inter', sans-serif; font-size: 1.05rem; font-weight: 600; line-height: 1.4; }
+    p, li { line-height: 1.7; }
+
+    /* ── 3. Accessibility ── */
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-primary); color: #fff; padding: 8px 16px; z-index: 9999; font-size: 14px; border-radius: 0 0 4px 0; transition: top 0.2s; text-decoration: none; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-contrast: high) { :root { --style-primary: #C05020; --style-text: #000; --style-bg: #fff; } .browser-card { border: 2px solid #000; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+
+    /* ── 4. Slide Container ── */
+    .progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--style-primary); z-index: 100; transition: width 0.3s ease; transform: translateZ(0); will-change: width; }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0.8rem 1.2rem; opacity: 0; pointer-events: none; transform: translateZ(0); backface-visibility: hidden; transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* ── 5. Browser Card ── */
+    .browser-card { width: 100%; max-width: 1200px; max-height: calc(100vh - 4.8rem); display: flex; flex-direction: column; overflow: hidden; background: #fff; border-radius: 0.8rem; box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #E8E8E8; }
+    .browser-card--frameless { background: transparent; box-shadow: none; border: none; }
+    .browser-topbar { display: flex; align-items: center; padding: 0.5rem 1rem; background: var(--style-primary); border-radius: 0.8rem 0.8rem 0 0; min-height: 35px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+    .dot.red { background: rgba(255,255,255,0.45); }
+    .dot.yellow { background: rgba(255,255,255,0.65); }
+    .dot.green { background: rgba(255,255,255,0.9); }
+    .topbar-title { margin: 0 auto; color: rgba(255,255,255,0.92); font-size: 0.82rem; font-weight: 600; }
+    .browser-content { flex: 1; overflow-y: auto; padding: 1.2rem 2rem 1rem; }
+
+    /* ── 6. Section Header ── */
+    .section-header { margin-bottom: 0.8rem; border-bottom: 2px solid #F0F0F0; padding-bottom: 0.5rem; }
+    .section-header h2 { display: flex; align-items: center; color: var(--style-text); }
+    .section-icon { display: inline; font-size: 1.1em; margin-right: 0.4em; vertical-align: -0.05em; color: var(--style-primary); }
+    .section-subtitle { color: var(--style-text-secondary); font-size: 0.88rem; margin-top: 0.25rem; }
+
+    /* ── 7. Content Cards ── */
+    .bento-grid { display: grid; gap: var(--cell-gap); }
+    .bento-grid-2 { grid-template-columns: 1fr 1fr; }
+    .bento-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .bento-cell { border-radius: var(--cell-radius); padding: 0.8rem 1rem; display: flex; flex-direction: column; gap: 0.3rem; background: #fff; border: 1px solid #E8E8E8; }
+    /* 오렌지 강조 카드 (역할·주요 개념) */
+    .bento-cell--dark { background: #FFF8F3; border-left: 4px solid var(--style-primary); border-top: none; border-right: none; border-bottom: none; }
+    /* 정의 박스 (크림+노란 테두리) */
+    .bento-cell--accent { background: #FFFDE7; border-left: 4px solid #FFD600; border-top: none; border-right: none; border-bottom: none; }
+    /* 경고·보조 오렌지 */
+    .bento-cell--coral { background: #FFF3E0; border-left: 4px solid var(--style-primary); border-top: none; border-right: none; border-bottom: none; }
+    /* 핵심 요약 박스 (라이트 블루+파란 테두리) */
+    .bento-cell--teal { background: #E3F2FD; border-left: 4px solid var(--style-accent); border-top: none; border-right: none; border-bottom: none; }
+    /* 주요 강조 카드 (오렌지 솔리드) */
+    .bento-cell--purple { background: var(--style-primary); color: #fff; border: none; }
+    /* 보조 블루 카드 */
+    .bento-cell--lavender { background: #EEF4FF; border-left: 4px solid var(--style-accent); border-top: none; border-right: none; border-bottom: none; }
+    /* 섹션 구분 배경 */
+    .bento-cell--light { background: #F5F7FA; border: 1px solid #E8E8E8; }
+    .bento-cell--span2 { grid-column: span 2; }
+    .bento-cell h3 { font-size: 1rem; font-weight: 700; color: var(--style-text); }
+    .bento-cell--purple h3 { color: #fff; }
+    .bento-cell p { font-size: 0.88rem; line-height: 1.5; }
+    .bento-cell ul { padding-left: 1.1rem; font-size: 0.86rem; }
+    .bento-cell li { margin-bottom: 0.2rem; }
+    .bento-cell code { font-family: 'Consolas', 'Courier New', monospace; font-size: 0.82rem; background: rgba(0,0,0,0.06); padding: 0.1em 0.35em; border-radius: 4px; }
+    .bento-cell--purple code { background: rgba(255,255,255,0.2); }
+
+    /* ── 8. Stat Grid ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--cell-gap); }
+    .stat-item { border-radius: var(--cell-radius); padding: 0.8rem; text-align: center; }
+    .stat-num { font-size: 1.7rem; font-weight: 800; display: block; color: var(--style-primary); }
+    .stat-label { font-size: 0.82rem; margin-top: 0.2rem; display: block; line-height: 1.4; color: var(--style-text-secondary); }
+    .stat-item.bento-cell--purple .stat-num { color: #fff; }
+    .stat-item.bento-cell--purple .stat-label { color: rgba(255,255,255,0.85); }
+    .stat-item.bento-cell--teal .stat-num { color: var(--style-accent); }
+
+    /* ── 9. Task List ── */
+    .task-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .task-item { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.65rem 0.9rem; border-radius: 0.5rem; background: #fff; border: 1px solid #E8E8E8; border-left: 4px solid var(--style-primary); }
+    .task-num { background: var(--style-primary); color: #fff; width: 1.6rem; height: 1.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; margin-top: 0.1rem; }
+    .task-num--purple { background: var(--style-primary); }
+    .task-item h3 { font-size: 0.95rem; margin-bottom: 0.1rem; color: var(--style-text); }
+    .task-item p { font-size: 0.85rem; color: var(--style-text-secondary); }
+
+    /* ── 10. Two Column ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .col-box { background: #F5F7FA; border-radius: var(--cell-radius); padding: 0.8rem 1rem; border: 1px solid #E8E8E8; }
+    .col-box--dark { background: #FFF8F3; border-left: 4px solid var(--style-primary); border-top: 1px solid #FFE8D0; border-right: 1px solid #FFE8D0; border-bottom: 1px solid #FFE8D0; }
+    .col-box--bad { background: #FFF5F5; border-left: 4px solid #E53935; }
+    .col-box--good { background: #F0FFF9; border-left: 4px solid var(--style-accent); }
+
+    /* ── 11. Comparison Table ── */
+    .comp-table { width: 100%; border-collapse: collapse; border-radius: 0.5rem; overflow: hidden; font-size: 0.86rem; }
+    .comp-table th { background: var(--style-primary); color: #fff; padding: 0.45rem 0.8rem; text-align: left; font-weight: 600; }
+    .comp-table td { padding: 0.4rem 0.8rem; border-bottom: 1px solid #E8E8E8; vertical-align: middle; }
+    .comp-table tr:nth-child(even) td { background: #F5F7FA; }
+    .comp-table code { font-size: 0.8rem; background: rgba(0,0,0,0.06); padding: 0.1em 0.3em; border-radius: 3px; font-family: 'Consolas', monospace; }
+
+    /* ── 12. Highlight Box (핵심 요약 박스) ── */
+    .highlight-box { background: #E3F2FD; border-left: 4px solid var(--style-accent); color: var(--style-text); padding: 0.65rem 1rem 0.65rem 1.2rem; border-radius: 0 0.5rem 0.5rem 0; font-size: 0.88rem; font-weight: 500; }
+    .highlight-box code { background: rgba(27,126,212,0.1); font-family: 'Consolas', monospace; font-size: 0.82rem; padding: 0.1em 0.3em; border-radius: 3px; }
+    .highlight-box--purple { background: var(--style-primary); color: #fff; border-left-color: #C05A18; }
+
+    /* ── 13. Prompt Block (정의 박스 스타일) ── */
+    .prompt-block { background: #FFFDE7; border: 1px solid rgba(255,214,0,0.35); border-left: 4px solid #FFD600; border-radius: 0 0.5rem 0.5rem 0; padding: 0.55rem 0.8rem; font-size: 0.82rem; line-height: 1.75; margin-top: 0.3rem; }
+    .prompt-block--bad { border-left-color: #E53935; background: #FFF5F5; border-color: rgba(229,57,53,0.2); }
+    .prompt-block .ptag { color: #B45309; font-weight: 700; font-size: 0.75rem; display: inline-block; min-width: 3.5em; }
+    .prompt-block .pval { color: var(--style-text); }
+    .col-box--dark .prompt-block { background: #FFFDE7; border-left: 4px solid #FFD600; border-top: 1px solid rgba(255,214,0,0.3); border-right: 1px solid rgba(255,214,0,0.3); border-bottom: 1px solid rgba(255,214,0,0.3); }
+    .col-box--dark .prompt-block .ptag { color: #B45309; }
+    .col-box--dark .prompt-block .pval { color: var(--style-text); }
+    .col-box--dark .prompt-block--bad { border-left-color: #E53935; background: #FFF5F5; border-color: rgba(229,57,53,0.2); }
+
+    /* ── 14. Status Badge ── */
+    .status-badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 0.3rem; font-size: 0.72rem; font-weight: 700; margin-bottom: 0.4rem; letter-spacing: 0.02em; }
+    .status-badge--bad { background: #E53935; color: #fff; }
+    .status-badge--good { background: var(--style-accent); color: #fff; }
+
+    /* ── 15. Issue List ── */
+    .issue-list { list-style: none; padding: 0; margin-top: 0.4rem; font-size: 0.82rem; }
+    .issue-list li { padding: 0.15rem 0; padding-left: 1.2em; position: relative; color: var(--style-text-secondary); }
+    .issue-list li::before { content: "✗"; position: absolute; left: 0; color: #E53935; font-weight: 700; }
+
+    /* ── 16. Cover ── */
+    .cover-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 100%; }
+    .cover-badge { display: inline-block; background: var(--style-primary); color: #fff; padding: 0.3rem 1rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 700; margin-bottom: 1.2rem; letter-spacing: 0.05em; }
+    .cover-title { margin-bottom: 0.6rem; }
+    .cover-subtitle { color: var(--style-text-secondary); font-size: 1.05rem; font-weight: 400; margin-bottom: 1.5rem; }
+    .cover-divider { width: 60px; height: 4px; background: var(--style-primary); border-radius: 2px; margin: 0 auto 1rem; }
+    .cover-meta { font-size: 0.88rem; color: var(--style-text-secondary); display: flex; gap: 0.5rem; justify-content: center; }
+
+    /* ── 17. End Slide ── */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 100%; }
+    .end-title { font-size: 1.8rem; margin-bottom: 1rem; }
+    .end-summary { max-width: 680px; text-align: left; }
+    .end-summary ul { list-style: none; padding: 0; }
+    .end-summary li { padding: 0.25rem 0; font-size: 0.9rem; line-height: 1.5; }
+
+    /* ── 18. Animations ── */
+    @keyframes popUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide.active .bento-cell,
+    .slide.active .stat-item,
+    .slide.active .task-item { animation: popUp 0.4s ease-out both; }
+    .slide.active .bento-cell:nth-child(2),
+    .slide.active .stat-item:nth-child(2),
+    .slide.active .task-item:nth-child(2) { animation-delay: 0.07s; }
+    .slide.active .bento-cell:nth-child(3),
+    .slide.active .stat-item:nth-child(3),
+    .slide.active .task-item:nth-child(3) { animation-delay: 0.14s; }
+    .slide.active .bento-cell:nth-child(4),
+    .slide.active .task-item:nth-child(4) { animation-delay: 0.21s; }
+    .slide.active .bento-cell:nth-child(5) { animation-delay: 0.28s; }
+    .slide.active .bento-cell:nth-child(6) { animation-delay: 0.35s; }
+
+    /* ── 19. Nav Bar ── */
+    .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 42px; background: #2D3748; display: flex; align-items: center; justify-content: center; gap: 0.8rem; z-index: 50; padding: 0 1rem; }
+    .nav-btn { background: none; border: none; cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: background 0.2s; }
+    .nav-btn:hover { background: rgba(255,255,255,0.15); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn:disabled:hover { background: none; }
+    .nav-btn svg { width: 18px; height: 18px; fill: #fff; }
+    .nav-counter { color: rgba(255,255,255,0.7); font-size: 14px; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 2px; }
+    .slide-input { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 28px; text-align: center; font-size: 14px; font-family: 'Inter', sans-serif; border-radius: 4px; padding: 2px; }
+    .slide-input:focus { outline: 2px solid var(--style-primary); }
+
+    /* ── 20. Responsive ── */
+    @media (max-width: 1024px) { html, body { font-size: clamp(15px, 2vw, 22px); } }
+    @media (max-width: 768px) { .bento-grid-2, .bento-grid-3, .stat-grid, .two-col { grid-template-columns: 1fr; } .bento-cell--span2 { grid-column: span 1; } }
+    @media (max-width: 480px) { html, body { font-size: clamp(14px, 3.5vw, 18px); } .browser-content { padding: 0.8rem; } h1 { font-size: 1.7rem; } h2 { font-size: 1.2rem; } }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="12" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ═══ Slide 1: Cover ═══ -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <div class="cover-badge">정보 · 프롬프트 설계</div>
+          <h1 class="cover-title">글쓰기 프롬프트 설계</h1>
+          <p class="cover-subtitle">AI로 자기평가문 작성하기</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>샘플고등학교</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026">2026학년도</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 2: 오늘 배울 내용 ═══ -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 오늘 배울 내용">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">오늘의 목표</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 오늘 배울 3가지</h2>
+            <p class="section-subtitle">AI를 제대로 활용하는 핵심 기술 — 프롬프트 설계</p>
+          </div>
+          <div class="stat-grid">
+            <div class="stat-item bento-cell--dark">
+              <span class="stat-num">01</span>
+              <span class="stat-label">프롬프트란?<br>좋은 입력 = 좋은 출력</span>
+            </div>
+            <div class="stat-item bento-cell--purple">
+              <span class="stat-num">02</span>
+              <span class="stat-label">고급 기법<br>예시 제시 · 절차 설명 · 재료 제공</span>
+            </div>
+            <div class="stat-item bento-cell--teal">
+              <span class="stat-num">03</span>
+              <span class="stat-label">자기평가문 실습<br>내 활동 → 프롬프트 → 결과</span>
+            </div>
+          </div>
+          <div class="bento-grid bento-grid-2" style="margin-top:0.5rem;">
+            <div class="bento-cell bento-cell--accent">
+              <h3>이 수업이 중요한 이유</h3>
+              <p>AI에게 "잘 물어보는 능력"이 곧 AI 활용 능력. 같은 AI도 프롬프트에 따라 결과가 완전히 달라집니다.</p>
+            </div>
+            <div class="bento-cell bento-cell--light">
+              <h3>오늘의 실습 목표</h3>
+              <p>4요소 기본기 + 예시 제시·절차 설명·재료 제공 고급 기법까지 익혀서, 내 활동을 자기평가문 프롬프트로 직접 설계합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 3: 프롬프트란? ═══ -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 프롬프트란">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">프롬프트 개념</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프롬프트란?</h2>
+            <p class="section-subtitle">AI에게 보내는 지시문 — 질문의 질이 답변의 질을 결정합니다</p>
+          </div>
+          <div class="bento-grid bento-grid-3">
+            <div class="bento-cell bento-cell--dark">
+              <h3>AI 글쓰기 도구</h3>
+              <p>ChatGPT, Claude, Gemini 등 대형언어모델(LLM) 기반 도구들</p>
+              <p style="font-size:0.8rem;margin-top:0.2rem;opacity:0.7;">지난 수업에서 배운 LLM을 활용합니다</p>
+            </div>
+            <div class="bento-cell bento-cell--purple">
+              <h3>프롬프트 (Prompt)</h3>
+              <p>AI에게 입력하는 텍스트 지시문. 무엇을, 어떻게 해달라는 요청 전체를 말합니다.</p>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <h3>핵심 원리</h3>
+              <p><strong>좋은 프롬프트 → 좋은 결과</strong></p>
+              <p style="font-size:0.82rem;margin-top:0.2rem;">구체적·명확·구조화된 입력일수록 원하는 결과가 나옵니다</p>
+            </div>
+          </div>
+          <div class="bento-grid bento-grid-2" style="margin-top:0.5rem;">
+            <div class="bento-cell bento-cell--light">
+              <h3>글쓰기에서 AI가 잘 하는 것</h3>
+              <ul>
+                <li>공식 문체로 내용 정리·다듬기</li>
+                <li>키워드를 문단으로 확장하기</li>
+                <li>다양한 표현으로 바꿔 쓰기</li>
+                <li>분량에 맞게 조절하기</li>
+              </ul>
+            </div>
+            <div class="bento-cell bento-cell--light">
+              <h3>AI가 못 하는 것 (내가 해야 할 것)</h3>
+              <ul>
+                <li>내가 실제로 한 활동 내용 파악</li>
+                <li>내가 느낀 점·배운 점 진술</li>
+                <li>구체적인 수치·날짜·결과 제공</li>
+                <li>교과별 특수 맥락 설명</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 4: 좋은 vs 나쁜 프롬프트 ═══ -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 좋은 프롬프트 vs 나쁜 프롬프트">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">프롬프트 비교</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 좋은 프롬프트 vs 나쁜 프롬프트</h2>
+            <p class="section-subtitle">같은 AI에게 같은 주제를 물어도 결과가 완전히 다릅니다</p>
+          </div>
+          <div class="two-col">
+            <div class="col-box col-box--bad">
+              <span class="status-badge status-badge--bad">나쁜 프롬프트</span>
+              <div class="prompt-block prompt-block--bad">
+                "자기평가문 써줘"
+              </div>
+              <ul class="issue-list" style="margin-top:0.6rem;">
+                <li>어떤 활동을 했는지 설명 없음</li>
+                <li>내가 배운 것·느낀 점 없음</li>
+                <li>길이·문체·형식 지정 없음</li>
+                <li>결과: 누구에게나 해당하는 공허한 문장</li>
+              </ul>
+            </div>
+            <div class="col-box col-box--good">
+              <span class="status-badge status-badge--good">좋은 프롬프트</span>
+              <div class="prompt-block" style="font-size:0.8rem;">
+                <span class="ptag">[역할]</span><span class="pval"> 나는 고2 학생이야.</span><br>
+                <span class="ptag">[맥락]</span><span class="pval"> 정보 수업에서 AI 이미지 생성 프로젝트를 했어. 프롬프트를 3번 수정하며 원하는 이미지에 가까워지는 걸 배웠어.</span><br>
+                <span class="ptag">[과제]</span><span class="pval"> 이 활동에 대한 자기평가문을 작성해줘.</span><br>
+                <span class="ptag">[형식]</span><span class="pval"> 200자 이내, 1인칭, 활동 내용·배운 점·느낀 점 포함.</span>
+              </div>
+              <p style="font-size:0.82rem;color:#1B7ED4;margin-top:0.5rem;font-weight:600;">→ 나만의 경험이 담긴 자기평가문 초안 생성!</p>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.7rem;">
+            <strong>핵심 차이:</strong> AI는 내 경험을 모른다. 내가 무엇을 했는지 구체적으로 알려줄수록 결과가 좋아집니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 5: 프롬프트 설계 4요소 ═══ -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 프롬프트 설계 4요소">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">프롬프트 4요소</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프롬프트 설계 4요소</h2>
+            <p class="section-subtitle">이 4가지를 채우면 좋은 프롬프트가 완성됩니다</p>
+          </div>
+          <div class="bento-grid bento-grid-2">
+            <div class="bento-cell bento-cell--dark">
+              <h3>① 역할 (Role)</h3>
+              <p>내가 누구인지 AI에게 알려주기</p>
+              <p style="margin-top:0.3rem;font-size:0.82rem;opacity:0.8;">예: "나는 고2 학생이야" "나는 ○○고 2학년이야"</p>
+            </div>
+            <div class="bento-cell bento-cell--purple">
+              <h3>② 맥락 (Context)</h3>
+              <p>어떤 수업에서 무슨 활동을 했는지 설명</p>
+              <p style="margin-top:0.3rem;font-size:0.82rem;opacity:0.85;">예: "1학기 수학 수업에서 통계 데이터 분석 프로젝트를 했어. 팀장으로 발표를 이끌었어."</p>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <h3>③ 과제 (Task)</h3>
+              <p>AI에게 원하는 것을 명확하게 지시</p>
+              <p style="margin-top:0.3rem;font-size:0.82rem;">예: "이 활동에 대한 자기평가문을 작성해줘" "자기평가문 초안을 만들어줘"</p>
+            </div>
+            <div class="bento-cell bento-cell--accent">
+              <h3>④ 형식 (Format)</h3>
+              <p>결과물의 길이·문체·스타일 지정</p>
+              <p style="margin-top:0.3rem;font-size:0.82rem;">예: "200자 이내, 3인칭으로" "학교생활기록부 문체로, 띄어쓰기 포함 500자"</p>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            4요소를 모두 채울수록 더 좋은 결과! &nbsp;|&nbsp; 처음에는 태그 <strong>[역할] [맥락] [과제] [형식]</strong>을 그대로 붙여 쓰고, 각 항목을 채워보세요.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 6: 예시 제시 기법 ═══ -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 예시 제시 기법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">예시 제시 기법</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 예시를 주면 AI가 따라합니다 — One-shot / Few-shot</h2>
+            <p class="section-subtitle">원하는 결과물의 형식·문체를 보여주면 AI가 그 스타일로 작성합니다</p>
+          </div>
+          <div class="bento-grid bento-grid-3" style="margin-bottom:0.6rem;">
+            <div class="bento-cell bento-cell--light">
+              <h3>Zero-shot</h3>
+              <p>예시 없이 지시만</p>
+              <p style="font-size:0.82rem;margin-top:0.3rem;color:var(--style-text-secondary);">→ AI가 일반적인 형식으로 작성. 기대와 다를 수 있음</p>
+            </div>
+            <div class="bento-cell bento-cell--dark">
+              <h3>One-shot</h3>
+              <p>원하는 결과 예시 1개 제공</p>
+              <p style="font-size:0.82rem;margin-top:0.3rem;color:var(--style-text-secondary);">→ AI가 예시의 길이·문체·구조를 파악하여 비슷하게 작성</p>
+            </div>
+            <div class="bento-cell bento-cell--purple">
+              <h3>Few-shot</h3>
+              <p>좋은 예시 2~3개 제공</p>
+              <p style="font-size:0.82rem;margin-top:0.3rem;opacity:0.85;">→ 패턴을 파악하여 더 일관된 결과 생성</p>
+            </div>
+          </div>
+          <div class="bento-cell bento-cell--accent">
+            <h3>One-shot 프롬프트 예시 ([형식]에 예시 추가)</h3>
+            <div class="prompt-block" style="font-size:0.79rem;margin-top:0.3rem;">
+              <span class="ptag">[역할]</span><span class="pval"> 나는 고2 학생이야.</span><br>
+              <span class="ptag">[맥락]</span><span class="pval"> 정보 수업에서 AI 이미지 생성 프로젝트를 했어. 프롬프트를 3번 수정하며 원하는 결과에 가까워지는 걸 배웠어.</span><br>
+              <span class="ptag">[과제]</span><span class="pval"> 자기평가문을 작성해줘. 아래 예시와 같은 문체·길이로.</span><br>
+              <span class="ptag">[예시]</span><span class="pval"> "수학 수업에서 통계 프로젝트를 수행하며 데이터 뒤에 숨겨진 의미를 읽어내는 능력이 중요함을 깨달았다. 단순히 수치를 계산하는 데서 그치지 않고…"</span><br>
+              <span class="ptag">[형식]</span><span class="pval"> 1인칭, 200자 이내.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 7: 절차 설명 기법 ═══ -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 절차 설명 기법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">절차 설명 기법</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 생각하는 순서를 알려주세요 — 절차 설명 기법</h2>
+            <p class="section-subtitle">AI에게 단계별 작성 순서를 지시하면 구조적인 결과를 얻습니다</p>
+          </div>
+          <div class="two-col" style="margin-bottom:0.55rem;">
+            <div class="col-box col-box--bad">
+              <span class="status-badge status-badge--bad">절차 없이</span>
+              <div class="prompt-block prompt-block--bad" style="font-size:0.83rem;margin-top:0.4rem;">
+                [과제] 자기평가문을 작성해줘.
+              </div>
+              <p style="font-size:0.82rem;color:var(--style-text-secondary);margin-top:0.4rem;">→ AI가 임의 순서로 작성. 배운 점이 빠지거나 활동 나열에 그칠 수 있음</p>
+            </div>
+            <div class="col-box col-box--good">
+              <span class="status-badge status-badge--good">절차 포함</span>
+              <div class="prompt-block" style="font-size:0.83rem;margin-top:0.4rem;">
+                [과제] 다음 순서로 자기평가문을 작성해줘:<br>
+                ① 내가 한 활동을 1~2문장으로 요약<br>
+                ② 그 과정에서 배운 점·역량을 서술<br>
+                ③ 느낀 점과 앞으로의 다짐으로 마무리
+              </div>
+              <p style="font-size:0.82rem;color:#1B7ED4;margin-top:0.4rem;">→ 구조가 잡힌 완성도 높은 자기평가문 생성</p>
+            </div>
+          </div>
+          <div class="highlight-box">
+            <strong>절차 설명이 특히 유용한 경우:</strong> 여러 항목을 모두 포함해야 할 때 &nbsp;|&nbsp; 특정 순서로 내용이 전개되어야 할 때 &nbsp;|&nbsp; AI가 중요한 내용을 빠뜨릴 때
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 8: 재료 제공 기법 ═══ -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 재료 제공 기법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">재료 제공 기법</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 내 글을 재료로 주세요 — 재료 제공 기법</h2>
+            <p class="section-subtitle">기존에 작성한 보고서·메모를 프롬프트에 붙여넣어 AI가 활용하게 합니다</p>
+          </div>
+          <div class="two-col" style="margin-bottom:0.55rem;">
+            <div class="col-box col-box--bad">
+              <span class="status-badge status-badge--bad">재료 없이</span>
+              <div class="prompt-block prompt-block--bad" style="font-size:0.83rem;margin-top:0.4rem;">
+                [과제] 내 환경 캠페인 활동을 자기평가문으로 써줘.
+              </div>
+              <p style="font-size:0.82rem;color:var(--style-text-secondary);margin-top:0.4rem;">→ AI가 내용을 모르므로 일반적이고 막연한 글 생성</p>
+            </div>
+            <div class="col-box col-box--good">
+              <span class="status-badge status-badge--good">재료 제공</span>
+              <div class="prompt-block" style="font-size:0.83rem;margin-top:0.4rem;">
+                [재료] 아래는 내가 쓴 활동 보고서야:<br>
+                ... (복사 -&gt; 붙여넣기)<br><br>
+                [과제] 위 보고서를 바탕으로 무엇을 했는지, 어떻게 했는지를 분석하여 자기평가문에 활용
+              </div>
+              <p style="font-size:0.82rem;color:#1B7ED4;margin-top:0.4rem;">→ 내 실제 활동을 반영한 구체적인 자기평가문 생성</p>
+            </div>
+          </div>
+          <div class="highlight-box">
+            <strong>재료 제공 기법의 핵심:</strong> [재료] 태그로 원문을 먼저 제시 &nbsp;|&nbsp; [과제] 태그로 재료를 어떻게 처리할지 지시 &nbsp;|&nbsp; 메모·보고서·키워드 목록 모두 재료가 될 수 있음
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 9: 고급 기법 3가지 정리 ═══ -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 고급 기법 3가지 정리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">고급 기법 3가지 정리</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 고급 기법 3가지 한눈에 보기</h2>
+            <p class="section-subtitle">기본 4요소 위에 고급 기법을 얹으면 결과물의 완성도가 높아집니다</p>
+          </div>
+          <div class="bento-grid bento-grid-3">
+            <div class="bento-cell bento-cell--purple">
+              <h3>① 예시 제시</h3>
+              <p style="font-size:0.85rem;margin-bottom:0.5rem;">내가 원하는 문체·형식의 예시를 프롬프트에 직접 보여주는 방법</p>
+              <div class="prompt-block" style="font-size:0.8rem;">
+                [과제] 아래 예시 문체로 작성해줘:<br>
+                "나는 이번 활동에서 …"
+              </div>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <h3>② 절차 설명</h3>
+              <p style="font-size:0.85rem;margin-bottom:0.5rem;">AI가 생각하는 순서를 단계별로 지정해 구조적인 결과를 얻는 방법</p>
+              <div class="prompt-block" style="font-size:0.8rem;">
+                [과제] ① 활동 요약<br>
+                → ② 배운 점<br>
+                → ③ 느낀 점·다짐 순서로 작성해줘
+              </div>
+            </div>
+            <div class="bento-cell bento-cell--accent">
+              <h3>③ 재료 제공</h3>
+              <p style="font-size:0.85rem;margin-bottom:0.5rem;">기존에 작성한 보고서·메모를 원문 재료로 넣어 AI가 활용하게 하는 방법</p>
+              <div class="prompt-block" style="font-size:0.8rem;">
+                [재료] 아래는 내가 쓴 보고서야:<br>
+                ... (붙여넣기)<br>
+                [과제] 위 내용을 분석하여 활용
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.55rem;">
+            <strong>조합도 가능:</strong> 재료 제공 + 절차 설명을 함께 쓰면 내 실제 내용을 원하는 구조로 정리할 수 있습니다
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 10: 자기평가문이란? ═══ -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 자기평가문이란">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">자기평가문이란?</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 자기평가문이란?</h2>
+            <p class="section-subtitle">수업 활동·학습 경험에 대해 자기 자신을 객관적으로 평가하는 글</p>
+          </div>
+          <div class="bento-grid bento-grid-3">
+            <div class="bento-cell bento-cell--dark">
+              <h3>자기평가문 개념</h3>
+              <p>수업 활동·학습 경험을 바탕으로 자기 자신을 객관적으로 돌아보고 평가하는 1인칭 글</p>
+            </div>
+            <div class="bento-cell bento-cell--purple">
+              <h3>자기평가문의 구성</h3>
+              <ul style="font-size:0.85rem;">
+                <li><strong>활동 내용</strong> — 무엇을 했나</li>
+                <li><strong>배운 점</strong> — 어떤 지식·역량을 얻었나</li>
+                <li><strong>느낀 점</strong> — 과정에서 어떤 생각을 했나</li>
+              </ul>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <h3>언제 쓰나?</h3>
+              <ul style="font-size:0.85rem;">
+                <li>수행평가 자기평가 항목</li>
+                <li>포트폴리오 소개 글</li>
+                <li>프로젝트 마무리 성찰</li>
+                <li>활동 보고서 소감</li>
+              </ul>
+            </div>
+          </div>
+          <div class="bento-grid bento-grid-2" style="margin-top:0.5rem;">
+            <div class="bento-cell bento-cell--accent">
+              <h3>AI가 도움이 되는 부분</h3>
+              <p>내가 메모한 키워드와 경험을 입력하면 → 자연스러운 문장으로 정리·확장·다듬기</p>
+            </div>
+            <div class="bento-cell bento-cell--light">
+              <h3>주의사항</h3>
+              <p>AI 초안은 방향만 잡아주는 도구. 실제 느낀 점·구체적 사실은 반드시 내 언어로 수정·보완해야 합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 11: 활동 → 프롬프트 구조화 ═══ -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 활동을 프롬프트에 담는 법">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">활동 → 프롬프트 구조화</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 실제 활동을 자기평가문 프롬프트로 만드는 4단계</h2>
+            <p class="section-subtitle">내가 한 활동을 구조화하면 좋은 프롬프트가 됩니다</p>
+          </div>
+          <div class="task-list">
+            <div class="task-item">
+              <span class="task-num task-num--purple">1</span>
+              <div>
+                <h3>평가할 활동 선택</h3>
+                <p>이번 학기 수업 중 기억에 남는 활동 1개 선택 → 수행평가 발표 / 실험·실습 / 독서 토론 / 프로젝트 등 자유롭게</p>
+              </div>
+            </div>
+            <div class="task-item">
+              <span class="task-num task-num--purple">2</span>
+              <div>
+                <h3>활동 내용 메모 (4가지)</h3>
+                <p><strong>무엇을 했나</strong> (활동명·소재) &nbsp;|&nbsp; <strong>어떻게 했나</strong> (방법·나의 역할) &nbsp;|&nbsp; <strong>배운 점</strong> (지식·역량) &nbsp;|&nbsp; <strong>느낀 점</strong> (생각·깨달음·아쉬운 점)</p>
+              </div>
+            </div>
+            <div class="task-item">
+              <span class="task-num task-num--purple">3</span>
+              <div>
+                <h3>4요소 프롬프트 작성</h3>
+                <p>[역할] 나는 고2 학생 &nbsp;|&nbsp; [맥락] 2단계에서 메모한 내용 &nbsp;|&nbsp; [과제] 자기평가문 작성 &nbsp;|&nbsp; [형식] 200자 이내, 1인칭, 활동 내용·배운 점·느낀 점 포함</p>
+              </div>
+            </div>
+            <div class="task-item">
+              <span class="task-num task-num--purple">4</span>
+              <div>
+                <h3>AI 초안 검토 &amp; 내 언어로 수정</h3>
+                <p>AI 초안 확인 → 사실과 다른 부분·과장된 표현 수정 → 내가 실제로 느낀 점을 구체적으로 보완 → 필요 시 재요청</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 12: 자기평가문 프롬프트 예시 ═══ -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: 자기평가문 프롬프트 예시">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">자기평가문 프롬프트 예시</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 완성된 자기평가문 프롬프트 예시</h2>
+            <p class="section-subtitle">아래 예시를 참고하여 내 활동에 맞게 바꿔보세요</p>
+          </div>
+          <div class="two-col">
+            <div class="col-box col-box--dark">
+              <div style="margin-bottom:0.35rem;">
+                <span class="status-badge status-badge--good">국어 수업 예시</span>
+              </div>
+              <div class="prompt-block" style="font-size:0.78rem;">
+                <span class="ptag">[역할]</span><span class="pval"> 나는 고2 학생이야.</span><br>
+                <span class="ptag">[맥락]</span><span class="pval"> 국어 수업에서 소설 '파친코'를 읽고 팀 토론을 했어. 조장 역할을 맡아 토론 방향을 이끌었고, 처음에는 의견 조율이 어려웠지만 적극적으로 발언을 정리하면서 팀이 결론을 낼 수 있었어.</span><br>
+                <span class="ptag">[과제]</span><span class="pval"> 이 활동에 대한 자기평가문을 작성해줘.</span><br>
+                <span class="ptag">[형식]</span><span class="pval"> 200자 이내, 1인칭, 활동 내용·배운 점·느낀 점 포함.</span>
+              </div>
+            </div>
+            <div class="col-box col-box--dark">
+              <div style="margin-bottom:0.35rem;">
+                <span class="status-badge status-badge--good">정보 수업 예시</span>
+              </div>
+              <div class="prompt-block" style="font-size:0.78rem;">
+                <span class="ptag">[역할]</span><span class="pval"> 나는 고2 학생이야.</span><br>
+                <span class="ptag">[맥락]</span><span class="pval"> 정보 수업에서 AI 이미지 생성 프로젝트를 했어. 프롬프트를 3번 수정하며 원하는 이미지에 가까워지는 걸 경험했어. 처음엔 막막했는데 구체적으로 쓸수록 좋은 결과가 나온다는 걸 깨달았어.</span><br>
+                <span class="ptag">[과제]</span><span class="pval"> 이 활동에 대한 자기평가문을 작성해줘.</span><br>
+                <span class="ptag">[형식]</span><span class="pval"> 200자 이내, 1인칭, 활동·배운 점·느낀 점 포함.</span>
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.7rem;">
+            맥락이 핵심! 활동명만 쓰지 말고 <strong>내 역할·어려웠던 점·깨달은 것</strong>을 구체적으로 넣을수록 진짜 나다운 자기평가문이 나옵니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 13: 초안 다듬기의 중요성 ═══ -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 13: 초안 다듬기의 중요성">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">초안 다듬기</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> AI 초안, 왜 잘 다듬어야 할까?</h2>
+            <p class="section-subtitle">AI 출력물은 출발점 — 진짜 글은 다듬는 과정에서 완성됩니다</p>
+          </div>
+          <div class="bento-grid bento-grid-2">
+            <div class="bento-cell bento-cell--dark">
+              <h3>AI 글은 '평균'이다</h3>
+              <p>AI는 수백만 개 글의 평균값. 내 실제 경험의 감동과 구체적인 맥락은 내가 직접 채워야 합니다.</p>
+            </div>
+            <div class="bento-cell bento-cell--teal">
+              <h3>진정성이 평가의 핵심</h3>
+              <p>평가자는 학생의 진짜 성장이 담긴 글을 원합니다. 내 목소리가 없는 글은 설득력을 잃습니다.</p>
+            </div>
+            <div class="bento-cell bento-cell--accent">
+              <h3>사실 오류 점검 필수</h3>
+              <p>AI는 내가 알려준 맥락만 압니다. 날짜·수치·활동 내용을 잘못 표현하거나 과장할 수 있습니다.</p>
+            </div>
+            <div class="bento-cell bento-cell--light">
+              <h3>글쓰기 역량은 내 것</h3>
+              <p>프롬프트 작성 → 초안 생성 → 내 언어로 수정. 이 전 과정이 나의 AI 글쓰기 역량이 됩니다.</p>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            AI는 <strong>초안 생성 도구</strong>, 완성은 내 몫. "내 언어로 수정"이 가장 중요한 단계입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 14: 실습 안내 ═══ -->
+    <div class="slide" data-slide="13" role="region" aria-label="슬라이드 14: 실습 안내">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">실습</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 실습: 내 자기평가문 프롬프트 직접 만들기</h2>
+            <p class="section-subtitle">교과·활동은 자유롭게 선택 — 기본 4요소 + 고급 기법까지 적용해보세요</p>
+          </div>
+          <div class="task-list">
+            <div class="task-item">
+              <span class="task-num task-num--purple">1</span>
+              <div>
+                <h3>평가할 활동 1개 선택</h3>
+                <p>이번 학기에 기억에 남는 수업 활동 1개 선택 — 국어·수학·영어·사회·과학·정보·예체능 자유롭게</p>
+              </div>
+            </div>
+            <div class="task-item">
+              <span class="task-num task-num--purple">2</span>
+              <div>
+                <h3>활동 내용 메모 (4가지)</h3>
+                <p>무엇을 했나 &nbsp;|&nbsp; 내 역할·방법은 &nbsp;|&nbsp; 무엇을 배웠나 &nbsp;|&nbsp; 어떤 점을 느꼈나 — 짧은 키워드라도 구체적으로</p>
+              </div>
+            </div>
+            <div class="task-item">
+              <span class="task-num task-num--purple">3</span>
+              <div>
+                <h3>기본 4요소 프롬프트 작성</h3>
+                <p>[역할] [맥락: 2번 내용] [과제: 자기평가문 작성해줘] [형식: 1인칭, 200자, 활동·배운 점·느낀 점 포함]</p>
+              </div>
+            </div>
+            <div class="task-item">
+              <span class="task-num task-num--purple">4</span>
+              <div>
+                <h3>고급 기법 1개 선택하여 추가</h3>
+                <p><strong>예시 제시</strong>: [과제]에 "아래 예시 문체로 작성해줘" + 예시 문장 1개 추가 &nbsp;|&nbsp; <strong>절차 설명</strong>: [과제]에 "① 활동 요약 → ② 배운 점 → ③ 느낀 점·다짐 순서로 작성해줘" 추가 &nbsp;|&nbsp; <strong>재료 제공</strong>: [재료]에 내가 쓴 보고서·메모 붙여넣기 + [과제]에 "위 내용을 바탕으로 작성해줘" 추가</p>
+              </div>
+            </div>
+            <div class="task-item">
+              <span class="task-num task-num--purple">5</span>
+              <div>
+                <h3>AI 입력 → 초안 검토 &amp; 내 언어로 수정</h3>
+                <p>AI 초안 확인 → 과장·오류 수정 → 실제 느낀 점을 내 말로 보완 → 결과가 마음에 안 들면 맥락 추가해서 재요청</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 15: 마무리 ═══ -->
+    <div class="slide" data-slide="14" role="region" aria-label="슬라이드 15: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <h2 class="end-title">오늘의 핵심 정리</h2>
+          <div class="highlight-box end-summary">
+            <ul>
+              <li>✅ <strong>프롬프트</strong> = AI에게 보내는 지시문. 구체적일수록 좋은 결과</li>
+              <li>✅ 설계 <strong>4요소</strong>: [역할] 내가 누구 &nbsp;|&nbsp; [맥락] 무슨 활동 &nbsp;|&nbsp; [과제] 자기평가문 작성 &nbsp;|&nbsp; [형식] 1인칭·200자</li>
+              <li>✅ <strong>자기평가문</strong>: AI는 초안만, 실제 느낀 점·구체적 사실은 반드시 내 언어로 수정</li>
+              <li>✅ <strong>맥락이 핵심</strong>: 활동명만 쓰지 말고 내 역할·어려웠던 점·깨달은 것까지 담기</li>
+              <li>✅ 마음에 안 들면 더 구체적인 정보를 추가해서 <strong>다시 요청</strong>하기</li>
+            </ul>
+          </div>
+          <p style="margin-top:1rem;color:var(--style-text-secondary);font-size:0.9rem;">프롬프트 설계 능력은 AI 시대의 핵심 역량입니다.</p>
+          <div class="cover-divider" style="margin-top:1rem;" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>샘플고등학교 정보</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides">12</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    /* ── Navigation Logic ── */
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const slideInput = document.getElementById('slideInput');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function announceSlide(c, t) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (c + 1) + ' / ' + t;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      var content = slides[currentSlide].querySelector('.browser-content');
+      if (content) { content.scrollTop = 0; content.focus(); }
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    /* Keyboard */
+    document.addEventListener('keydown', function(e) {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].indexOf(e.key) !== -1) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key) !== -1) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    /* Mouse wheel (debounced) */
+    var wheelLocked = false;
+    document.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(function() { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    /* Touch swipe */
+    var touchStartX = 0;
+    document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      var diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) { if (diff > 0) nextSlide(); else prevSlide(); }
+    }, { passive: true });
+
+    /* Slide input */
+    slideInput.addEventListener('focus', function() { this.select(); });
+    slideInput.addEventListener('keydown', function(e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') { var n = parseInt(this.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); this.blur(); }
+      else if (e.key === 'Escape') { this.value = currentSlide + 1; this.blur(); }
+    });
+    slideInput.addEventListener('blur', function() {
+      var n = parseInt(this.value);
+      if (n >= 1 && n <= totalSlides) goToSlide(n - 1);
+      else this.value = currentSlide + 1;
+    });
+
+    /* Nav buttons */
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    /* Init */
+    updateNav();
+    document.getElementById('totalSlides').textContent = totalSlides;
+  </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

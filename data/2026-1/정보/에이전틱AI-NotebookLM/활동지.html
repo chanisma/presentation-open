@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>활동지 — 에이전틱 AI, 직접 체험하기</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F3F4F6;
+      --primary: #2563EB;
+      --primary-light: #EFF6FF;
+      --accent: #F97316;
+      --accent-light: #FFF7ED;
+      --success: #059669;
+      --success-light: #ECFDF5;
+      --warn: #D97706;
+      --danger: #DC2626;
+      --text: #111827;
+      --text-sub: #4B5563;
+      --glass: #FFFFFF;
+      --glass-border: #E5E7EB;
+      --glass-strong: #F9FAFB;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 6rem;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      position: sticky; top: 0; z-index: 100;
+      background: #FFFFFF;
+      border-bottom: 2px solid var(--glass-border);
+      padding: 0.65rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .page-header-left { display: flex; align-items: center; gap: 0.8rem; }
+    .page-title { font-size: 0.98rem; font-weight: 600; color: var(--text); }
+    .page-badge {
+      font-size: 0.75rem; padding: 0.15rem 0.6rem; border-radius: 2rem;
+      background: var(--primary-light); color: var(--primary);
+      border: 1px solid #BFDBFE;
+    }
+
+    /* ── Main ── */
+    .main { max-width: 860px; margin: 0 auto; padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 1rem; }
+
+    /* ── Intro banner ── */
+    .intro-banner {
+      background: var(--primary-light);
+      border: 1px solid #BFDBFE;
+      border-radius: 1rem; padding: 1rem 1.3rem;
+      display: flex; align-items: flex-start; gap: 0.8rem;
+    }
+    .intro-icon { font-size: 1.6rem; flex-shrink: 0; }
+    .intro-text h2 { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem; }
+    .intro-text p { font-size: 0.85rem; color: var(--text-sub); line-height: 1.6; }
+
+    /* ── Form Card ── */
+    .form-card {
+      background: var(--glass); border: 1px solid var(--glass-border);
+      border-radius: 1rem; overflow: hidden;
+    }
+    .form-card-header {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.65rem 1.2rem; border-bottom: 1px solid var(--glass-border);
+      background: var(--glass-strong);
+    }
+    .form-card-num {
+      font-size: 0.75rem; font-weight: 700; color: var(--primary);
+      background: var(--primary-light); border: 1px solid #BFDBFE;
+      border-radius: 50%; width: 1.55rem; height: 1.55rem; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .form-card-num.accent { color: #0369A1; background: #E0F2FE; border-color: #BAE6FD; }
+    .form-card-num.orange { color: var(--accent); background: var(--accent-light); border-color: #FED7AA; }
+    .form-card-num.success { color: var(--success); background: var(--success-light); border-color: #A7F3D0; }
+    .form-card-title { font-size: 0.97rem; font-weight: 600; }
+    .form-card-step {
+      margin-left: auto; font-size: 0.75rem; font-weight: 600; padding: 0.1rem 0.55rem;
+      border-radius: 0.4rem;
+    }
+    .step-tag-1 { background: var(--primary-light); color: var(--primary); border: 1px solid #BFDBFE; }
+    .step-tag-2 { background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
+    .step-tag-3 { background: var(--accent-light); color: var(--accent); border: 1px solid #FED7AA; }
+    .step-tag-r { background: var(--success-light); color: var(--success); border: 1px solid #A7F3D0; }
+    .form-card-body { padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: 0.9rem; }
+
+    /* ── Fields ── */
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .field label { font-size: 0.86rem; color: var(--text-sub); font-weight: 500; }
+    .required { color: var(--danger); }
+    input[type="text"], input[type="date"], textarea, select {
+      background: #FFFFFF; border: 1px solid var(--glass-border);
+      border-radius: 0.5rem; padding: 0.55rem 0.8rem;
+      color: var(--text); font-family: inherit; font-size: 0.93rem;
+      width: 100%; transition: border-color 0.2s, background 0.2s;
+      resize: vertical;
+    }
+    input[type="text"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
+      outline: none; border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    input.invalid, textarea.invalid { border-color: var(--danger); }
+    textarea { min-height: 4.5rem; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
+    .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+    .hint { font-size: 0.79rem; color: var(--text-sub); padding: 0.45rem 0.7rem; background: var(--glass-strong); border-radius: 0.4rem; border-left: 2px solid var(--glass-border); line-height: 1.55; }
+    .hint.primary { border-left-color: var(--primary); background: var(--primary-light); }
+    .hint.accent  { border-left-color: #0369A1; background: #E0F2FE; }
+    .hint.orange  { border-left-color: var(--accent); background: var(--accent-light); }
+
+    /* ── Radio group ── */
+    .radio-group { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .radio-opt {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 0.85rem; border-radius: 0.5rem; cursor: pointer;
+      background: #FFFFFF; border: 1px solid var(--glass-border);
+      font-size: 0.9rem; transition: all 0.15s;
+    }
+    .radio-opt:hover { background: var(--glass-strong); }
+    .radio-opt input[type="radio"] { accent-color: var(--primary); width: auto; }
+    .radio-opt.selected { background: var(--primary-light); border-color: #93C5FD; color: var(--primary); }
+
+    /* ── Checkbox group ── */
+    .check-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .check-opt {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.38rem 0.7rem; border-radius: 0.45rem; cursor: pointer;
+      background: #FFFFFF; border: 1px solid var(--glass-border);
+      font-size: 0.88rem; transition: all 0.15s;
+    }
+    .check-opt:hover { background: var(--glass-strong); }
+    .check-opt input[type="checkbox"] { accent-color: var(--primary); width: auto; flex-shrink: 0; }
+
+    /* ── Mission blocks ── */
+    .mission-block {
+      background: var(--glass-strong); border: 1px solid var(--glass-border);
+      border-radius: 0.75rem; padding: 0.8rem 1rem;
+      display: flex; flex-direction: column; gap: 0.65rem;
+    }
+    .mission-block-header { display: flex; align-items: center; gap: 0.5rem; }
+    .mission-num {
+      font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.5rem;
+      border-radius: 0.3rem; flex-shrink: 0;
+    }
+    .m1 { background: var(--primary-light); color: var(--primary); }
+    .m2 { background: #E0F2FE; color: #0369A1; }
+    .m3 { background: var(--accent-light); color: var(--accent); }
+    .mission-title { font-size: 0.92rem; font-weight: 600; }
+    .mission-goal { font-size: 0.79rem; color: var(--text-sub); margin-left: auto; }
+
+    /* ── Rating stars ── */
+    .star-row { display: flex; align-items: center; gap: 0.4rem; }
+    .star-row label { font-size: 0.84rem; color: var(--text-sub); min-width: 6rem; }
+    .stars { display: flex; gap: 0.25rem; }
+    .star {
+      font-size: 1.3rem; cursor: pointer; color: #D1D5DB;
+      transition: color 0.12s; user-select: none;
+    }
+    .star.on { color: var(--warn); }
+
+    /* ── Q3 verdict ── */
+    .verdict-row { display: flex; gap: 0.6rem; }
+    .verdict-btn {
+      flex: 1; padding: 0.6rem; border-radius: 0.6rem; border: 1px solid var(--glass-border);
+      background: #FFFFFF; cursor: pointer; font-family: inherit;
+      font-size: 0.9rem; font-weight: 600; transition: all 0.15s; color: var(--text);
+    }
+    .verdict-btn.good.active { background: var(--success-light); border-color: #6EE7B7; color: var(--success); }
+    .verdict-btn.bad.active  { background: #FEF2F2; border-color: #FCA5A5; color: var(--danger); }
+    .verdict-btn:hover { background: var(--glass-strong); }
+
+    /* ── Separator ── */
+    .sep { height: 1px; background: var(--glass-border); margin: 0.2rem 0; }
+
+    /* ── Action bar ── */
+    .action-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: #FFFFFF;
+      border-top: 2px solid var(--glass-border);
+      padding: 0.65rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .action-bar-left, .action-bar-right { display: flex; align-items: center; gap: 0.5rem; }
+    .draft-label { font-size: 0.78rem; color: var(--text-sub); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 1rem; border-radius: 0.5rem; border: 1px solid transparent;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer; font-family: inherit;
+      transition: background 0.15s;
+    }
+    .btn svg { width: 1em; height: 1em; }
+    .btn-success { background: var(--success-light); border-color: #6EE7B7; color: var(--success); }
+    .btn-success:hover { background: #D1FAE5; }
+    .btn-ghost { background: transparent; border-color: var(--glass-border); color: var(--text-sub); text-decoration: none; }
+    .btn-ghost:hover { background: var(--glass-strong); color: var(--text); }
+    .btn-danger { background: #FEF2F2; border-color: #FCA5A5; color: var(--danger); }
+    .btn-danger:hover { background: #FEE2E2; }
+    .btn-print { background: var(--primary-light); border-color: #93C5FD; color: var(--primary); }
+    .btn-print:hover { background: #DBEAFE; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── Toast ── */
+    .toast-container { position: fixed; bottom: 5rem; right: 1.5rem; z-index: 200; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
+    .toast {
+      padding: 0.6rem 1rem; border-radius: 0.5rem; font-size: 0.86rem;
+      max-width: 300px; animation: toastIn 0.2s ease;
+    }
+    .toast.success { background: #059669; color: #fff; }
+    .toast.error   { background: var(--danger); color: #fff; }
+    .toast.info    { background: var(--primary); color: #fff; }
+    @keyframes toastIn { from { transform: translateX(110%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; color: #111; padding: 0; }
+      .page-header, .action-bar, .toast-container { display: none !important; }
+      .main { max-width: 100%; padding: 0.5rem; }
+      .form-card { background: #fff; border: 1px solid #ccc; border-radius: 0; margin-bottom: 0.8rem; break-inside: avoid; }
+      .intro-banner { background: #f0f0ff; border-color: #aaa; }
+      input, textarea, select { background: #fff !important; color: #111 !important; border: 1px solid #999 !important; }
+      .hint { background: #f9f9f9; border-left-color: #aaa; color: #444; }
+      .verdict-btn { color: #111; }
+    }
+
+    /* ── Settings panel (교사 전용) ── */
+    .settings-panel {
+      background: #FFFBEB; border-bottom: 2px solid #FDE68A;
+      padding: 0.7rem 1.5rem; display: none;
+      align-items: center; gap: 0.8rem; flex-wrap: wrap;
+    }
+    .settings-panel.open { display: flex; }
+    .settings-panel label { font-size: 0.82rem; color: #92400E; font-weight: 600; white-space: nowrap; }
+    .settings-panel input[type="text"] {
+      flex: 1; min-width: 260px; font-size: 0.82rem;
+      background: #FFFFFF; border: 1px solid #FCD34D; color: #111827;
+      padding: 0.4rem 0.7rem;
+    }
+    .settings-panel input[type="text"]:focus { border-color: #F59E0B; background: #FFFBEB; }
+    .settings-label { font-size: 0.78rem; color: #92400E; background: #FEF3C7; padding: 0.15rem 0.5rem; border-radius: 0.3rem; border: 1px solid #FDE68A; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .field-grid, .field-grid-2 { grid-template-columns: 1fr; }
+      .verdict-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="page-header">
+  <div class="page-header-left">
+    <a href="index.html" class="btn btn-ghost" aria-label="발표자료로 돌아가기">← 발표자료</a>
+    <span class="page-title">에이전틱 AI 체험 활동지</span>
+    <span class="page-badge">2026</span>
+  </div>
+  <div style="display:flex;gap:0.4rem;">
+    <button class="btn btn-print" id="btnPrint">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+      인쇄
+    </button>
+    <button class="btn" id="btnSettings" title="교사 설정" style="background:#FFFBEB;border-color:#FDE68A;color:#92400E;">⚙</button>
+  </div>
+</header>
+
+<!-- ── 교사 설정 패널 ── -->
+<div class="settings-panel" id="settingsPanel">
+  <span class="settings-label">교사 전용</span>
+  <label for="scriptUrl">Apps Script URL</label>
+  <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+  <button class="btn" id="btnSaveUrl" style="background:#FEF3C7;border-color:#FCD34D;color:#92400E;white-space:nowrap;">URL 저장</button>
+  <button class="btn" id="btnClearUrl" style="background:#FEF2F2;border-color:#FCA5A5;color:#DC2626;white-space:nowrap;">URL 초기화</button>
+</div>
+
+<!-- ── Main ── -->
+<main class="main" id="main">
+
+  <!-- Intro -->
+  <div class="intro-banner">
+    <div class="intro-icon">🤖</div>
+    <div class="intro-text">
+      <h2>에이전틱 AI, 직접 체험하기 — NotebookLM 관찰 기록지</h2>
+      <p>STEP 1~3를 순서대로 수행하며 관찰한 내용을 기록하세요. 저장 버튼을 누르면 기록이 TXT 파일로 저장됩니다.</p>
+    </div>
+  </div>
+
+  <!-- ── 카드 0: 기본 정보 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num">★</span>
+      <span class="form-card-title">기본 정보</span>
+    </div>
+    <div class="form-card-body">
+      <div class="field-grid">
+        <div class="field">
+          <label for="studentName">이름 <span class="required">*</span></label>
+          <input type="text" id="studentName" placeholder="홍길동">
+        </div>
+        <div class="field">
+          <label for="classInfo">반 / 번호 <span class="required">*</span></label>
+          <input type="text" id="classInfo" placeholder="예: 1반 15번">
+        </div>
+        <div class="field">
+          <label for="today">날짜</label>
+          <input type="date" id="today">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 1: STEP 1 — 소스 업로드 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num">1</span>
+      <span class="form-card-title">STEP 1 — 소스 업로드 (에이전트의 <em>감지</em> 단계)</span>
+      <span class="form-card-step step-tag-1">감지 · Perceive</span>
+    </div>
+    <div class="form-card-body">
+      <p class="hint primary">NotebookLM에 소스 3개를 업로드합니다. 어떤 자료를 사용했나요?</p>
+      <div class="field">
+        <label for="src1">소스 1 <span class="required">*</span></label>
+        <input type="text" id="src1" placeholder="예: 유튜브 링크 / 기사 URL / PDF 제목">
+      </div>
+      <div class="field">
+        <label for="src2">소스 2 <span class="required">*</span></label>
+        <input type="text" id="src2" placeholder="예: 유튜브 링크 / 기사 URL / PDF 제목">
+      </div>
+      <div class="field">
+        <label for="src3">소스 3 <span class="required">*</span></label>
+        <input type="text" id="src3" placeholder="예: 유튜브 링크 / 기사 URL / PDF 제목">
+      </div>
+      <div class="field">
+        <label for="srcObserve">AI가 소스를 처리할 때 무엇을 관찰했나요?</label>
+        <textarea id="srcObserve" rows="3" placeholder="AI가 자료를 '읽는' 과정에서 눈에 띈 점을 자유롭게 적어보세요."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 2: STEP 2 — 미션 수행 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num accent">2</span>
+      <span class="form-card-title">STEP 2 — 미션 3종 수행 (에이전트의 <em>판단+행동</em> 단계)</span>
+      <span class="form-card-step step-tag-2">판단+행동 · Reason+Act</span>
+    </div>
+    <div class="form-card-body">
+      <p class="hint accent">같은 소스 3개로 서로 다른 목표를 가진 미션을 수행합니다. 각 미션에서 생성된 산출물과 느낀 점을 기록하세요.</p>
+
+      <!-- 미션 1 -->
+      <div class="mission-block">
+        <div class="mission-block-header">
+          <span class="mission-num m1">미션 ①</span>
+          <span class="mission-title">핵심 파악 — 마인드맵</span>
+          <span class="mission-goal">목표: 자료의 구조를 파악하라</span>
+        </div>
+        <div class="field">
+          <label for="m1output">생성된 산출물 (마인드맵의 핵심 개념 3가지)</label>
+          <input type="text" id="m1output" placeholder="예: AI 에이전트, 자율성, 목표 기반 행동">
+        </div>
+        <div class="star-row" id="starRow1">
+          <label>완성도</label>
+          <div class="stars" id="stars1">
+            <span class="star" data-v="1">★</span>
+            <span class="star" data-v="2">★</span>
+            <span class="star" data-v="3">★</span>
+            <span class="star" data-v="4">★</span>
+            <span class="star" data-v="5">★</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m1memo">관찰 메모 (AI가 개념을 어떻게 구조화했나요?)</label>
+          <textarea id="m1memo" rows="2" placeholder="AI가 스스로 연결 지은 개념, 의외의 구조 등을 메모하세요."></textarea>
+        </div>
+      </div>
+
+      <!-- 미션 2 -->
+      <div class="mission-block">
+        <div class="mission-block-header">
+          <span class="mission-num m2">미션 ②</span>
+          <span class="mission-title">가르치기 — 퀴즈 또는 플래시카드</span>
+          <span class="mission-goal">목표: 다른 사람을 가르쳐라</span>
+        </div>
+        <div class="field">
+          <label>선택한 산출물</label>
+          <div class="radio-group" id="m2typeGroup">
+            <label class="radio-opt"><input type="radio" name="m2type" value="퀴즈"> 퀴즈</label>
+            <label class="radio-opt"><input type="radio" name="m2type" value="플래시카드"> 플래시카드</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m2output">가장 인상적인 문항 또는 카드 1개</label>
+          <input type="text" id="m2output" placeholder="예: Q. 에이전트와 챗봇의 차이는?">
+        </div>
+        <div class="star-row" id="starRow2">
+          <label>완성도</label>
+          <div class="stars" id="stars2">
+            <span class="star" data-v="1">★</span>
+            <span class="star" data-v="2">★</span>
+            <span class="star" data-v="3">★</span>
+            <span class="star" data-v="4">★</span>
+            <span class="star" data-v="5">★</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m2memo">관찰 메모 (같은 자료를 어떻게 '교육용'으로 변환했나요?)</label>
+          <textarea id="m2memo" rows="2" placeholder="미션 1(마인드맵)과 어떻게 다른 방식으로 자료를 활용했는지 적어보세요."></textarea>
+        </div>
+      </div>
+
+      <!-- 미션 3 -->
+      <div class="mission-block">
+        <div class="mission-block-header">
+          <span class="mission-num m3">미션 ③</span>
+          <span class="mission-title">보고하기 — 보고서 또는 데이터 표</span>
+          <span class="mission-goal">목표: 의사결정자에게 보고하라</span>
+        </div>
+        <div class="field">
+          <label>선택한 산출물</label>
+          <div class="radio-group" id="m3typeGroup">
+            <label class="radio-opt"><input type="radio" name="m3type" value="보고서"> 보고서</label>
+            <label class="radio-opt"><input type="radio" name="m3type" value="데이터 표"> 데이터 표</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m3output">보고서/데이터 표의 핵심 내용 요약</label>
+          <input type="text" id="m3output" placeholder="예: AI 에이전트 도입 필요성 3가지 근거 제시">
+        </div>
+        <div class="star-row" id="starRow3">
+          <label>완성도</label>
+          <div class="stars" id="stars3">
+            <span class="star" data-v="1">★</span>
+            <span class="star" data-v="2">★</span>
+            <span class="star" data-v="3">★</span>
+            <span class="star" data-v="4">★</span>
+            <span class="star" data-v="5">★</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="m3memo">관찰 메모 (수치·요약 중심으로 어떻게 재구성했나요?)</label>
+          <textarea id="m3memo" rows="2" placeholder="미션 1, 2와 달리 어떤 정보를 강조/생략했는지 비교해 보세요."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 3: STEP 3 — 관찰 기록 Q1 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num orange">3</span>
+      <span class="form-card-title">STEP 3 — Q1: 가장 '똑똑한' 산출물은?</span>
+      <span class="form-card-step step-tag-3">관찰 기록</span>
+    </div>
+    <div class="form-card-body">
+      <p class="hint orange">세 가지 미션 중 AI가 자료를 가장 잘 재구성했다고 느낀 산출물은 무엇인가요?</p>
+      <div class="field">
+        <label>가장 잘 만들어진 산출물 <span class="required">*</span></label>
+        <div class="radio-group" id="q1BestGroup">
+          <label class="radio-opt"><input type="radio" name="q1best" value="마인드맵"> 마인드맵</label>
+          <label class="radio-opt"><input type="radio" name="q1best" value="퀴즈"> 퀴즈</label>
+          <label class="radio-opt"><input type="radio" name="q1best" value="플래시카드"> 플래시카드</label>
+          <label class="radio-opt"><input type="radio" name="q1best" value="보고서"> 보고서</label>
+          <label class="radio-opt"><input type="radio" name="q1best" value="데이터 표"> 데이터 표</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="q1reason">그 이유는 무엇인가요? <span class="required">*</span></label>
+        <textarea id="q1reason" rows="3" placeholder="AI가 어떤 방식으로 자료를 재구성한 것이 인상적이었나요? 구체적으로 적어보세요."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 4: STEP 3 — 관찰 기록 Q2 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num orange">4</span>
+      <span class="form-card-title">STEP 3 — Q2: AI의 오류나 누락이 있었나요?</span>
+      <span class="form-card-step step-tag-3">관찰 기록</span>
+    </div>
+    <div class="form-card-body">
+      <p class="hint orange">AI가 잘못 이해하거나 빠뜨린 내용이 있었나요? 비판적으로 살펴보세요.</p>
+      <div class="field">
+        <label>오류/누락 여부</label>
+        <div class="radio-group" id="q2ErrorGroup">
+          <label class="radio-opt"><input type="radio" name="q2error" value="있다"> 있었다</label>
+          <label class="radio-opt"><input type="radio" name="q2error" value="없다"> 없었다</label>
+          <label class="radio-opt"><input type="radio" name="q2error" value="잘 모르겠다"> 잘 모르겠다</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="q2wrong">사실과 다른 내용 (있다면)</label>
+        <textarea id="q2wrong" rows="2" placeholder="AI가 틀리게 설명한 내용이 있다면 구체적으로 적어보세요."></textarea>
+      </div>
+      <div class="field">
+        <label for="q2missing">중요한데 누락된 내용 (있다면)</label>
+        <textarea id="q2missing" rows="2" placeholder="분명히 소스에 있었는데 산출물에서 빠진 정보가 있다면 적어보세요."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 5: STEP 3 — 관찰 기록 Q3 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num orange">5</span>
+      <span class="form-card-title">STEP 3 — Q3: AI가 추가 검색까지 할 수 있다면?</span>
+      <span class="form-card-step step-tag-3">사고 확장</span>
+    </div>
+    <div class="form-card-body">
+      <p class="hint orange">NotebookLM은 우리가 준 소스 안에서만 작동합니다. 만약 AI가 인터넷에서 <strong>스스로 추가 자료를 검색</strong>까지 할 수 있다면 어떨까요?</p>
+      <div class="field">
+        <label>나의 판단 <span class="required">*</span></label>
+        <div class="verdict-row">
+          <button class="verdict-btn good" id="verdictGood" type="button">👍 더 좋다 — 유용성이 높아진다</button>
+          <button class="verdict-btn bad"  id="verdictBad"  type="button">⚠️ 위험하다 — 통제가 어려워진다</button>
+        </div>
+        <input type="hidden" id="q3verdict" value="">
+      </div>
+      <div class="field">
+        <label for="q3reason">그렇게 생각하는 이유 <span class="required">*</span></label>
+        <textarea id="q3reason" rows="4" placeholder="구체적인 상황을 예시로 들어 설명해 보세요. '예를 들어 ~한 경우, AI가 스스로 검색한다면…'"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 카드 6: 오늘의 정리 ── -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <span class="form-card-num success">6</span>
+      <span class="form-card-title">오늘의 정리 — 에이전트 3단계를 내 말로</span>
+      <span class="form-card-step step-tag-r">정리·회고</span>
+    </div>
+    <div class="form-card-body">
+      <p class="hint">에이전트의 3단계 루프를 오늘 체험을 바탕으로 내 말로 설명해 보세요.</p>
+      <div class="field-grid">
+        <div class="field">
+          <label for="step1summary">① 감지(Perceive)</label>
+          <textarea id="step1summary" rows="3" placeholder="소스 업로드 단계에서 AI가 한 일은 무엇이었나요?"></textarea>
+        </div>
+        <div class="field">
+          <label for="step2summary">② 판단(Reason)</label>
+          <textarea id="step2summary" rows="3" placeholder="미션 목표가 달라질 때 AI는 어떻게 다르게 생각했나요?"></textarea>
+        </div>
+        <div class="field">
+          <label for="step3summary">③ 행동(Act)</label>
+          <textarea id="step3summary" rows="3" placeholder="같은 소스로 다른 결과물이 나온 것은 왜일까요?"></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <label for="humanRole">AI 에이전트 시대, 내가 해야 할 일은?</label>
+        <textarea id="humanRole" rows="3" placeholder="오늘 수업을 통해 '인간의 역할'에 대해 어떤 생각이 들었나요?"></textarea>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── Action Bar ── -->
+<div class="action-bar">
+  <div class="action-bar-left">
+    <button class="btn btn-success" id="btnSave">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17 3H5c-1.1 0-2 .9-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+      <span id="btnSaveText">저장하기</span>
+    </button>
+  </div>
+  <div class="action-bar-right">
+    <span class="draft-label" id="draftLabel">임시저장: 대기 중</span>
+    <button class="btn btn-danger" id="btnClear">초기화</button>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+/* ── 상수 ── */
+var DRAFT_KEY = 'draft_agentic_ai_2026';
+var URL_KEY   = 'sheets_url_agentic_ai';
+var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';
+var draftTimer = null;
+
+function scheduleDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(saveDraft, 1500);
+}
+
+function saveDraft() {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(getFormData()));
+    var label = document.getElementById('draftLabel');
+    var now = new Date();
+    label.textContent = '임시저장: ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  } catch(e) { /* localStorage 불가 환경 무시 */ }
+}
+
+function loadDraft() {
+  try {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    var d = JSON.parse(raw);
+    setFormData(d);
+    showToast('이전 작성 내용을 불러왔습니다.', 'info', 3000);
+  } catch(e) { /* 손상된 draft 무시 */ }
+}
+
+/* ── 별점 ── */
+var starValues = { stars1: 0, stars2: 0, stars3: 0 };
+
+['stars1','stars2','stars3'].forEach(function(id) {
+  var container = document.getElementById(id);
+  if (!container) return;
+  container.querySelectorAll('.star').forEach(function(star) {
+    star.addEventListener('click', function() {
+      starValues[id] = parseInt(this.getAttribute('data-v'), 10);
+      updateStars(id);
+      scheduleDraft();
+    });
+    star.addEventListener('mouseenter', function() {
+      var v = parseInt(this.getAttribute('data-v'), 10);
+      container.querySelectorAll('.star').forEach(function(s) {
+        s.classList.toggle('on', parseInt(s.getAttribute('data-v'),10) <= v);
+      });
+    });
+    star.addEventListener('mouseleave', function() {
+      updateStars(id);
+    });
+  });
+});
+
+function updateStars(id) {
+  var v = starValues[id] || 0;
+  document.getElementById(id).querySelectorAll('.star').forEach(function(s) {
+    s.classList.toggle('on', parseInt(s.getAttribute('data-v'),10) <= v);
+  });
+}
+
+/* ── 라디오 그룹 active 스타일 ── */
+function initRadioGroup(name) {
+  document.querySelectorAll('input[name="' + name + '"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.querySelectorAll('input[name="' + name + '"]').forEach(function(r) {
+        r.closest('.radio-opt').classList.toggle('selected', r.checked);
+      });
+      scheduleDraft();
+    });
+  });
+}
+['m2type','m3type','q1best','q2error'].forEach(initRadioGroup);
+
+/* ── Q3 판단 버튼 ── */
+document.getElementById('verdictGood').addEventListener('click', function() {
+  document.getElementById('q3verdict').value = '더 좋다';
+  this.classList.add('active');
+  document.getElementById('verdictBad').classList.remove('active');
+  scheduleDraft();
+});
+document.getElementById('verdictBad').addEventListener('click', function() {
+  document.getElementById('q3verdict').value = '위험하다';
+  this.classList.add('active');
+  document.getElementById('verdictGood').classList.remove('active');
+  scheduleDraft();
+});
+
+/* ── 입력 이벤트 ── */
+document.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(function(el) {
+  el.addEventListener('input', scheduleDraft);
+});
+
+/* ── 날짜 기본값 ── */
+(function() {
+  var el = document.getElementById('today');
+  if (el) el.value = new Date().toISOString().slice(0,10);
+})();
+
+/* ── getFormData / setFormData ── */
+function getFormData() {
+  function val(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function radio(name) {
+    var checked = document.querySelector('input[name="' + name + '"]:checked');
+    return checked ? checked.value : '';
+  }
+  return {
+    source:      'notebooklm',
+    studentName: val('studentName'),
+    classInfo:   val('classInfo'),
+    today:       val('today'),
+    src1: val('src1'), src2: val('src2'), src3: val('src3'),
+    srcObserve: val('srcObserve'),
+    m1output: val('m1output'), m1stars: starValues.stars1, m1memo: val('m1memo'),
+    m2type: radio('m2type'), m2output: val('m2output'), m2stars: starValues.stars2, m2memo: val('m2memo'),
+    m3type: radio('m3type'), m3output: val('m3output'), m3stars: starValues.stars3, m3memo: val('m3memo'),
+    q1best: radio('q1best'), q1reason: val('q1reason'),
+    q2error: radio('q2error'), q2wrong: val('q2wrong'), q2missing: val('q2missing'),
+    q3verdict: val('q3verdict'), q3reason: val('q3reason'),
+    step1summary: val('step1summary'), step2summary: val('step2summary'),
+    step3summary: val('step3summary'), humanRole: val('humanRole')
+  };
+}
+
+function setFormData(d) {
+  function set(id, v) { var el = document.getElementById(id); if (el && v !== undefined) el.value = v; }
+  set('studentName', d.studentName); set('classInfo', d.classInfo); set('today', d.today);
+  set('src1', d.src1); set('src2', d.src2); set('src3', d.src3);
+  set('srcObserve', d.srcObserve);
+  set('m1output', d.m1output); set('m1memo', d.m1memo);
+  set('m2output', d.m2output); set('m2memo', d.m2memo);
+  set('m3output', d.m3output); set('m3memo', d.m3memo);
+  set('q1reason', d.q1reason);
+  set('q2wrong', d.q2wrong); set('q2missing', d.q2missing);
+  set('q3reason', d.q3reason);
+  set('step1summary', d.step1summary); set('step2summary', d.step2summary);
+  set('step3summary', d.step3summary); set('humanRole', d.humanRole);
+
+  // 별점
+  if (d.m1stars) { starValues.stars1 = d.m1stars; updateStars('stars1'); }
+  if (d.m2stars) { starValues.stars2 = d.m2stars; updateStars('stars2'); }
+  if (d.m3stars) { starValues.stars3 = d.m3stars; updateStars('stars3'); }
+
+  // 라디오
+  ['m2type','m3type','q1best','q2error'].forEach(function(name) {
+    var key = name === 'q1best' ? 'q1best' : name;
+    var v = d[key];
+    if (!v) return;
+    var radio = document.querySelector('input[name="' + name + '"][value="' + v + '"]');
+    if (radio) { radio.checked = true; radio.closest('.radio-opt').classList.add('selected'); }
+  });
+
+  // Q3 verdict
+  if (d.q3verdict === '더 좋다') {
+    document.getElementById('q3verdict').value = '더 좋다';
+    document.getElementById('verdictGood').classList.add('active');
+  } else if (d.q3verdict === '위험하다') {
+    document.getElementById('q3verdict').value = '위험하다';
+    document.getElementById('verdictBad').classList.add('active');
+  }
+}
+
+/* ── 유효성 검사 ── */
+function validate() {
+  var required = ['studentName','classInfo','src1','src2','src3','q1reason','q3reason'];
+  var ok = true;
+  required.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (!el.value.trim()) { el.classList.add('invalid'); ok = false; }
+    else el.classList.remove('invalid');
+  });
+  // 필수 라디오
+  if (!document.querySelector('input[name="q1best"]:checked')) ok = false;
+  if (!document.getElementById('q3verdict').value) ok = false;
+  return ok;
+}
+
+/* ── TXT 빌더 ── */
+function buildTxt(d) {
+  var stars = function(n) { return '★'.repeat(n || 0) + '☆'.repeat(5-(n||0)); };
+  var lines = [];
+  lines.push('══════════════════════════════════════════');
+  lines.push('  에이전틱 AI 체험 활동지 — NotebookLM');
+  lines.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+  lines.push('══════════════════════════════════════════');
+  lines.push('');
+  lines.push('【 기본 정보 】');
+  lines.push('이름: ' + (d.studentName||''));
+  lines.push('반/번호: ' + (d.classInfo||''));
+  lines.push('날짜: ' + (d.today||''));
+  lines.push('');
+  lines.push('──────────────────────────────────────────');
+  lines.push('【 STEP 1 — 감지(Perceive): 소스 업로드 】');
+  lines.push('──────────────────────────────────────────');
+  lines.push('소스 1: ' + (d.src1||''));
+  lines.push('소스 2: ' + (d.src2||''));
+  lines.push('소스 3: ' + (d.src3||''));
+  lines.push('');
+  lines.push('AI 처리 관찰:');
+  lines.push(d.srcObserve||'(미작성)');
+  lines.push('');
+  lines.push('──────────────────────────────────────────');
+  lines.push('【 STEP 2 — 판단+행동: 미션 3종 】');
+  lines.push('──────────────────────────────────────────');
+  lines.push('[미션 ① 핵심 파악 — 마인드맵]');
+  lines.push('핵심 개념: ' + (d.m1output||''));
+  lines.push('완성도: ' + stars(d.m1stars));
+  lines.push('관찰 메모: ' + (d.m1memo||'(미작성)'));
+  lines.push('');
+  lines.push('[미션 ② 가르치기 — ' + (d.m2type||'미선택') + ']');
+  lines.push('인상적인 문항/카드: ' + (d.m2output||''));
+  lines.push('완성도: ' + stars(d.m2stars));
+  lines.push('관찰 메모: ' + (d.m2memo||'(미작성)'));
+  lines.push('');
+  lines.push('[미션 ③ 보고하기 — ' + (d.m3type||'미선택') + ']');
+  lines.push('핵심 내용 요약: ' + (d.m3output||''));
+  lines.push('완성도: ' + stars(d.m3stars));
+  lines.push('관찰 메모: ' + (d.m3memo||'(미작성)'));
+  lines.push('');
+  lines.push('──────────────────────────────────────────');
+  lines.push('【 STEP 3 — 관찰 기록 】');
+  lines.push('──────────────────────────────────────────');
+  lines.push('[Q1: 가장 잘 만들어진 산출물]');
+  lines.push('선택: ' + (d.q1best||'미선택'));
+  lines.push('이유:');
+  lines.push(d.q1reason||'(미작성)');
+  lines.push('');
+  lines.push('[Q2: AI의 오류 및 누락]');
+  lines.push('오류 여부: ' + (d.q2error||'미선택'));
+  lines.push('사실과 다른 내용: ' + (d.q2wrong||'없음'));
+  lines.push('누락된 내용: ' + (d.q2missing||'없음'));
+  lines.push('');
+  lines.push('[Q3: AI가 추가 검색까지 한다면?]');
+  lines.push('나의 판단: ' + (d.q3verdict||'미선택'));
+  lines.push('이유:');
+  lines.push(d.q3reason||'(미작성)');
+  lines.push('');
+  lines.push('──────────────────────────────────────────');
+  lines.push('【 오늘의 정리 】');
+  lines.push('──────────────────────────────────────────');
+  lines.push('[① 감지(Perceive)]');
+  lines.push(d.step1summary||'(미작성)');
+  lines.push('');
+  lines.push('[② 판단(Reason)]');
+  lines.push(d.step2summary||'(미작성)');
+  lines.push('');
+  lines.push('[③ 행동(Act)]');
+  lines.push(d.step3summary||'(미작성)');
+  lines.push('');
+  lines.push('[AI 에이전트 시대, 내가 해야 할 일]');
+  lines.push(d.humanRole||'(미작성)');
+  lines.push('');
+  lines.push('══════════════════════════════════════════');
+  return lines.join('\n');
+}
+
+function downloadTxt(d) {
+  var blob = new Blob([buildTxt(d)], { type: 'text/plain;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  var name = (d.studentName || '학생').replace(/\s/g,'') + '_에이전틱AI활동지.txt';
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── 저장 버튼 ── */
+/* ── 구글 시트 전송 ── */
+function sendToSheet(data) {
+  var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+  if (!url) return;
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(function() { /* no-cors — 오류 무시 */ });
+}
+
+/* ── 저장 버튼 ── */
+document.getElementById('btnSave').addEventListener('click', function() {
+  if (!validate()) {
+    showToast('필수 항목(*)을 모두 입력해 주세요.', 'error', 3500);
+    var first = document.querySelector('input.invalid, textarea.invalid');
+    if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  var data = getFormData();
+  downloadTxt(data);
+  sendToSheet(data);
+  saveDraft();
+  var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+  showToast(url ? '저장 완료! TXT 다운로드 + 구글 시트 전송' : '저장 완료! TXT 파일이 다운로드되었습니다.', 'success', 4000);
+});
+
+/* ── 교사 설정 패널 ── */
+document.getElementById('btnSettings').addEventListener('click', function() {
+  var panel = document.getElementById('settingsPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    var saved = localStorage.getItem(URL_KEY) || '';
+    document.getElementById('scriptUrl').value = saved;
+  }
+});
+document.getElementById('btnSaveUrl').addEventListener('click', function() {
+  var url = document.getElementById('scriptUrl').value.trim();
+  if (url) {
+    localStorage.setItem(URL_KEY, url);
+    showToast('URL이 저장되었습니다.', 'success');
+  } else {
+    showToast('URL을 입력해 주세요.', 'error');
+  }
+});
+document.getElementById('btnClearUrl').addEventListener('click', function() {
+  localStorage.removeItem(URL_KEY);
+  document.getElementById('scriptUrl').value = '';
+  showToast('URL이 초기화되었습니다.', 'info');
+});
+
+/* ── 초기화 버튼 ── */
+document.getElementById('btnClear').addEventListener('click', function() {
+  if (!confirm('입력 내용을 모두 지우시겠습니까?')) return;
+  document.querySelectorAll('input[type="text"], textarea').forEach(function(el) { el.value = ''; el.classList.remove('invalid'); });
+  document.querySelectorAll('input[type="date"]').forEach(function(el) { el.value = new Date().toISOString().slice(0,10); });
+  document.querySelectorAll('input[type="radio"]').forEach(function(el) { el.checked = false; el.closest('.radio-opt').classList.remove('selected'); });
+  document.getElementById('q3verdict').value = '';
+  document.getElementById('verdictGood').classList.remove('active');
+  document.getElementById('verdictBad').classList.remove('active');
+  starValues = { stars1: 0, stars2: 0, stars3: 0 };
+  ['stars1','stars2','stars3'].forEach(updateStars);
+  document.getElementById('draftLabel').textContent = '임시저장: 대기 중';
+  try { localStorage.removeItem(DRAFT_KEY); } catch(e) {}
+  showToast('초기화되었습니다.', 'info');
+});
+
+/* ── 인쇄 버튼 ── */
+document.getElementById('btnPrint').addEventListener('click', function() {
+  window.print();
+});
+
+/* ── 토스트 ── */
+function showToast(msg, type, duration) {
+  type = type || 'info'; duration = duration || 2800;
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = msg;
+  var container = document.getElementById('toastContainer');
+  container.appendChild(toast);
+  setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, duration);
+}
+
+/* ── 초기 로드 ── */
+loadDraft();
+</script>
+</body>
+</html>

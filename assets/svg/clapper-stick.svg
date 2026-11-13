@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 32" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 클래퍼보드 위쪽 움직이는 막대(clapper-slate.svg와 한 쌍). 덱이 경첩(왼쪽 아래)을 축으로 회전시킨다.
+       몸판과 같은 폭(viewBox 320)이라 같은 width로 놓고, 이 파일의 y=28이 몸판의 y=8에 오도록 겹치면 맞물린다.
+       팔레트: ink #1d1b22 · slate #2b2933 · stripe #f6f2ea
+       앵커: 회전축(경첩) (20, 28) → transform-origin 6.25% 87.5% · 닫힘 0°, 열림 -24° 권장 -->
+  <defs>
+    <clipPath id="ck-bar"><rect x="14" y="4" width="292" height="24" rx="3" /></clipPath>
+  </defs>
+  <rect x="14" y="4" width="292" height="24" rx="3" fill="#2b2933" />
+  <g clip-path="url(#ck-bar)" fill="#f6f2ea">
+    <path d="M26 4 L52 4 L66 28 L40 28 Z" /><path d="M78 4 L104 4 L118 28 L92 28 Z" /><path d="M130 4 L156 4 L170 28 L144 28 Z" />
+    <path d="M182 4 L208 4 L222 28 L196 28 Z" /><path d="M234 4 L260 4 L274 28 L248 28 Z" /><path d="M286 4 L312 4 L326 28 L300 28 Z" />
+  </g>
+  <rect x="14" y="4" width="292" height="24" rx="3" stroke="#1d1b22" stroke-width="2.4" />
+  <path d="M30 9 L120 9" stroke="#ffffff" stroke-width="2.4" opacity=".25" />
+</svg>

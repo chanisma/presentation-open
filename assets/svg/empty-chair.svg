@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 220" fill="none">
+  <!-- 빈 의자 — 잉크 스케치 단선. 의도: "그 데이터로 뭘 할지 정하는 사람의 자리는 비어 있다".
+       에메랄드 잉크(다크 배경용). 등받이 + 좌판 + 다리 4 + 가로 버팀대, 약간 기운 손그림. -->
+  <g stroke="#34d399" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- 등받이 프레임 -->
+    <path d="M52 24 C50 60 49 96 48 120"/>
+    <path d="M126 20 C128 56 129 92 130 118"/>
+    <path d="M50 30 C76 26 102 24 128 26"/>
+    <path d="M49 56 C75 52 101 50 129 52" stroke-width="2.4" opacity="0.8"/>
+    <path d="M49 84 C75 80 101 78 129 80" stroke-width="2.4" opacity="0.8"/>
+    <!-- 좌판 (살짝 원근) -->
+    <path d="M40 122 C70 116 110 116 140 120 L 150 134 C116 140 66 140 30 136 Z"/>
+    <!-- 다리 4 -->
+    <path d="M36 136 C34 160 32 184 30 204"/>
+    <path d="M146 134 C148 158 150 182 152 202"/>
+    <path d="M50 138 C49 158 48 176 47 192" stroke-width="2.6" opacity="0.75"/>
+    <path d="M132 138 C133 158 134 176 135 192" stroke-width="2.6" opacity="0.75"/>
+    <!-- 버팀대 -->
+    <path d="M33 176 C62 172 104 172 148 174" stroke-width="2.4" opacity="0.75"/>
+  </g>
+</svg>

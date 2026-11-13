@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>함수의 개념과 그래프 — 고등학교 수학</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* ===== 1. CSS Variables & Reset ===== */
+    :root {
+      --bg: #FFFFFF;
+      --primary: #111111;
+      --accent: #E8000D;
+      --text: #111111;
+      --text-secondary: #444444;
+      --divider: #DDDDDD;
+      --main: #E8000D;
+      --white: #FFFFFF;
+      --light: #F5F5F5;
+      --gray-200: #DDDDDD;
+      --gray-600: #666666;
+      --gray-700: #444444;
+      --red-stripe: #E8000D;
+      font-size: clamp(16px, 1.5vw, 28px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Pretendard Variable', 'Inter', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ===== 2. Accessibility ===== */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--main); color: var(--white);
+      padding: 8px 16px; z-index: 9999;
+      font-size: 14px; border-radius: 0 0 4px 0;
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--main); outline-offset: 2px; border-radius: 2px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-contrast: high) {
+      :root { --main: #0000ff; --accent: #0000ff; --primary: #000000; }
+      .browser-card { border: 2px solid #000000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ===== 3. Progress Bar ===== */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: var(--accent); z-index: 1000;
+      will-change: width; transform: translateZ(0);
+      transition: width 0.3s ease;
+    }
+
+    /* ===== 4. Slide Container ===== */
+    .presentation {
+      width: 100%; height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      padding: 2rem 2rem 4.8rem;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== 5. Browser Card (Swiss/minimal style) ===== */
+    .browser-card {
+      background: var(--white);
+      border: 1px solid var(--divider);
+      border-radius: 0;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+      width: 100%;
+      max-width: 800px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Swiss signature: left red stripe */
+    .browser-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--red-stripe);
+      z-index: 1;
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 0.9rem 0.55rem 1.4rem;
+      border-bottom: 1px solid var(--divider);
+      background: #FAFAFA;
+      flex-shrink: 0;
+    }
+    .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #28CA41; }
+    .topbar-title {
+      margin-left: auto; margin-right: auto;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.6rem 1.8rem 1.4rem 2.2rem;
+    }
+
+    /* ===== 6. Typography ===== */
+    h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.15; color: var(--primary); }
+    h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.25; color: var(--primary); }
+    h3 { font-size: 1.1rem; font-weight: 600; line-height: 1.35; color: var(--primary); }
+    p  { font-size: 1rem; line-height: 1.7; color: var(--text); }
+
+    /* Swiss horizontal rule under headings */
+    .section-rule {
+      display: block;
+      width: 100%;
+      height: 1px;
+      background: var(--divider);
+      margin: 0.7rem 0 1.1rem;
+    }
+
+    /* ===== 7. Badge ===== */
+    .badge {
+      display: inline-block;
+      font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2em 0.7em;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .badge-filled {
+      background: var(--accent);
+      color: var(--white);
+      border-color: var(--accent);
+    }
+
+    /* ===== 8. Cover Slide ===== */
+    .cover-slide {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .cover-title { margin-top: 0.5rem; }
+    .cover-subtitle {
+      font-size: 1.05rem; color: var(--text-secondary);
+      font-weight: 400; line-height: 1.5;
+    }
+    .cover-divider {
+      width: 3rem; height: 4px;
+      background: var(--accent);
+      margin: 0.4rem 0;
+    }
+    .cover-meta {
+      font-size: 0.88rem; color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      display: flex; gap: 0.6rem; align-items: center;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+
+    /* ===== 9. TOC ===== */
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+    .toc-item {
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.65rem 0.8rem;
+      border-left: 3px solid transparent;
+      border-bottom: 1px solid var(--divider);
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .toc-item:hover, .toc-item:focus { border-left-color: var(--accent); background: #FFF5F5; outline: none; }
+    .toc-num {
+      font-size: 0.82rem; font-weight: 700; color: var(--accent);
+      font-family: 'Inter', Arial, sans-serif;
+      letter-spacing: 0.06em; min-width: 1.8rem;
+    }
+    .toc-text { font-size: 0.95rem; font-weight: 600; flex: 1; }
+    .toc-arrow { font-size: 0.82rem; color: var(--accent); margin-left: auto; }
+
+    /* ===== 10. Card Grid ===== */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+    .card-grid { margin-top: 0.9rem; }
+    .card {
+      padding: 1rem 1rem 0.9rem;
+      border: 1px solid var(--divider);
+      border-top: 3px solid var(--accent);
+      background: var(--white);
+      contain: layout style;
+    }
+    .card-label {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent);
+      font-family: 'Inter', Arial, sans-serif;
+      display: block; margin-bottom: 0.35rem;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .card-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ===== 11. Highlight Box ===== */
+    .highlight-box {
+      background: #FFF5F5;
+      border-left: 4px solid var(--accent);
+      padding: 0.8rem 1rem;
+      margin: 0.8rem 0;
+      font-size: 0.95rem; line-height: 1.65;
+    }
+    .highlight-box strong { color: var(--accent); }
+
+    /* ===== 12. Activity List ===== */
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.8rem; }
+    .activity-item {
+      display: flex; gap: 0.9rem; align-items: flex-start;
+      padding: 0.7rem 0.8rem;
+      border-bottom: 1px solid var(--divider);
+    }
+    .activity-num {
+      min-width: 1.8rem; height: 1.8rem;
+      background: var(--accent); color: var(--white);
+      font-size: 0.78rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .activity-body { flex: 1; }
+    .activity-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .activity-desc { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; }
+
+    /* ===== 13. Stat Highlight ===== */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; margin: 0.9rem 0; }
+    .stat-item { padding: 0.9rem 0.7rem; border: 1px solid var(--divider); border-top: 3px solid var(--accent); text-align: center; contain: layout style; }
+    .stat-number { display: block; font-size: 1.8rem; font-weight: 800; color: var(--accent); font-family: 'Inter', Arial, sans-serif; line-height: 1.1; }
+    .stat-label { display: block; font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.25rem; font-weight: 600; }
+
+    /* ===== 14. Two-Column ===== */
+    .two-col { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 1rem; margin-top: 0.9rem; align-items: start; }
+    .col-divider { background: var(--divider); align-self: stretch; }
+    .col-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--accent); }
+    .col-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .col-list li { font-size: 0.9rem; line-height: 1.6; padding-left: 0.8rem; border-left: 2px solid var(--divider); color: var(--text); }
+
+    /* ===== 15. Math-specific: formula box ===== */
+    .formula-box {
+      background: #111111;
+      color: #FFFFFF;
+      padding: 0.9rem 1.2rem;
+      margin: 0.8rem 0;
+      font-family: 'Inter', 'Courier New', monospace;
+      font-size: 1.05rem;
+      letter-spacing: 0.03em;
+      border-left: 4px solid var(--accent);
+      line-height: 1.7;
+    }
+    .formula-box .var { color: #FFB3B3; font-weight: 700; }
+    .formula-box .op  { color: #FFDD88; }
+
+    /* Graph placeholder (SVG-based) */
+    .graph-area {
+      margin: 0.7rem 0;
+      border: 1px solid var(--divider);
+      border-top: 3px solid var(--accent);
+      background: #FAFAFA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+    }
+    .graph-area svg { display: block; max-width: 100%; height: auto; }
+
+    /* Definition term/value */
+    .def-list { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .def-item { display: flex; gap: 0.7rem; align-items: baseline; }
+    .def-term {
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--accent);
+      font-family: 'Inter', Arial, sans-serif;
+      min-width: 5rem; flex-shrink: 0;
+    }
+    .def-body { font-size: 0.9rem; line-height: 1.6; color: var(--text); }
+
+    /* End slide */
+    .end-slide { display: flex; flex-direction: column; gap: 0.8rem; }
+    .end-title { font-size: 2rem; font-weight: 800; }
+    .end-subtitle { font-size: 1rem; color: var(--text-secondary); }
+    .summary-list { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.5rem; }
+    .summary-list li {
+      font-size: 0.9rem; padding: 0.4rem 0;
+      border-bottom: 1px solid var(--divider);
+      display: flex; gap: 0.6rem; align-items: baseline;
+    }
+    .summary-list li::before {
+      content: '\25A0';
+      color: var(--accent); font-size: 0.6rem;
+      flex-shrink: 0; margin-top: 0.15rem;
+    }
+
+    /* ===== 16. Navigation Bar ===== */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--gray-200);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--gray-200); border-radius: 50%;
+      background: var(--white); cursor: pointer;
+      font-size: 0; color: var(--gray-700);
+      transition: all 0.2s; padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+    .nav-btn:focus-visible { outline: 3px solid var(--main); outline-offset: 2px; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700; color: var(--gray-600);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700;
+      color: inherit; font-family: inherit; padding: 0;
+      outline: none; cursor: pointer; transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--main); }
+    .slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px; }
+
+    /* ===== 17. Responsive ===== */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .slide { padding: 1.5rem 1.5rem 4.8rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .col-divider { height: 1px; width: 100%; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      h1 { font-size: 1.7rem; }
+      .browser-content { padding: 0.9rem 1rem 0.9rem 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar"
+       role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ===== 슬라이드 1: 표지 ===== -->
+    <div class="slide active" data-slide="0"
+         role="region" aria-label="슬라이드 1: 표지 — 함수의 개념과 그래프">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Mathematics</span>
+        </div>
+        <div class="browser-content cover-slide">
+          <span class="badge">고등학교 수학 · 함수</span>
+          <h1 class="cover-title">함수의 개념과<br>그래프</h1>
+          <p class="cover-subtitle">정의역, 공역, 치역부터 함수 그래프의 성질까지<br>핵심 개념을 체계적으로 이해합니다.</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>고등학교 수학</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-03">2026년</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 슬라이드 2: 목차 ===== -->
+    <div class="slide" data-slide="1"
+         role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">목차</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <h2>학습 목차</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0"
+                  aria-label="3번 슬라이드로 이동: 함수란 무엇인가"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                <span class="toc-num" aria-hidden="true">01</span>
+                <span class="toc-text">함수란 무엇인가</span>
+                <span class="toc-arrow" aria-hidden="true">&#8594;</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                  aria-label="4번 슬라이드로 이동: 정의역 · 공역 · 치역"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num" aria-hidden="true">02</span>
+                <span class="toc-text">정의역 · 공역 · 치역</span>
+                <span class="toc-arrow" aria-hidden="true">&#8594;</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                  aria-label="5번 슬라이드로 이동: 함수의 종류"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num" aria-hidden="true">03</span>
+                <span class="toc-text">함수의 종류</span>
+                <span class="toc-arrow" aria-hidden="true">&#8594;</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                  aria-label="6번 슬라이드로 이동: 함수의 그래프"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                <span class="toc-num" aria-hidden="true">04</span>
+                <span class="toc-text">함수의 그래프</span>
+                <span class="toc-arrow" aria-hidden="true">&#8594;</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                  aria-label="7번 슬라이드로 이동: 합성함수와 역함수"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num" aria-hidden="true">05</span>
+                <span class="toc-text">합성함수와 역함수</span>
+                <span class="toc-arrow" aria-hidden="true">&#8594;</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0"
+                  aria-label="8번 슬라이드로 이동: 핵심 정리"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                <span class="toc-num" aria-hidden="true">06</span>
+                <span class="toc-text">핵심 정리 &amp; 마무리</span>
+                <span class="toc-arrow" aria-hidden="true">&#8594;</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 슬라이드 3: 함수란 무엇인가 ===== -->
+    <div class="slide" data-slide="2"
+         role="region" aria-label="슬라이드 3: 함수란 무엇인가">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">01 — 함수의 정의</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <span class="badge badge-filled">개념 도입</span>
+          <h2 style="">함수란 무엇인가</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <div class="highlight-box" role="note">
+            집합 <strong>X</strong>의 각 원소에 집합 <strong>Y</strong>의 원소가 <strong>하나씩만</strong> 대응할 때,
+            이 대응을 <strong>X에서 Y로의 함수</strong>라 한다.
+          </div>
+          <div class="formula-box" aria-label="함수 표기 공식">
+            <span class="var">f</span> : <span class="var">X</span> <span class="op">&#8594;</span> <span class="var">Y</span>
+            &nbsp;&nbsp;또는&nbsp;&nbsp;
+            <span class="var">y</span> <span class="op">=</span> <span class="var">f</span>(<span class="var">x</span>)
+          </div>
+          <div class="def-list">
+            <div class="def-item">
+              <span class="def-term">핵심 조건</span>
+              <span class="def-body">X의 모든 원소에 대응이 존재해야 한다 — 대응이 없거나 2개 이상이면 함수가 아니다.</span>
+            </div>
+            <div class="def-item">
+              <span class="def-term">예 (함수 O)</span>
+              <span class="def-body">f(x) = 2x + 1 &nbsp;&#8594;&nbsp; x마다 유일한 y값 존재</span>
+            </div>
+            <div class="def-item">
+              <span class="def-term">예 (함수 X)</span>
+              <span class="def-body">x&#178; + y&#178; = 1 &nbsp;&#8594;&nbsp; 하나의 x에 두 y값 대응</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 슬라이드 4: 정의역 · 공역 · 치역 ===== -->
+    <div class="slide" data-slide="3"
+         role="region" aria-label="슬라이드 4: 정의역 공역 치역">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">02 — 핵심 용어</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <h2>정의역 · 공역 · 치역</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <div class="grid-3 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-label">Domain</span>
+              <h3 class="card-title">정의역</h3>
+              <p class="card-desc">함수의 입력값 전체 집합 X<br>모든 x가 대응 대상</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-label">Codomain</span>
+              <h3 class="card-title">공역</h3>
+              <p class="card-desc">출력값이 속할 수 있는 전체 집합 Y<br>치역을 포함하는 범위</p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-label">Range</span>
+              <h3 class="card-title">치역</h3>
+              <p class="card-desc">실제로 대응된 y값들의 집합<br>공역의 부분집합: f(X) &#8838; Y</p>
+            </div>
+          </div>
+          <div class="highlight-box" role="note" style="margin-top:0.9rem;">
+            <strong>치역 &#8800; 공역</strong>임에 주의하라.&nbsp;
+            f(x) = x&#178;에서 공역이 R이라면 치역은 [0, &#8734;)이다.
+          </div>
+          <div class="formula-box" aria-label="치역 표기">
+            치역 = { <span class="var">f</span>(<span class="var">x</span>) <span class="op">|</span> <span class="var">x</span> &#8712; <span class="var">X</span> }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 슬라이드 5: 함수의 종류 ===== -->
+    <div class="slide" data-slide="4"
+         role="region" aria-label="슬라이드 5: 함수의 종류">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">03 — 함수의 종류</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <h2>함수의 종류</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <div class="activity-num" aria-hidden="true">1:1</div>
+              <div class="activity-body">
+                <h3 class="activity-title">일대일 함수 (단사함수)</h3>
+                <p class="activity-desc">
+                  서로 다른 x에 서로 다른 f(x)가 대응.
+                  x&#8321; &#8800; x&#8322; &#8658; f(x&#8321;) &#8800; f(x&#8322;)
+                </p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <div class="activity-num" aria-hidden="true">ON</div>
+              <div class="activity-body">
+                <h3 class="activity-title">위로의 함수 (전사함수)</h3>
+                <p class="activity-desc">
+                  치역 = 공역. Y의 모든 원소에 대응하는 X의 원소가 존재한다.
+                </p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <div class="activity-num" aria-hidden="true">1-1</div>
+              <div class="activity-body">
+                <h3 class="activity-title">일대일 대응 (전단사함수)</h3>
+                <p class="activity-desc">
+                  단사 + 전사를 동시에 만족. 역함수가 존재하는 조건이다.
+                </p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <div class="activity-num" aria-hidden="true">ID</div>
+              <div class="activity-body">
+                <h3 class="activity-title">항등함수 / 상수함수</h3>
+                <p class="activity-desc">
+                  항등함수: f(x) = x &nbsp;&#8212;&nbsp;
+                  상수함수: f(x) = c (c는 상수, 치역 = {c})
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 슬라이드 6: 함수의 그래프 ===== -->
+    <div class="slide" data-slide="5"
+         role="region" aria-label="슬라이드 6: 함수의 그래프">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">04 — 그래프</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <h2>함수의 그래프</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">수직선 판별법</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">임의의 수직선이 그래프와 <strong>1번만</strong> 만나면 함수의 그래프</li>
+                <li role="listitem">2번 이상 만나는 지점이 있으면 함수가 아니다</li>
+                <li role="listitem">원 x&#178;+y&#178;=r&#178;은 수직선과 2교점 &#8594; 함수 아님</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">그래프 해석</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">x 절편: f(x)=0이 되는 x값</li>
+                <li role="listitem">y 절편: f(0) 값</li>
+                <li role="listitem">증가/감소 구간: 기울기의 부호로 판단</li>
+                <li role="listitem">대칭축: 우함수(y축), 기함수(원점)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="graph-area" aria-label="수직선 판별법 예시 그래프 (SVG)">
+            <svg viewBox="0 0 320 140" width="320" height="140" aria-hidden="true">
+              <!-- 축 -->
+              <line x1="20" y1="70" x2="300" y2="70" stroke="#DDDDDD" stroke-width="1.5"/>
+              <line x1="160" y1="10" x2="160" y2="130" stroke="#DDDDDD" stroke-width="1.5"/>
+              <!-- 포물선 y=0.04(x-160)^2+30 -->
+              <path d="M 60,114 Q 160,18 260,114" stroke="#111111" stroke-width="2.2" fill="none"/>
+              <!-- 수직선 (함수 판별) -->
+              <line x1="200" y1="15" x2="200" y2="128" stroke="#E8000D" stroke-width="1.8" stroke-dasharray="5,3"/>
+              <!-- 교점 -->
+              <circle cx="200" cy="50" r="3.5" fill="#E8000D"/>
+              <!-- 레이블 -->
+              <text x="205" y="45" font-size="10" fill="#E8000D" font-family="Inter,Arial,sans-serif">1교점 &#10003;</text>
+              <text x="146" y="135" font-size="10" fill="#888888" font-family="Inter,Arial,sans-serif">O</text>
+              <text x="295" y="80" font-size="10" fill="#888888" font-family="Inter,Arial,sans-serif">x</text>
+              <text x="163" y="16" font-size="10" fill="#888888" font-family="Inter,Arial,sans-serif">y</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 슬라이드 7: 합성함수와 역함수 ===== -->
+    <div class="slide" data-slide="6"
+         role="region" aria-label="슬라이드 7: 합성함수와 역함수">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">05 — 합성 &amp; 역함수</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <h2>합성함수와 역함수</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem">
+              <span class="card-label">Composition</span>
+              <h3 class="card-title">합성함수</h3>
+              <p class="card-desc">두 함수를 순서대로 적용한 새로운 함수</p>
+              <div class="formula-box" aria-label="합성함수 공식" style="margin-top:0.6rem; font-size:0.9rem;">
+                (<span class="var">g</span> &#8728; <span class="var">f</span>)(<span class="var">x</span>)
+                <span class="op"> = </span>
+                <span class="var">g</span>(<span class="var">f</span>(<span class="var">x</span>))
+              </div>
+              <p class="card-desc" style="margin-top:0.45rem;">
+                주의: g&#8728;f &#8800; f&#8728;g (교환법칙 불성립)
+              </p>
+            </div>
+            <div class="card" role="listitem">
+              <span class="card-label">Inverse</span>
+              <h3 class="card-title">역함수</h3>
+              <p class="card-desc">일대일 대응인 함수에만 존재</p>
+              <div class="formula-box" aria-label="역함수 공식" style="margin-top:0.6rem; font-size:0.9rem;">
+                <span class="var">f</span> &#8728; <span class="var">f</span><sup>-1</sup>
+                <span class="op"> = </span>
+                <span class="var">I</span>&nbsp;&nbsp;
+                (<span class="var">I</span>: 항등함수)
+              </div>
+              <p class="card-desc" style="margin-top:0.45rem;">
+                그래프는 y = x에 대해 대칭
+              </p>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            역함수 구하는 절차: <strong>(1)</strong> y = f(x) 로 놓기
+            &#8594; <strong>(2)</strong> x에 대해 풀기
+            &#8594; <strong>(3)</strong> x와 y 교환
+            &#8594; <strong>(4)</strong> f&#8315;&#185;(x) 표기
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 슬라이드 8: 핵심 정리 & 마무리 ===== -->
+    <div class="slide" data-slide="7"
+         role="region" aria-label="슬라이드 8: 핵심 정리 마무리">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Summary</span>
+        </div>
+        <div class="browser-content end-slide" tabindex="-1">
+          <span class="badge">단원 마무리</span>
+          <h1 class="end-title">핵심 정리</h1>
+          <p class="end-subtitle">오늘 배운 내용을 한눈에 확인하세요.</p>
+          <div class="highlight-box end-summary" role="complementary" aria-label="핵심 요약">
+            <h2 style="font-size:1rem; margin-bottom:0.4rem;">함수의 개념과 그래프 — 핵심 5가지</h2>
+            <ul class="summary-list" role="list">
+              <li role="listitem">함수: X의 각 원소에 Y의 원소가 <strong>하나씩</strong> 대응</li>
+              <li role="listitem">정의역(X) &#8712; 공역(Y) &#8839; 치역 f(X)</li>
+              <li role="listitem">단사 · 전사 · 전단사(일대일 대응) 구별</li>
+              <li role="listitem">수직선 판별법으로 함수 그래프 확인</li>
+              <li role="listitem">역함수 존재 조건: 일대일 대응, 그래프는 y=x 대칭</li>
+            </ul>
+          </div>
+          <div class="stat-grid" role="list" aria-label="학습 지표">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="5가지 핵심 용어">5</span>
+              <span class="stat-label">핵심 용어</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="4가지 함수 유형">4</span>
+              <span class="stat-label">함수 유형</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="1가지 판별법">1</span>
+              <span class="stat-label">판별법</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled
+            aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()"
+            aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlidesCount = slides.length;
+    let currentSlide = 0;
+
+    const progressBar = document.getElementById('progressBar');
+    const slideInput  = document.getElementById('slideInput');
+    const prevBtn     = document.getElementById('prevBtn');
+    const nextBtn     = document.getElementById('nextBtn');
+
+    document.getElementById('totalSlides').textContent = totalSlidesCount;
+    progressBar.setAttribute('aria-valuemax', totalSlidesCount);
+
+    // Stagger delay init
+    document.querySelectorAll('.stagger-item').forEach((el, i) => {
+      el.style.setProperty('--delay', (i * 0.08) + 's');
+    });
+
+    function announceSlide(idx, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (idx + 1) + ' / ' + total;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlidesCount) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlidesCount - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlidesCount) return;
+      const cur  = slides[currentSlide];
+      const next = slides[index];
+      cur.classList.add('will-animate');
+      next.classList.add('will-animate');
+      cur.classList.remove('active');
+      currentSlide = index;
+      next.classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlidesCount);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+      setTimeout(() => {
+        cur.classList.remove('will-animate');
+        next.classList.remove('will-animate');
+      }, 400);
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    // Keyboard + clicker
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault(); nextSlide();
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+        else if (e.key === 'End')  { e.preventDefault(); goToSlide(totalSlidesCount - 1); }
+    });
+
+    // Mouse wheel (600ms debounce)
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    // Touch swipe (50px threshold)
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+    }, { passive: true });
+
+    // Slide input direct navigation
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        const val = parseInt(slideInput.value, 10);
+        if (!isNaN(val) && val >= 1 && val <= totalSlidesCount) goToSlide(val - 1);
+        else slideInput.value = currentSlide + 1;
+        slideInput.blur();
+      } else if (e.key === 'Escape') {
+        slideInput.value = currentSlide + 1;
+        slideInput.blur();
+      }
+    });
+    slideInput.addEventListener('blur', () => {
+      const val = parseInt(slideInput.value, 10);
+      if (!isNaN(val) && val >= 1 && val <= totalSlidesCount) goToSlide(val - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    // Fullscreen
+    function toggleFullscreen() {
+      const fsE = document.getElementById('fsExpand');
+      const fsC = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          fsE.style.display = 'none';
+          fsC.style.display = 'block';
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          fsE.style.display = 'block';
+          fsC.style.display = 'none';
+        }).catch(() => {});
+      }
+    }
+
+    // Init
+    updateNav();
+  </script>
+</body>
+</html>

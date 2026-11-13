@@ -1,0 +1,159 @@
+{
+  "scenario_1": [
+    {
+      "slide": 1,
+      "keyword": "solar system planets aesthetic background",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Solar_System_true_color_%28captions%29.jpg/1280px-Solar_System_true_color_%28captions%29.jpg",
+      "local_path": "test/cycle4-images/img-1-1-solar-system-cover.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 97275,
+      "mime_type": "image/jpeg"
+    },
+    {
+      "slide": 3,
+      "keyword": "solar system diagram planets order",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Planets2013.svg/1280px-Planets2013.svg.png",
+      "local_path": "test/cycle4-images/img-1-3-solar-system-diagram.png",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 575378,
+      "mime_type": "image/png"
+    },
+    {
+      "slide": 4,
+      "keyword": "inner planets mercury venus earth mars comparison",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Terrestrial_planet_size_comparisons_right_to_left.jpg/1280px-Terrestrial_planet_size_comparisons_right_to_left.jpg",
+      "local_path": "test/cycle4-images/img-1-4-inner-planets.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 87050,
+      "mime_type": "image/jpeg"
+    },
+    {
+      "slide": 5,
+      "keyword": "outer planets jupiter saturn uranus neptune",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Gas_giants_in_the_solar_system.jpg/1280px-Gas_giants_in_the_solar_system.jpg",
+      "local_path": "test/cycle4-images/img-1-5-outer-planets.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 243636,
+      "mime_type": "image/jpeg"
+    },
+    {
+      "slide": 8,
+      "keyword": "mars perseverance rover NASA photo",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Perseverance_Landing_Skycrane.jpg/1280px-Perseverance_Landing_Skycrane.jpg",
+      "local_path": "test/cycle4-images/img-1-8-perseverance-rover.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons (NASA Public Domain)",
+      "file_size_bytes": 191541,
+      "mime_type": "image/jpeg"
+    }
+  ],
+  "scenario_2": [
+    {
+      "slide": 1,
+      "keyword": "UNESCO world heritage sites collage aesthetic",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Buddhist_monks_in_front_of_the_Angkor_Wat.jpg/1280px-Buddhist_monks_in_front_of_the_Angkor_Wat.jpg",
+      "local_path": "test/cycle4-images/img-2-1-unesco-heritage.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 348735,
+      "mime_type": "image/jpeg",
+      "note": "Used Angkor Wat landscape as UNESCO heritage cover image"
+    },
+    {
+      "slide": 3,
+      "keyword": "Gyeongbokgung palace Seoul Korea landscape photo",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/%EA%B4%91%ED%99%94%EB%AC%B8_%EC%9B%94%EB%8C%80.jpg/1280px-%EA%B4%91%ED%99%94%EB%AC%B8_%EC%9B%94%EB%8C%80.jpg",
+      "local_path": "test/cycle4-images/img-2-3-gyeongbokgung.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 331626,
+      "mime_type": "image/jpeg"
+    },
+    {
+      "slide": 4,
+      "keyword": "Seokguram grotto Bulguksa temple Korea",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Lotus_Flower_Bridge_and_Seven_Treasure_Bridge_at_Bulguksa_in_Gyeongju%2C_Korea.jpg/1280px-Lotus_Flower_Bridge_and_Seven_Treasure_Bridge_at_Bulguksa_in_Gyeongju%2C_Korea.jpg",
+      "local_path": "test/cycle4-images/img-2-4-bulguksa.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 486223,
+      "mime_type": "image/jpeg"
+    },
+    {
+      "slide": 5,
+      "keyword": "Angkor Wat Cambodia temple landscape photo",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Buddhist_monks_in_front_of_the_Angkor_Wat.jpg/1280px-Buddhist_monks_in_front_of_the_Angkor_Wat.jpg",
+      "local_path": "test/cycle4-images/img-2-5-angkor-wat.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 348735,
+      "mime_type": "image/jpeg"
+    },
+    {
+      "slide": 6,
+      "keyword": "Colosseum Rome Italy landscape photo",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Colosseo_2020.jpg/1280px-Colosseo_2020.jpg",
+      "local_path": "test/cycle4-images/img-2-6-colosseum.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 332790,
+      "mime_type": "image/jpeg"
+    }
+  ],
+  "scenario_3": [
+    {
+      "slide": 1,
+      "keyword": "artificial intelligence education futuristic background",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Dall-e_3_%28jan_%2724%29_artificial_intelligence_icon.png",
+      "local_path": "test/cycle4-images/img-3-1-ai-cover.png",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 747140,
+      "mime_type": "image/png"
+    },
+    {
+      "slide": 6,
+      "keyword": "generative AI chatbot interface education diagram",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/AI-ML-DL.svg/1280px-AI-ML-DL.svg.png",
+      "local_path": "test/cycle4-images/img-3-6-generative-ai.png",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 256186,
+      "mime_type": "image/png"
+    },
+    {
+      "slide": 7,
+      "keyword": "AI classroom education technology students learning photo",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/ChatGPT_street_art_in_Tel_Aviv.jpg/1280px-ChatGPT_street_art_in_Tel_Aviv.jpg",
+      "local_path": "test/cycle4-images/img-3-7-ai-classroom.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 444096,
+      "mime_type": "image/jpeg"
+    },
+    {
+      "slide": 11,
+      "keyword": "teacher using AI laptop classroom workshop photo",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Interactive_whiteboard_at_CeBIT_2007.jpg",
+      "local_path": "test/cycle4-images/img-3-11-teacher-workshop.jpg",
+      "status": "success",
+      "source": "Wikimedia Commons",
+      "file_size_bytes": 86808,
+      "mime_type": "image/jpeg"
+    }
+  ],
+  "summary": {
+    "total_images": 14,
+    "successful": 14,
+    "failed": 0,
+    "total_size_bytes": 4377219,
+    "all_sources_wikimedia": true,
+    "search_method": "WebSearch + Wikimedia Commons API (Playwright Chrome extension unavailable)",
+    "download_method": "curl with Wikimedia URLs",
+    "validation": "All files verified as valid image MIME types, all under 2MB"
+  }
+}

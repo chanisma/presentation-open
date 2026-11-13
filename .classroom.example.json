@@ -1,0 +1,13 @@
+{
+  "_설명": "이 파일을 .classroom.json 으로 복사해 채우세요. .classroom.json 은 gitignore 됩니다 — 토큰이 들어가므로 절대 커밋 금지.",
+  "gasUrl": "https://script.google.com/macros/s/여기에_배포ID/exec",
+  "token": "setup() 실행 로그에 찍힌 토큰",
+  "origin": "https://2026kijunit.netlify.app",
+  "_courses": "node scripts/classroom-post.mjs --courses 로 확인한 courseId 를 쓰기 편한 별칭에 매핑. --to 인공지능기초 처럼 쓴다.",
+  "courses": {
+    "인공지능기초": "000000000000",
+    "정보": "000000000000"
+  },
+  "_defaultType": "announcement(공지) | material(수업 자료) | assignment(과제)",
+  "defaultType": "announcement"
+}

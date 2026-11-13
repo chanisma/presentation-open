@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>피지컬 AI 프로젝트 - 학생용 실습 가이드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0F0F2D;
+      --primary: #A78BFA;
+      --accent: #67E8F9;
+      --text: #FFFFFF;
+      --text-sec: #C8C8E0;
+      --glass: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.15);
+      --glass-strong: rgba(255,255,255,0.12);
+      --success: #34D399;
+      --warn: #FBBF24;
+      --danger: #F87171;
+      --pink: #F472B6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(167,139,250,0.12), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(103,232,249,0.08), transparent);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+
+    .guide-container {
+      max-width: 800px; margin: 0 auto;
+    }
+
+    /* Header */
+    .guide-header {
+      text-align: center; margin-bottom: 2.5rem;
+    }
+    .guide-badge {
+      display: inline-block; padding: 0.3em 1em;
+      border-radius: 2em; font-size: 0.85rem; font-weight: 600;
+      background: rgba(167,139,250,0.2); color: var(--primary);
+      border: 1px solid rgba(167,139,250,0.3);
+      margin-bottom: 0.8rem;
+    }
+    .guide-header h1 {
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+      font-size: 2.2rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+    }
+    .guide-header p { color: var(--text-sec); font-size: 1rem; }
+
+    /* Section */
+    .section {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+      padding: 1.5rem 2rem;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(20px);
+    }
+    .section h2 {
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+      font-size: 1.4rem; font-weight: 700;
+      margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .section h3 {
+      font-size: 1.1rem; font-weight: 600;
+      color: var(--accent); margin-bottom: 0.5rem; margin-top: 1rem;
+    }
+    .section h3:first-of-type { margin-top: 0.3rem; }
+
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2rem; height: 2rem; border-radius: 50%;
+      background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.4);
+      color: var(--primary); font-weight: 700; font-size: 0.9rem;
+      flex-shrink: 0;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Highlight */
+    .highlight {
+      background: var(--glass-strong);
+      border: 1px solid var(--glass-border);
+      border-left: 3px solid var(--primary);
+      border-radius: 0.6rem;
+      padding: 0.8rem 1rem;
+      margin: 0.8rem 0;
+    }
+    .highlight--accent { border-left-color: var(--accent); }
+    .highlight--warn { border-left-color: var(--warn); }
+    .highlight--danger { border-left-color: var(--danger); }
+    .highlight p { margin: 0; }
+
+    /* Code */
+    .code {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      padding: 1rem 1.2rem;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      overflow-x: auto;
+      margin: 0.8rem 0;
+      color: var(--text-sec);
+      white-space: pre;
+    }
+    .code-label {
+      font-size: 0.75rem; color: var(--accent);
+      font-weight: 600; margin-bottom: 0.2rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .kw { color: var(--primary); }
+    .fn { color: var(--accent); }
+    .str { color: var(--success); }
+    .cmt { color: rgba(200,200,224,0.45); font-style: italic; }
+    .num { color: var(--warn); }
+
+    /* List */
+    .step-list {
+      list-style: none; display: flex; flex-direction: column; gap: 0.8rem;
+    }
+    .step-item {
+      display: flex; gap: 0.8rem; align-items: flex-start;
+      padding: 0.8rem 1rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.6rem;
+    }
+    .step-content { flex: 1; }
+    .step-content h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .step-content p { font-size: 0.9rem; color: var(--text-sec); margin: 0; }
+
+    /* Table */
+    .info-table {
+      width: 100%; border-collapse: collapse;
+      margin: 0.8rem 0; font-size: 0.9rem;
+    }
+    .info-table th, .info-table td {
+      padding: 0.5rem 0.8rem; text-align: left;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .info-table th {
+      background: rgba(167,139,250,0.12);
+      color: var(--primary); font-weight: 600;
+    }
+    .info-table td { color: var(--text-sec); }
+    .info-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+    /* Circuit Diagram (ASCII) */
+    .circuit {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.6rem;
+      padding: 1rem 1.2rem;
+      font-family: 'Consolas', monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      white-space: pre;
+      overflow-x: auto;
+      color: var(--text-sec);
+      margin: 0.8rem 0;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .checklist li {
+      font-size: 0.9rem; color: var(--text-sec);
+      padding: 0.3rem 0; padding-left: 1.8rem;
+      position: relative;
+    }
+    .checklist li::before {
+      content: '☐'; position: absolute; left: 0;
+      color: var(--accent); font-size: 1rem;
+    }
+
+    /* Troubleshoot */
+    .trouble-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.8rem; margin-top: 0.5rem;
+    }
+    .trouble-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.6rem;
+      padding: 0.8rem 1rem;
+    }
+    .trouble-card h4 {
+      font-size: 0.9rem; font-weight: 600;
+      color: var(--warn); margin-bottom: 0.3rem;
+    }
+    .trouble-card p { font-size: 0.85rem; color: var(--text-sec); margin: 0.15rem 0; }
+
+    /* Footer */
+    .guide-footer {
+      text-align: center; margin-top: 2rem;
+      color: var(--text-sec); font-size: 0.8rem;
+    }
+
+    /* Print */
+    @media print {
+      body { background: white; color: #333; padding: 1cm; }
+      .section { border: 1px solid #ddd; background: white; backdrop-filter: none; page-break-inside: avoid; }
+      .guide-header h1 { -webkit-text-fill-color: #5b21b6; background: none; }
+      .code { background: #f5f5f5; color: #333; border: 1px solid #ddd; }
+      .kw, .fn, .str, .cmt, .num { color: #333; }
+      .highlight { background: #f9f9f9; border-color: #ddd; }
+      h2, h3 { color: #333; }
+      .step-num { border: 1px solid #999; color: #333; background: #f0f0f0; }
+    }
+
+    @media (max-width: 640px) {
+      .trouble-grid { grid-template-columns: 1fr; }
+      .section { padding: 1rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="guide-container">
+    <!-- Header -->
+    <div class="guide-header">
+      <span class="guide-badge">인공지능과 피지컬컴퓨팅</span>
+      <h1>피지컬 AI 프로젝트</h1>
+      <p>손동작 인식 스마트 조명 — 학생용 실습 가이드</p>
+    </div>
+
+    <!-- Section 0: 개요 -->
+    <div class="section">
+      <h2><span class="step-num">0</span> 프로젝트 개요</h2>
+      <div class="highlight">
+        <p>웹캠으로 손동작을 인식하고, 아두이노에 연결된 LED를 제어하는 <strong>피지컬 AI</strong> 프로젝트입니다.</p>
+      </div>
+
+      <h3>전체 시스템 구조</h3>
+      <div class="circuit">웹캠 → Teachable Machine → Web Serial API → USB → 아두이노 → LED
+(센서)    (AI 모델)         (통신)         (케이블) (제어기)   (출력)</div>
+
+      <h3>필요한 파일</h3>
+      <table class="info-table">
+        <thead>
+          <tr><th>파일</th><th>용도</th><th>설명</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>app.html</strong></td><td>웹 앱</td><td>Chrome에서 열어 사용하는 메인 프로그램</td></tr>
+          <tr><td><strong>smart_light.ino</strong></td><td>아두이노 코드</td><td>Arduino IDE로 아두이노에 업로드</td></tr>
+          <tr><td><strong>guide.html</strong></td><td>이 문서</td><td>실습 가이드 (지금 보고 있는 문서)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>준비물 체크리스트</h3>
+      <ul class="checklist">
+        <li>아두이노 Uno + USB 케이블</li>
+        <li>LED 3개 (빨강, 초록, 파랑)</li>
+        <li>220Ω 저항 3개</li>
+        <li>브레드보드 + 점퍼선</li>
+        <li>Chrome 브라우저 (Edge도 가능)</li>
+        <li>Arduino IDE 설치됨</li>
+        <li>Teachable Machine 모델 링크 (지난 시간에 저장한 것)</li>
+      </ul>
+    </div>
+
+    <!-- Section 1: 회로 -->
+    <div class="section">
+      <h2><span class="step-num">1</span> 아두이노 회로 연결</h2>
+
+      <h3>회로 연결표</h3>
+      <table class="info-table">
+        <thead>
+          <tr><th>LED 색상</th><th>아두이노 핀</th><th>연결 방법</th></tr>
+        </thead>
+        <tbody>
+          <tr><td style="color:#F87171;">빨간 LED</td><td>디지털 <strong>9</strong>번</td><td>긴 다리(+) → 220Ω 저항 → 9번 핀</td></tr>
+          <tr><td style="color:#34D399;">초록 LED</td><td>디지털 <strong>10</strong>번</td><td>긴 다리(+) → 220Ω 저항 → 10번 핀</td></tr>
+          <tr><td style="color:#60A5FA;">파란 LED</td><td>디지털 <strong>11</strong>번</td><td>긴 다리(+) → 220Ω 저항 → 11번 핀</td></tr>
+          <tr><td colspan="3">모든 LED의 짧은 다리(-) → <strong>GND</strong>에 연결</td></tr>
+        </tbody>
+      </table>
+
+      <h3>회로도</h3>
+      <div class="circuit">
+아두이노 Uno
+┌──────────────┐
+│              │
+│  9번 핀 ──── 220Ω ──── [빨강 LED] ──┐
+│              │                       │
+│ 10번 핀 ──── 220Ω ──── [초록 LED] ──┤
+│              │                       │
+│ 11번 핀 ──── 220Ω ──── [파랑 LED] ──┤
+│              │                       │
+│  GND ────────────────────────────────┘
+│              │
+└──────────────┘
+      </div>
+
+      <div class="highlight--warn highlight">
+        <p><strong>주의!</strong> LED에는 극성이 있습니다. 긴 다리가 (+), 짧은 다리가 (-) 입니다. 반대로 연결하면 켜지지 않습니다. 저항을 빼먹으면 LED가 타버릴 수 있으니 반드시 연결하세요.</p>
+      </div>
+    </div>
+
+    <!-- Section 2: 아두이노 코드 -->
+    <div class="section">
+      <h2><span class="step-num">2</span> 아두이노 코드 업로드</h2>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-content">
+            <h4>Arduino IDE 실행</h4>
+            <p>아두이노를 USB 케이블로 컴퓨터에 연결한 후 Arduino IDE를 엽니다.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-content">
+            <h4>보드 & 포트 설정</h4>
+            <p>메뉴에서 <strong>도구 → 보드 → "Arduino Uno"</strong> 선택, <strong>도구 → 포트 → "COM○"</strong> (숫자가 있는 것) 선택</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-content">
+            <h4>코드 붙여넣기</h4>
+            <p>Arduino IDE의 기존 코드를 모두 지우고, 아래 코드를 복사하여 붙여넣으세요. 또는 <strong>smart_light.ino</strong> 파일을 직접 열어도 됩니다.</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="code-label">smart_light.ino</div>
+      <div class="code"><span class="kw">const int</span> RED_PIN   = <span class="num">9</span>;
+<span class="kw">const int</span> GREEN_PIN = <span class="num">10</span>;
+<span class="kw">const int</span> BLUE_PIN  = <span class="num">11</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial</span>.begin(<span class="num">9600</span>);
+  <span class="fn">pinMode</span>(RED_PIN, <span class="kw">OUTPUT</span>);
+  <span class="fn">pinMode</span>(GREEN_PIN, <span class="kw">OUTPUT</span>);
+  <span class="fn">pinMode</span>(BLUE_PIN, <span class="kw">OUTPUT</span>);
+
+  <span class="cmt">// 시작 시 LED 3번 깜빡 → 연결 확인용</span>
+  <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">3</span>; i++) {
+    <span class="fn">digitalWrite</span>(RED_PIN, <span class="kw">HIGH</span>);
+    <span class="fn">digitalWrite</span>(GREEN_PIN, <span class="kw">HIGH</span>);
+    <span class="fn">digitalWrite</span>(BLUE_PIN, <span class="kw">HIGH</span>);
+    <span class="fn">delay</span>(<span class="num">200</span>);
+    <span class="fn">digitalWrite</span>(RED_PIN, <span class="kw">LOW</span>);
+    <span class="fn">digitalWrite</span>(GREEN_PIN, <span class="kw">LOW</span>);
+    <span class="fn">digitalWrite</span>(BLUE_PIN, <span class="kw">LOW</span>);
+    <span class="fn">delay</span>(<span class="num">200</span>);
+  }
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (<span class="fn">Serial</span>.available() > <span class="num">0</span>) {
+    <span class="kw">char</span> cmd = <span class="fn">Serial</span>.read();
+
+    <span class="fn">digitalWrite</span>(RED_PIN, <span class="kw">LOW</span>);
+    <span class="fn">digitalWrite</span>(GREEN_PIN, <span class="kw">LOW</span>);
+    <span class="fn">digitalWrite</span>(BLUE_PIN, <span class="kw">LOW</span>);
+
+    <span class="kw">switch</span> (cmd) {
+      <span class="kw">case</span> <span class="str">'R'</span>: <span class="fn">digitalWrite</span>(RED_PIN, <span class="kw">HIGH</span>);   <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="str">'G'</span>: <span class="fn">digitalWrite</span>(GREEN_PIN, <span class="kw">HIGH</span>); <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="str">'B'</span>: <span class="fn">digitalWrite</span>(BLUE_PIN, <span class="kw">HIGH</span>);  <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="str">'O'</span>: <span class="kw">break</span>; <span class="cmt">// 이미 전부 꺼짐</span>
+    }
+  }
+}</div>
+
+      <ol class="step-list" style="margin-top:0.8rem;">
+        <li class="step-item">
+          <span class="step-num">4</span>
+          <div class="step-content">
+            <h4>업로드</h4>
+            <p>상단의 <strong>→ (업로드)</strong> 버튼을 클릭합니다. "Done uploading." 메시지가 나오면 성공!</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">5</span>
+          <div class="step-content">
+            <h4>확인</h4>
+            <p>업로드 성공 시 LED 3개가 3번 깜빡입니다. 깜빡이면 회로와 코드 모두 정상!</p>
+          </div>
+        </li>
+      </ol>
+
+      <div class="highlight--danger highlight">
+        <p><strong>중요!</strong> 업로드가 끝나면 Arduino IDE의 <strong>시리얼 모니터를 반드시 닫아주세요</strong>. 시리얼 모니터가 열려 있으면 웹 페이지에서 아두이노에 연결할 수 없습니다.</p>
+      </div>
+    </div>
+
+    <!-- Section 3: 웹 앱 사용 -->
+    <div class="section">
+      <h2><span class="step-num">3</span> 웹 앱(app.html) 사용법</h2>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">1</span>
+          <div class="step-content">
+            <h4>app.html을 Chrome에서 열기</h4>
+            <p>파일을 더블클릭하거나, Chrome에 파일을 드래그합니다.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">2</span>
+          <div class="step-content">
+            <h4>모델 URL 입력 → "모델 로드" 클릭</h4>
+            <p>지난 시간에 Teachable Machine에서 저장한 모델 링크를 붙여넣고 "모델 로드" 버튼을 클릭합니다. 웹캠이 자동으로 켜집니다.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">3</span>
+          <div class="step-content">
+            <h4>"아두이노 연결" 클릭</h4>
+            <p>팝업에서 아두이노 포트를 선택합니다. (보통 "USB Serial" 또는 "COM○"으로 표시됩니다)</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">4</span>
+          <div class="step-content">
+            <h4>손동작으로 LED 제어!</h4>
+            <p>웹캠 앞에서 손동작을 하면 AI가 인식하고, 아두이노 LED가 제어됩니다.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h3>클래스 → LED 매핑</h3>
+      <table class="info-table">
+        <thead>
+          <tr><th>TM 클래스 순서</th><th>전송 명령</th><th>LED 동작</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1번째 클래스 (예: 주먹)</td><td style="color:#F87171; font-weight:600;">R</td><td>빨간 LED 켜짐</td></tr>
+          <tr><td>2번째 클래스 (예: 보)</td><td style="color:#34D399; font-weight:600;">G</td><td>초록 LED 켜짐</td></tr>
+          <tr><td>3번째 클래스 (예: 가위)</td><td style="color:#60A5FA; font-weight:600;">B</td><td>파란 LED 켜짐</td></tr>
+          <tr><td>4번째 클래스 (예: 없음)</td><td style="color:var(--text-sec); font-weight:600;">O</td><td>모든 LED 꺼짐</td></tr>
+        </tbody>
+      </table>
+
+      <div class="highlight--accent highlight">
+        <p><strong>팁:</strong> AI의 인식 확률이 70% 이상일 때만 명령이 전송됩니다. 동작을 명확하게 해주세요. 화면 왼쪽의 LED 표시등으로 현재 상태를 확인할 수 있습니다.</p>
+      </div>
+    </div>
+
+    <!-- Section 4: 트러블슈팅 -->
+    <div class="section">
+      <h2><span class="step-num">4</span> 문제 해결 가이드</h2>
+
+      <div class="trouble-grid">
+        <div class="trouble-card">
+          <h4>LED가 안 켜져요</h4>
+          <p>1. LED 극성 확인 (긴 다리 = +)</p>
+          <p>2. 저항이 연결되어 있는지 확인</p>
+          <p>3. 핀 번호가 9, 10, 11인지 확인</p>
+          <p>4. 아두이노에 코드가 업로드 되었는지 확인</p>
+        </div>
+        <div class="trouble-card">
+          <h4>시리얼 연결이 안 돼요</h4>
+          <p>1. Arduino IDE 시리얼 모니터 닫기</p>
+          <p>2. Chrome 브라우저인지 확인</p>
+          <p>3. USB 케이블 다시 연결</p>
+          <p>4. 페이지 새로고침 후 재시도</p>
+        </div>
+        <div class="trouble-card">
+          <h4>모델 로드가 안 돼요</h4>
+          <p>1. URL 끝에 / 가 있는지 확인</p>
+          <p>2. 인터넷 연결 확인</p>
+          <p>3. URL을 다시 복사해서 붙여넣기</p>
+          <p>4. Teachable Machine에서 모델 재업로드</p>
+        </div>
+        <div class="trouble-card">
+          <h4>인식이 잘 안 돼요</h4>
+          <p>1. 밝은 곳에서 테스트</p>
+          <p>2. 동작을 더 크고 명확하게</p>
+          <p>3. 배경이 단순한 곳에서 테스트</p>
+          <p>4. TM에서 데이터 추가 후 재학습</p>
+        </div>
+      </div>
+
+      <div class="highlight" style="margin-top:1rem;">
+        <p><strong>포트가 목록에 안 보여요?</strong> Windows에서 아두이노 드라이버가 설치되지 않았을 수 있습니다. Arduino IDE를 설치하면 드라이버가 함께 설치됩니다. 설치 후 USB를 다시 연결하세요.</p>
+      </div>
+    </div>
+
+    <!-- Section 5: 코드 이해하기 -->
+    <div class="section">
+      <h2><span class="step-num">5</span> 코드 이해하기 (선택)</h2>
+
+      <h3>아두이노 코드가 하는 일</h3>
+      <table class="info-table">
+        <thead>
+          <tr><th>코드</th><th>의미</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>Serial.begin(9600)</code></td><td>시리얼 통신 시작 (속도 9600bps)</td></tr>
+          <tr><td><code>pinMode(9, OUTPUT)</code></td><td>9번 핀을 출력 모드로 설정</td></tr>
+          <tr><td><code>Serial.available()</code></td><td>시리얼로 데이터가 왔는지 확인</td></tr>
+          <tr><td><code>Serial.read()</code></td><td>시리얼에서 문자 1개 읽기</td></tr>
+          <tr><td><code>digitalWrite(9, HIGH)</code></td><td>9번 핀에 전류 보내기 (LED 켜기)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>웹 앱(app.html)이 하는 일</h3>
+      <table class="info-table">
+        <thead>
+          <tr><th>단계</th><th>설명</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1. 모델 로드</td><td>TensorFlow.js로 Teachable Machine 모델을 불러옴</td></tr>
+          <tr><td>2. 웹캠 캡처</td><td>웹캠 영상을 프레임 단위로 캡처</td></tr>
+          <tr><td>3. 예측</td><td>캡처한 이미지를 AI 모델에 넣어 각 클래스의 확률 계산</td></tr>
+          <tr><td>4. 판단</td><td>가장 높은 확률의 클래스를 선택 (70% 이상일 때만)</td></tr>
+          <tr><td>5. 전송</td><td>Web Serial API로 해당 문자(R/G/B/O)를 아두이노에 전송</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Section 6: 도전 과제 -->
+    <div class="section">
+      <h2><span class="step-num">+</span> 도전 과제</h2>
+
+      <div class="highlight--accent highlight">
+        <p>기본 프로젝트를 완성했다면, 아래 도전 과제에 도전해보세요!</p>
+      </div>
+
+      <ol class="step-list">
+        <li class="step-item">
+          <span class="step-num">A</span>
+          <div class="step-content">
+            <h4>동작 클래스 추가하기</h4>
+            <p>Teachable Machine에서 5번째, 6번째 클래스를 추가하고, 아두이노 코드에 새로운 LED 패턴(깜빡임, 페이드 등)을 추가해보세요.</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">B</span>
+          <div class="step-content">
+            <h4>부저 연결하기</h4>
+            <p>LED 대신 또는 LED와 함께 부저를 연결하면 손동작으로 소리를 제어할 수 있습니다. (부저는 저항 없이 바로 연결 가능)</p>
+          </div>
+        </li>
+        <li class="step-item">
+          <span class="step-num">C</span>
+          <div class="step-content">
+            <h4>서보모터 연결하기</h4>
+            <p>서보모터를 연결하면 손동작으로 물리적인 움직임(문 열기, 팔 움직이기 등)을 제어할 수 있습니다.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Footer -->
+    <div class="guide-footer">
+      <p>샘플고등학교 | 인공지능과 피지컬컴퓨팅 | 피지컬 AI 프로젝트</p>
+    </div>
+  </div>
+</body>
+</html>

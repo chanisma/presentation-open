@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "activities": [
+    {
+      "id": "ai-replace-teacher",
+      "slide": 3,
+      "kind": "choice",
+      "prompt": "선생님은 AI가 교사의 일을 얼마나 대신하게 될 거라고 보십니까? (정답 없음, 투표)",
+      "options": [
+        "거의 대신하지 못한다",
+        "행정·반복 업무 일부를 대신한다",
+        "수업 준비·평가까지 상당 부분 대신한다",
+        "교사의 역할 자체가 바뀐다"
+      ]
+    },
+    {
+      "id": "teacher-only-work",
+      "slide": 7,
+      "kind": "wordcloud",
+      "prompt": "AI가 대신할 수 없는 교사의 일을 한 단어로 적어 주세요."
+    },
+    {
+      "id": "useful-today",
+      "slide": 13,
+      "kind": "short",
+      "prompt": "오늘 시켜 본 일 중 실제 업무에 바로 쓸 만했던 것은 무엇입니까?"
+    },
+    {
+      "id": "tomorrow-one-task",
+      "slide": "last",
+      "kind": "short",
+      "prompt": "내일 AI에게 가장 먼저 맡겨 볼 업무 하나를 적어 주세요. (출구 티켓)"
+    }
+  ]
+}

@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>경제 기초 — 수요와 공급</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <style>
+    /* 1. Reset & CSS Variables */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --style-bg: #F0EDE8;
+      --style-primary: #1A1A1A;
+      --style-accent: #E63030;
+      --style-text: #1A1A1A;
+      --style-text-secondary: #555555;
+      --style-footnote: #999999;
+      --style-rule: #D0CBC3;
+      --style-card-bg: #E8E4DE;
+      --style-card-border: #C8C2BB;
+      --white: #FFFFFF;
+      --gray-200: #D0CBC3;
+      --gray-600: #666666;
+      --gray-700: #444444;
+      --main: #E63030;
+      --dark: #C02020;
+      --light: #FAF8F5;
+    }
+
+    /* 2. Base Typography */
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* 3. Slide Container & Navigation */
+    .presentation {
+      height: calc(100vh - 42px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 4. Browser Card Chrome */
+    .browser-card {
+      width: 100%;
+      max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--white);
+      border-radius: 0.6rem;
+      box-shadow: 0 4px 32px rgba(26,26,26,0.10), 0 1px 4px rgba(26,26,26,0.06);
+    }
+
+    .browser-card--frameless {
+      background: transparent;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0.9rem;
+      background: var(--style-primary);
+      border-radius: 0.6rem 0.6rem 0 0;
+      flex-shrink: 0;
+    }
+
+    .dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; }
+    .dot.red    { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green  { background: #28CA41; }
+
+    .topbar-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      color: #888888;
+      margin: 0 auto;
+      text-transform: uppercase;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    /* 5. Progress Bar */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      background: var(--style-accent);
+      z-index: 1000;
+      transition: width 0.3s ease;
+      will-change: width;
+      transform: translateZ(0);
+    }
+
+    /* 6. Accessibility */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+      white-space: nowrap; border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px; left: 0;
+      background: var(--main);
+      color: var(--white);
+      padding: 8px 16px;
+      z-index: 9999;
+      font-size: 14px;
+      border-radius: 0 0 4px 0;
+      transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+
+    :focus-visible {
+      outline: 3px solid var(--main);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    :focus:not(:focus-visible) { outline: none; }
+
+    /* 7. Nav Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1.5rem;
+      background: rgba(240,237,232,0.97);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--gray-200);
+      z-index: 999;
+      font-size: 14px;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 50%;
+      background: var(--white);
+      cursor: pointer;
+      font-size: 0;
+      color: var(--gray-700);
+      transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .nav-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray-600);
+      min-width: 3rem;
+      text-align: center;
+      display: flex; align-items: center; gap: 0.15rem;
+      line-height: 1;
+    }
+
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700;
+      color: inherit; font-family: inherit; padding: 0;
+      outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--main); }
+    .slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px; }
+
+    /* ─── STYLE 11: Typographic Bold / Kinetic Typography ─── */
+
+    /* Kinetic display text */
+    .kinetic-display {
+      font-family: 'Bebas Neue', 'Anton', Impact, sans-serif;
+      color: var(--style-primary);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+    }
+
+    .kinetic-accent {
+      color: var(--style-accent);
+    }
+
+    .mono-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--style-footnote);
+    }
+
+    /* Red left-edge bar (signature) */
+    .left-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--style-accent);
+      border-radius: 0;
+    }
+
+    /* Horizontal rule signature element */
+    .typo-rule {
+      height: 2px;
+      background: var(--style-primary);
+      margin: 0.5rem 0;
+    }
+
+    .typo-rule--light {
+      height: 1px;
+      background: var(--style-rule);
+      margin: 0.4rem 0;
+    }
+
+    .typo-rule--accent {
+      height: 3px;
+      background: var(--style-accent);
+      margin: 0.4rem 0;
+    }
+
+    /* ─── Cover Slide ─── */
+    .cover-card {
+      background: var(--style-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-card .browser-topbar {
+      background: #0A0A0A;
+    }
+
+    .cover-content {
+      padding: 1.2rem 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 560px;
+      position: relative;
+    }
+
+    .cover-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--style-accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .cover-h1 {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 5.5rem;
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 0.3rem;
+    }
+
+    .cover-h1 .accent { color: var(--style-accent); }
+
+    .cover-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: #888888;
+      text-transform: uppercase;
+      margin-top: 0.8rem;
+    }
+
+    .cover-footnote {
+      position: absolute;
+      bottom: 1rem;
+      right: 2rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      color: #555555;
+      text-transform: uppercase;
+    }
+
+    .cover-deco-bar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      background: var(--style-accent);
+    }
+
+    /* ─── TOC Slide ─── */
+    .toc-slide .browser-content {
+      padding: 0.8rem 0 0.8rem 0;
+      position: relative;
+    }
+
+    .toc-header {
+      padding: 0 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .toc-big-label {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 3.2rem;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: var(--style-primary);
+    }
+
+    .toc-big-label .accent { color: var(--style-accent); }
+
+    .toc-list {
+      list-style: none;
+      border-top: 2px solid var(--style-primary);
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.55rem 2rem;
+      border-bottom: 1px solid var(--style-rule);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .toc-item:hover { background: var(--style-card-bg); }
+
+    .toc-num {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 1.5rem;
+      color: var(--style-accent);
+      min-width: 2rem;
+      line-height: 1;
+    }
+
+    .toc-text {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--style-primary);
+      flex: 1;
+    }
+
+    .toc-arrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--style-footnote);
+    }
+
+    /* ─── Section Header (shared) ─── */
+    .section-header {
+      margin-bottom: 0.6rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 2.4rem;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      color: var(--style-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .section-icon {
+      display: inline;
+      font-size: 1.2em;
+      margin-right: 0.4em;
+      vertical-align: -0.1em;
+    }
+
+    .section-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--style-footnote);
+      margin-top: 0.2rem;
+    }
+
+    /* ─── Highlight Box ─── */
+    .highlight-box {
+      background: var(--style-card-bg);
+      border-left: 4px solid var(--style-accent);
+      padding: 0.65rem 1rem;
+      margin: 0.5rem 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--style-text);
+      font-weight: 600;
+    }
+
+    /* ─── Card Grid ─── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    .card {
+      background: var(--style-card-bg);
+      border: 1px solid var(--style-card-border);
+      padding: 0.7rem 0.9rem;
+      contain: layout style;
+    }
+
+    .card-icon {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-title {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--style-primary);
+      margin-bottom: 0.2rem;
+    }
+
+    .card-desc {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: var(--style-text-secondary);
+    }
+
+    .card--accent-top {
+      border-top: 3px solid var(--style-accent);
+    }
+
+    /* ─── Big Type Slides (Kinetic) ─── */
+    .kinetic-slide .browser-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kinetic-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--style-accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .kinetic-h2 {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 4.2rem;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: var(--style-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .kinetic-h2 .accent { color: var(--style-accent); }
+
+    .kinetic-body {
+      font-family: 'Pretendard Variable', sans-serif;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--style-text-secondary);
+      max-width: 640px;
+    }
+
+    .kinetic-footnote {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--style-footnote);
+      margin-top: 0.8rem;
+    }
+
+    /* ─── Two Column ─── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 2px 1fr;
+      gap: 0;
+      margin-top: 0.5rem;
+    }
+
+    .col-divider {
+      background: var(--style-rule);
+      margin: 0 0.8rem;
+    }
+
+    .col-title {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.02em;
+      color: var(--style-primary);
+      margin-bottom: 0.4rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 2px solid var(--style-accent);
+    }
+
+    .col-list {
+      list-style: none;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--style-text-secondary);
+    }
+
+    .col-list li {
+      padding: 0.2rem 0;
+      border-bottom: 1px solid var(--style-rule);
+      padding-left: 0.6rem;
+      position: relative;
+    }
+
+    .col-list li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 3px;
+      background: var(--style-accent);
+    }
+
+    /* ─── Stat Highlight ─── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.6rem;
+      margin: 0.5rem 0;
+    }
+
+    .stat-item {
+      background: var(--style-card-bg);
+      border-top: 3px solid var(--style-accent);
+      padding: 0.7rem 0.8rem;
+      text-align: center;
+      contain: layout style;
+    }
+
+    .stat-number {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 2.2rem;
+      color: var(--style-primary);
+      display: block;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--style-footnote);
+      display: block;
+      margin-top: 0.2rem;
+    }
+
+    /* ─── End Slide ─── */
+    .end-card {
+      background: var(--style-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .end-card .browser-topbar {
+      background: #0A0A0A;
+    }
+
+    .end-content {
+      padding: 1.2rem 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 520px;
+      position: relative;
+    }
+
+    .end-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--style-accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .end-title {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 4.8rem;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+    }
+
+    .end-title .accent { color: var(--style-accent); }
+
+    .end-summary {
+      background: rgba(255,255,255,0.06);
+      border-left: 4px solid var(--style-accent);
+      padding: 0.7rem 1rem;
+      margin-top: 0.5rem;
+      max-width: 540px;
+    }
+
+    .end-summary-title {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      color: var(--style-accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .end-summary-list {
+      list-style: none;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: #CCCCCC;
+      font-family: 'Pretendard Variable', sans-serif;
+    }
+
+    .end-summary-list li {
+      padding: 0.1rem 0;
+    }
+
+    .end-summary-list li::before {
+      content: '— ';
+      color: var(--style-accent);
+    }
+
+    .end-footnote {
+      position: absolute;
+      bottom: 1rem;
+      right: 2rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.5rem;
+      letter-spacing: 0.12em;
+      color: #444444;
+      text-transform: uppercase;
+    }
+
+    .end-deco-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: var(--style-accent);
+    }
+
+    /* ─── Task List ─── */
+    .task-list {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+
+    .task-item {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-start;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--style-rule);
+    }
+
+    .task-num {
+      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-size: 1.4rem;
+      color: var(--style-accent);
+      min-width: 2rem;
+      line-height: 1;
+    }
+
+    .task-body { flex: 1; }
+
+    .task-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--style-primary);
+      margin-bottom: 0.15rem;
+    }
+
+    .task-desc {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: var(--style-text-secondary);
+    }
+
+    /* 8. Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .slide { padding: 1.5rem; }
+      .browser-card { border-radius: 0.8rem; }
+    }
+
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .col-divider { display: none; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .cover-h1 { font-size: 3.5rem; }
+      .kinetic-h2 { font-size: 2.8rem; }
+    }
+
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      .cover-h1 { font-size: 2.8rem; }
+    }
+
+    /* 9. Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* High contrast */
+    @media (prefers-contrast: high) {
+      :root {
+        --style-primary: #000000;
+        --style-accent: #CC0000;
+        --style-text: #000000;
+        --style-bg: #FFFFFF;
+      }
+      .browser-card { border: 2px solid #000000; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- SLIDE 1: Cover -->
+    <div class="slide active" data-slide="0"
+         role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card cover-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">Economics — Supply &amp; Demand</span>
+        </div>
+        <div class="cover-content">
+          <div class="end-deco-bar" aria-hidden="true"></div>
+          <p class="cover-eyebrow">고등학교 경제 · 기초 개념</p>
+          <h1 class="cover-h1">
+            수요와<br>
+            <span class="accent">공급</span>
+          </h1>
+          <div class="typo-rule--accent" style="max-width:320px;" aria-hidden="true"></div>
+          <p class="cover-subtitle">시장 가격은 어떻게 결정되는가</p>
+          <p class="cover-footnote" aria-hidden="true">Economics / Grade 11 · 2026</p>
+          <div class="cover-deco-bar" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: TOC -->
+    <div class="slide" data-slide="1"
+         role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">목차</span>
+        </div>
+        <div class="browser-content toc-slide" tabindex="-1">
+          <div class="toc-header">
+            <div class="toc-big-label">
+              목차<span class="accent">.</span>
+            </div>
+            <p class="mono-label">Contents</p>
+          </div>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0"
+                  aria-label="슬라이드 3으로 이동: 수요란 무엇인가"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                <span class="toc-num" aria-hidden="true">01</span>
+                <span class="toc-text">수요란 무엇인가</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                  aria-label="슬라이드 4으로 이동: 수요 곡선과 이동"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num" aria-hidden="true">02</span>
+                <span class="toc-text">수요 곡선과 이동</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                  aria-label="슬라이드 5로 이동: 공급이란 무엇인가"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num" aria-hidden="true">03</span>
+                <span class="toc-text">공급이란 무엇인가</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                  aria-label="슬라이드 6으로 이동: 균형 가격의 결정"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                <span class="toc-num" aria-hidden="true">04</span>
+                <span class="toc-text">균형 가격의 결정</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                  aria-label="슬라이드 7으로 이동: 시장 균형의 변동"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num" aria-hidden="true">05</span>
+                <span class="toc-text">시장 균형의 변동</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0"
+                  aria-label="슬라이드 8로 이동: 핵심 정리"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                <span class="toc-num" aria-hidden="true">06</span>
+                <span class="toc-text">핵심 정리</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: 수요란 무엇인가 -->
+    <div class="slide kinetic-slide" data-slide="2"
+         role="region" aria-label="슬라이드 3: 수요란 무엇인가">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">01 — 수요</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="typo-rule--accent" aria-hidden="true"></div>
+            <h2 class="kinetic-display" style="font-size:3rem;">
+              <span class="kinetic-accent">수요</span>란<br>무엇인가
+            </h2>
+            <p class="section-subtitle">What is Demand?</p>
+          </div>
+          <div class="highlight-box">
+            수요란 소비자가 일정 기간 동안 다양한 가격 수준에서 구입하고자 하는 재화 또는 서비스의 양이다.
+          </div>
+          <div class="grid-2 card-grid" role="list" style="margin-top:0.5rem;">
+            <div class="card card--accent-top" role="listitem">
+              <span class="card-icon" aria-hidden="true">📉</span>
+              <h3 class="card-title">수요의 법칙</h3>
+              <p class="card-desc">가격이 오르면 수요량 감소, 가격이 내리면 수요량 증가 — 가격과 수요량은 반비례</p>
+            </div>
+            <div class="card card--accent-top" role="listitem">
+              <span class="card-icon" aria-hidden="true">👛</span>
+              <h3 class="card-title">수요량 vs 수요</h3>
+              <p class="card-desc">수요량은 특정 가격의 구매량, 수요는 가격-수량 전체 관계(곡선 전체)</p>
+            </div>
+          </div>
+          <p class="kinetic-footnote" aria-hidden="true">Demand · Law of Demand · Consumer Behavior</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: 수요 곡선과 이동 -->
+    <div class="slide" data-slide="3"
+         role="region" aria-label="슬라이드 4: 수요 곡선과 이동">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">02 — 수요 곡선</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="typo-rule--accent" aria-hidden="true"></div>
+            <h2 class="kinetic-display" style="font-size:2.6rem;">
+              수요 곡선과<br><span class="kinetic-accent">이동</span>
+            </h2>
+            <p class="section-subtitle">Demand Curve Shifts</p>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">곡선 위의 이동</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">원인: 해당 재화의 <strong>가격 변화</strong></li>
+                <li role="listitem">결과: 수요량(점) 변화</li>
+                <li role="listitem">곡선 자체는 그대로</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">곡선 자체의 이동</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">원인: <strong>가격 외</strong> 요인 변화</li>
+                <li role="listitem">소득 수준 변화</li>
+                <li role="listitem">대체재·보완재 가격 변화</li>
+                <li role="listitem">소비자 기호·기대 변화</li>
+              </ul>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            소득이 증가하면 정상재 수요 곡선은 <strong>우측 이동</strong>, 열등재는 <strong>좌측 이동</strong>한다.
+          </div>
+          <p class="kinetic-footnote" aria-hidden="true">Demand Curve · Movement vs. Shift</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: 공급이란 무엇인가 -->
+    <div class="slide kinetic-slide" data-slide="4"
+         role="region" aria-label="슬라이드 5: 공급이란 무엇인가">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">03 — 공급</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="typo-rule--accent" aria-hidden="true"></div>
+            <h2 class="kinetic-display" style="font-size:3rem;">
+              <span class="kinetic-accent">공급</span>이란<br>무엇인가
+            </h2>
+            <p class="section-subtitle">What is Supply?</p>
+          </div>
+          <div class="highlight-box">
+            공급이란 생산자가 일정 기간 동안 다양한 가격 수준에서 판매하고자 하는 재화 또는 서비스의 양이다.
+          </div>
+          <div class="grid-2 card-grid" role="list" style="margin-top:0.5rem;">
+            <div class="card card--accent-top" role="listitem">
+              <span class="card-icon" aria-hidden="true">📈</span>
+              <h3 class="card-title">공급의 법칙</h3>
+              <p class="card-desc">가격이 오르면 공급량 증가, 가격이 내리면 공급량 감소 — 가격과 공급량은 정비례</p>
+            </div>
+            <div class="card card--accent-top" role="listitem">
+              <h3 class="card-title">공급 곡선 이동 요인</h3>
+              <p class="card-desc">생산 요소 비용, 기술 수준, 생산자 수, 정부 보조금·세금, 미래 가격 기대</p>
+            </div>
+          </div>
+          <p class="kinetic-footnote" aria-hidden="true">Supply · Law of Supply · Producer Behavior</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: 균형 가격의 결정 -->
+    <div class="slide" data-slide="5"
+         role="region" aria-label="슬라이드 6: 균형 가격의 결정">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">04 — 균형</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="typo-rule--accent" aria-hidden="true"></div>
+            <h2 class="kinetic-display" style="font-size:2.6rem;">
+              <span class="kinetic-accent">균형</span> 가격의<br>결정
+            </h2>
+            <p class="section-subtitle">Market Equilibrium</p>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="수요량 공급량 같음">Qd=Qs</span>
+              <span class="stat-label">균형 조건</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">P*</span>
+              <span class="stat-label">균형 가격</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">Q*</span>
+              <span class="stat-label">균형 거래량</span>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            균형이란 수요량과 공급량이 일치하는 상태다. 초과 수요 시 가격 상승, 초과 공급 시 가격 하락하여 균형으로 수렴한다.
+          </div>
+          <ol class="task-list" role="list" style="margin-top:0.4rem;">
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">01</span>
+              <div class="task-body">
+                <h3 class="task-title">초과 수요 (가격 &lt; 균형)</h3>
+                <p class="task-desc">수요량 &gt; 공급량 → 품귀 발생 → 가격 상승 압력</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">02</span>
+              <div class="task-body">
+                <h3 class="task-title">초과 공급 (가격 &gt; 균형)</h3>
+                <p class="task-desc">공급량 &gt; 수요량 → 재고 누적 → 가격 하락 압력</p>
+              </div>
+            </li>
+          </ol>
+          <p class="kinetic-footnote" aria-hidden="true">Equilibrium Price · Excess Demand · Excess Supply</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: 시장 균형의 변동 -->
+    <div class="slide" data-slide="6"
+         role="region" aria-label="슬라이드 7: 시장 균형의 변동">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">05 — 균형 변동</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <div class="typo-rule--accent" aria-hidden="true"></div>
+            <h2 class="kinetic-display" style="font-size:2.6rem;">
+              시장 균형의<br><span class="kinetic-accent">변동</span>
+            </h2>
+            <p class="section-subtitle">Shifts in Equilibrium</p>
+          </div>
+          <div class="grid-3 card-grid" role="list" style="margin-top:0.5rem;">
+            <div class="card card--accent-top" role="listitem">
+              <span class="card-icon" aria-hidden="true">⬆</span>
+              <h3 class="card-title">수요 증가</h3>
+              <p class="card-desc">균형 가격 상승, 균형 거래량 증가 (곡선 우측 이동)</p>
+            </div>
+            <div class="card card--accent-top" role="listitem">
+              <h3 class="card-title">수요 감소</h3>
+              <p class="card-desc">균형 가격 하락, 균형 거래량 감소 (곡선 좌측 이동)</p>
+            </div>
+            <div class="card card--accent-top" role="listitem">
+              <h3 class="card-title">공급 증가</h3>
+              <p class="card-desc">균형 가격 하락, 균형 거래량 증가 (곡선 우측 이동)</p>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.5rem;">
+            수요와 공급이 동시에 변화할 때는 가격과 거래량 변동 방향 중 하나가 불확정이 될 수 있다.
+          </div>
+          <p class="kinetic-footnote" aria-hidden="true">Equilibrium Shifts · Supply &amp; Demand Analysis</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: 핵심 정리 (End) -->
+    <div class="slide" data-slide="7"
+         role="region" aria-label="슬라이드 8: 핵심 정리">
+      <div class="browser-card end-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div>
+          <div class="dot yellow"></div>
+          <div class="dot green"></div>
+          <span class="topbar-title">핵심 정리</span>
+        </div>
+        <div class="end-content">
+          <div class="end-deco-bar" aria-hidden="true"></div>
+          <p class="end-eyebrow">Summary · 수요와 공급</p>
+          <h2 class="end-title">
+            핵심<br><span class="accent">정리</span>
+          </h2>
+          <div class="end-summary" role="complementary" aria-label="핵심 요약">
+            <p class="end-summary-title">TODAY'S KEY POINTS</p>
+            <ul class="end-summary-list" role="list">
+              <li role="listitem">수요의 법칙: 가격 ↑ → 수요량 ↓ (반비례)</li>
+              <li role="listitem">공급의 법칙: 가격 ↑ → 공급량 ↑ (정비례)</li>
+              <li role="listitem">균형: Qd = Qs가 되는 가격(P*)과 거래량(Q*)</li>
+              <li role="listitem">곡선 이동 → 새로운 균형점으로 이동</li>
+            </ul>
+          </div>
+          <p class="end-footnote" aria-hidden="true">Economics · Supply &amp; Demand · 2026</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled
+            aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()"
+            aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    const progressBar = document.getElementById('progressBar');
+    const slideInput  = document.getElementById('slideInput');
+    const prevBtn     = document.getElementById('prevBtn');
+    const nextBtn     = document.getElementById('nextBtn');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (current + 1) + ' / ' + total;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      const cur  = slides[currentSlide];
+      const next = slides[index];
+      cur.classList.add('will-animate');
+      next.classList.add('will-animate');
+      cur.classList.remove('active');
+      currentSlide = index;
+      next.classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = next.querySelector('.browser-content');
+      if (content) content.focus();
+      setTimeout(() => {
+        cur.classList.remove('will-animate');
+        next.classList.remove('will-animate');
+      }, 400);
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault(); nextSlide();
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+        else if (e.key === 'End')  { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', function() { this.select(); });
+    slideInput.addEventListener('keydown', function(e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        const v = parseInt(this.value, 10);
+        if (!isNaN(v) && v >= 1 && v <= totalSlides) goToSlide(v - 1);
+        else this.value = currentSlide + 1;
+        this.blur();
+      } else if (e.key === 'Escape') {
+        this.value = currentSlide + 1;
+        this.blur();
+      }
+    });
+    slideInput.addEventListener('blur', function() {
+      const v = parseInt(this.value, 10);
+      if (!isNaN(v) && v >= 1 && v <= totalSlides) goToSlide(v - 1);
+      else this.value = currentSlide + 1;
+    });
+
+    function toggleFullscreen() {
+      const fsExpand   = document.getElementById('fsExpand');
+      const fsCompress = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().then(() => {
+          fsExpand.style.display   = 'none';
+          fsCompress.style.display = 'block';
+        }).catch(() => {});
+      } else {
+        document.exitFullscreen().then(() => {
+          fsExpand.style.display   = 'block';
+          fsCompress.style.display = 'none';
+        }).catch(() => {});
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      const fsExpand   = document.getElementById('fsExpand');
+      const fsCompress = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        fsExpand.style.display   = 'block';
+        fsCompress.style.display = 'none';
+      }
+    });
+
+    updateNav();
+    announceSlide(0, totalSlides);
+  </script>
+</body>
+</html>

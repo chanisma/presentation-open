@@ -1,0 +1,4 @@
+notebook_id: ddf33669-3eed-4c3b-864e-8d9046777eef
+artifact_id: 7606ddcb-1131-4a80-ab5a-7a8450de276d
+title: Reading the World with Math and Informatics (오리엔테이션 10장)
+created: 2026-07-13

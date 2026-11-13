@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>활동 3 · AI에게 좋은 질문하기 — 디지털 네트워크와 행렬 [정보편]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FDFDFB;--card:#FFFFFF;--ink:#33415C;--ink-soft:#7B8698;--rule:#D5DBE1;--teal:#3E9C93;--coral:#E8705A;--mustard:#E4B04A;--teal-wash:rgba(62,156,147,0.09);--coral-wash:rgba(232,112,90,0.10);--mustard-wash:rgba(228,176,74,0.16);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.6;padding-bottom:96px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;}
+  header{background:var(--paper);border-bottom:1px solid var(--rule);padding:20px 28px 0;position:relative;}
+  .backlink{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--teal);text-decoration:none;font-weight:500;margin-bottom:12px;}
+  .backlink:hover{text-decoration:underline;}
+  header h1{font-size:24px;font-weight:700;color:var(--teal);letter-spacing:-0.01em;}
+  header .sub{font-size:13.5px;color:var(--ink-soft);margin-top:5px;}
+  .head-actions{position:absolute;top:18px;right:28px;display:flex;gap:8px;}
+  .icon-btn{background:transparent;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;border-radius:8px;cursor:pointer;font:500 13px 'Noto Sans KR';}
+  .icon-btn:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttabs{display:flex;gap:4px;margin-top:16px;flex-wrap:wrap;}
+  .acttab{font-size:12.5px;padding:8px 14px;border:1px solid var(--rule);border-bottom:none;border-radius:9px 9px 0 0;background:var(--paper);color:var(--ink-soft);text-decoration:none;}
+  .acttab:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttab.on{background:var(--card);color:var(--teal);font-weight:700;border-color:var(--teal);border-bottom:1px solid var(--card);position:relative;top:1px;}
+  #settingsPanel{display:none;max-width:960px;margin:16px auto 0;padding:16px 18px;background:var(--card);border:1px dashed var(--rule);border-radius:12px;}
+  #settingsPanel label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
+  #settingsPanel input{width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:8px;font:14px 'Noto Sans KR';color:var(--ink);}
+  #settingsPanel .row{display:flex;gap:8px;margin-top:10px;}
+  main{max-width:960px;margin:0 auto;padding:24px 28px;}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .card>h2{font-size:18px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .badge{font-size:12px;font-weight:700;letter-spacing:0.04em;background:var(--teal);color:#fff;padding:3px 10px;border-radius:20px;flex:none;}
+  .badge.b2{background:var(--mustard);}
+  .card>.hint{font-size:13.5px;color:var(--ink-soft);margin-bottom:16px;}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;}
+  .field label .req{color:var(--coral);}
+  .field input,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:9px;font:14px 'Noto Sans KR';color:var(--ink);background:var(--paper);}
+  .field textarea{resize:vertical;min-height:100px;line-height:1.7;}
+  .field textarea.prompt{font-family:'JetBrains Mono',monospace;font-size:13.5px;}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--teal);background:#fff;}
+  .sizebar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+  .sizebar .lab{font-size:13px;font-weight:500;}
+  .stepper{display:flex;align-items:center;gap:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden;}
+  .stepper button{width:30px;height:30px;border:none;background:var(--paper);color:var(--ink);font:600 15px 'Noto Sans KR';cursor:pointer;}
+  .stepper button:hover{background:var(--teal-wash);color:var(--teal);}
+  .stepper button:disabled{color:var(--rule);cursor:default;background:var(--paper);}
+  .stepper span{width:32px;text-align:center;font:600 13.5px 'Noto Sans KR';border-left:1px solid var(--rule);border-right:1px solid var(--rule);height:30px;line-height:30px;}
+  .members{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px;}
+  .member{display:flex;align-items:center;gap:8px;}
+  .member input{flex:1;padding:8px 10px;border:1px solid var(--rule);border-radius:8px;font:14px 'Noto Sans KR';background:var(--paper);}
+  .member .num{width:26px;height:26px;flex:none;border-radius:50%;background:var(--teal-wash);color:var(--teal);font:700 12px 'Noto Sans KR';display:flex;align-items:center;justify-content:center;}
+  .buildarea{display:flex;flex-wrap:wrap;gap:26px;align-items:flex-start;}
+  .mtable{border-collapse:collapse;}
+  .mtable th{font-size:12px;font-weight:500;color:var(--ink-soft);padding:4px;max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mtable th.rowh{text-align:right;padding-right:8px;}
+  .cell{width:38px;height:38px;border:1px solid var(--rule);border-radius:7px;background:var(--paper);color:var(--ink);font:600 15px 'Noto Sans KR';cursor:pointer;}
+  .cell:hover:not(:disabled){border-color:var(--teal);}
+  .cell.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .cell:disabled{background:#F1F3F5;color:#B6BCC5;cursor:default;border-style:dashed;}
+  .matrixdata{flex:1;min-width:260px;background:#FBFAF7;border:1px solid var(--rule);border-radius:12px;padding:14px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);white-space:pre;overflow-x:auto;line-height:1.65;}
+  .insertbar{display:flex;gap:8px;align-items:center;margin-top:14px;flex-wrap:wrap;}
+  .insertedmsg{font-size:12.5px;color:var(--teal);font-weight:600;opacity:0;transition:opacity .2s;}
+  .insertedmsg.on{opacity:1;}
+  .checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:8px;}
+  .chk{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);cursor:pointer;transition:background .12s,border-color .12s;}
+  .chk:hover{border-color:var(--teal);}
+  .chk.on{background:var(--teal-wash);border-color:var(--teal);}
+  .chk input{margin-top:3px;width:16px;height:16px;accent-color:var(--teal);flex:none;}
+  .chk .t{font-size:13px;}.chk .t b{display:block;color:var(--ink);}.chk .t span{color:var(--ink-soft);font-size:12px;}
+  .meter{margin-top:12px;font-size:13px;font-weight:600;color:var(--ink-soft);}
+  .meter.full{color:var(--teal);}
+  .example{background:#FBFAF7;border:1px solid var(--rule);border-radius:12px;padding:14px 16px;margin-top:4px;}
+  .example .lab{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;}
+  .example.good .lab{color:var(--teal);}.example.bad .lab{color:var(--coral);}
+  .example .q{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);line-height:1.6;}
+  .twoex{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media(max-width:640px){.twoex{grid-template-columns:1fr;}}
+  .btn{padding:10px 18px;border:none;border-radius:9px;cursor:pointer;font:600 14px 'Noto Sans KR';transition:opacity .15s;}
+  .btn:hover{opacity:.88;}.btn:active{transform:translateY(1px);}
+  .btn-teal{background:var(--teal);color:#fff;}.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}
+  .btn-draft{background:var(--mustard);color:#3D2E06;}.btn-load{background:#7C3AED;color:#fff;}
+  .btn-reset{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}.btn-submit{background:var(--teal);color:#fff;padding:10px 24px;}
+  .actionbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(253,253,251,0.97);border-top:1px solid var(--rule);padding:12px 28px;}
+  .actionbar .inner{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+  .actionbar .spacer{flex:1;}.draft-label{font-size:12.5px;color:var(--ink-soft);}
+  #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:60;max-width:88vw;text-align:center;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}#toast.success{background:var(--teal);}#toast.error{background:var(--coral);}
+  @media print{.head-actions,.actionbar,#settingsPanel,.acttabs,.backlink,#toast{display:none!important;}body{padding-bottom:0;}}
+  @media(max-width:640px){main{padding:18px 14px;}.card{padding:18px 16px;}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="a-bear"><circle cx="-13" cy="-14" r="7" fill="#3E9C93"/><circle cx="13" cy="-14" r="7" fill="#3E9C93"/><circle cx="0" cy="0" r="20" fill="#3E9C93"/><circle cx="0" cy="7" r="9" fill="#FDFDFB"/><circle cx="-7" cy="-2" r="2.5" fill="#33415C"/><circle cx="7" cy="-2" r="2.5" fill="#33415C"/></g>
+</defs></svg>
+
+<header>
+  <div class="wrap">
+    <a class="backlink" href="index.html">← 슬라이드덱으로 돌아가기</a>
+    <h1>활동 3 · AI에게 좋은 질문하기</h1>
+    <div class="sub">AI를 계산기가 아니라 동료로 — 목적·데이터·출력·설명을 담은 프롬프트를 직접 써 보세요 &nbsp;·&nbsp; 슬라이드 18~20</div>
+    <div class="acttabs">
+      <a class="acttab" href="활동1.html">활동 1 · 파이썬 실습</a>
+      <a class="acttab" href="활동2.html">활동 2 · 중심성 비교</a>
+      <a class="acttab on" href="활동3.html">활동 3 · AI 프롬프트</a>
+      <a class="acttab" href="활동4.html">활동 4 · 프로젝트 설계</a>
+      <a class="acttab" href="활동5.html">활동 5 · 프로젝트 진행</a>
+      <a class="acttab" href="활동6.html">활동 6 · 심화 결과물</a>
+    </div>
+  </div>
+  <div class="head-actions">
+    <button class="icon-btn" id="btnPrint" type="button">인쇄</button>
+    <button class="icon-btn" id="btnSettings" type="button" title="교사 설정">⚙</button>
+  </div>
+</header>
+
+<div id="settingsPanel">
+  <label for="urlInput">Apps Script 배포 URL (교사 전용)</label>
+  <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row"><button class="btn btn-teal" id="btnSaveUrl" type="button">URL 저장</button><button class="btn btn-ghost" id="btnClearUrl" type="button">초기화</button></div>
+</div>
+
+<main>
+  <section class="card">
+    <h2>기본 정보</h2>
+    <div class="grid2">
+      <div class="field" style="margin-bottom:0;"><label for="studentName">이름 <span class="req">*</span></label><input type="text" id="studentName" placeholder="홍길동"></div>
+      <div class="field" style="margin-bottom:0;"><label for="classInfo">반 / 번호 <span class="req">*</span></label><input type="text" id="classInfo" placeholder="1학년 3반 12번"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge b2">참고</span> 좋은 프롬프트는 이렇게 다르다</h2>
+    <div class="twoex">
+      <div class="example bad"><div class="lab">✗ 아쉬운 질문</div><div class="q">"네트워크 분석 코드 짜줘"<br><span style="color:var(--ink-soft);font-size:12px;">무엇을? 어떤 데이터로?</span></div></div>
+      <div class="example good"><div class="lab">✓ 좋은 질문</div><div class="q">"인접행렬 A에서 매개 중심성을 NetworkX로 구하고, 상위 3명을 출력하는 코드를 만들어줘. 각 줄이 무슨 일을 하는지 주석으로 설명해줘."</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge b2">준비</span> 프롬프트에 넣을 행렬 데이터 만들기</h2>
+    <div class="hint">프롬프트의 "② 데이터" 요소에 쓸 인접행렬을 여기서 직접 만들어 보세요. 인원 수는 자유롭게 늘리거나 줄일 수 있습니다(기본 5명). <b>이 표는 활동지 제출 내용에는 포함되지 않고</b>, 아래 프롬프트에 데이터 텍스트를 넣는 용도로만 사용됩니다.</div>
+    <div class="sizebar">
+      <span class="lab">인원 수</span>
+      <div class="stepper">
+        <button type="button" id="btnSizeDown" aria-label="인원 줄이기">−</button>
+        <span id="sizeVal">5</span>
+        <button type="button" id="btnSizeUp" aria-label="인원 늘리기">+</button>
+      </div>
+      <span class="lab" style="color:var(--ink-soft);font-weight:400;">명 (최소 2명 · 최대 12명)</span>
+    </div>
+    <div class="members" id="members"></div>
+    <div class="buildarea">
+      <div><table class="mtable" id="matrixA"></table></div>
+      <div class="matrixdata" id="matrixData"></div>
+    </div>
+    <div class="insertbar">
+      <button class="btn btn-teal btn-sm" id="btnInsertMatrix" type="button">↓ 프롬프트에 행렬 데이터 넣기</button>
+      <span class="insertedmsg" id="insertedMsg">프롬프트에 추가됐어요!</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge">작성</span> 나의 프롬프트 만들기</h2>
+    <div class="hint">먼저 AI에게 무엇을 시킬지 정하고, 아래 <b>네 가지 요소</b>를 담아 프롬프트를 써 보세요. 요소를 담을 때마다 체크하면 충족도가 올라갑니다.</div>
+    <div class="field"><label for="goal">① 나는 AI에게 무엇을 시키고 싶은가? (목표 한 문장)</label><input type="text" id="goal" placeholder="예) 우리 동아리 관계망에서 가장 다리 역할을 하는 사람 찾기"></div>
+    <div class="field"><label for="prompt">② AI에게 보낼 프롬프트 <span class="req">*</span></label><textarea id="prompt" class="prompt" placeholder="예) 인접행렬 B에서 매개 중심성을 NetworkX로 구하고, 값이 큰 순으로 상위 3명을 출력하는 코드를 만들어줘. 각 줄이 무슨 일을 하는지 주석으로 설명해줘."></textarea></div>
+    <div class="field" style="margin-bottom:6px;"><label>③ 내 프롬프트에 담긴 요소를 체크하세요</label>
+      <div class="checks" id="promptChecks">
+        <label class="chk"><input type="checkbox" data-k="목적"><span class="t"><b>목적</b><span>무엇을 하려는지</span></span></label>
+        <label class="chk"><input type="checkbox" data-k="데이터"><span class="t"><b>데이터</b><span>어떤 행렬·자료로</span></span></label>
+        <label class="chk"><input type="checkbox" data-k="출력"><span class="t"><b>출력 형태</b><span>상위 3명, 표 등</span></span></label>
+        <label class="chk"><input type="checkbox" data-k="설명"><span class="t"><b>설명 요청</b><span>"각 줄 주석으로"</span></span></label>
+      </div>
+      <div class="meter" id="meter">0 / 4 요소 반영</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge">검증·성찰</span> AI가 준 답을 내 것으로</h2>
+    <div class="field"><label for="verify">④ AI가 준 코드·결과를 <b>어떻게 검증</b>할 건가요? (슬라이드 20의 안전벨트를 떠올려 보세요)</label><textarea id="verify" placeholder="예) 우리 반 5명은 손으로 답을 아니까, AI 코드를 그 5명한테 돌려서 값이 맞는지 대조하겠습니다."></textarea></div>
+    <div class="field" style="margin-bottom:0;"><label for="q1">AI가 준 코드에서 <b>이해되지 않는 줄</b>이 있다면 어떻게 해결할 건가요?</label><textarea id="q1" placeholder="예) '이 줄이 무슨 일을 하는지 더 쉽게 설명해줘'라고 다시 물어보겠습니다."></textarea></div>
+  </section>
+</main>
+
+<div class="actionbar"><div class="inner">
+  <button class="btn btn-load" id="btnLoad" type="button">불러오기</button>
+  <span class="draft-label" id="draftLabel">임시저장: —</span>
+  <span class="spacer"></span>
+  <button class="btn btn-reset" id="btnReset" type="button">초기화</button>
+  <button class="btn btn-draft" id="btnDraft" type="button">임시저장</button>
+  <button class="btn btn-submit" id="btnSubmit" type="button">제출하기</button>
+</div></div>
+<input type="file" id="fileInput" accept=".json" hidden>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var DEFAULT_URL='https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';var URL_KEY='sheets_url_net_activities';var DRAFT_KEY='draft_net_aiprompt_2026';var INFO_KEY='net_student_info';var SOURCE='net_aiprompt';
+  var N_MIN=2,N_MAX=12;var N=5;var A=[],mNames=[];
+  var SAMPLE=['가은','나래','다온','라온','마루','바다','사랑','아름','자운','차분','카랑','타래'];
+
+  function zeros(n){var m=[],i,j;for(i=0;i<n;i++){m.push([]);for(j=0;j<n;j++)m[i].push(0);}return m;}
+  function mname(i){var v=(mNames[i]||'').trim();return v||('학생'+(i+1));}
+  function resizeMatrix(newN){
+    var na=zeros(newN),i,j;
+    for(i=0;i<newN&&i<A.length;i++)for(j=0;j<newN&&j<A.length;j++)na[i][j]=A[i][j];
+    A=na;
+    mNames=mNames.slice(0,newN);
+    N=newN;
+  }
+  function renderMembers(){
+    var box=document.getElementById('members');box.textContent='';
+    for(var i=0;i<N;i++){
+      var w=document.createElement('div');w.className='member';
+      var num=document.createElement('span');num.className='num';num.textContent=String(i+1);
+      var inp=document.createElement('input');inp.type='text';inp.placeholder=SAMPLE[i]||('학생'+(i+1));inp.value=mNames[i]||'';inp.setAttribute('aria-label',(i+1)+'번째 사람 이름');
+      (function(idx){inp.addEventListener('input',function(){mNames[idx]=this.value;renderMatrix();renderMatrixData();});})(i);
+      w.appendChild(num);w.appendChild(inp);box.appendChild(w);
+    }
+  }
+  function renderMatrix(){
+    var t=document.getElementById('matrixA');t.textContent='';
+    var hr=document.createElement('tr');hr.appendChild(document.createElement('th'));
+    for(var c=0;c<N;c++){var th=document.createElement('th');th.textContent=mname(c);hr.appendChild(th);}
+    t.appendChild(hr);
+    for(var i=0;i<N;i++){
+      var tr=document.createElement('tr');var rh=document.createElement('th');rh.className='rowh';rh.textContent=mname(i);tr.appendChild(rh);
+      for(var j=0;j<N;j++){
+        var td=document.createElement('td');var b=document.createElement('button');b.type='button';b.className='cell'+(A[i][j]?' on':'');b.textContent=String(A[i][j]);
+        if(i===j){b.disabled=true;b.title='자기 자신과의 관계는 0';}
+        else{(function(x,y){b.addEventListener('click',function(){var v=A[x][y]?0:1;A[x][y]=v;A[y][x]=v;renderMatrix();renderMatrixData();});})(i,j);}
+        td.appendChild(b);tr.appendChild(td);
+      }
+      t.appendChild(tr);
+    }
+  }
+  function matrixDataText(){
+    var names=[];for(var i=0;i<N;i++)names.push(mname(i));
+    var rows=A.map(function(r){return '  ['+r.join(', ')+']';});
+    var lines=[];
+    lines.push('사람(순서): '+names.join(', '));
+    lines.push('인접행렬:');
+    lines.push('[');
+    lines.push(rows.join(',\n'));
+    lines.push(']');
+    return lines.join('\n');
+  }
+  function renderMatrixData(){
+    document.getElementById('matrixData').textContent=matrixDataText();
+  }
+  function updateSizeUI(){
+    document.getElementById('sizeVal').textContent=String(N);
+    document.getElementById('btnSizeDown').disabled=(N<=N_MIN);
+    document.getElementById('btnSizeUp').disabled=(N>=N_MAX);
+  }
+  function insertMatrixIntoPrompt(){
+    var ta=document.getElementById('prompt');
+    var block='[행렬 데이터]\n'+matrixDataText();
+    var cur=ta.value;
+    ta.value=cur?(cur.replace(/\s+$/,'')+'\n\n'+block):block;
+    ta.dispatchEvent(new Event('input'));
+    var msg=document.getElementById('insertedMsg');msg.classList.add('on');setTimeout(function(){msg.classList.remove('on');},1800);
+  }
+
+  function val(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+  function checkedElems(){return Array.prototype.slice.call(document.querySelectorAll('#promptChecks input:checked'));}
+  function updateMeter(){
+    var boxes=document.querySelectorAll('#promptChecks input');var n=0;
+    boxes.forEach(function(cb){if(cb.checked){cb.closest('.chk').classList.add('on');n++;}else cb.closest('.chk').classList.remove('on');});
+    var m=document.getElementById('meter');m.textContent=n+' / 4 요소 반영'+(n===4?' — 훌륭해요!':'');m.className='meter'+(n===4?' full':'');
+    return n;
+  }
+  function getFormData(){
+    var elems=checkedElems().map(function(cb){return cb.getAttribute('data-k');});
+    return {source:SOURCE,activity:'3_AI프롬프트',
+      studentName:val('studentName'),classInfo:val('classInfo'),
+      goal:val('goal'),prompt:val('prompt'),
+      elements:elems.join(', '),elementCount:elems.length+'/4',
+      verify:val('verify'),q1:val('q1')};
+  }
+  function setFormData(d){
+    if(!d)return;
+    ['studentName','classInfo','goal','prompt','verify','q1'].forEach(function(k){var e=document.getElementById(k);if(e&&typeof d[k]==='string')e.value=d[k];});
+    if(typeof d.elements==='string'){var set=d.elements.split(',').map(function(s){return s.trim();});document.querySelectorAll('#promptChecks input').forEach(function(cb){cb.checked=set.indexOf(cb.getAttribute('data-k'))>=0;});}
+    updateMeter();saveInfo();
+  }
+  function validate(){
+    if(!val('studentName'))return '이름을 입력해 주세요.';
+    if(!val('classInfo'))return '반 / 번호를 입력해 주세요.';
+    if(!val('prompt'))return '프롬프트를 작성해 주세요.';
+    if(!val('verify'))return 'AI 결과 검증 방법을 적어 주세요.';
+    return '';
+  }
+  function buildTxt(d){
+    var L=[];L.push('═══════════════════════════════════════');
+    L.push('  디지털 네트워크와 행렬 [정보편]');L.push('  활동 3 · AI에게 좋은 질문하기');
+    L.push('  작성일시: '+new Date().toLocaleString('ko-KR'));L.push('═══════════════════════════════════════');L.push('');
+    L.push('이름: '+d.studentName);L.push('반/번호: '+d.classInfo);L.push('');
+    L.push('① 목표: '+d.goal);L.push('');
+    L.push('② 프롬프트:');L.push(d.prompt);L.push('');
+    L.push('③ 담긴 요소('+d.elementCount+'): '+d.elements);L.push('');
+    L.push('④ 검증 방법: '+d.verify);L.push('');
+    L.push('이해 안 되는 줄 해결: '+d.q1);L.push('');
+    L.push('═══════════════════════════════════════');return L.join('\n');
+  }
+  function saveInfo(){try{localStorage.setItem(INFO_KEY,JSON.stringify({studentName:val('studentName'),classInfo:val('classInfo')}));}catch(e){}}
+  function loadInfo(){try{var r=localStorage.getItem(INFO_KEY);if(!r)return;var d=JSON.parse(r);if(!val('studentName')&&d.studentName)document.getElementById('studentName').value=d.studentName;if(!val('classInfo')&&d.classInfo)document.getElementById('classInfo').value=d.classInfo;}catch(e){}}
+  function downloadBlob(c,fn,mime){var b=new Blob([c],{type:mime});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+  function stamp(){return new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');}
+  function safeName(d){return (d.studentName||'학생').replace(/[\\/:*?"<>|\s]/g,'');}
+  var draftTimer=null;function scheduleDraft(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,1200);}
+  function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(getFormData()));document.getElementById('draftLabel').textContent='임시저장: '+new Date().toLocaleTimeString('ko-KR');saveInfo();}catch(e){}}
+  function loadDraft(){try{var r=localStorage.getItem(DRAFT_KEY);if(!r)return;setFormData(JSON.parse(r));document.getElementById('draftLabel').textContent='임시저장: 복원됨';}catch(e){}}
+  var toastTimer=null;function showToast(m,t,ms){var el=document.getElementById('toast');el.textContent=m;el.className='show'+(t?' '+t:'');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.className='';},ms||2600);}
+  function sendToSheet(data){var url=localStorage.getItem(URL_KEY)||DEFAULT_URL;if(!url){showToast('파일은 저장됐습니다. (시트 URL 미설정)','error',4200);return;}fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(){showToast('제출 완료! 파일 저장 + 시트 전송','success',4200);}).catch(function(e){showToast('파일은 저장됐습니다. 시트 오류: '+e.message,'error',4600);});}
+
+  function init(){
+    A=zeros(N);mNames=[];
+    renderMembers();renderMatrix();renderMatrixData();updateSizeUI();
+    document.getElementById('btnSizeUp').addEventListener('click',function(){if(N>=N_MAX)return;resizeMatrix(N+1);renderMembers();renderMatrix();renderMatrixData();updateSizeUI();});
+    document.getElementById('btnSizeDown').addEventListener('click',function(){if(N<=N_MIN)return;resizeMatrix(N-1);renderMembers();renderMatrix();renderMatrixData();updateSizeUI();});
+    document.getElementById('btnInsertMatrix').addEventListener('click',insertMatrixIntoPrompt);
+    loadInfo();loadDraft();updateMeter();
+    document.querySelectorAll('#promptChecks input').forEach(function(cb){cb.addEventListener('change',function(){updateMeter();scheduleDraft();});});
+    document.getElementById('btnPrint').addEventListener('click',function(){window.print();});
+    document.getElementById('btnSettings').addEventListener('click',function(){var p=document.getElementById('settingsPanel');p.style.display=(p.style.display==='block')?'none':'block';document.getElementById('urlInput').value=localStorage.getItem(URL_KEY)||'';});
+    document.getElementById('btnSaveUrl').addEventListener('click',function(){var u=document.getElementById('urlInput').value.trim();if(!u){showToast('URL을 입력해 주세요.','error');return;}localStorage.setItem(URL_KEY,u);showToast('URL이 저장되었습니다.','success');});
+    document.getElementById('btnClearUrl').addEventListener('click',function(){localStorage.removeItem(URL_KEY);document.getElementById('urlInput').value='';showToast('URL이 초기화되었습니다.');});
+    document.getElementById('btnDraft').addEventListener('click',function(){var d=getFormData();d._draftMeta={savedAt:new Date().toISOString(),source:SOURCE,version:1};downloadBlob(JSON.stringify(d,null,2),safeName(d)+'_활동3_AI프롬프트_'+stamp()+'.json','application/json;charset=utf-8');saveDraft();showToast('임시저장 파일(.json) 다운로드됨','success');});
+    var fi=document.getElementById('fileInput');
+    document.getElementById('btnLoad').addEventListener('click',function(){fi.click();});
+    fi.addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){try{setFormData(JSON.parse(ev.target.result));saveDraft();showToast('불러왔습니다.','success');}catch(err){showToast('파일을 읽을 수 없습니다: '+err.message,'error');}};rd.readAsText(f,'utf-8');e.target.value='';});
+    document.getElementById('btnReset').addEventListener('click',function(){if(!confirm('작성한 내용을 지웁니다. 계속할까요?'))return;localStorage.removeItem(DRAFT_KEY);location.reload();});
+    document.getElementById('btnSubmit').addEventListener('click',function(){var msg=validate();if(msg){showToast(msg,'error',3400);return;}if(!confirm('제출하시겠습니까?\n· TXT 파일 다운로드\n· 구글 시트로 전송'))return;var btn=this;btn.disabled=true;var d=getFormData();downloadBlob(buildTxt(d),safeName(d)+'_활동3_AI프롬프트_'+stamp()+'.txt','text/plain;charset=utf-8');sendToSheet(d);setTimeout(function(){btn.disabled=false;},1500);});
+    document.querySelectorAll('input, textarea').forEach(function(el){el.addEventListener('input',scheduleDraft);el.addEventListener('change',function(){scheduleDraft();saveInfo();});});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>

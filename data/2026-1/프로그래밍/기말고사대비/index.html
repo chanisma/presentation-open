@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로그래밍 기말고사 준비 자료</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f0f2f5;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-400: #bdbdbd;
+  --gray-500: #9e9e9e;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --blue: #2196f3;        --blue-dark: #1565c0;   --blue-light: #e3f2fd;
+  --green: #3aaa5c;       --green-dark: #2d8a49;  --green-light: #e8f5e9;
+  --purple: #7c4dff;      --purple-dark: #5e35b1; --purple-light: #ede7f6;
+  --orange: #fb8c00;      --orange-dark: #ef6c00; --orange-light: #fff3e0;
+  --teal: #00897b;        --teal-dark: #00695c;   --teal-light: #e0f2f1;
+  --red: #e53935;         --red-light: #ffebee;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.05);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Top nav ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--gray-200);
+}
+.topbar-inner {
+  max-width: 1080px; margin: 0 auto;
+  display: flex; align-items: center; gap: 1rem;
+  padding: .7rem 1.5rem; flex-wrap: wrap;
+}
+.topbar .brand { font-weight: 800; color: var(--gray-900); font-size: 1rem; white-space: nowrap; }
+.topbar nav { display: flex; gap: .25rem; flex-wrap: wrap; margin-left: auto; }
+.topbar nav a {
+  font-size: .82rem; font-weight: 600; color: var(--gray-600);
+  text-decoration: none; padding: .35rem .7rem; border-radius: 999px;
+  transition: all .15s;
+}
+.topbar nav a:hover { background: var(--blue-light); color: var(--blue-dark); }
+
+/* ===== Layout ===== */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+
+/* ===== Hero ===== */
+.hero {
+  text-align: center;
+  padding: 3.5rem 1.5rem 2.5rem;
+  background: linear-gradient(135deg, #1565c0 0%, #2196f3 55%, #7c4dff 130%);
+  color: #fff; border-radius: 0 0 28px 28px;
+  margin-bottom: 2.5rem;
+  box-shadow: var(--shadow);
+}
+.hero .eyebrow {
+  display: inline-block; font-size: .8rem; font-weight: 700; letter-spacing: .08em;
+  background: rgba(255,255,255,.18); padding: .35rem .9rem; border-radius: 999px;
+  margin-bottom: 1rem;
+}
+.hero h1 { font-size: clamp(1.8rem, 4.5vw, 2.7rem); font-weight: 900; line-height: 1.25; letter-spacing: -.02em; }
+.hero p { margin-top: .8rem; font-size: clamp(.95rem, 2vw, 1.1rem); opacity: .92; font-weight: 400; }
+
+/* ===== Section ===== */
+section { margin-bottom: 2.8rem; scroll-margin-top: 80px; }
+.section-head { display: flex; align-items: center; gap: .7rem; margin-bottom: 1.1rem; }
+.section-num {
+  flex: none; width: 2rem; height: 2rem; border-radius: 9px;
+  background: var(--gray-900); color: #fff; font-weight: 800; font-size: .95rem;
+  display: grid; place-items: center;
+}
+.section-head h2 { font-size: 1.45rem; font-weight: 800; letter-spacing: -.01em; }
+
+.card {
+  background: var(--white); border-radius: 16px; padding: 1.6rem 1.7rem;
+  box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+}
+.card + .card { margin-top: 1rem; }
+.card p + p { margin-top: .8rem; }
+.lead { font-size: 1.02rem; color: var(--gray-800); }
+.muted { color: var(--gray-600); }
+strong.hl { color: var(--blue-dark); font-weight: 700; }
+
+/* ===== Stat row ===== */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.stat {
+  background: var(--white); border-radius: 16px; padding: 1.3rem 1rem; text-align: center;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200);
+}
+.stat .num { font-size: 2.1rem; font-weight: 900; line-height: 1; }
+.stat .label { margin-top: .45rem; font-size: .85rem; font-weight: 600; color: var(--gray-600); }
+.stat.total .num { color: var(--gray-900); }
+.stat.c1 .num { color: var(--blue); }
+.stat.c2 .num { color: var(--green); }
+.stat.c3 .num { color: var(--purple); }
+
+/* ===== Callouts ===== */
+.callout {
+  border-radius: 14px; padding: 1.1rem 1.3rem; margin-top: 1rem;
+  border-left: 5px solid var(--gray-400); background: var(--gray-50);
+  display: flex; gap: .85rem; align-items: flex-start;
+}
+.callout .ico { font-size: 1.3rem; flex: none; line-height: 1.5; }
+.callout .body { flex: 1; }
+.callout .body b { display: block; margin-bottom: .2rem; font-weight: 700; }
+.callout.tip { background: var(--green-light); border-color: var(--green); }
+.callout.tip b { color: var(--green-dark); }
+.callout.warn { background: var(--orange-light); border-color: var(--orange); }
+.callout.warn b { color: var(--orange-dark); }
+.callout.info { background: var(--blue-light); border-color: var(--blue); }
+.callout.info b { color: var(--blue-dark); }
+.callout.key { background: var(--red-light); border-color: var(--red); }
+.callout.key b { color: var(--red); }
+
+/* ===== Steps ===== */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+.step {
+  background: var(--white); border-radius: 14px; padding: 1.3rem; box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200); position: relative; overflow: hidden;
+}
+.step .step-n { font-size: .8rem; font-weight: 800; color: var(--blue); letter-spacing: .05em; }
+.step h4 { font-size: 1.05rem; font-weight: 800; margin: .35rem 0 .5rem; }
+.step p { font-size: .9rem; color: var(--gray-600); line-height: 1.6; }
+.step::after { content: ""; position: absolute; right: -14px; bottom: -14px; width: 60px; height: 60px;
+  background: var(--blue-light); border-radius: 50%; opacity: .5; }
+
+/* ===== Chips ===== */
+.chips { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: 1rem; }
+.chip {
+  font-family: 'JetBrains Mono', monospace; font-size: .88rem; font-weight: 600;
+  background: var(--gray-900); color: #fff; padding: .45rem .85rem; border-radius: 9px;
+}
+.chip.alt { background: var(--purple); }
+
+/* ===== Scope (언어별 문법) ===== */
+.scope-group { display: flex; gap: .8rem; align-items: flex-start; flex-wrap: wrap; padding: 1rem 0; border-top: 1px solid var(--gray-200); }
+.scope-group:first-of-type { border-top: none; padding-top: .4rem; }
+.scope-label { flex: none; font-weight: 800; font-size: .85rem; padding: .42rem .8rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; }
+.scope-label.html { background: var(--orange-light); color: var(--orange-dark); }
+.scope-label.css  { background: var(--blue-light); color: var(--blue-dark); }
+.scope-label.js   { background: #fff8e1; color: #f57f17; }
+.scope-chips { display: flex; flex-wrap: wrap; gap: .5rem; flex: 1; min-width: 60%; }
+.scope-chips .chip { font-size: .82rem; font-weight: 600; background: var(--gray-100); color: var(--gray-800); border: 1px solid var(--gray-300); }
+
+/* ===== Duo (양방향 이해) · 제외 배지 · 인라인 코드 ===== */
+.duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.excl { display: inline-flex; align-items: center; gap: .3rem; font-size: .85rem; font-weight: 700; background: var(--gray-100); color: var(--gray-600); border: 1px dashed var(--gray-400); padding: .35rem .75rem; border-radius: 8px; }
+code { font-family: 'JetBrains Mono', monospace; font-size: .85em; background: var(--gray-100); color: var(--gray-800); padding: .12rem .4rem; border-radius: 5px; }
+
+/* ===== Question-type list ===== */
+.qtypes { display: grid; gap: .8rem; margin-top: 1rem; }
+.qtype { display: flex; gap: 1rem; align-items: flex-start; background: var(--white);
+  border: 1px solid var(--gray-200); border-radius: 14px; padding: 1.1rem 1.3rem; box-shadow: var(--shadow-sm); }
+.qtype .badge { flex: none; font-weight: 800; font-size: .85rem; padding: .35rem .7rem; border-radius: 8px;
+  white-space: nowrap; }
+.badge.b1 { background: var(--blue-light); color: var(--blue-dark); }
+.badge.b2 { background: var(--green-light); color: var(--green-dark); }
+.badge.b3 { background: var(--purple-light); color: var(--purple-dark); }
+.qtype .qbody h4 { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; }
+.qtype .qbody p { font-size: .92rem; color: var(--gray-600); }
+
+/* ===== Terms ===== */
+.cat-head { display: flex; align-items: center; gap: .6rem; margin: 1.8rem 0 .9rem; }
+.cat-dot { width: .9rem; height: .9rem; border-radius: 50%; flex: none; }
+.cat-head h3 { font-size: 1.12rem; font-weight: 800; }
+.cat-head .count { font-size: .8rem; font-weight: 600; color: var(--gray-500); }
+
+.terms { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.term {
+  background: var(--white); border-radius: 14px; padding: 1.2rem 1.3rem;
+  box-shadow: var(--shadow-sm); border: 1px solid var(--gray-200);
+  border-top: 4px solid var(--gray-300); position: relative;
+}
+.term h4 { font-size: 1.08rem; font-weight: 800; margin-bottom: .15rem; }
+.term .en { font-size: .8rem; font-weight: 600; color: var(--gray-500); font-family: 'JetBrains Mono', monospace; margin-bottom: .55rem; }
+.term p { font-size: .92rem; color: var(--gray-700); line-height: 1.65; }
+
+.c-net   { border-top-color: var(--blue); }
+.c-data  { border-top-color: var(--purple); }
+.c-smart { border-top-color: var(--green); }
+.c-phys  { border-top-color: var(--orange); }
+.c-ai    { border-top-color: var(--teal); }
+.dot-net{background:var(--blue);} .dot-data{background:var(--purple);}
+.dot-smart{background:var(--green);} .dot-phys{background:var(--orange);} .dot-ai{background:var(--teal);}
+
+/* ===== Footer ===== */
+.foot { text-align: center; color: var(--gray-500); font-size: .85rem; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200); }
+
+/* ===== Responsive ===== */
+@media (max-width: 760px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .steps { grid-template-columns: 1fr; }
+  .terms { grid-template-columns: 1fr; }
+  .topbar nav { display: none; }
+}
+
+@media print {
+  body { background: #fff; font-size: 11pt; }
+  .topbar { display: none; }
+  .hero { background: #1565c0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border-radius: 0; }
+  .card, .term, .stat, .step, .qtype { box-shadow: none; border: 1px solid #ccc; }
+  section, .term { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="brand">📘 프로그래밍 기말 준비</span>
+    <nav>
+      <a href="#overview">시험 개요</a>
+      <a href="#direction">출제 방향</a>
+      <a href="#skills">필요한 능력</a>
+      <a href="#subjective">서답·서술형</a>
+      <a href="#scope">시험 범위</a>
+      <a href="#howto">공부법</a>
+      <a href="#terms">핵심 용어</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <span class="eyebrow">2026학년도 1학기 2차 정기시험 대비</span>
+  <h1>프로그래밍 기말고사 준비 자료</h1>
+  <p>시험 안내 · 문제 푸는 공부법 · 객관식 핵심 용어 정리</p>
+</header>
+
+<div class="wrap">
+
+  <!-- 1. 시험 개요 -->
+  <section id="overview">
+    <div class="section-head"><span class="section-num">1</span><h2>시험 개요</h2></div>
+    <div class="stats">
+      <div class="stat total"><div class="num">26</div><div class="label">전체 문항</div></div>
+      <div class="stat c1"><div class="num">20</div><div class="label">객관식</div></div>
+      <div class="stat c2"><div class="num">4</div><div class="label">서답형</div></div>
+      <div class="stat c3"><div class="num">2</div><div class="label">서술형</div></div>
+    </div>
+    <div class="callout info" style="margin-top:1.2rem;">
+      <span class="ico">🧭</span>
+      <div class="body">
+        <b>한눈에 보기</b>
+        객관식 20문항 중 <strong class="hl">8문항은 아래에 정리한 용어 문제</strong>이고, 나머지 12문항과 서답형·서술형은 모두 <strong class="hl">HTML·CSS·JavaScript 코드 문제</strong>입니다. 코드 문제 중 <strong class="hl">6문제 정도</strong>는 어느 정도 고민을 해야 풀 수 있도록 구성했습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 출제 방향 -->
+  <section id="direction">
+    <div class="section-head"><span class="section-num">2</span><h2>출제 방향</h2></div>
+    <div class="card">
+      <p class="lead">아래에 있는 <strong class="hl">용어 문제를 제외하면</strong> 모두 프로그래밍과 관련된 문제를 출제하였습니다. 그중 6문제 정도는 한 번에 답이 보이지 않고 <strong class="hl">생각이 필요한 문제</strong>입니다.</p>
+      <div class="callout tip">
+        <span class="ico">✅</span>
+        <div class="body">
+          <b>이렇게 대비하세요</b>
+          용어 문제 <strong class="hl">8문항</strong>은 아래 「핵심 용어 정리」만 익히면 되고, 나머지는 모두 <strong class="hl">HTML·CSS·JavaScript 코드 문제</strong>입니다. 코드를 통째로 외우기보다 직접 써 보고 결과를 예측하는 연습에 집중하세요.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 필요한 능력 -->
+  <section id="skills">
+    <div class="section-head"><span class="section-num">3</span><h2>문제를 풀기 위해 필요한 능력</h2></div>
+    <p class="lead muted">이런 문제를 풀려면 다음 흐름으로 생각하는 힘이 필요합니다.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">STEP 1</div>
+        <h4>문제 파악</h4>
+        <p>‘주어진 문제가 무엇인지’ 정확히 이해하는 능력. 무엇을 입력받아 무엇을 내놓아야 하는지 짚어 봅니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">STEP 2</div>
+        <h4>해결 방법 설계</h4>
+        <p>‘문제를 해결하기 위해 어떤 방법을 사용할지’ 생각하는 능력. 어떤 순서로 풀어 나갈지 계획합니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-n">STEP 3</div>
+        <h4>코드로 표현</h4>
+        <p>찾은 해결 방법을 ‘어떻게 프로그래밍 언어로 표현할지’ 생각하는 능력. 문법에 맞게 코드로 옮깁니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 서답형·서술형 안내 -->
+  <section id="subjective">
+    <div class="section-head"><span class="section-num">4</span><h2>서답형 · 서술형 안내</h2></div>
+    <div class="qtypes">
+      <div class="qtype">
+        <span class="badge b1">서답형 · 4문제</span>
+        <div class="qbody">
+          <h4>코드의 빈칸을 채우는 문제</h4>
+          <p>모든 코드를 직접 쓰는 것이 아니라, 코드의 한 부분을 공백으로 두고 어떤 식이 들어가야 하는지 찾습니다. 작성된 코드 각각의 <strong class="hl">의미를 해석</strong>하고, <strong class="hl">실행되는 순서</strong>에 따라 문제가 어떻게 해결되어 가는지 파악하면 정답에 가까워집니다.</p>
+        </div>
+      </div>
+      <div class="qtype">
+        <span class="badge b3">서술형 · 2문제</span>
+        <div class="qbody">
+          <h4>처음부터 끝까지 코드를 쓰는 문제</h4>
+          <p>주어진 조건에 맞게 HTML·CSS·JavaScript 코드를 직접 작성합니다. 수업 시간에 했던 활동과 연계되기도 하니 <strong class="hl">프로그래밍 활동을 복습</strong>해 보세요. 단, <strong class="hl">외우는 것이 아닙니다.</strong> 문법과 목적에 맞게 직접 작성할 수 있어야 합니다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout warn">
+      <span class="ico">💡</span>
+      <div class="body">
+        <b>다행인 점</b>
+        서답·서술형 6문제 중 <u>4문제(서답형)는 코드의 빈칸을 채우는 형태</u>라, 코드를 읽고 해석하는 연습만 잘 해도 충분히 풀 수 있습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 시험 범위 문법 -->
+  <section id="scope">
+    <div class="section-head"><span class="section-num">5</span><h2>시험에 쓰이는 HTML · CSS · JavaScript</h2></div>
+    <div class="card">
+      <p class="lead">모든 문제는 <strong class="hl">수업 시간에 배운 HTML · CSS · JavaScript 내용</strong> 안에서만 출제됩니다. 세 언어가 각각 어떤 역할을 하는지(HTML=구조, CSS=디자인, JavaScript=동작) 떠올리며 아래 내용을 다져 두세요.</p>
+      <div class="scope-group">
+        <span class="scope-label html">HTML</span>
+        <div class="scope-chips">
+          <span class="chip">기본 문서 구조</span>
+          <span class="chip">태그 · 요소 · 속성</span>
+          <span class="chip">제목 · 문단 태그</span>
+          <span class="chip">목록 태그</span>
+          <span class="chip">이미지 태그 (src 속성)</span>
+          <span class="chip">링크 태그 (href 속성)</span>
+        </div>
+      </div>
+      <div class="scope-group">
+        <span class="scope-label css">CSS</span>
+        <div class="scope-chips">
+          <span class="chip">선택자 (태그 · id · class)</span>
+          <span class="chip">스타일 적용 3가지 (인라인 · 내부 · 외부)</span>
+          <span class="chip">글자색 · 배경색</span>
+          <span class="chip">박스 모델 (margin · padding · border)</span>
+          <span class="chip">레이아웃</span>
+        </div>
+      </div>
+      <div class="scope-group">
+        <span class="scope-label js">JavaScript</span>
+        <div class="scope-chips">
+          <span class="chip">변수 (let)</span>
+          <span class="chip">자료형 (불리언 등)</span>
+          <span class="chip">비교 연산자 (== · ===)</span>
+          <span class="chip">조건문 (if · else)</span>
+          <span class="chip">반복문 (for)</span>
+          <span class="chip">함수 (function)</span>
+          <span class="chip">콘솔 출력 (console.log)</span>
+          <span class="chip">요소 선택 · 이벤트 (addEventListener)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 공부법 -->
+  <section id="howto">
+    <div class="section-head"><span class="section-num">6</span><h2>어떻게 공부해야 할까</h2></div>
+    <div class="callout key">
+      <span class="ico">🚫</span>
+      <div class="body">
+        <b>외워서 풀 수 있는 문제는 거의 없습니다</b>
+        연습 문제나 활동지의 코드를 <u>그대로 실행만 해 보거나 통째로 외우지</u> 마세요. 외우는 것이 아니라, 문법에 따라·목적에 따라 코드를 <strong class="hl">직접 작성할 수 있어야</strong> 합니다.
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="ico">📌</span>
+      <div class="body">
+        <b>시험에 나오지 않는 차시</b>
+        아래 두 차시 내용은 <strong class="hl">시험 범위에서 제외</strong>됩니다. 나머지 HTML·CSS·JavaScript 핵심 내용에 집중하세요.
+        <div style="display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.6rem;">
+          <span class="excl">✕ 9차시 · 예제를 통해 배우는 CSS3</span>
+          <span class="excl">✕ 12차시 · JavaScript 실전: addEventListener 응용</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="lead muted" style="margin-top:1.4rem;">특히 코드는 <strong class="hl">두 방향</strong>으로 이해할 수 있어야 합니다.</p>
+    <div class="duo">
+      <div class="step">
+        <div class="step-n">방향 1 · 효과 → 코드</div>
+        <h4>원하는 효과를 코드로</h4>
+        <p>“웹페이지에 이런 효과를 주려면 어떤 코드를 써야 할까?”를 떠올릴 수 있어야 합니다.<br>예) 제목 글자를 파랑으로 → <code>h1 { color: blue; }</code></p>
+      </div>
+      <div class="step">
+        <div class="step-n">방향 2 · 코드 → 화면</div>
+        <h4>코드를 보고 결과를</h4>
+        <p>“이 코드를 실행하면 화면에 어떻게 표시될까?”를 예측할 수 있어야 합니다.<br>예) <code>&lt;img src="cat.png"&gt;</code> → 화면에 cat.png 이미지 표시</p>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="ico">⌨️</span>
+      <div class="body">
+        <b>이렇게 공부하세요</b>
+        문법에 맞게 코드를 <strong class="hl">직접 써 보고</strong>, <strong class="hl">결과가 내 생각대로 화면에 나오는지 확인</strong>하세요. 효과↔코드 두 방향을 오가며 연습하면 어떤 문제든 풀 수 있습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 핵심 용어 -->
+  <section id="terms">
+    <div class="section-head"><span class="section-num">7</span><h2>객관식 핵심 용어 정리</h2></div>
+    <div class="card" style="margin-bottom:.6rem;">
+      <p class="lead">웹 개발 수업에서 꼭 알아야 할 핵심 용어를 모았습니다. 설명을 <strong class="hl">토씨 하나 틀리지 않게 외우는 것이 아니라</strong>, 읽고 ‘어떤 용어와 관련된 내용인지’ 판단할 수 있으면 됩니다. 단어의 의미와 설명이 어떻게 이어지는지 연결 지으며 공부하면 관련 문제는 쉽게 풀 수 있습니다.</p>
+    </div>
+
+    <!-- 웹의 3대 언어 -->
+    <div class="cat-head"><span class="cat-dot dot-net"></span><h3>웹의 3대 언어</h3><span class="count">3</span></div>
+    <div class="terms">
+      <div class="term c-net"><h4>HTML</h4><div class="en">HyperText Markup Language</div><p>웹페이지의 뼈대와 내용을 만드는 언어다. 제목·문단·이미지·링크를 어디에 둘지 정해 페이지의 구조를 짠다. 집을 지을 때의 골조에 해당하며 디자인은 CSS가 맡는다.</p></div>
+      <div class="term c-net"><h4>CSS</h4><div class="en">Cascading Style Sheets</div><p>HTML로 만든 뼈대에 색·글꼴·크기·배치 같은 디자인을 입히는 언어다. 같은 내용이라도 CSS에 따라 전혀 다른 느낌이 된다. 웹페이지가 '어떻게 보일지'를 담당한다.</p></div>
+      <div class="term c-net"><h4>JavaScript</h4><div class="en">JavaScript</div><p>웹페이지가 움직이고 사용자에게 반응하게 만드는 프로그래밍 언어다. 버튼을 누르면 화면이 바뀌는 것처럼 동작과 상호작용을 담당한다. HTML이 뼈대이고 CSS가 디자인이라면 JavaScript는 두뇌 역할이다.</p></div>
+    </div>
+
+    <!-- 웹의 동작 원리와 인프라 -->
+    <div class="cat-head"><span class="cat-dot dot-data"></span><h3>웹의 동작 원리와 인프라</h3><span class="count">9</span></div>
+    <div class="terms">
+      <div class="term c-data"><h4>인터넷</h4><div class="en">Internet</div><p>전 세계의 컴퓨터를 서로 연결하는 거대한 통신망이다. 정보가 오갈 수 있는 도로망과 같다. 웹을 비롯한 다양한 서비스가 이 위에서 동작한다.</p></div>
+      <div class="term c-data"><h4>웹(WWW)</h4><div class="en">World Wide Web</div><p>인터넷 위에서 문서를 서로 연결해 공유하는 서비스다. 우리가 브라우저로 보는 화면이 바로 웹이다. 인터넷이 도로라면 웹은 그 위를 달리는 서비스 하나에 비유할 수 있다.</p></div>
+      <div class="term c-data"><h4>웹페이지</h4><div class="en">Web Page</div><p>글·사진·버튼 등이 담긴 화면 한 장짜리 문서다. 서버에 저장된 HTML·CSS·JS 파일을 브라우저가 받아 보여 준다. 이런 페이지가 여러 개 모이면 웹사이트가 된다.</p></div>
+      <div class="term c-data"><h4>웹사이트</h4><div class="en">Website</div><p>하나의 주제로 모여 있는 여러 웹페이지의 묶음이다. 네이버·유튜브처럼 우리가 매일 방문하는 곳이 웹사이트다. 보통 헤더·내비·메인·푸터 같은 영역으로 구성된다.</p></div>
+      <div class="term c-data"><h4>웹브라우저</h4><div class="en">Web Browser</div><p>서버에서 받은 HTML·CSS·JS 파일을 해석해 화면에 그려 주는 프로그램이다. 크롬·엣지·사파리 등이 웹브라우저다. 우리가 웹을 볼 수 있게 해 주는 창문 역할을 한다.</p></div>
+      <div class="term c-data"><h4>웹서버</h4><div class="en">Web Server</div><p>웹사이트의 파일을 저장해 두었다가 요청이 오면 보내 주는 컴퓨터다. 손님 주문을 받아 음료를 만들어 주는 바리스타에 비유할 수 있다. 우리가 보는 화면도 서버가 보내 준 파일이다.</p></div>
+      <div class="term c-data"><h4>클라이언트</h4><div class="en">Client</div><p>서버에 정보를 요청하고 받아 보는 쪽이다. 보통 우리가 쓰는 웹브라우저가 클라이언트 역할을 한다. 카페에서 주문하는 손님에 해당한다.</p></div>
+      <div class="term c-data"><h4>프론트엔드</h4><div class="en">Frontend</div><p>사용자가 직접 보고 만지는 화면 쪽 개발을 뜻한다. 브라우저에 보이는 버튼·글자·디자인이 모두 프론트엔드다. 반대로 서버에서 데이터를 처리하는 보이지 않는 쪽은 백엔드라고 한다.</p></div>
+      <div class="term c-data"><h4>백엔드</h4><div class="en">Backend</div><p>서버에서 데이터를 저장하고 처리하는 보이지 않는 쪽의 개발을 뜻한다. 회원 정보 저장이나 로그인 확인처럼 화면 뒤에서 일어나는 일을 담당한다. 사용자 눈에 보이는 프론트엔드와 짝을 이룬다.</p></div>
+    </div>
+
+    <!-- HTML·CSS 핵심 개념 -->
+    <div class="cat-head"><span class="cat-dot dot-smart"></span><h3>HTML·CSS 핵심 개념</h3><span class="count">8</span></div>
+    <div class="terms">
+      <div class="term c-smart"><h4>태그</h4><div class="en">Tag</div><p>HTML에서 내용을 감싸 그 역할을 표시하는 기본 단위다. 보통 시작 태그와 종료 태그가 짝을 이루며 그 사이의 내용이 화면에 나타난다. 태그마다 고유한 역할이 정해져 있다.</p></div>
+      <div class="term c-smart"><h4>요소</h4><div class="en">Element</div><p>태그와 그 안에 담긴 내용을 합쳐 부르는 하나의 덩어리다. 웹페이지는 이런 요소들이 모이고 겹쳐서 만들어진다. 요소 안에 또 다른 요소를 넣는 중첩도 가능하다.</p></div>
+      <div class="term c-smart"><h4>속성</h4><div class="en">Attribute</div><p>태그에 추가 정보나 설정을 더해 주는 값이다. 예를 들어 이미지의 경로나 링크가 이동할 주소처럼 태그의 동작을 더 자세히 지정한다. 태그 시작 부분에 '이름=값' 형태로 쓴다.</p></div>
+      <div class="term c-smart"><h4>스타일</h4><div class="en">Style</div><p>글자색·배경색·크기·배치처럼 웹페이지의 겉모습을 꾸미는 디자인 설정이다. CSS를 이용해 원하는 요소에 스타일을 적용한다. 같은 구조라도 스타일에 따라 분위기가 달라진다.</p></div>
+      <div class="term c-smart"><h4>선택자</h4><div class="en">Selector</div><p>CSS에서 디자인을 적용할 대상을 골라 지목하는 부분이다. 먼저 어떤 요소를 꾸밀지 정한 다음 그 요소에 스타일을 입힌다. 요소 종류·아이디·클래스 등을 기준으로 대상을 고를 수 있다.</p></div>
+      <div class="term c-smart"><h4>박스 모델</h4><div class="en">Box Model</div><p>웹페이지의 모든 요소를 하나의 상자로 보는 개념이다. 상자는 내용·안쪽 여백·테두리·바깥쪽 여백의 여러 겹으로 이루어진다. 이 겹들을 조절해 요소 사이 간격과 크기를 만든다.</p></div>
+      <div class="term c-smart"><h4>레이아웃</h4><div class="en">Layout</div><p>웹페이지에서 요소들을 어디에 어떻게 배치할지 정하는 짜임새다. 요소를 가로나 세로로 나란히 정렬해 화면을 보기 좋게 구성한다. 좋은 레이아웃은 정보를 한눈에 들어오게 한다.</p></div>
+      <div class="term c-smart"><h4>반응형 웹</h4><div class="en">Responsive Web</div><p>화면 크기에 따라 웹페이지의 배치와 모양이 자동으로 바뀌게 만드는 방식이다. 컴퓨터·태블릿·스마트폰 어디에서 봐도 보기 좋게 표시된다. 하나의 코드로 모든 기기에 대응하는 것이 핵심이다.</p></div>
+    </div>
+
+    <!-- JavaScript와 동적 웹 -->
+    <div class="cat-head"><span class="cat-dot dot-phys"></span><h3>JavaScript와 동적 웹</h3><span class="count">3</span></div>
+    <div class="terms">
+      <div class="term c-phys"><h4>DOM</h4><div class="en">Document Object Model</div><p>브라우저가 HTML 문서를 자바스크립트로 다룰 수 있도록 나무(트리) 구조의 객체로 표현한 것이다. DOM 덕분에 JavaScript가 화면의 글자나 스타일을 바꾸고 요소를 추가·삭제할 수 있다. 화면과 코드를 잇는 다리 역할을 한다.</p></div>
+      <div class="term c-phys"><h4>이벤트</h4><div class="en">Event</div><p>클릭·키 입력·스크롤처럼 사용자가 하는 행동을 브라우저가 감지하는 것을 뜻한다. 이런 행동에 동작을 연결하면 사용자와 상호작용하는 웹을 만들 수 있다. 동적인 웹페이지의 출발점이 되는 개념이다.</p></div>
+      <div class="term c-phys"><h4>동적·인터랙티브 웹</h4><div class="en">Dynamic / Interactive Web</div><p>사용자의 행동에 따라 화면이 실시간으로 바뀌고 반응하는 웹이다. 다크 모드 전환이나 실시간 글자 수 표시처럼 살아 움직이는 페이지를 말한다. 고정된 화면인 정적 웹과 반대되는 개념이다.</p></div>
+    </div>
+
+    <!-- 개발 도구와 방식 -->
+    <div class="cat-head"><span class="cat-dot dot-ai"></span><h3>개발 도구와 방식</h3><span class="count">2</span></div>
+    <div class="terms">
+      <div class="term c-ai"><h4>바이브 코딩</h4><div class="en">Vibe Coding</div><p>코드를 한 줄씩 직접 치는 대신 원하는 것을 일상 언어로 AI에게 설명하면 AI가 코드를 만들어 주는 새로운 개발 방식이다. 사람은 요청하고 결과를 확인하고 다듬는 역할을 맡는다. 2025년에 크게 유행한 개념이다.</p></div>
+      <div class="term c-ai"><h4>프롬프트</h4><div class="en">Prompt</div><p>AI에게 무엇을 해 달라고 전달하는 요청 문장이다. 맥락을 주고 구체적으로 작게 나눠서 형식까지 정해 말할수록 더 좋은 결과가 나온다. AI를 잘 다루는 핵심 기술이다.</p></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    프로그래밍 기말고사 준비 자료 · 2026학년도 1학기 2차 정기시험 대비<br>
+    설명을 외우지 말고, 의미를 이해하며 직접 코드를 써 보는 연습을 하세요. 여러분의 시험을 응원합니다! 🙌
+  </div>
+
+</div>
+</body>
+</html>

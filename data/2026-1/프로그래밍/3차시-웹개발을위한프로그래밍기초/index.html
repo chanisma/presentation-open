@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로그래밍 3차시 - HTML 태그의 이해</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --main: #2196f3;
+  --dark: #1565c0;
+  --light: #e3f2fd;
+  --accent: #42a5f5;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --red-dot: #ff5f57;
+  --yellow-dot: #ffbd2e;
+  --green-dot: #28c840;
+  --blue-accent: #2196f3;
+  --orange-accent: #ff9800;
+  --purple-accent: #9c27b0;
+  --green-accent: #43b867;
+  --red-accent: #e53935;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--main);
+  overflow: hidden;
+  color: var(--gray-900);
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+
+.presentation { width: 100%; height: 100%; position: relative; }
+
+.slide {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 2.2vh 3vw;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+.browser-card {
+  background: var(--white);
+  border-radius: 1rem;
+  width: 100%; max-width: 1600px;
+  height: 100%; max-height: calc(100vh - 4.4vh);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.browser-topbar {
+  background: var(--gray-100);
+  padding: 0.6rem 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+
+.dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; }
+.dot.red { background: var(--red-dot); }
+.dot.yellow { background: var(--yellow-dot); }
+.dot.green { background: var(--green-dot); }
+
+.browser-topbar .title {
+  flex: 1; text-align: center;
+  font-size: 0.8rem; color: var(--gray-600);
+  font-weight: 500; margin-right: 2.5rem;
+}
+
+.browser-content {
+  padding: 2.5rem 3.5rem;
+  overflow-y: auto; flex: 1;
+}
+
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; margin-bottom: 0.5rem; }
+h2 { font-size: 1.7rem; font-weight: 700; margin-bottom: 1rem; color: var(--dark); }
+h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.6rem; }
+p  { font-size: 1.05rem; line-height: 1.7; color: var(--gray-800); }
+
+.subtitle { font-size: 1.2rem; color: var(--gray-600); font-weight: 400; margin-bottom: 0.3rem; }
+
+.badge {
+  display: inline-block; padding: 0.25rem 0.75rem;
+  border-radius: 20px; font-size: 0.85rem; font-weight: 600;
+  margin-right: 0.4rem; margin-bottom: 0.4rem;
+}
+.badge.blue { background: var(--light); color: var(--dark); }
+.badge.green { background: #e8f5e9; color: #2d8a49; }
+.badge.orange { background: #fff3e0; color: #e65100; }
+.badge.purple { background: #f3e5f5; color: #7b1fa2; }
+.badge.red { background: #fce4ec; color: #c62828; }
+
+.info-box {
+  background: var(--light);
+  border-left: 4px solid var(--accent);
+  padding: 1rem 1.3rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+  margin: 1rem 0; font-size: 1rem; line-height: 1.6;
+}
+.info-box.green { background: #e8f5e9; border-left-color: var(--green-accent); }
+.info-box.orange { background: #fff3e0; border-left-color: var(--orange-accent); }
+.info-box.purple { background: #f3e5f5; border-left-color: var(--purple-accent); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+
+.card-item {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.7rem; padding: 1.2rem;
+}
+.card-item .icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.card-item h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; }
+.card-item p { font-size: 0.95rem; color: var(--gray-600); line-height: 1.5; }
+
+.section-divider { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.3rem; }
+.section-divider .section-icon {
+  width: 2.8rem; height: 2.8rem; border-radius: 0.6rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; background: var(--light);
+}
+.section-divider .section-text h2 { margin-bottom: 0; }
+.section-divider .section-text .section-sub { font-size: 0.9rem; color: var(--gray-600); font-weight: 400; }
+
+.cover-content { text-align: center; padding: 2rem 1.5rem; }
+.cover-content h1 { font-size: 2.8rem; margin-bottom: 0.8rem; color: var(--dark); }
+.cover-content .year-badge {
+  display: inline-block; background: var(--dark); color: var(--white);
+  padding: 0.4rem 1.5rem; border-radius: 1.5rem;
+  font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem;
+}
+
+.highlight-box {
+  background: linear-gradient(135deg, var(--light), #bbdefb);
+  border-radius: 0.8rem; padding: 1.5rem; margin: 1rem 0; text-align: center;
+}
+.highlight-box .big-text { font-size: 1.5rem; font-weight: 800; color: var(--dark); margin-bottom: 0.3rem; }
+.highlight-box .small-text { font-size: 0.95rem; color: var(--gray-600); }
+
+.code-block {
+  background: #1e1e1e; color: #d4d4d4;
+  border-radius: 0.6rem; padding: 1rem 1.3rem;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.95rem; line-height: 1.7;
+  overflow-x: auto; margin: 0.8rem 0;
+  white-space: pre-wrap;
+}
+.code-block .tag { color: #569cd6; }
+.code-block .attr { color: #9cdcfe; }
+.code-block .value { color: #ce9178; }
+.code-block .comment { color: #6a9955; }
+
+.toc-list { list-style: none; padding: 0; margin: 1rem 0; }
+.toc-item {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.8rem 1rem; border-radius: 0.6rem;
+  cursor: pointer; transition: all 0.2s;
+  margin-bottom: 0.4rem;
+}
+.toc-item:hover { background: var(--light); transform: translateX(5px); }
+.toc-num {
+  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+}
+.toc-text h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.1rem; }
+.toc-text p { font-size: 0.85rem; color: var(--gray-600); margin: 0; }
+
+.tag-visual {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin: 1.5rem 0;
+}
+.tag-part {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 1.3rem; font-weight: 600;
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.5rem;
+}
+.tag-part.open { background: #e3f2fd; color: #1565c0; }
+.tag-part.close { background: #e3f2fd; color: #1565c0; }
+.tag-part.content { background: #fff3e0; color: #e65100; padding: 0.8rem 1.5rem; }
+.tag-arrow { font-size: 1.5rem; color: var(--gray-300); margin: 0 0.3rem; }
+
+.nested-box {
+  border: 2.5px solid var(--dark);
+  border-radius: 0.8rem; padding: 1.2rem;
+  margin: 0.8rem 0; position: relative;
+}
+.nested-box .box-label {
+  position: absolute; top: -0.6rem; left: 1rem;
+  background: var(--white); padding: 0 0.5rem;
+  font-family: 'Consolas', monospace;
+  font-size: 0.85rem; font-weight: 600; color: var(--dark);
+}
+.nested-box.html-box { border-color: #1565c0; }
+.nested-box.html-box .box-label { color: #1565c0; }
+.nested-box.head-box { border-color: #7b1fa2; }
+.nested-box.head-box .box-label { color: #7b1fa2; }
+.nested-box.body-box { border-color: #e65100; }
+.nested-box.body-box .box-label { color: #e65100; }
+
+.task-box {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 1.2rem; margin-bottom: 0.6rem;
+  border-radius: 0.6rem; border-left: 4px solid var(--accent);
+  background: var(--gray-50);
+}
+.task-num {
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
+}
+.task-text h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.2rem; }
+.task-text p { font-size: 0.9rem; color: var(--gray-600); margin: 0; }
+
+.tag-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  border-radius: 0.6rem; overflow: hidden; margin: 0.8rem 0;
+}
+.tag-table th {
+  background: var(--dark); color: var(--white);
+  padding: 0.7rem 1rem; text-align: left;
+  font-size: 0.95rem; font-weight: 600;
+}
+.tag-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--gray-200);
+  font-size: 0.95rem; line-height: 1.5;
+}
+.tag-table tr:nth-child(even) td { background: var(--gray-50); }
+.tag-table code {
+  font-family: 'Consolas', monospace;
+  background: #f0f4f8; padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem; font-size: 0.9rem;
+  color: var(--dark); font-weight: 600;
+}
+
+.compare-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1rem 0;
+}
+.compare-card {
+  border-radius: 0.8rem; padding: 1.5rem;
+  border: 2px solid var(--gray-200);
+}
+.compare-card h3 { margin-bottom: 0.8rem; }
+.compare-card ul { list-style: none; padding: 0; }
+.compare-card ul li {
+  padding: 0.4rem 0; font-size: 0.95rem;
+  color: var(--gray-800); line-height: 1.6;
+  padding-left: 1.5rem; position: relative;
+}
+.compare-card ul li::before {
+  content: '●'; position: absolute; left: 0;
+  color: var(--accent); font-size: 0.6rem; top: 0.55rem;
+}
+.compare-card.block { border-color: #1565c0; background: #f5f9ff; }
+.compare-card.block h3 { color: #1565c0; }
+.compare-card.inline { border-color: #e65100; background: #fff9f5; }
+.compare-card.inline h3 { color: #e65100; }
+
+.goal-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0;
+}
+.goal-card {
+  background: var(--white); border: 2px solid var(--gray-200);
+  border-radius: 0.8rem; padding: 1.5rem; text-align: center;
+  transition: all 0.2s;
+}
+.goal-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.goal-card .goal-flag { font-size: 2rem; margin-bottom: 0.5rem; }
+.goal-card h4 { font-size: 1.05rem; font-weight: 600; color: var(--dark); line-height: 1.4; }
+
+.web-box {
+  border: 2px solid var(--accent); border-radius: 0.4rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 600; color: var(--dark);
+  background: var(--light); padding: 0.5rem;
+}
+
+.attr-visual {
+  font-family: 'Consolas', monospace;
+  font-size: 1.15rem; line-height: 2;
+  background: #f8f9fa; padding: 1.2rem 1.5rem;
+  border-radius: 0.6rem; border: 1px solid var(--gray-200);
+  margin: 0.8rem 0;
+}
+.attr-visual .tag-name { color: #569cd6; font-weight: 700; }
+.attr-visual .attr-name { color: #9cdcfe; }
+.attr-visual .attr-val { color: #ce9178; }
+.attr-visual .bracket { color: var(--gray-600); }
+
+.link-btn {
+  display: inline-block; padding: 0.6rem 1.5rem;
+  background: var(--dark); color: var(--white);
+  border-radius: 0.5rem; text-decoration: none;
+  font-weight: 600; font-size: 0.95rem;
+  transition: all 0.2s; margin-top: 0.5rem;
+}
+.link-btn:hover { background: var(--accent); transform: translateY(-2px); }
+
+/* Code-Result split view */
+.code-result-split {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;
+}
+.split-label {
+  font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 0.4rem;
+  padding: 0.2rem 0.6rem; border-radius: 0.3rem; display: inline-block;
+}
+.split-label.code-label { background: #1e1e1e; color: #d4d4d4; }
+.split-label.result-label { background: var(--green-accent); color: var(--white); }
+.result-preview {
+  background: var(--white); border: 2px solid var(--gray-200);
+  border-radius: 0.6rem; padding: 1.2rem;
+  min-height: 100px;
+}
+
+/* Website with tag labels */
+.site-demo {
+  border-radius: 0.6rem; overflow: hidden;
+  border: 2px solid var(--gray-200); position: relative;
+}
+.site-demo [data-tag] { position: relative; transition: all 0.3s; }
+.site-demo.show-tags [data-tag] {
+  outline: 2.5px dashed var(--tag-color, #999);
+  outline-offset: -2px;
+}
+.site-demo [data-tag]::before {
+  content: attr(data-tag);
+  position: absolute; top: -1px; left: 4px;
+  font-family: 'Consolas', monospace; font-size: 0.6rem;
+  font-weight: 700; color: var(--tag-color, #999);
+  opacity: 0; transition: opacity 0.3s; z-index: 5;
+  background: rgba(255,255,255,0.85); padding: 0 3px; border-radius: 2px;
+}
+.site-demo.show-tags [data-tag]::before { opacity: 1; }
+
+/* Build-up animation for HTML structure */
+.buildup-step { opacity: 0.2; transition: all 0.4s ease; transform: translateY(5px); }
+.buildup-step.visible { opacity: 1; transform: translateY(0); }
+
+/* Block vs Inline demo */
+.block-inline-demo { margin: 1rem 0; }
+.demo-block {
+  background: #bbdefb; border: 2px solid #1565c0;
+  padding: 0.5rem 1rem; margin: 0.3rem 0;
+  border-radius: 0.3rem; font-family: 'Consolas', monospace;
+  font-size: 0.85rem; color: #0d47a1; font-weight: 600;
+  text-align: center;
+}
+.demo-inline {
+  background: #ffe0b2; border: 2px solid #e65100;
+  padding: 0.2rem 0.6rem; margin: 0 0.2rem;
+  border-radius: 0.3rem; font-family: 'Consolas', monospace;
+  font-size: 0.85rem; color: #bf360c; font-weight: 600;
+  display: inline;
+}
+
+/* CSS preview for class/id */
+.css-preview {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;
+}
+.css-before, .css-after {
+  border-radius: 0.6rem; padding: 1.2rem; border: 2px solid var(--gray-200);
+}
+.css-before { background: #fafafa; }
+.css-after { background: #f5f9ff; border-color: var(--accent); }
+.css-before-label, .css-after-label {
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 0.6rem;
+  padding: 0.15rem 0.5rem; border-radius: 0.3rem; display: inline-block;
+}
+.css-before-label { background: var(--gray-200); color: var(--gray-700); }
+.css-after-label { background: var(--accent); color: var(--white); }
+
+/* Heading size demo */
+.heading-demo {
+  background: var(--gray-50); border-radius: 0.6rem;
+  padding: 1rem 1.5rem; border: 1px solid var(--gray-200); margin: 0.5rem 0;
+}
+.heading-demo-item {
+  display: flex; align-items: baseline; gap: 1rem;
+  padding: 0.3rem 0; border-bottom: 1px solid var(--gray-100);
+}
+.heading-demo-item:last-child { border-bottom: none; }
+.heading-demo-item .demo-tag {
+  font-family: 'Consolas', monospace; font-size: 0.8rem;
+  color: var(--dark); font-weight: 600; min-width: 3rem;
+}
+
+/* Practice preview */
+.practice-preview {
+  background: var(--white); border: 2px solid var(--green-accent);
+  border-radius: 0.8rem; padding: 1.5rem; position: relative;
+}
+.practice-preview::before {
+  content: '완성 미리보기'; position: absolute; top: -0.6rem; left: 1rem;
+  background: var(--green-accent); color: var(--white);
+  padding: 0.1rem 0.6rem; border-radius: 0.3rem;
+  font-size: 0.75rem; font-weight: 700;
+}
+
+/* Toggle hint */
+.hint-toggle {
+  background: none; border: 1px dashed var(--accent);
+  border-radius: 0.4rem; padding: 0.4rem 0.8rem;
+  font-size: 0.85rem; color: var(--accent); cursor: pointer;
+  font-weight: 600; font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s; margin-top: 0.3rem;
+}
+.hint-toggle:hover { background: var(--light); }
+.hint-content {
+  max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+}
+.hint-content.open { max-height: 300px; }
+
+/* Code editor template */
+.editor-template {
+  background: #1e1e1e; border-radius: 0.8rem; overflow: hidden;
+  font-family: 'Consolas', 'Monaco', monospace; font-size: 0.9rem;
+}
+.editor-topbar {
+  background: #2d2d2d; padding: 0.4rem 0.8rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  border-bottom: 1px solid #3a3a3a;
+}
+.editor-topbar .tab {
+  background: #1e1e1e; color: #ccc; padding: 0.25rem 0.8rem;
+  border-radius: 0.3rem 0.3rem 0 0; font-size: 0.75rem; font-weight: 600;
+}
+.editor-body {
+  padding: 1rem 0.5rem; color: #d4d4d4; line-height: 1.8;
+  display: flex; min-height: 200px;
+}
+.editor-lines {
+  color: #858585; text-align: right; padding-right: 0.8rem;
+  border-right: 1px solid #3a3a3a; margin-right: 0.8rem;
+  user-select: none; min-width: 2rem; font-size: 0.85rem;
+}
+.editor-code { flex: 1; }
+.editor-code .tag { color: #569cd6; }
+.editor-code .attr { color: #9cdcfe; }
+.editor-code .value { color: #ce9178; }
+.editor-code .comment { color: #6a9955; }
+.editor-code .text { color: #d4d4d4; }
+
+/* Challenge box */
+.challenge-box {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 2px solid #ffb74d; border-radius: 0.6rem;
+  padding: 0.8rem 1rem; margin-top: 0.8rem;
+}
+.challenge-box h4 { color: #e65100; font-size: 0.9rem; margin-bottom: 0.3rem; }
+.challenge-box p { font-size: 0.85rem; color: #bf360c; margin: 0; }
+
+/* Step card for improved practice */
+.step-card {
+  background: var(--white); border: 1.5px solid var(--gray-200);
+  border-radius: 0.5rem; padding: 0.6rem 0.8rem;
+  margin-bottom: 0.4rem; transition: all 0.2s;
+}
+.step-card:hover { border-color: var(--accent); background: #f8fbff; }
+.step-card .step-header {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.step-card .step-num {
+  width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  background: var(--dark); color: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.7rem; flex-shrink: 0;
+}
+.step-card .step-title { font-weight: 600; font-size: 0.9rem; }
+.step-card .step-desc { font-size: 0.8rem; color: var(--gray-600); margin: 0.2rem 0 0 2rem; }
+.step-card .step-code {
+  margin: 0.3rem 0 0 2rem; font-family: Consolas, monospace;
+  font-size: 0.8rem; background: #f0f4f8; padding: 0.2rem 0.5rem;
+  border-radius: 0.25rem; color: var(--dark); display: inline-block;
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), #64b5f6);
+  z-index: 1000; transition: width 0.3s ease;
+}
+
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem; padding: 0.8rem 1.5rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--gray-200); z-index: 999;
+}
+.nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 2.6rem; height: 2.6rem;
+  border: 1px solid var(--gray-200); border-radius: 0.5rem;
+  background: var(--white); cursor: pointer;
+  font-size: 1.1rem; color: var(--gray-700); transition: all 0.2s;
+}
+.nav-btn:hover:not(:disabled) { border-color: var(--main); color: var(--main); background: var(--light); }
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.nav-counter {
+  font-size: 0.85rem; font-weight: 600; color: var(--gray-600);
+  min-width: 5rem; text-align: center;
+}
+
+@media (max-width: 1024px) {
+  html, body { font-size: clamp(13px, 1.8vw, 18px); }
+  .browser-content { padding: 1.8rem 2rem; }
+}
+@media (max-width: 768px) {
+  html, body { font-size: clamp(13px, 2.8vw, 17px); }
+  .grid-2, .grid-3, .compare-grid, .goal-grid, .code-result-split, .css-preview { grid-template-columns: 1fr; }
+  .browser-content { padding: 1.2rem 1.3rem; }
+  .cover-content h1 { font-size: 2rem; }
+}
+@media (max-width: 480px) {
+  html, body { font-size: clamp(13px, 3.5vw, 16px); }
+  .nav-btn { width: 2.2rem; height: 2.2rem; }
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="presentation" id="presentation">
+
+<!-- Slide 1: Cover -->
+<div class="slide active" data-slide="0">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">프로그래밍 3차시</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div class="cover-content">
+        <div class="year-badge">#3</div>
+        <h1>HTML 태그의 이해</h1>
+        <p class="subtitle" style="font-size:1.3rem; margin-top:1rem;">태그의 개념과 기본 구조 학습</p>
+        <div style="margin-top:2rem;">
+          <span class="badge blue">HTML</span>
+          <span class="badge purple">태그</span>
+          <span class="badge orange">구조</span>
+          <span class="badge green">실습</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 2: 오늘의 목표 -->
+<div class="slide" data-slide="1">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">오늘의 목표</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div style="width:100%;max-width:900px;">
+        <div class="section-divider">
+          <div class="section-icon">🎯</div>
+          <div class="section-text">
+            <h2>오늘의 목표</h2>
+            <span class="section-sub">이 수업이 끝나면 할 수 있는 것들</span>
+          </div>
+        </div>
+        <div class="goal-grid">
+          <div class="goal-card">
+            <div class="goal-flag">🚩</div>
+            <h4>HTML의<br>역할과 이해</h4>
+          </div>
+          <div class="goal-card">
+            <div class="goal-flag">🚩</div>
+            <h4>태그의 개념과<br>기본 구조 이해</h4>
+          </div>
+          <div class="goal-card">
+            <div class="goal-flag">🚩</div>
+            <h4>텍스트·목록 태그로<br>프로필 페이지 만들기</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 3: HTML이란? -->
+<div class="slide" data-slide="2">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">HTML이란?</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">📄</div>
+        <div class="section-text">
+          <h2>HTML (Hypertext Markup Language)</h2>
+          <span class="section-sub">웹 페이지를 만드는 기본 언어</span>
+        </div>
+      </div>
+      <div class="grid-3" style="margin-top:1.5rem;">
+        <div class="card-item" style="text-align:center;">
+          <div class="icon">🦴</div>
+          <h4>웹 페이지의 뼈대</h4>
+          <p>웹 페이지의 전체적인 구조와 골격을 만드는 역할</p>
+        </div>
+        <div class="card-item" style="text-align:center;">
+          <div class="icon">📦</div>
+          <h4>콘텐츠의 구분</h4>
+          <p>글, 이미지, 영상 등 콘텐츠를 영역별로 나누어 정리</p>
+        </div>
+        <div class="card-item" style="text-align:center;">
+          <div class="icon">📝</div>
+          <h4>콘텐츠 내용의 표시</h4>
+          <p>실제로 화면에 보여줄 내용을 작성하고 표현</p>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:1.5rem;">
+        <strong>핵심:</strong> HTML은 웹사이트를 구성할 요소들의 <strong>뼈대를 구축</strong>하는 역할을 합니다. 구체적인 배치나 디자인은 CSS(스타일 언어)를 활용합니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: 웹 페이지 = 박스 (interactive overlay) -->
+<div class="slide" data-slide="3">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">웹 페이지의 구조</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">📦</div>
+        <div class="section-text">
+          <h2>웹 페이지 = 박스들의 집합</h2>
+          <span class="section-sub">모든 웹사이트는 상자(박스)로 이루어져 있습니다</span>
+        </div>
+      </div>
+      <div class="compare-grid" style="margin-top:0.5rem;">
+        <div>
+          <p style="font-size:0.9rem;margin-bottom:0.6rem;font-weight:600;">아래 버튼을 눌러 HTML 태그를 확인해 보세요!</p>
+          <div class="site-demo" id="siteDemo" style="background:#f8f9fa;">
+            <div data-tag="&lt;header&gt;" style="--tag-color:#e53935;background:#1565c0;color:white;padding:0.5rem 1rem;display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:700;font-size:0.9rem;">🌐 My Site</span>
+              <span style="font-size:0.75rem;">홈 &nbsp; 소개 &nbsp; 연락</span>
+            </div>
+            <div style="padding:0.8rem;display:grid;grid-template-columns:2fr 1fr;gap:0.6rem;">
+              <div data-tag="&lt;main&gt;" style="--tag-color:#1565c0;">
+                <div data-tag="&lt;article&gt;" style="--tag-color:#2196f3;background:var(--light);padding:0.6rem;border-radius:0.4rem;margin-bottom:0.5rem;">
+                  <div style="font-weight:700;font-size:0.85rem;margin-bottom:0.3rem;">환영합니다!</div>
+                  <div style="font-size:0.7rem;color:var(--gray-600);line-height:1.5;">여기는 메인 콘텐츠 영역입니다.</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+                  <div data-tag="&lt;div&gt;" style="--tag-color:#2d8a49;background:#e8f5e9;padding:0.5rem;border-radius:0.3rem;font-size:0.7rem;text-align:center;">카드 1</div>
+                  <div data-tag="&lt;div&gt;" style="--tag-color:#e65100;background:#fff3e0;padding:0.5rem;border-radius:0.3rem;font-size:0.7rem;text-align:center;">카드 2</div>
+                </div>
+              </div>
+              <div data-tag="&lt;aside&gt;" style="--tag-color:#7b1fa2;background:#f3e5f5;padding:0.6rem;border-radius:0.4rem;">
+                <div style="font-weight:600;font-size:0.75rem;margin-bottom:0.3rem;">사이드바</div>
+                <div style="font-size:0.65rem;color:var(--gray-600);">메뉴1<br>메뉴2<br>메뉴3</div>
+              </div>
+            </div>
+            <div data-tag="&lt;footer&gt;" style="--tag-color:#ff9800;background:var(--gray-200);padding:0.4rem;text-align:center;font-size:0.65rem;">
+              &copy; 2026 My Site
+            </div>
+          </div>
+          <button onclick="document.getElementById('siteDemo').classList.toggle('show-tags')" style="margin-top:0.6rem;padding:0.5rem 1.2rem;background:var(--dark);color:white;border:none;border-radius:0.4rem;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'Noto Sans KR',sans-serif;">🔍 HTML 태그 보기/숨기기</button>
+        </div>
+        <div>
+          <p style="font-size:0.9rem;margin-bottom:0.6rem;font-weight:600;">겹겹이 쌓인 레이어 구조</p>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;">
+            <div style="padding:0.7rem 3rem;border-radius:0.5rem;font-weight:600;font-size:0.9rem;text-align:center;background:#bbdefb;color:#0d47a1;width:100%;">전체 페이지 (Frame)</div>
+            <div style="padding:0.7rem 2rem;border-radius:0.5rem;font-weight:600;font-size:0.9rem;text-align:center;background:#c8e6c9;color:#1b5e20;width:80%;">섹션 영역</div>
+            <div style="padding:0.7rem 1.5rem;border-radius:0.5rem;font-weight:600;font-size:0.9rem;text-align:center;background:#fff9c4;color:#f57f17;width:60%;">콘텐츠 박스</div>
+            <div style="padding:0.7rem 1rem;border-radius:0.5rem;font-weight:600;font-size:0.9rem;text-align:center;background:#ffccbc;color:#bf360c;width:40%;">텍스트/이미지</div>
+          </div>
+          <div class="info-box" style="margin-top:1rem;">
+            <strong>Frame</strong>은 캔버스(액자) 역할을 하며, 프레임 안에 또 다른 레이어를 배치할 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5: 목차 -->
+<div class="slide" data-slide="4">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">목차</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">📋</div>
+        <div class="section-text">
+          <h2>학습 순서</h2>
+          <span class="section-sub">오늘 배울 내용을 살펴봅시다</span>
+        </div>
+      </div>
+      <ul class="toc-list">
+        <li class="toc-item" onclick="goToSlide(5)">
+          <div class="toc-num">1</div>
+          <div class="toc-text"><h4>HTML 태그란?</h4><p>태그의 개념, 기본 구조, 중첩</p></div>
+        </li>
+        <li class="toc-item" onclick="goToSlide(8)">
+          <div class="toc-num">2</div>
+          <div class="toc-text"><h4>HTML 문서의 기본 구조</h4><p>html, head, body의 역할</p></div>
+        </li>
+        <li class="toc-item" onclick="goToSlide(10)">
+          <div class="toc-num">3</div>
+          <div class="toc-text"><h4>태그의 종류</h4><p>제목, 문단, 목록 태그 배우기</p></div>
+        </li>
+        <li class="toc-item" onclick="goToSlide(13)">
+          <div class="toc-num">4</div>
+          <div class="toc-text"><h4>실습: 오류 찾기 & 프로필 만들기</h4><p>디버깅 연습 + 직접 코딩</p></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 6: HTML 태그란? -->
+<div class="slide" data-slide="5">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div style="width:100%;max-width:900px;">
+        <div style="margin-bottom:0.5rem;">
+          <span class="badge blue">HTML</span><span class="badge purple">태그</span>
+        </div>
+        <h2 style="font-size:2rem;">태그(Tag)란?</h2>
+        <div class="grid-2" style="margin-top:1.5rem;">
+          <div class="card-item" style="text-align:center;padding:2rem;">
+            <div class="icon">📦</div>
+            <h4>상자 형태의 구조</h4>
+            <p>웹 페이지의 각 요소를 상자처럼 직관적으로 표현할 수 있도록 만든 표현 방식</p>
+          </div>
+          <div class="card-item" style="text-align:center;padding:2rem;">
+            <div class="icon">🔧</div>
+            <h4>각자의 역할</h4>
+            <p>각각의 태그는 고유한 역할 혹은 기능을 지니고 있음</p>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top:1.5rem;">
+          <div class="big-text">태그 = 웹 페이지를 구성하는 상자</div>
+          <div class="small-text">각 상자마다 이름과 역할이 정해져 있습니다</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7: 태그의 기본 구조 -->
+<div class="slide" data-slide="6">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그 #기초</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge purple">태그</span><span class="badge orange">기초</span>
+      </div>
+      <h2>태그의 기본 구조</h2>
+      <p style="margin-bottom:1rem;">태그는 <strong>시작 태그</strong>와 <strong>종료 태그</strong>로 구성되어 있으며, 상자의 테두리처럼 동작하여 안에 내용을 보관할 수 있습니다.</p>
+      <div class="tag-visual">
+        <div class="tag-part open">&lt;태그명&gt;</div>
+        <div class="tag-arrow">→</div>
+        <div class="tag-part content">내용</div>
+        <div class="tag-arrow">←</div>
+        <div class="tag-part close">&lt;/태그명&gt;</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:0 2rem;margin-top:0.3rem;">
+        <span style="font-weight:600;color:var(--dark);font-size:0.9rem;">⬆ 시작 태그</span>
+        <span style="font-weight:600;color:var(--dark);font-size:0.9rem;">종료 태그 ⬆</span>
+      </div>
+      <!-- Code-Result Split View -->
+      <div class="code-result-split" style="margin-top:1.5rem;">
+        <div>
+          <div class="split-label code-label">코드</div>
+          <div class="code-block" style="font-size:1.1rem;margin-top:0;">
+<span class="tag">&lt;p&gt;</span>This is a test document.<span class="tag">&lt;/p&gt;</span>
+          </div>
+        </div>
+        <div>
+          <div class="split-label result-label">결과</div>
+          <div class="result-preview" style="margin-top:0;display:flex;align-items:center;">
+            <p style="margin:0;">This is a test document.</p>
+          </div>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:0.8rem;">
+        <strong>시작 태그</strong> <code style="font-family:Consolas,monospace;background:#f0f4f8;padding:0.1rem 0.3rem;border-radius:0.2rem;">&lt;p&gt;</code>로 열고, <strong>종료 태그</strong> <code style="font-family:Consolas,monospace;background:#f0f4f8;padding:0.1rem 0.3rem;border-radius:0.2rem;">&lt;/p&gt;</code>로 닫습니다. 그 사이에 내용이 들어갑니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 8: 태그의 중첩 (animated) -->
+<div class="slide" data-slide="7">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그 #기초</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge purple">태그</span><span class="badge orange">기초</span>
+      </div>
+      <h2>태그의 중첩 (Nesting)</h2>
+      <p style="margin-bottom:1rem;">태그의 내용에 <strong>또 다른 태그</strong>가 들어갈 수 있으며, 이를 통해 더 세밀하게 웹 사이트를 구조화 할 수 있습니다.</p>
+      <div class="compare-grid">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <!-- Animated nesting visual -->
+          <div id="nestingDemo" style="width:100%;max-width:400px;">
+            <div class="buildup-step" data-step="1" style="border:3px solid #1565c0;border-radius:0.8rem;padding:1rem;background:#f5f9ff;">
+              <div style="font-family:Consolas,monospace;font-size:0.8rem;color:#1565c0;font-weight:700;">&lt;div&gt; 바깥 상자</div>
+              <div class="buildup-step" data-step="2" style="border:3px solid #e65100;border-radius:0.6rem;padding:0.8rem;margin:0.5rem 0.5rem;background:#fff9f0;">
+                <div style="font-family:Consolas,monospace;font-size:0.8rem;color:#e65100;font-weight:700;">&lt;p&gt; 안쪽 상자</div>
+                <div class="buildup-step" data-step="3" style="text-align:center;padding:0.5rem;color:var(--gray-700);font-weight:500;background:#fff3e0;border-radius:0.4rem;margin-top:0.3rem;">
+                  내용이 여기에!
+                </div>
+              </div>
+            </div>
+          </div>
+          <button onclick="animateNesting()" style="margin-top:1rem;padding:0.5rem 1.5rem;background:var(--dark);color:white;border:none;border-radius:0.4rem;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'Noto Sans KR',sans-serif;">▶ 단계별 보기</button>
+        </div>
+        <div>
+          <div class="code-block" style="font-size:0.95rem;line-height:1.9;">
+<span class="tag">&lt;div&gt;</span>
+  <span class="tag">&lt;p&gt;</span>
+    내용이 여기에!
+  <span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+          </div>
+          <div class="info-box" style="margin-top:1rem;">
+            <strong>상자 안의 상자!</strong> 큰 상자 안에 작은 상자를 넣을 수 있는 것처럼, 태그 안에 태그를 넣어 복잡한 구조를 만들 수 있습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 9: HTML 문서의 기본 구조 (build-up) -->
+<div class="slide" data-slide="8">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML 문서의 기본적인 구조</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge green">문서 구조</span>
+      </div>
+      <h2>HTML 문서의 기본 구조</h2>
+      <div class="compare-grid" style="margin-top:0.5rem;">
+        <div>
+          <div class="code-block" style="font-size:1.05rem;line-height:2;">
+<span class="tag">&lt;html&gt;</span>
+  <span class="tag">&lt;head&gt;</span>
+    <span class="comment">... 세부정보 ...</span>
+  <span class="tag">&lt;/head&gt;</span>
+  <span class="tag">&lt;body&gt;</span>
+    <span class="comment">... 실제 콘텐츠 ...</span>
+  <span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span>
+          </div>
+        </div>
+        <div>
+          <!-- House analogy build-up -->
+          <div id="houseDemo">
+            <div class="buildup-step" data-hstep="1" style="border:3px solid #1565c0;border-radius:0.8rem;padding:0.8rem;background:#f5f9ff;">
+              <div style="font-family:Consolas,monospace;font-size:0.8rem;color:#1565c0;font-weight:700;margin-bottom:0.5rem;">🏠 &lt;html&gt; = 집 전체</div>
+              <div class="buildup-step" data-hstep="2" style="border:2.5px solid #7b1fa2;border-radius:0.6rem;padding:0.6rem;background:#faf5ff;margin-bottom:0.5rem;">
+                <div style="font-family:Consolas,monospace;font-size:0.8rem;color:#7b1fa2;font-weight:700;">🏷️ &lt;head&gt; = 지붕 (보이지 않는 정보)</div>
+                <p style="font-size:0.8rem;color:#7b1fa2;margin:0.3rem 0 0;">페이지 타이틀, CSS, JS 연결 등</p>
+              </div>
+              <div class="buildup-step" data-hstep="3" style="border:2.5px solid #e65100;border-radius:0.6rem;padding:0.6rem;background:#fff9f0;">
+                <div style="font-family:Consolas,monospace;font-size:0.8rem;color:#e65100;font-weight:700;">👁️ &lt;body&gt; = 거실 (보이는 내용)</div>
+                <p style="font-size:0.8rem;color:#e65100;margin:0.3rem 0 0;">화면에 띄울 글, 이미지 등</p>
+              </div>
+            </div>
+          </div>
+          <button onclick="animateHouse()" style="margin-top:0.8rem;padding:0.45rem 1.2rem;background:var(--dark);color:white;border:none;border-radius:0.4rem;cursor:pointer;font-size:0.85rem;font-weight:600;font-family:'Noto Sans KR',sans-serif;">▶ 단계별 보기</button>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:0.5rem;">
+        🏠 <strong>집 비유:</strong> html은 집 전체, head는 지붕(보이지 않는 정보), body는 거실(눈에 보이는 내용)입니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 10: 태그 학습 팁 -->
+<div class="slide" data-slide="9">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그의 종류</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div style="width:100%;max-width:800px;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:1rem;">💡</div>
+        <h2 style="font-size:1.8rem;margin-bottom:1.5rem;">태그의 종류를 학습할 때 기억할 것</h2>
+        <div class="highlight-box" style="text-align:left;padding:2rem;">
+          <p style="font-size:1.1rem;line-height:1.8;color:var(--gray-800);">
+            태그의 종류는 너무나 다양하기 때문에, <strong>모든 태그의 기능과 역할을 익히는데 초점을 맞추기 보다는</strong> 태그가 뼈대의 역할을 한다는 것과 <strong>작성 방법에 익숙해지는 것</strong>에 초점을 맞춰 연습하는게 좋습니다.
+          </p>
+        </div>
+        <div class="info-box orange" style="margin-top:1.5rem;text-align:left;">
+          🔑 <strong>핵심 포인트:</strong> 외우지 말고, 사용법에 익숙해지세요! 필요할 때 찾아보면 됩니다.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 11: 태그 종류 - 문서정보/텍스트 + h1~h6 크기 비교 -->
+<div class="slide" data-slide="10">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그의 종류</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge purple">태그의 종류</span>
+      </div>
+      <h2>문서 정보 & 텍스트 관련 태그</h2>
+      <table class="tag-table">
+        <thead><tr><th style="width:18%;">태그</th><th style="width:22%;">이름</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;title&gt;</code></td><td>타이틀</td><td><code>&lt;head&gt;</code> 안에 작성; 웹 페이지의 타이틀 (브라우저 탭에 표시)</td></tr>
+          <tr><td><code>&lt;h1&gt;</code>~<code>&lt;h6&gt;</code></td><td>Header (제목)</td><td>제목 태그; <code>&lt;h1&gt;</code>이 가장 크고 <code>&lt;h6&gt;</code>이 가장 작음</td></tr>
+          <tr><td><code>&lt;p&gt;</code></td><td>Paragraph</td><td>문단을 구분하는 태그; 텍스트 내용을 담음</td></tr>
+          <tr><td><code>&lt;br&gt;</code></td><td>Break</td><td>줄 바꿈 태그; 종료 태그가 없음</td></tr>
+        </tbody>
+      </table>
+      <!-- h1~h6 size comparison -->
+      <p style="font-size:0.9rem;font-weight:600;margin-top:1rem;margin-bottom:0.3rem;">h1 ~ h6 크기 비교</p>
+      <div class="heading-demo">
+        <div class="heading-demo-item"><span class="demo-tag">&lt;h1&gt;</span><span style="font-size:1.8rem;font-weight:800;">가장 큰 제목</span></div>
+        <div class="heading-demo-item"><span class="demo-tag">&lt;h2&gt;</span><span style="font-size:1.5rem;font-weight:700;">두 번째 제목</span></div>
+        <div class="heading-demo-item"><span class="demo-tag">&lt;h3&gt;</span><span style="font-size:1.25rem;font-weight:600;">세 번째 제목</span></div>
+        <div class="heading-demo-item"><span class="demo-tag">&lt;h4&gt;</span><span style="font-size:1.05rem;font-weight:600;">네 번째 제목</span></div>
+        <div class="heading-demo-item"><span class="demo-tag">&lt;h5&gt;</span><span style="font-size:0.9rem;font-weight:600;">다섯 번째 제목</span></div>
+        <div class="heading-demo-item"><span class="demo-tag">&lt;h6&gt;</span><span style="font-size:0.8rem;font-weight:600;">가장 작은 제목</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 12: 태그 종류 - 목록 (code-result split) -->
+<div class="slide" data-slide="11">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">#HTML #태그의 종류</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge purple">태그의 종류</span><span class="badge green">목록</span>
+      </div>
+      <h2>목록 태그</h2>
+      <table class="tag-table">
+        <thead><tr><th style="width:15%;">태그</th><th style="width:30%;">이름</th><th>설명</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;ul&gt;</code></td><td>Unordered List</td><td>순서 없는 목록; <strong>점(●)</strong>으로 표시</td></tr>
+          <tr><td><code>&lt;ol&gt;</code></td><td>Ordered List</td><td>순서 있는 목록; <strong>숫자</strong>로 표시</td></tr>
+          <tr><td><code>&lt;li&gt;</code></td><td>List Item</td><td>리스트의 내용; <code>&lt;ul&gt;</code> 혹은 <code>&lt;ol&gt;</code> 안에 사용</td></tr>
+        </tbody>
+      </table>
+      <div class="code-result-split" style="margin-top:0.8rem;">
+        <div>
+          <div class="split-label code-label">코드</div>
+          <div class="code-block" style="margin-top:0;line-height:2;">
+<span class="tag">&lt;ul&gt;</span>
+  <span class="tag">&lt;li&gt;</span>사과<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span>바나나<span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span>
+
+<span class="tag">&lt;ol&gt;</span>
+  <span class="tag">&lt;li&gt;</span>첫 번째<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span>두 번째<span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ol&gt;</span>
+          </div>
+        </div>
+        <div>
+          <div class="split-label result-label">결과</div>
+          <div class="result-preview" style="margin-top:0;">
+            <p style="font-weight:600;margin-bottom:0.3rem;font-size:0.9rem;">순서 없는 목록 (ul)</p>
+            <ul style="padding-left:1.5rem;margin-bottom:0.8rem;">
+              <li style="font-size:0.95rem;">사과</li>
+              <li style="font-size:0.95rem;">바나나</li>
+            </ul>
+            <p style="font-weight:600;margin-bottom:0.3rem;font-size:0.9rem;">순서 있는 목록 (ol)</p>
+            <ol style="padding-left:1.5rem;">
+              <li style="font-size:0.95rem;">첫 번째</li>
+              <li style="font-size:0.95rem;">두 번째</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 13: 코드-결과 종합 예시 (h, p, ul, ol) -->
+<div class="slide" data-slide="12">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">코드-결과 비교</div>
+    </div>
+    <div class="browser-content">
+      <div style="margin-bottom:0.5rem;">
+        <span class="badge blue">HTML</span><span class="badge orange">종합 예시</span>
+      </div>
+      <h2>지금까지 배운 태그 종합 예시</h2>
+      <div class="code-result-split">
+        <div>
+          <div class="split-label code-label">코드</div>
+          <div class="code-block" style="margin-top:0;font-size:0.9rem;line-height:2.2;">
+<span class="tag">&lt;h1&gt;</span>나의 프로필<span class="tag">&lt;/h1&gt;</span>
+
+<span class="tag">&lt;h2&gt;</span>자기소개<span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;p&gt;</span>안녕하세요! 저는 홍길동입니다.<span class="tag">&lt;/p&gt;</span>
+
+<span class="tag">&lt;h2&gt;</span>좋아하는 음식<span class="tag">&lt;/h2&gt;</span>
+<span class="tag">&lt;ul&gt;</span>
+  <span class="tag">&lt;li&gt;</span>피자<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span>치킨<span class="tag">&lt;/li&gt;</span>
+  <span class="tag">&lt;li&gt;</span>떡볶이<span class="tag">&lt;/li&gt;</span>
+<span class="tag">&lt;/ul&gt;</span>
+          </div>
+        </div>
+        <div>
+          <div class="split-label result-label">브라우저 결과</div>
+          <div class="result-preview" style="margin-top:0;">
+            <h1 style="font-size:1.6rem;font-weight:800;margin-bottom:0.6rem;">나의 프로필</h1>
+            <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:0.3rem;">자기소개</h2>
+            <p style="margin-bottom:0.6rem;">안녕하세요! 저는 홍길동입니다.</p>
+            <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:0.3rem;">좋아하는 음식</h2>
+            <ul style="padding-left:1.5rem;">
+              <li>피자</li>
+              <li>치킨</li>
+              <li>떡볶이</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="info-box green" style="margin-top:0.5rem;">
+        🎯 이렇게 HTML 코드를 작성하면 브라우저에서 오른쪽과 같이 표시됩니다!
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 14: 오류 찾기 실습 -->
+<div class="slide" data-slide="13">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">실습: 오류 찾기</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">🔎</div>
+        <div class="section-text">
+          <h2>HTML 오류를 찾아라!</h2>
+          <span class="section-sub">아래 코드에는 오류가 숨어 있습니다. 몇 개나 찾을 수 있나요?</span>
+        </div>
+      </div>
+      <div class="compare-grid">
+        <div>
+          <div class="split-label code-label">오류가 있는 코드</div>
+          <div class="code-block" style="margin-top:0;font-size:0.95rem;line-height:2.4;">
+<span style="color:#858585;"> 1</span>  <span class="tag">&lt;html&gt;</span>
+<span style="color:#858585;"> 2</span>    <span class="tag">&lt;head&gt;</span>
+<span style="color:#858585;"> 3</span>      <span class="tag">&lt;title&gt;</span>나의 페이지
+
+<span style="color:#858585;"> 4</span>    <span class="tag">&lt;/head&gt;</span>
+<span style="color:#858585;"> 5</span>    <span class="tag">&lt;body&gt;</span>
+
+<span style="color:#858585;"> 6</span>      <span class="tag">&lt;h1&gt;</span>자기소개<span class="tag">&lt;/h2&gt;</span>
+<span style="color:#858585;"> 7</span>      <span class="tag">&lt;p&gt;</span>안녕하세요!
+
+<span style="color:#858585;"> 8</span>      <span class="tag">&lt;ul&gt;</span>
+<span style="color:#858585;"> 9</span>        <span class="tag">&lt;li&gt;</span>취미: 독서<span class="tag">&lt;/li&gt;</span>
+<span style="color:#858585;">10</span>        <span class="tag">&lt;li&gt;</span>좋아하는 색: 파랑
+<span style="color:#858585;">11</span>      <span class="tag">&lt;/ol&gt;</span>
+
+<span style="color:#858585;">12</span>    <span class="tag">&lt;/body&gt;</span>
+<span style="color:#858585;">13</span>  <span class="tag">&lt;/html&gt;</span>
+          </div>
+        </div>
+        <div>
+          <div style="margin-bottom:0.6rem;">
+            <div class="split-label result-label">오류 목록 (총 4개)</div>
+          </div>
+          <div id="errorList">
+            <div class="step-card" style="cursor:pointer;" onclick="revealError(this)">
+              <div class="step-header"><div class="step-num" style="background:#e53935;">1</div><span class="step-title">3번 줄에 오류가 있어요</span></div>
+              <div class="step-desc" style="display:none;color:#e53935;font-weight:600;margin-top:0.3rem;">&lt;title&gt;의 <strong>닫는 태그 &lt;/title&gt;</strong>이 없습니다!</div>
+            </div>
+            <div class="step-card" style="cursor:pointer;" onclick="revealError(this)">
+              <div class="step-header"><div class="step-num" style="background:#e65100;">2</div><span class="step-title">6번 줄에 오류가 있어요</span></div>
+              <div class="step-desc" style="display:none;color:#e65100;font-weight:600;margin-top:0.3rem;">&lt;h1&gt;으로 열었는데 <strong>&lt;/h2&gt;</strong>로 닫았습니다! → &lt;/h1&gt;이어야 합니다</div>
+            </div>
+            <div class="step-card" style="cursor:pointer;" onclick="revealError(this)">
+              <div class="step-header"><div class="step-num" style="background:#7b1fa2;">3</div><span class="step-title">7번, 10번 줄에 오류가 있어요</span></div>
+              <div class="step-desc" style="display:none;color:#7b1fa2;font-weight:600;margin-top:0.3rem;">&lt;p&gt;와 &lt;li&gt;의 <strong>닫는 태그</strong>가 각각 빠져있습니다!</div>
+            </div>
+            <div class="step-card" style="cursor:pointer;" onclick="revealError(this)">
+              <div class="step-header"><div class="step-num" style="background:#2d8a49;">4</div><span class="step-title">11번 줄에 오류가 있어요</span></div>
+              <div class="step-desc" style="display:none;color:#2d8a49;font-weight:600;margin-top:0.3rem;">&lt;ul&gt;로 열었는데 <strong>&lt;/ol&gt;</strong>로 닫았습니다! → &lt;/ul&gt;이어야 합니다</div>
+            </div>
+          </div>
+          <p style="font-size:0.8rem;color:var(--gray-600);margin-top:0.5rem;text-align:center;">각 항목을 클릭하면 정답이 보입니다!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 15: 실습 1 -->
+<div class="slide" data-slide="14">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">실습 1</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">✏️</div>
+        <div class="section-text">
+          <h2>실습: 개인 프로필 페이지 만들기</h2>
+          <span class="section-sub">나만의 프로필 페이지를 HTML로 직접 만들어 봅시다</span>
+        </div>
+      </div>
+      <div class="compare-grid">
+        <div>
+          <p style="font-size:0.85rem;color:var(--gray-600);margin-bottom:0.5rem;">주제: <strong>나, 또는 내가 좋아하는 것</strong> (게임, 아이돌, 음식 등 자유)</p>
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">1</div><span class="step-title">기본 구조 입력</span></div>
+            <div class="step-desc">html, head, body 뼈대를 작성하세요</div>
+            <button class="hint-toggle" onclick="toggleHint(this)" style="margin-left:2rem;margin-top:0.2rem;font-size:0.75rem;padding:0.2rem 0.5rem;">💡 힌트</button>
+            <div class="hint-content"><div class="code-block" style="font-size:0.75rem;margin:0.2rem 0 0 2rem;padding:0.4rem 0.6rem;"><span class="tag">&lt;html&gt;</span><br>&nbsp;&nbsp;<span class="tag">&lt;head&gt;&lt;/head&gt;</span><br>&nbsp;&nbsp;<span class="tag">&lt;body&gt;&lt;/body&gt;</span><br><span class="tag">&lt;/html&gt;</span></div></div>
+          </div>
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">2</div><span class="step-title">&lt;title&gt;로 페이지 제목 넣기</span></div>
+            <div class="step-code">&lt;title&gt;홍길동의 프로필&lt;/title&gt;</div>
+          </div>
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">3</div><span class="step-title">&lt;h1&gt;, &lt;h2&gt;로 제목과 소제목 쓰기</span></div>
+            <div class="step-desc">큰 제목 1개 + 소제목 2~3개를 만들어 보세요</div>
+          </div>
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">4</div><span class="step-title">&lt;p&gt;로 자기소개 또는 설명 글 쓰기</span></div>
+            <div class="step-desc">각 소제목 아래에 설명 문단을 추가하세요</div>
+          </div>
+          <div class="step-card">
+            <div class="step-header"><div class="step-num">5</div><span class="step-title">&lt;ul&gt;, &lt;li&gt;로 목록 만들기</span></div>
+            <div class="step-desc">좋아하는 것, 취미 등을 리스트로 나열해 보세요</div>
+          </div>
+          <div class="challenge-box">
+            <h4>🏆 도전 과제</h4>
+            <p>&lt;ol&gt;을 사용해서 순위가 있는 목록(예: 좋아하는 음식 TOP 3)도 만들어 보세요!</p>
+          </div>
+          <div style="margin-top:0.6rem;text-align:center;">
+            <a href="https://docs.google.com/forms/d/e/YOUR_GOOGLE_DOC_ID/viewform" target="_blank" class="link-btn" style="background:#2d8a49;">📤 코드 제출하기 →</a>
+          </div>
+        </div>
+        <div>
+          <div class="practice-preview">
+            <div style="margin-top:0.5rem;">
+              <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:0.4rem;">내가 좋아하는 게임</h1>
+              <h2 style="font-size:1rem;font-weight:700;margin-bottom:0.2rem;">소개</h2>
+              <p style="font-size:0.85rem;margin-bottom:0.5rem;">저는 OOO 게임을 가장 좋아합니다. 이 게임은 ...</p>
+              <h2 style="font-size:1rem;font-weight:700;margin-bottom:0.2rem;">게임 특징</h2>
+              <ul style="padding-left:1.3rem;font-size:0.85rem;margin-bottom:0.5rem;">
+                <li>오픈 월드</li>
+                <li>멀티플레이</li>
+                <li>아름다운 그래픽</li>
+              </ul>
+              <h2 style="font-size:1rem;font-weight:700;margin-bottom:0.2rem;">좋아하는 캐릭터 TOP 3</h2>
+              <ol style="padding-left:1.3rem;font-size:0.85rem;">
+                <li>캐릭터 A</li>
+                <li>캐릭터 B</li>
+                <li>캐릭터 C</li>
+              </ol>
+            </div>
+          </div>
+          <p style="font-size:0.78rem;color:var(--gray-600);margin-top:0.5rem;text-align:center;">예시일 뿐! 자유롭게 나만의 주제로 만들어 보세요 🎨</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 15: 작성한 코드 1 -->
+<div class="slide" data-slide="15">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">작성한 코드</div>
+    </div>
+    <div class="browser-content">
+      <div class="section-divider">
+        <div class="section-icon">💻</div>
+        <div class="section-text">
+          <h2>작성한 코드 (예시)</h2>
+          <span class="section-sub">여러분이 작성한 코드와 비교해 보세요</span>
+        </div>
+      </div>
+      <div class="editor-template">
+        <div class="editor-topbar">
+          <div class="tab">index.html</div>
+        </div>
+        <div class="editor-body">
+          <div class="editor-lines">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22</div>
+          <div class="editor-code">
+<span class="tag">&lt;html&gt;</span><br>
+<span class="tag">&lt;head&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;title&gt;</span><span class="text">내가 좋아하는 게임</span><span class="tag">&lt;/title&gt;</span><br>
+<span class="tag">&lt;/head&gt;</span><br>
+<span class="tag">&lt;body&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span><span class="text">내가 좋아하는 게임</span><span class="tag">&lt;/h1&gt;</span><br>
+<br>
+&nbsp;&nbsp;<span class="tag">&lt;h2&gt;</span><span class="text">소개</span><span class="tag">&lt;/h2&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span><span class="text">저는 OOO 게임을 가장 좋아합니다.</span><span class="tag">&lt;/p&gt;</span><br>
+<br>
+&nbsp;&nbsp;<span class="tag">&lt;h2&gt;</span><span class="text">게임 특징</span><span class="tag">&lt;/h2&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;ul&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span><span class="text">오픈 월드</span><span class="tag">&lt;/li&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span><span class="text">멀티플레이</span><span class="tag">&lt;/li&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;/ul&gt;</span><br>
+<br>
+&nbsp;&nbsp;<span class="tag">&lt;h2&gt;</span><span class="text">좋아하는 캐릭터 TOP 3</span><span class="tag">&lt;/h2&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;ol&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span><span class="text">캐릭터 A</span><span class="tag">&lt;/li&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;li&gt;</span><span class="text">캐릭터 B</span><span class="tag">&lt;/li&gt;</span><br>
+&nbsp;&nbsp;<span class="tag">&lt;/ol&gt;</span><br>
+<span class="tag">&lt;/body&gt;</span><br>
+<span class="tag">&lt;/html&gt;</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-box" style="margin-top:0.8rem;">
+        📝 이 코드는 예시입니다. 여러분은 자신만의 주제와 내용으로 작성하면 됩니다! 중요한 것은 <strong>태그의 열고 닫기</strong>와 <strong>중첩 구조</strong>입니다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 17: 마무리 -->
+<div class="slide" data-slide="16">
+  <div class="browser-card">
+    <div class="browser-topbar">
+      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+      <div class="title">마무리</div>
+    </div>
+    <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+      <div class="cover-content">
+        <div style="font-size:3rem;margin-bottom:1rem;">🎉</div>
+        <h1 style="font-size:2.5rem;">수고하셨습니다!</h1>
+        <p class="subtitle" style="font-size:1.2rem;margin-top:1rem;margin-bottom:2rem;">오늘 배운 내용을 정리해 봅시다</p>
+        <div class="grid-3" style="max-width:700px;margin:0 auto;">
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">🦴</div>
+            <h4>HTML = 뼈대</h4>
+          </div>
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">📦</div>
+            <h4>태그 = 상자</h4>
+          </div>
+          <div class="card-item" style="text-align:center;">
+            <div class="icon">🔀</div>
+            <h4>중첩 = 상자 안의 상자</h4>
+          </div>
+        </div>
+        <div class="highlight-box" style="margin-top:1.5rem;max-width:600px;margin-left:auto;margin-right:auto;">
+          <div class="big-text">다음 시간 예고</div>
+          <div class="small-text">태그의 속성, 이미지/링크 태그, 블록 vs 인라인</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>◀</button>
+  <span class="nav-counter" id="navCounter">1 / 17</span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()">▶</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+
+function updateSlide() {
+  slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide));
+  document.getElementById('navCounter').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+  document.getElementById('prevBtn').disabled = currentSlide === 0;
+  document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+  document.getElementById('progressBar').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+}
+
+function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+function goToSlide(index) { if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); } }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+  if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', function(e) {
+  const diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+});
+
+// Nesting animation
+let nestStep = 0;
+function animateNesting() {
+  const steps = document.querySelectorAll('#nestingDemo .buildup-step');
+  nestStep = 0;
+  steps.forEach(s => s.classList.remove('visible'));
+  function showNext() {
+    if (nestStep < steps.length) {
+      steps[nestStep].classList.add('visible');
+      nestStep++;
+      setTimeout(showNext, 500);
+    }
+  }
+  showNext();
+}
+
+// House structure animation
+let houseStep = 0;
+function animateHouse() {
+  const steps = document.querySelectorAll('#houseDemo .buildup-step');
+  houseStep = 0;
+  steps.forEach(s => s.classList.remove('visible'));
+  function showNext() {
+    if (houseStep < steps.length) {
+      steps[houseStep].classList.add('visible');
+      houseStep++;
+      setTimeout(showNext, 600);
+    }
+  }
+  showNext();
+}
+
+// Error reveal
+function revealError(card) {
+  const desc = card.querySelector('.step-desc');
+  if (desc) desc.style.display = desc.style.display === 'none' ? 'block' : 'none';
+}
+
+// Hint toggle
+function toggleHint(btn) {
+  const content = btn.nextElementSibling;
+  content.classList.toggle('open');
+  btn.textContent = content.classList.contains('open') ? '🔽 힌트 접기' : '💡 힌트 보기';
+}
+
+updateSlide();
+</script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

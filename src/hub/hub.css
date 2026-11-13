@@ -1,0 +1,745 @@
+/* ── 허브(수업 자료) 전용 스타일 ────────────────────────────────────
+   base.css(엔진 영역)는 건드리지 않고, 토큰 어휘(var(--…)) 위에서만
+   허브 화면을 조립한다. 클래스는 전부 hub- 접두사로 충돌을 방지.
+
+   설계 원칙 (Apple HIG 계열):
+   · 단순함 ≠ 미니멀 — 핵심 목적(찾기·분류·활용)만 남기고 장식 카피는 뺀다.
+     큰 타이틀·리드 문장·통계 나열 대신 검색과 필터가 화면의 주인공.
+   · 재질과 깊이 — 상단 바는 반투명 레이어(backdrop-filter), 콘텐츠가 그 아래로
+     흘러 지나간다. 불투명 고정 바가 아니다.
+   · 응답 — 피드백은 pointerdown 즉시(:active), 짧고 중단 가능한 전이만 쓴다.
+   · 타이포 — 크기별 자간(큰 글자는 음수, 작은 라벨은 양수)과 굵기·행간을 한 세트로.
+   · 접근성 — prefers-reduced-motion / reduced-transparency / contrast 대응. */
+
+.hub {
+  height: 100vh;
+  height: 100svh;
+  overflow-y: auto;
+  background:
+    radial-gradient(70% 50% at 50% -10%, var(--bg-grad-1), transparent 62%),
+    radial-gradient(46% 38% at 92% 4%, var(--bg-grad-2), transparent 68%);
+}
+
+/* ══ 상단 바 — 찾기 · 분류 · 활용 ══════════════════════════════════ */
+.hub-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 12px clamp(16px, 4vw, 40px) 10px;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border-bottom: 1px solid var(--hair-2);
+}
+
+.hub-bar-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.6vw, 20px);
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+/* 어디에 있는지 — 짧고 구체적인 라벨 하나 */
+.hub-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex: none;
+  color: var(--fg);
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hub-mark-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: var(--glow);
+}
+
+/* ── 검색: 화면의 주인공 ── */
+.hub-search {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 560px;
+}
+
+.hub-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  translate: 0 -50%;
+  font-size: 14px;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.hub-search input {
+  width: 100%;
+  padding: 10px 44px 10px 40px;
+  border-radius: 12px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--fg);
+  font-size: 15px;
+  font-family: var(--font-body);
+  letter-spacing: -0.005em;
+  outline: none;
+  transition:
+    border-color 0.18s var(--ease),
+    background 0.18s var(--ease),
+    box-shadow 0.18s var(--ease);
+}
+
+.hub-search input::placeholder {
+  color: var(--fg-faint);
+}
+
+.hub-search input:hover {
+  background: var(--surface-2);
+}
+
+.hub-search input:focus-visible {
+  background: var(--surface-2);
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+
+.hub-search-kbd,
+.hub-search-clear {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  translate: 0 -50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 7px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1;
+}
+
+.hub-search-kbd {
+  border: 1px solid var(--hair);
+  color: var(--fg-faint);
+  pointer-events: none;
+}
+
+.hub-search-clear {
+  border: 0;
+  background: color-mix(in srgb, var(--fg) 12%, transparent);
+  color: var(--fg-muted);
+  cursor: pointer;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.hub-search-clear:hover {
+  background: color-mix(in srgb, var(--fg) 20%, transparent);
+  color: var(--fg);
+}
+
+/* ── 활용: 참여 · 콘솔 ── */
+.hub-actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.hub-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 11px;
+  border: 1px solid var(--hair);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease),
+    border-color 0.18s var(--ease),
+    transform 0.18s var(--ease-spring);
+}
+
+.hub-action:hover {
+  background: var(--surface-2);
+  border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+}
+
+.hub-action:active {
+  transform: scale(0.97);
+}
+
+.hub-action--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.hub-action--primary:hover {
+  background: var(--accent);
+  filter: brightness(1.06);
+}
+
+/* ══ 분류 — 학기·구분(1차) → 과목(2차), 한 줄 ══════════════════════ */
+.hub-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 1280px;
+  margin: 10px auto 0;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* 넘치는 쪽은 딱딱한 구분선 대신 페이드로 잘라 보여준다 */
+  mask-image: linear-gradient(90deg, #000 0 calc(100% - 28px), transparent);
+}
+
+.hub-filters::-webkit-scrollbar {
+  display: none;
+}
+
+/* 학기·구분 — iOS 세그먼트 컨트롤 어법 */
+.hub-seg {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 11px;
+  border: 1px solid var(--hair-2);
+  background: var(--surface);
+}
+
+.hub-seg-btn {
+  padding: 6px 13px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--fg-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease),
+    color 0.18s var(--ease),
+    transform 0.18s var(--ease-spring);
+}
+
+.hub-seg-btn:hover {
+  color: var(--fg);
+}
+
+.hub-seg-btn:active {
+  transform: scale(0.96);
+}
+
+.hub-seg-btn.active {
+  background: color-mix(in srgb, var(--fg) 13%, transparent);
+  color: var(--fg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.hub-filter-sep {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  background: var(--hair);
+}
+
+.hub-tabs {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+
+.hub-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.18s var(--ease),
+    color 0.18s var(--ease),
+    border-color 0.18s var(--ease),
+    transform 0.18s var(--ease-spring);
+}
+
+.hub-tab:hover {
+  color: var(--fg);
+  background: var(--surface);
+}
+
+.hub-tab:active {
+  transform: scale(0.96);
+}
+
+.hub-tab.active {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 38%, transparent);
+}
+
+.hub-tab-n {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  opacity: 0.7;
+}
+
+/* ══ 본문 ═════════════════════════════════════════════════════════ */
+.hub-shell {
+  max-width: 1280px;
+  margin-inline: auto;
+  padding: clamp(18px, 3vh, 28px) clamp(16px, 4vw, 40px) clamp(48px, 8vh, 96px);
+}
+
+.hub-center {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.hub-state-title {
+  font-family: var(--font-head);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.hub-state-sub {
+  color: var(--fg-muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* 지금 무엇을 보고 있는지 — 한 줄 상태 */
+.hub-status {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: clamp(16px, 2.5vh, 24px);
+  color: var(--fg-faint);
+  font-size: 12.5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.01em;
+}
+
+.hub-status b {
+  color: var(--fg-muted);
+  font-weight: 700;
+}
+
+.hub-status-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff8ba0;
+}
+
+.hub-reset {
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  background: transparent;
+  color: var(--fg-muted);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+
+.hub-reset:hover {
+  color: var(--fg);
+  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
+/* ── 섹션 ── */
+.hub-section {
+  margin-bottom: clamp(28px, 4.5vh, 44px);
+}
+
+.hub-section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--hair-2);
+}
+
+.hub-section-head h2 {
+  font-family: var(--font-head);
+  font-size: clamp(16px, 1.8vw, 19px);
+  font-weight: 800;
+  letter-spacing: -0.018em;
+  line-height: 1.2;
+}
+
+.hub-section-n {
+  color: var(--fg-faint);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+/* ── 카드 그리드 ── */
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
+  gap: clamp(10px, 1.3vw, 16px);
+}
+
+.hub-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: clamp(16px, 1.7vw, 20px);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  cursor: pointer;
+  /* 짧고 중단 가능한 전이 — 누르는 순간 반응 */
+  transition:
+    transform 0.22s var(--ease-spring),
+    border-color 0.22s var(--ease),
+    box-shadow 0.22s var(--ease);
+}
+
+.hub-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--primary) 34%, var(--hair));
+  box-shadow: 0 18px 40px -28px rgba(0, 0, 0, 0.9);
+}
+
+.hub-card:active {
+  transform: scale(0.985);
+  transition-duration: 0.08s;
+}
+
+.hub-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 65%, transparent);
+  outline-offset: 2px;
+}
+
+.hub-card-bar {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  opacity: 0.62;
+}
+
+.hub-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.hub-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.hub-badges {
+  display: flex;
+  gap: 5px;
+}
+
+.hub-badge-app,
+.hub-badge-doc,
+.hub-badge-quiz {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+.hub-badge-app {
+  color: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 34%, transparent);
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+}
+
+.hub-badge-doc {
+  color: var(--fg-faint);
+  border: 1px solid var(--hair);
+}
+
+/* 문항이 준비된 수업 표시 — '지금 방송 중'이 아니라 '퀴즈가 있다'는 정적 표식 */
+.hub-badge-quiz {
+  color: #ff5c7a;
+  border: 1px solid rgba(255, 92, 122, 0.36);
+  background: rgba(255, 92, 122, 0.09);
+}
+
+.hub-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff5c7a;
+  box-shadow: 0 0 8px rgba(255, 92, 122, 0.9);
+  animation: hub-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes hub-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.hub-card-body {
+  flex: 1;
+  display: block;
+}
+
+.hub-card-title {
+  margin-bottom: 7px;
+  font-family: var(--font-head);
+  font-size: clamp(15.5px, 1.6vw, 17px);
+  font-weight: 700;
+  letter-spacing: -0.016em;
+  line-height: 1.32;
+  word-break: keep-all;
+}
+
+.hub-card-desc {
+  color: var(--fg-muted);
+  font-size: 12.5px;
+  line-height: 1.62;
+  letter-spacing: 0.002em;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.hub-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 2px;
+  padding-top: 11px;
+  border-top: 1px solid var(--hair-2);
+}
+
+.hub-chips {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.hub-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  color: var(--fg-faint);
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.hub-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--fg-faint);
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+/* 열기 · 발표 — 버튼 대신 하이라인으로 나눈 컴팩트한 텍스트 액션 */
+.hub-acts {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hub-open {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 12.5px;
+  font-family: var(--font-body);
+}
+
+.hub-present {
+  padding-left: 8px;
+  border-left: 1px solid var(--hair);
+  color: #ff8ba0;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: var(--font-body);
+  transition: color 0.18s var(--ease);
+}
+
+.hub-present:hover {
+  color: #ffc2cd;
+}
+
+.hub-present:active {
+  color: #ff5c7a;
+}
+
+/* 로컬 덱 에디터로 가는 링크 — dev 서버에서만 렌더된다(Hub.tsx) */
+.hub-edit {
+  padding-left: 8px;
+  border-left: 1px solid var(--hair);
+  color: var(--fg-faint);
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: var(--font-body);
+  transition: color 0.18s var(--ease);
+}
+
+.hub-edit:hover {
+  color: var(--fg);
+}
+
+/* ── 기타 ── */
+.hub-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: clamp(48px, 10vh, 96px) 0;
+  text-align: center;
+}
+
+.hub-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair-2);
+  color: var(--fg-faint);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.01em;
+}
+
+.hub-foot a {
+  color: var(--fg-faint);
+}
+
+.hub-pulse {
+  animation: hub-pulse 1.4s ease-in-out infinite;
+}
+
+/* ── 좁은 화면: 검색은 한 줄을 통째로 ── */
+@media (max-width: 720px) {
+  .hub-bar-row {
+    flex-wrap: wrap;
+  }
+  .hub-search {
+    order: 3;
+    max-width: none;
+    flex-basis: 100%;
+  }
+  .hub-actions {
+    margin-left: auto;
+  }
+  .hub-action span {
+    display: none;
+  }
+  .hub-action {
+    padding: 9px 12px;
+  }
+}
+
+/* ── 접근성 ── */
+@media (prefers-reduced-motion: reduce) {
+  .hub-live-dot,
+  .hub-pulse {
+    animation: none;
+  }
+  .hub-card,
+  .hub-action,
+  .hub-tab,
+  .hub-seg-btn,
+  .hub-present {
+    transition-property: background, color, border-color, box-shadow;
+  }
+  .hub-card:hover,
+  .hub-card:active,
+  .hub-action:active,
+  .hub-tab:active,
+  .hub-seg-btn:active {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .hub-bar {
+    background: var(--bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .hub-card,
+  .hub-seg,
+  .hub-search input {
+    border-color: color-mix(in srgb, var(--fg) 34%, transparent);
+  }
+  .hub-card-desc,
+  .hub-status {
+    color: var(--fg);
+  }
+}

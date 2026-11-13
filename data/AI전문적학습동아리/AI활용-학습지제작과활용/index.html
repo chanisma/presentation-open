@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>AI를 활용한 학습지 제작과 활용</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --style-bg: #F8FAFC;
+      --style-primary: #0055FF;
+      --style-accent: #00D1FF;
+      --style-text: #0F172A;
+      --style-text-secondary: #475569;
+      --glass-bg: rgba(255, 255, 255, 0.7);
+      --glass-border: rgba(0, 85, 255, 0.1);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      overflow: hidden;
+    }
+
+    /* Light-glass background decoration */
+    .bg-deco {
+      position: fixed; border-radius: 50%;
+      filter: blur(100px); z-index: 0;
+      opacity: 0.45; pointer-events: none;
+    }
+    .bg-deco--1 { top: -15%; right: -10%; width: 420px; height: 420px; background: rgba(0, 85, 255, 0.10); }
+    .bg-deco--2 { bottom: -15%; left: -10%; width: 360px; height: 360px; background: rgba(0, 209, 255, 0.10); }
+
+    /* Progress bar */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      transition: width 0.4s ease; z-index: 1000;
+    }
+
+    /* Slide container */
+    .presentation {
+      position: relative; z-index: 1;
+      width: 100%;
+      height: calc(100vh - 50px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem 2rem;
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      padding: 1.5vh 2vw;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    .slide-frame {
+      max-width: 1400px;
+      width: 100%;
+      max-height: calc(100vh - 8vh);
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--glass-border);
+      border-radius: 1.2rem;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .slide-frame img {
+      width: 100%;
+      height: auto;
+      max-height: calc(100vh - 9vh);
+      object-fit: contain;
+      display: block;
+    }
+
+    /* Footer / Nav Bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.6rem; padding: 0.55rem 1.5rem;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid #E2E8F0;
+      z-index: 999;
+      height: 50px;
+    }
+
+    .nav-side {
+      display: flex; align-items: center; gap: 0.5rem;
+      flex: 1;
+    }
+    .nav-side.left { justify-content: flex-start; }
+    .nav-side.right { justify-content: flex-end; }
+    .nav-side.center { justify-content: center; flex: 0 0 auto; }
+
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 2rem; height: 2rem; border: 1px solid #E2E8F0;
+      border-radius: 50%; background: #FFF;
+      cursor: pointer; color: #64748B; transition: all 0.2s;
+    }
+    .nav-btn svg { width: 0.7rem; height: 0.7rem; fill: currentColor; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: var(--style-primary); color: #FFF; }
+    .nav-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+    .nav-counter {
+      font-size: 13px; font-weight: 700; color: #64748B;
+      min-width: 3.5rem; text-align: center;
+      display: flex; align-items: center; gap: 0.2rem;
+    }
+    .slide-input {
+      width: 1.8rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+      outline: none; transition: border-color 0.2s; font-family: inherit;
+    }
+    .slide-input:focus { border-bottom-color: var(--style-primary); }
+
+    .footer-label {
+      font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+      font-size: 0.72rem; font-weight: 700; color: #94A3B8;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+
+    .download-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      background: linear-gradient(135deg, var(--style-primary), #2563EB);
+      color: #FFF;
+      text-decoration: none;
+      border-radius: 2rem;
+      font-size: 0.78rem; font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0, 85, 255, 0.25);
+      transition: all 0.2s;
+      font-family: 'Montserrat', 'Noto Sans KR', sans-serif;
+    }
+    .download-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 85, 255, 0.35);
+    }
+    .download-btn svg { width: 0.8rem; height: 0.8rem; fill: currentColor; }
+    .download-btn .dl-size {
+      font-size: 0.66rem; opacity: 0.8; font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .footer-label { display: none; }
+      .nav-bar { padding: 0.45rem 0.8rem; }
+      .download-btn { padding: 0.3rem 0.7rem; font-size: 0.72rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="bg-deco bg-deco--1"></div>
+  <div class="bg-deco bg-deco--2"></div>
+
+  <div class="presentation" id="presentation">
+    <div class="slide active" data-slide="0"><div class="slide-frame"><img src="slides/slide-01.jpg" alt="슬라이드 1"></div></div>
+    <div class="slide" data-slide="1"><div class="slide-frame"><img src="slides/slide-02.jpg" alt="슬라이드 2" loading="lazy"></div></div>
+    <div class="slide" data-slide="2"><div class="slide-frame"><img src="slides/slide-03.jpg" alt="슬라이드 3" loading="lazy"></div></div>
+    <div class="slide" data-slide="3"><div class="slide-frame"><img src="slides/slide-04.jpg" alt="슬라이드 4" loading="lazy"></div></div>
+    <div class="slide" data-slide="4"><div class="slide-frame"><img src="slides/slide-05.jpg" alt="슬라이드 5" loading="lazy"></div></div>
+    <div class="slide" data-slide="5"><div class="slide-frame"><img src="slides/slide-06.jpg" alt="슬라이드 6" loading="lazy"></div></div>
+    <div class="slide" data-slide="6"><div class="slide-frame"><img src="slides/slide-07.jpg" alt="슬라이드 7" loading="lazy"></div></div>
+    <div class="slide" data-slide="7"><div class="slide-frame"><img src="slides/slide-08.jpg" alt="슬라이드 8" loading="lazy"></div></div>
+    <div class="slide" data-slide="8"><div class="slide-frame"><img src="slides/slide-09.jpg" alt="슬라이드 9" loading="lazy"></div></div>
+    <div class="slide" data-slide="9"><div class="slide-frame"><img src="slides/slide-10.jpg" alt="슬라이드 10" loading="lazy"></div></div>
+    <div class="slide" data-slide="10"><div class="slide-frame"><img src="slides/slide-11.jpg" alt="슬라이드 11" loading="lazy"></div></div>
+    <div class="slide" data-slide="11"><div class="slide-frame"><img src="slides/slide-12.jpg" alt="슬라이드 12" loading="lazy"></div></div>
+    <div class="slide" data-slide="12"><div class="slide-frame"><img src="slides/slide-13.jpg" alt="슬라이드 13" loading="lazy"></div></div>
+    <div class="slide" data-slide="13"><div class="slide-frame"><img src="slides/slide-14.jpg" alt="슬라이드 14" loading="lazy"></div></div>
+    <div class="slide" data-slide="14"><div class="slide-frame"><img src="slides/slide-15.jpg" alt="슬라이드 15" loading="lazy"></div></div>
+  </div>
+
+  <!-- ─── Footer / Navigation Bar ─── -->
+  <div class="nav-bar">
+    <div class="nav-side left">
+      <span class="footer-label">2026 AI 전문적학습동아리</span>
+    </div>
+    <div class="nav-side center">
+      <button class="nav-btn" id="prevBtn" aria-label="이전 슬라이드">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </button>
+      <div class="nav-counter">
+        <input type="text" id="slideInput" class="slide-input" value="1" inputmode="numeric">
+        <span>/</span>
+        <span id="totalSlides">15</span>
+      </div>
+      <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+      </button>
+    </div>
+    <div class="nav-side right">
+      <a class="download-btn" href="downloads/skills.zip" download="skills.zip" aria-label="스킬 zip 다운로드">
+        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        skills.zip
+        <span class="dl-size">다운로드</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    var slides = document.querySelectorAll('.slide');
+    var totalSlides = slides.length;
+    var currentSlide = 0;
+    var progressBar = document.getElementById('progressBar');
+    var prevBtn = document.getElementById('prevBtn');
+    var nextBtn = document.getElementById('nextBtn');
+    var slideInput = document.getElementById('slideInput');
+    var totalSlidesEl = document.getElementById('totalSlides');
+
+    totalSlidesEl.textContent = totalSlides;
+
+    function goToSlide(idx) {
+      if (idx < 0 || idx >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = idx;
+      slides[currentSlide].classList.add('active');
+      progressBar.style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+    window.goToSlide = goToSlide;
+
+    prevBtn.addEventListener('click', function() { goToSlide(currentSlide - 1); });
+    nextBtn.addEventListener('click', function() { goToSlide(currentSlide + 1); });
+
+    slideInput.addEventListener('change', function() {
+      var n = parseInt(slideInput.value, 10);
+      if (!isNaN(n) && n >= 1 && n <= totalSlides) goToSlide(n - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+    slideInput.addEventListener('focus', function() { slideInput.select(); });
+
+    document.addEventListener('keydown', function(e) {
+      if (document.activeElement === slideInput) return;
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault(); goToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault(); goToSlide(currentSlide - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault(); goToSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault(); goToSlide(totalSlides - 1);
+      }
+    });
+
+    var wheelLock = false;
+    document.addEventListener('wheel', function(e) {
+      if (wheelLock) return;
+      wheelLock = true;
+      setTimeout(function() { wheelLock = false; }, 600);
+      if (e.deltaY > 0) goToSlide(currentSlide + 1);
+      else if (e.deltaY < 0) goToSlide(currentSlide - 1);
+    }, { passive: true });
+
+    var touchStartX = 0;
+    document.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      var diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) goToSlide(currentSlide + 1);
+        else goToSlide(currentSlide - 1);
+      }
+    }, { passive: true });
+
+    goToSlide(0);
+  })();
+  </script>
+  <script type="module" src="../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

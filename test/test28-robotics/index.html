@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로봇공학의 세계</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* 1. Reset & CSS Variables */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --style-bg: #0D0D0D;
+      --style-primary: #00FFC8;
+      --style-accent: #00FFC8;
+      --style-text: #00FFC8;
+      --style-text-secondary: rgba(0, 255, 200, 0.5);
+      --style-panel: rgba(0, 255, 200, 0.06);
+      --style-border: rgba(0, 255, 200, 0.2);
+      --style-grid: rgba(0, 255, 200, 0.06);
+      --style-glow: rgba(0, 255, 200, 0.3);
+      --font-title: 'Bebas Neue', 'Pretendard Variable', sans-serif;
+      --font-body: 'Space Mono', 'Pretendard Variable', monospace;
+      --white: #ffffff;
+      --gray-200: rgba(0, 255, 200, 0.15);
+      --gray-600: rgba(0, 255, 200, 0.6);
+      --gray-700: rgba(0, 255, 200, 0.7);
+      --main: #00FFC8;
+    }
+
+    /* 2. Base Typography */
+    html, body {
+      font-family: var(--font-body);
+      font-size: clamp(16px, 1.5vw, 28px);
+      background: var(--style-bg);
+      color: var(--style-text);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    h1 { font-size: 2.4rem; font-weight: 800; font-family: var(--font-title); letter-spacing: 6px; }
+    h2 { font-size: 1.5rem; font-weight: 700; font-family: var(--font-title); letter-spacing: 4px; }
+    h3 { font-size: 1.15rem; font-weight: 600; font-family: var(--font-body); }
+    p  { font-size: 1rem; line-height: 1.7; }
+
+    /* 3. Slide Container */
+    .presentation {
+      position: fixed;
+      inset: 0;
+      bottom: 2.8rem;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      padding: 1.5rem;
+      /* dot-grid background */
+      background-image: radial-gradient(circle, var(--style-grid) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* 4. Browser Card Chrome */
+    .browser-card {
+      width: 100%;
+      max-width: 960px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-radius: 0.6rem;
+      background: rgba(13, 13, 13, 0.95);
+      border: 1px solid var(--style-border);
+      box-shadow: 0 0 30px var(--style-glow), inset 0 0 60px rgba(0,255,200,0.02);
+      position: relative;
+    }
+
+    /* Corner bracket markers */
+    .browser-card::before,
+    .browser-card::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: var(--style-primary);
+      border-style: solid;
+      opacity: 0.6;
+      z-index: 10;
+    }
+    .browser-card::before {
+      top: -1px; left: -1px;
+      border-width: 2px 0 0 2px;
+    }
+    .browser-card::after {
+      bottom: -1px; right: -1px;
+      border-width: 0 2px 2px 0;
+    }
+
+    .browser-topbar {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid var(--style-border);
+      background: rgba(0,255,200,0.04);
+      flex-shrink: 0;
+    }
+    .dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; flex-shrink: 0; }
+    .dot.red    { background: #ff5f57; box-shadow: 0 0 6px #ff5f57; }
+    .dot.yellow { background: #febc2e; box-shadow: 0 0 6px #febc2e; }
+    .dot.green  { background: #28c840; box-shadow: 0 0 6px #28c840; }
+    .topbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 0.8rem;
+      font-family: var(--font-body);
+      color: var(--style-text-secondary);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .browser-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      scrollbar-width: thin;
+      scrollbar-color: var(--style-border) transparent;
+    }
+    .browser-content:focus { outline: none; }
+
+    /* 5. Components */
+    .badge {
+      display: inline-block;
+      padding: 0.22rem 0.7rem;
+      border-radius: 0.25rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      font-family: var(--font-body);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid var(--style-primary);
+      color: var(--style-primary);
+      background: rgba(0,255,200,0.08);
+    }
+
+    .highlight-box {
+      background: var(--style-panel);
+      border-left: 3px solid var(--style-primary);
+      border-radius: 0 0.4rem 0.4rem 0;
+      padding: 0.9rem 1.2rem;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: var(--style-text);
+      line-height: 1.6;
+    }
+
+    /* Card Grid */
+    .card-grid { display: grid; gap: 0.8rem; margin-top: 1rem; }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: var(--style-panel);
+      border: 1px solid var(--style-border);
+      border-radius: 0.4rem;
+      padding: 1rem;
+      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      border-color: var(--style-primary);
+      box-shadow: 0 0 12px var(--style-glow);
+    }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.4rem; }
+    .card-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.3rem; color: var(--style-primary); }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* Activity List */
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.8rem; }
+    .activity-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 0.8rem 1rem;
+      background: var(--style-panel);
+      border: 1px solid var(--style-border);
+      border-radius: 0.4rem;
+    }
+    .activity-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .activity-body { flex: 1; }
+    .activity-title { font-size: 1rem; font-weight: 700; color: var(--style-primary); margin-bottom: 0.2rem; }
+    .activity-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* Task List */
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.8rem; }
+    .task-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      padding: 0.8rem 1rem;
+      background: var(--style-panel);
+      border: 1px solid var(--style-border);
+      border-radius: 0.4rem;
+    }
+    .task-num {
+      font-family: var(--font-title);
+      font-size: 1.6rem;
+      color: var(--style-primary);
+      opacity: 0.5;
+      flex-shrink: 0;
+      line-height: 1;
+      letter-spacing: 2px;
+    }
+    .task-body { flex: 1; }
+    .task-title { font-size: 1rem; font-weight: 700; color: var(--style-primary); margin-bottom: 0.2rem; }
+    .task-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+
+    /* Stat Grid */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1rem; }
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+      background: var(--style-panel);
+      border: 1px solid var(--style-border);
+      border-radius: 0.4rem;
+    }
+    .stat-number {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 2rem;
+      color: var(--style-primary);
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px var(--style-glow);
+    }
+    .stat-label { font-size: 0.82rem; color: var(--style-text-secondary); letter-spacing: 1px; }
+
+    /* TOC */
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.7rem 1rem;
+      background: var(--style-panel);
+      border: 1px solid var(--style-border);
+      border-radius: 0.4rem;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .toc-item:hover, .toc-item:focus {
+      border-color: var(--style-primary);
+      box-shadow: 0 0 10px var(--style-glow);
+      outline: none;
+    }
+    .toc-num {
+      font-family: var(--font-title);
+      font-size: 1.4rem;
+      color: var(--style-primary);
+      opacity: 0.5;
+      letter-spacing: 2px;
+      min-width: 2rem;
+    }
+    .toc-text { flex: 1; font-size: 0.95rem; color: var(--style-text); }
+    .toc-arrow { color: var(--style-primary); opacity: 0.5; font-size: 0.9rem; }
+
+    /* Section overview */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .section-icon { font-size: 1.6rem; }
+
+    /* Cover slide */
+    .cover-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      gap: 0.8rem;
+    }
+    .cover-title {
+      font-family: var(--font-title);
+      font-size: 3rem;
+      letter-spacing: 10px;
+      /* Outline text effect */
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--style-primary);
+      text-shadow: 0 0 20px var(--style-glow), 0 0 40px var(--style-glow);
+      line-height: 1.1;
+    }
+    .cover-subtitle {
+      font-size: 1rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .cover-divider {
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--style-primary), transparent);
+      margin: 0.5rem 0;
+    }
+    .cover-meta {
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      letter-spacing: 1px;
+    }
+
+    /* End slide */
+    .end-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 1rem;
+    }
+    .end-header { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .end-icon { font-size: 2rem; }
+    .end-title {
+      font-family: var(--font-title);
+      font-size: 2.8rem;
+      letter-spacing: 8px;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--style-primary);
+      text-shadow: 0 0 20px var(--style-glow);
+    }
+    .end-subtitle { font-size: 0.95rem; color: var(--style-text-secondary); letter-spacing: 1px; }
+    .end-summary {
+      width: 100%;
+      max-width: 600px;
+      text-align: left;
+    }
+    .summary-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.6rem; color: var(--style-primary); }
+    .summary-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .summary-list li { font-size: 0.9rem; color: var(--style-text-secondary); }
+
+    /* Two-column */
+    .two-col { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 1.2rem; margin-top: 1rem; }
+    .col-divider { background: var(--style-border); }
+    .col-title { font-size: 1.05rem; font-weight: 700; color: var(--style-primary); margin-bottom: 0.6rem; letter-spacing: 1px; }
+    .col-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+    .col-list li { font-size: 0.88rem; color: var(--style-text-secondary); padding-left: 0.8rem; border-left: 2px solid var(--style-border); }
+
+    /* Section title */
+    .section-title { font-family: var(--font-title); letter-spacing: 4px; color: var(--style-primary); margin-bottom: 0.6rem; }
+
+    /* 6. Numbered card/activity label variants */
+    .card-num-label {
+      display: block;
+      font-family: var(--font-title);
+      font-size: 1.6rem;
+      color: var(--style-primary);
+      opacity: 0.4;
+      letter-spacing: 3px;
+      margin-bottom: 0.3rem;
+      line-height: 1;
+    }
+    .act-num {
+      font-family: var(--font-title);
+      font-size: 1.4rem;
+      color: var(--style-primary);
+      opacity: 0.5;
+      letter-spacing: 2px;
+      line-height: 1;
+      min-width: 2.4rem;
+      flex-shrink: 0;
+    }
+
+    /* 7. Utility classes */
+    .mt-1 { margin-top: 1rem; }
+    .hidden { display: none; }
+    .fs-btn { margin-left: 0.3rem; }
+
+    /* 7. Progress bar */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: var(--style-primary);
+      box-shadow: 0 0 8px var(--style-glow);
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    /* 7. Nav Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 1.5rem;
+      background: rgba(13,13,13,0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--style-border);
+      z-index: 999;
+      font-size: 14px;
+    }
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--style-border);
+      border-radius: 50%;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0;
+      color: var(--style-primary);
+      transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: rgba(0,255,200,0.15); box-shadow: 0 0 8px var(--style-glow); }
+    .nav-btn:focus-visible { outline: 2px solid var(--style-primary); outline-offset: 2px; }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--style-text-secondary);
+      min-width: 3rem;
+      text-align: center;
+      display: flex; align-items: center; gap: 0.15rem;
+      line-height: 1;
+      font-family: var(--font-body);
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: var(--style-primary);
+      font-family: inherit; padding: 0; outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-primary); }
+
+    /* 8. Accessibility */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--style-primary); color: #000;
+      padding: 8px 16px; z-index: 9999; font-size: 14px;
+      border-radius: 0 0 4px 0; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 2px solid var(--style-primary); outline-offset: 2px; border-radius: 2px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* 9. Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { grid-template-columns: 1fr; }
+      .col-divider { display: none; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .cover-title { font-size: 2rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .browser-content { padding: 0.8rem; }
+      h1 { font-size: 1.7rem; }
+      h2 { font-size: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="8"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">ROBOTICS.EXE</span>
+        </div>
+        <div class="browser-content cover-slide" tabindex="-1">
+          <div class="badge">고등학교 기술 수업</div>
+          <h1 class="cover-title">로봇공학의 세계</h1>
+          <p class="cover-subtitle">WORLD OF ROBOTICS · 기계가 움직이는 방법</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>기술 교과</span>
+            <span aria-hidden="true">·</span>
+            <span>고등학교</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026">2026</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: TOC -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 목차">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">INDEX</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <h2 class="section-title">목차</h2>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" onclick="goToSlide(2)" role="button" tabindex="0"
+                  aria-label="슬라이드 3으로 이동: 로봇공학이란?"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(2)">
+                <span class="toc-num" aria-hidden="true">01</span>
+                <span class="toc-text">로봇공학이란?</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(3)" role="button" tabindex="0"
+                  aria-label="슬라이드 4으로 이동: 로봇의 3대 구성요소"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(3)">
+                <span class="toc-num" aria-hidden="true">02</span>
+                <span class="toc-text">로봇의 3대 구성요소</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(4)" role="button" tabindex="0"
+                  aria-label="슬라이드 5으로 이동: 로봇의 종류"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(4)">
+                <span class="toc-num" aria-hidden="true">03</span>
+                <span class="toc-text">로봇의 종류</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(5)" role="button" tabindex="0"
+                  aria-label="슬라이드 6으로 이동: 산업 현장의 로봇"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(5)">
+                <span class="toc-num" aria-hidden="true">04</span>
+                <span class="toc-text">산업 현장의 로봇</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(6)" role="button" tabindex="0"
+                  aria-label="슬라이드 7으로 이동: 미래 로봇 기술"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(6)">
+                <span class="toc-num" aria-hidden="true">05</span>
+                <span class="toc-text">미래 로봇 기술</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+              <li class="toc-item" onclick="goToSlide(7)" role="button" tabindex="0"
+                  aria-label="슬라이드 8으로 이동: 정리 및 과제"
+                  onkeydown="if(event.key==='Enter'||event.key===' ')goToSlide(7)">
+                <span class="toc-num" aria-hidden="true">06</span>
+                <span class="toc-text">정리 및 과제</span>
+                <span class="toc-arrow" aria-hidden="true">→</span>
+              </li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 로봇공학이란? -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 로봇공학이란?">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">UNIT 01 · WHAT IS ROBOTICS</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-divider">
+            <span class="section-icon" aria-hidden="true">🤖</span>
+            <h2>로봇공학이란?</h2>
+          </div>
+          <div class="highlight-box" role="note">
+            로봇공학(Robotics)은 기계공학, 전자공학, 컴퓨터과학이 결합된 융합 학문으로,
+            인간을 대신해 작업을 수행하는 기계 시스템을 설계·제작·운용하는 기술입니다.
+          </div>
+          <div class="grid-2 card-grid mt-1" role="list">
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">01</span>
+              <h3 class="card-title">기계공학</h3>
+              <p class="card-desc">구조, 동력, 메커니즘 설계. 로봇의 몸체와 관절을 구성합니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">02</span>
+              <h3 class="card-title">전자·제어공학</h3>
+              <p class="card-desc">센서, 액추에이터, 회로 설계. 로봇의 감각과 운동을 담당합니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">03</span>
+              <h3 class="card-title">컴퓨터과학</h3>
+              <p class="card-desc">알고리즘, AI, 소프트웨어. 로봇의 판단과 학습을 가능하게 합니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">04</span>
+              <h3 class="card-title">인공지능</h3>
+              <p class="card-desc">머신러닝, 딥러닝 기반으로 스스로 학습하고 환경에 적응합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 로봇의 3대 구성요소 -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 로봇의 3대 구성요소">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">UNIT 02 · CORE COMPONENTS</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-divider">
+            <span class="section-icon" aria-hidden="true">🔩</span>
+            <h2>로봇의 3대 구성요소</h2>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon act-num" aria-hidden="true">01</span>
+              <div class="activity-body">
+                <h3 class="activity-title">센서 (Sensor) — 인식</h3>
+                <p class="activity-desc">
+                  외부 환경을 감지하는 입력 장치. 카메라, 거리 센서(LiDAR), 적외선, 압력 센서 등이 있으며
+                  로봇이 주변 상황을 '느끼고' 데이터를 수집합니다.
+                </p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon act-num" aria-hidden="true">02</span>
+              <div class="activity-body">
+                <h3 class="activity-title">제어기 (Controller) — 판단</h3>
+                <p class="activity-desc">
+                  센서 데이터를 처리하고 명령을 생성하는 두뇌 역할. 마이크로컨트롤러(MCU),
+                  임베디드 컴퓨터, AI 프로세서 등이 사용됩니다.
+                </p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon act-num" aria-hidden="true">03</span>
+              <div class="activity-body">
+                <h3 class="activity-title">액추에이터 (Actuator) — 행동</h3>
+                <p class="activity-desc">
+                  제어 신호를 실제 운동으로 변환하는 출력 장치. 모터(서보/스텝핑),
+                  유압 실린더, 공압 장치 등이 로봇의 '근육' 역할을 합니다.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 로봇의 종류 -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 로봇의 종류">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">UNIT 03 · ROBOT TYPES</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-divider">
+            <span class="section-icon" aria-hidden="true">🔬</span>
+            <h2>로봇의 종류</h2>
+          </div>
+          <div class="grid-3 card-grid" role="list">
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">01</span>
+              <h3 class="card-title">산업용 로봇</h3>
+              <p class="card-desc">제조 공장에서 용접, 조립, 도장 작업을 수행. 정밀도와 반복성이 핵심입니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">02</span>
+              <h3 class="card-title">서비스 로봇</h3>
+              <p class="card-desc">청소 로봇, 배달 로봇, 안내 로봇 등 일상 생활을 지원합니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">03</span>
+              <h3 class="card-title">의료 로봇</h3>
+              <p class="card-desc">수술 보조(다빈치 로봇), 재활 치료, 약품 조제 등 의료 현장에서 활약합니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">04</span>
+              <h3 class="card-title">탐사 로봇</h3>
+              <p class="card-desc">화성 탐사(퍼서비어런스), 심해 탐사, 재난 현장 진입 등 위험 환경을 탐색합니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">05</span>
+              <h3 class="card-title">협동 로봇</h3>
+              <p class="card-desc">인간과 같은 공간에서 협력 작업. 안전 센서로 충돌을 방지합니다.</p>
+            </div>
+            <div class="card card-num" role="listitem">
+              <span class="card-num-label" aria-hidden="true">06</span>
+              <h3 class="card-title">교육용 로봇</h3>
+              <p class="card-desc">코딩 학습, STEM 교육에 활용. 아두이노·레고·NAO 등이 대표적입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 산업 현장의 로봇 (통계) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 산업 현장의 로봇">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">UNIT 04 · INDUSTRY DATA</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-divider">
+            <span class="section-icon" aria-hidden="true">📊</span>
+            <h2>산업 현장의 로봇</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="약 390만 대">3.9M</span>
+              <span class="stat-label">전 세계 운용 산업용 로봇 (2023)</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="1위">1위</span>
+              <span class="stat-label">한국 — 제조업 로봇 밀도 세계 1위</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="1012대">1012</span>
+              <span class="stat-label">한국 근로자 1만 명당 로봇 수</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            자동차, 전자, 반도체 산업에서 로봇 도입이 급속히 증가하고 있으며,
+            한국은 자동화 도입률 세계 최상위권을 유지하고 있습니다.
+            로봇공학 기술력은 국가 제조업 경쟁력과 직결됩니다.
+          </div>
+          <div class="two-col mt-1">
+            <div class="col-left">
+              <h3 class="col-title">주요 적용 산업</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">자동차 제조 (용접·도장)</li>
+                <li role="listitem">반도체·디스플레이 생산</li>
+                <li role="listitem">식음료·물류 창고</li>
+                <li role="listitem">건설·해양 구조물</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">핵심 기술 트렌드</h3>
+              <ul class="col-list" role="list">
+                <li role="listitem">머신비전 + AI 검사</li>
+                <li role="listitem">디지털 트윈 시뮬레이션</li>
+                <li role="listitem">5G 기반 원격 제어</li>
+                <li role="listitem">엣지 컴퓨팅 연동</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 미래 로봇 기술 -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 미래 로봇 기술">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">UNIT 05 · FUTURE TECH</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-divider">
+            <span class="section-icon" aria-hidden="true">🚀</span>
+            <h2>미래 로봇 기술</h2>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">01</span>
+              <div class="task-body">
+                <h3 class="task-title">휴머노이드 로봇 (Humanoid)</h3>
+                <p class="task-desc">
+                  인간과 유사한 이족보행 로봇. 보스턴 다이내믹스 Atlas, 테슬라 Optimus 등이
+                  공장·가정용으로 개발 중이며 범용 작업 수행을 목표로 합니다.
+                </p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">02</span>
+              <div class="task-body">
+                <h3 class="task-title">소프트 로봇 (Soft Robotics)</h3>
+                <p class="task-desc">
+                  유연한 소재(실리콘·형상기억합금)로 제작되어 좁은 공간 진입, 생체 모방 운동이
+                  가능합니다. 의료·식품 분야에서 안전한 물체 파지에 활용됩니다.
+                </p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">03</span>
+              <div class="task-body">
+                <h3 class="task-title">군집 로봇 (Swarm Robotics)</h3>
+                <p class="task-desc">
+                  수십~수천 개의 소형 로봇이 통신하며 집단 지능으로 협력. 재난 수색, 농업 수분,
+                  드론 쇼 등 복잡한 임무를 분산 처리합니다.
+                </p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num" aria-hidden="true">04</span>
+              <div class="task-body">
+                <h3 class="task-title">AI 강화학습 기반 로봇</h3>
+                <p class="task-desc">
+                  시뮬레이션에서 수백만 번 시행착오를 통해 스스로 동작 정책을 학습합니다.
+                  미리 프로그래밍하지 않아도 새로운 환경에 적응할 수 있습니다.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 정리 및 과제 -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 정리 및 과제">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">END · SUMMARY</span>
+        </div>
+        <div class="browser-content end-slide" tabindex="-1">
+          <div class="end-header">
+            <span class="end-icon" aria-hidden="true">✅</span>
+            <h1 class="end-title">정리</h1>
+            <p class="end-subtitle">로봇공학의 세계 · 핵심 요약</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="핵심 요약">
+            <h2 class="summary-title">오늘의 핵심 내용</h2>
+            <ul class="summary-list" role="list">
+              <li role="listitem">로봇공학은 기계·전자·컴퓨터·AI가 융합된 학문입니다</li>
+              <li role="listitem">센서(인식) → 제어기(판단) → 액추에이터(행동)의 3요소로 구성됩니다</li>
+              <li role="listitem">산업용·서비스·의료·탐사·협동 등 다양한 종류가 있습니다</li>
+              <li role="listitem">한국은 제조업 로봇 밀도 세계 1위 국가입니다</li>
+              <li role="listitem">휴머노이드·소프트·군집 로봇 등 미래 기술이 빠르게 발전 중입니다</li>
+            </ul>
+          </div>
+          <div class="highlight-box mt-1" role="note">
+            <strong>과제:</strong> 관심 있는 로봇 분야 하나를 선택하고, 해당 분야의 최신 로봇 사례를
+            조사하여 A4 1장 분량으로 정리해 오세요. (다음 수업 발표)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력 (Enter로 이동)"
+             inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlidesEl" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()"
+            aria-label="전체화면 전환" class="fs-btn">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="hidden">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    const totalSlidesEl = document.getElementById('totalSlidesEl');
+
+    totalSlidesEl.textContent = totalSlides;
+    progressBar.setAttribute('aria-valuemax', totalSlides);
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = `슬라이드 ${current + 1} / ${total}`;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    // Keyboard & clicker
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault(); nextSlide();
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+        else if (e.key === 'End')  { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    // Mouse wheel (600ms debounce)
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    // Touch swipe
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+    }, { passive: true });
+
+    // Slide input
+    slideInput.addEventListener('focus', () => slideInput.select());
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        const v = parseInt(slideInput.value, 10);
+        if (!isNaN(v) && v >= 1 && v <= totalSlides) goToSlide(v - 1);
+        else slideInput.value = currentSlide + 1;
+        slideInput.blur();
+      } else if (e.key === 'Escape') {
+        slideInput.value = currentSlide + 1;
+        slideInput.blur();
+      }
+    });
+    slideInput.addEventListener('blur', () => {
+      const v = parseInt(slideInput.value, 10);
+      if (!isNaN(v) && v >= 1 && v <= totalSlides) goToSlide(v - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    // Fullscreen
+    function toggleFullscreen() {
+      const expand = document.getElementById('fsExpand');
+      const compress = document.getElementById('fsCompress');
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        expand.classList.add('hidden');
+        compress.classList.remove('hidden');
+      } else {
+        document.exitFullscreen();
+        expand.classList.remove('hidden');
+        compress.classList.add('hidden');
+      }
+    }
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        document.getElementById('fsExpand').classList.remove('hidden');
+        document.getElementById('fsCompress').classList.add('hidden');
+      }
+    });
+
+    // Init
+    updateNav();
+  </script>
+</body>
+</html>

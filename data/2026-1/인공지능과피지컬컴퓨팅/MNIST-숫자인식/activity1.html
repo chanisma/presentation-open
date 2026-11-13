@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CNN이 보는 숫자 - 활동 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #2196f3;
+  --dark: #1565c0;
+  --light: #e3f2fd;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #263238;
+  --text-secondary: #546e7a;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+/* Header */
+.header {
+  background: linear-gradient(135deg, var(--dark) 0%, #7b1fa2 100%);
+  color: white;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle at 30% 70%, rgba(255,255,255,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.header h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 0.4rem;
+  position: relative;
+}
+.header .subtitle {
+  font-size: 0.95rem;
+  font-weight: 300;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+  position: relative;
+}
+.badges {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+}
+.badge {
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(4px);
+  padding: 0.25rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+/* Main container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+/* Controls */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.3s;
+}
+.card:hover { box-shadow: var(--shadow-lg); }
+.card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.card-title .icon {
+  width: 28px; height: 28px;
+  background: var(--light);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+}
+/* Sample grid */
+.sample-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sample-item {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 2px;
+  transition: all 0.2s;
+  position: relative;
+}
+.sample-item:hover {
+  border-color: var(--main);
+  transform: scale(1.08);
+}
+.sample-item.selected {
+  border-color: var(--main);
+  background: var(--light);
+  box-shadow: 0 0 0 3px rgba(33,150,243,0.2);
+}
+.sample-item canvas {
+  display: block;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+.sample-label {
+  position: absolute;
+  bottom: -2px; right: -2px;
+  background: var(--dark);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 700;
+  width: 14px; height: 14px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Analysis card */
+.analysis-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+.analysis-card .preview-area {
+  width: 112px; height: 112px;
+  background: #000;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  border: 3px solid var(--light);
+}
+.analysis-card .preview-area canvas {
+  image-rendering: pixelated;
+}
+.btn-analyze {
+  background: linear-gradient(135deg, var(--main), var(--dark));
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.3);
+  display: none;
+}
+.btn-analyze:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(33,150,243,0.4);
+}
+.btn-analyze:active { transform: translateY(0); }
+.btn-analyze.visible { display: inline-flex; align-items: center; gap: 0.5rem; }
+.prompt-text {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+/* Pipeline */
+.pipeline-section {
+  margin-bottom: 1.5rem;
+}
+.pipeline-wrapper {
+  overflow-x: auto;
+  padding: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: max-content;
+  padding: 0.5rem;
+}
+.layer-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  opacity: 0.4;
+  position: relative;
+}
+.layer-group.active { opacity: 1; }
+.layer-group.processing {
+  opacity: 1;
+  animation: layerPulse 0.6s ease;
+}
+@keyframes layerPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.layer-box {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 0.8rem;
+  box-shadow: var(--shadow);
+  text-align: center;
+  min-width: 90px;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+.layer-group.active .layer-box { border-color: var(--light); }
+.layer-group.processing .layer-box { border-color: var(--main); box-shadow: 0 0 0 4px rgba(33,150,243,0.15); }
+.layer-group.selected .layer-box { border-color: var(--main); background: var(--light); }
+.layer-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 0.4rem;
+  white-space: nowrap;
+}
+.layer-sublabel {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  margin-top: 0.3rem;
+}
+.layer-canvas-wrap {
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+}
+.layer-canvas-wrap canvas {
+  border-radius: 3px;
+  image-rendering: pixelated;
+}
+/* Connector arrows */
+.connector {
+  display: flex;
+  align-items: center;
+  padding: 0 0.3rem;
+  opacity: 0.3;
+  transition: opacity 0.3s;
+}
+.connector.active { opacity: 1; }
+.connector svg { width: 28px; height: 20px; }
+.connector svg path {
+  fill: none;
+  stroke: var(--main);
+  stroke-width: 2;
+  stroke-dasharray: 6 3;
+}
+.connector.flowing svg path {
+  animation: flowDash 0.6s linear infinite;
+}
+@keyframes flowDash {
+  to { stroke-dashoffset: -9; }
+}
+/* Bar chart for output */
+.output-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100px;
+}
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 13px;
+}
+.bar-label {
+  font-size: 0.55rem;
+  font-weight: 700;
+  width: 12px;
+  text-align: right;
+  color: var(--text-secondary);
+}
+.bar-track {
+  flex: 1;
+  height: 8px;
+  background: #e8e8e8;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: var(--main);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  width: 0%;
+}
+.bar-fill.top { background: linear-gradient(90deg, var(--main), #7b1fa2); }
+.bar-pct {
+  font-size: 0.5rem;
+  font-weight: 700;
+  width: 28px;
+  color: var(--text-secondary);
+}
+/* Flatten visual */
+.flatten-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 16px;
+  height: 56px;
+  overflow: hidden;
+}
+.flatten-cell {
+  flex: 1;
+  min-height: 1px;
+  border-radius: 1px;
+}
+/* Dense visual */
+.dense-visual {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  width: 40px;
+}
+.dense-node {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  transition: background 0.3s;
+}
+/* Detail panel */
+.detail-panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: none;
+  animation: slideDown 0.3s ease;
+}
+.detail-panel.visible { display: block; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.detail-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+.detail-close {
+  background: var(--light);
+  border: none;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.detail-close:hover { background: #ccc; }
+.detail-content {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.detail-maps {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.detail-maps canvas {
+  border-radius: 6px;
+  image-rendering: pixelated;
+  border: 1px solid #eee;
+}
+.detail-explanation {
+  flex: 1;
+  min-width: 240px;
+}
+.detail-explanation h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 0.5rem;
+}
+.detail-explanation p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 0.75rem;
+}
+.kernel-display {
+  display: inline-grid;
+  gap: 1px;
+  background: #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.3rem 0.3rem 0.3rem 0;
+  vertical-align: middle;
+}
+.kernel-cell {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1.5rem;
+}
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.footer a:hover { color: var(--main); }
+/* Responsive */
+@media (max-width: 768px) {
+  .controls { grid-template-columns: 1fr; }
+  .header h1 { font-size: 1.5rem; }
+  .container { padding: 1rem; }
+  .detail-content { flex-direction: column; }
+}
+/* Result badge */
+.result-badge {
+  display: none;
+  background: linear-gradient(135deg, var(--main), #7b1fa2);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(33,150,243,0.3);
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.result-badge.visible { display: inline-block; }
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.processing-status {
+  font-size: 0.8rem;
+  color: var(--main);
+  font-weight: 500;
+  min-height: 1.4em;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>&#x1F50D; CNN이 보는 숫자</h1>
+  <p class="subtitle">MNIST 테스트 데이터로 딥러닝의 각 단계를 관찰합니다</p>
+  <div class="badges">
+    <span class="badge">MNIST</span>
+    <span class="badge">CNN</span>
+    <span class="badge">시각화</span>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Controls -->
+  <div class="controls">
+    <div class="card">
+      <div class="card-title"><span class="icon">&#x270D;</span> 샘플 선택</div>
+      <div class="sample-grid" id="sampleGrid"></div>
+    </div>
+    <div class="card analysis-card">
+      <div class="card-title"><span class="icon">&#x26A1;</span> 분석</div>
+      <div class="preview-area" id="previewArea">
+        <span class="prompt-text" id="promptText">숫자를 선택하세요</span>
+        <canvas id="previewCanvas" width="28" height="28" style="display:none;width:100%;height:100%;"></canvas>
+      </div>
+      <button class="btn-analyze" id="btnAnalyze" onclick="runAnalysis()">&#x25B6; 분석 시작</button>
+      <div class="processing-status" id="processingStatus"></div>
+      <div class="result-badge" id="resultBadge"></div>
+    </div>
+  </div>
+
+  <!-- Pipeline -->
+  <div class="pipeline-section">
+    <div class="pipeline-wrapper">
+      <div class="pipeline" id="pipeline"></div>
+    </div>
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-header">
+      <div class="detail-title" id="detailTitle"></div>
+      <button class="detail-close" onclick="closeDetail()">&times;</button>
+    </div>
+    <div class="detail-content" id="detailContent"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <a href="index.html#last">&larr; 프레젠테이션으로 돌아가기</a>
+</div>
+
+<script>
+// ── State ──
+let selectedSample = null;
+let layerData = {};
+let isProcessing = false;
+let selectedLayer = null;
+
+// ── Digit Drawing Paths ──
+// Each digit has 2-3 variants. Coordinates are in 0-28 space.
+const digitPaths = {
+  0: [
+    [{type:'ellipse', cx:14, cy:14, rx:7, ry:10}],
+    [{type:'ellipse', cx:14, cy:15, rx:6, ry:9}],
+    [{type:'ellipse', cx:13, cy:14, rx:7.5, ry:10.5}]
+  ],
+  1: [
+    [{type:'lines', pts:[[10,7],[14,5],[14,23]]}],
+    [{type:'lines', pts:[[11,8],[15,5],[14,23]]}],
+    [{type:'lines', pts:[[12,9],[14,5],[14,24],[10,24],[18,24]]}]
+  ],
+  2: [
+    [{type:'arc', cx:14, cy:10, r:6, sa:-Math.PI, ea:0},{type:'lines', pts:[[20,10],[8,24],[21,24]]}],
+    [{type:'arc', cx:14, cy:11, r:5.5, sa:-Math.PI*0.9, ea:0.1},{type:'lines', pts:[[19.5,11],[7,23],[20,23]]}],
+  ],
+  3: [
+    [{type:'arc', cx:14, cy:10, r:5.5, sa:-Math.PI*0.8, ea:Math.PI*0.5},{type:'arc', cx:14, cy:19, r:5.5, sa:-Math.PI*0.5, ea:Math.PI*0.8}],
+    [{type:'arc', cx:13, cy:10, r:5, sa:-Math.PI*0.8, ea:Math.PI*0.4},{type:'arc', cx:13, cy:19, r:5.5, sa:-Math.PI*0.4, ea:Math.PI*0.8}],
+  ],
+  4: [
+    [{type:'lines', pts:[[18,5],[6,18],[22,18]]},{type:'lines', pts:[[18,5],[18,24]]}],
+    [{type:'lines', pts:[[16,5],[5,19],[21,19]]},{type:'lines', pts:[[16,5],[16,24]]}],
+  ],
+  5: [
+    [{type:'lines', pts:[[20,5],[9,5],[8,13]]},{type:'arc', cx:13, cy:18, r:6, sa:-Math.PI*0.6, ea:Math.PI*0.7}],
+    [{type:'lines', pts:[[19,6],[10,6],[9,13]]},{type:'arc', cx:14, cy:18, r:5.5, sa:-Math.PI*0.6, ea:Math.PI*0.7}],
+  ],
+  6: [
+    [{type:'arc', cx:14, cy:8, r:7, sa:-Math.PI*0.3, ea:-Math.PI*0.8, ccw:true},{type:'lines',pts:[[8.5,12.5],[8,18]]},{type:'ellipse', cx:13, cy:19, rx:5.5, ry:5.5}],
+    [{type:'arc', cx:15, cy:8, r:8, sa:-Math.PI*0.2, ea:-Math.PI*0.85, ccw:true},{type:'lines',pts:[[8,13],[7.5,18]]},{type:'ellipse', cx:13, cy:19, rx:5, ry:5.5}],
+  ],
+  7: [
+    [{type:'lines', pts:[[7,5],[21,5],[12,24]]}],
+    [{type:'lines', pts:[[8,6],[20,6],[13,24]]}],
+    [{type:'lines', pts:[[7,5],[21,5],[13,24]]},{type:'lines', pts:[[10,14],[18,14]]}]
+  ],
+  8: [
+    [{type:'ellipse', cx:14, cy:10, rx:5, ry:5.5},{type:'ellipse', cx:14, cy:20, rx:5.5, ry:5}],
+    [{type:'ellipse', cx:13, cy:10, rx:4.5, ry:5},{type:'ellipse', cx:13.5, cy:20, rx:5.5, ry:5.5}],
+  ],
+  9: [
+    [{type:'ellipse', cx:14, cy:10, rx:5.5, ry:5.5},{type:'lines', pts:[[19.5,10],[19,14]]},{type:'arc', cx:14, cy:20, r:7, sa:-Math.PI*0.1, ea:Math.PI*0.8}],
+    [{type:'ellipse', cx:14, cy:11, rx:5, ry:5.5},{type:'lines', pts:[[19,11],[18,15]]},{type:'arc', cx:14, cy:20, r:6, sa:0, ea:Math.PI*0.7}],
+  ]
+};
+
+// ── Generate digit on 28x28 canvas ──
+function generateDigit(digit, variantIdx) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 28; canvas.height = 28;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, 28, 28);
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2.2 + Math.random() * 0.6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.fillStyle = '#fff';
+
+  const rnd = () => (Math.random() - 0.5) * 1.2;
+  const variants = digitPaths[digit];
+  const variant = variants[variantIdx % variants.length];
+
+  for (const cmd of variant) {
+    const ox = rnd(), oy = rnd();
+    if (cmd.type === 'ellipse') {
+      ctx.beginPath();
+      ctx.ellipse(cmd.cx + ox, cmd.cy + oy, cmd.rx + rnd()*0.3, cmd.ry + rnd()*0.3, rnd()*0.05, 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (cmd.type === 'lines') {
+      ctx.beginPath();
+      for (let i = 0; i < cmd.pts.length; i++) {
+        const [x, y] = cmd.pts[i];
+        if (i === 0) ctx.moveTo(x + ox, y + oy);
+        else ctx.lineTo(x + rnd(), y + rnd());
+      }
+      ctx.stroke();
+    } else if (cmd.type === 'arc') {
+      ctx.beginPath();
+      ctx.arc(cmd.cx + ox, cmd.cy + oy, cmd.r, cmd.sa, cmd.ea, !!cmd.ccw);
+      ctx.stroke();
+    }
+  }
+
+  // Slight gaussian blur effect by drawing slightly offset
+  return canvas;
+}
+
+// ── Get pixel data as float array (grayscale 0-1) ──
+function getPixelData(canvas) {
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = new Float32Array(canvas.width * canvas.height);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = imgData.data[i * 4] / 255;
+  }
+  return { data, w: canvas.width, h: canvas.height };
+}
+
+// ── Convolution ──
+function convolve2d(input, w, h, kernel) {
+  const ks = kernel.length;
+  const half = Math.floor(ks / 2);
+  const outW = w - ks + 1;
+  const outH = h - ks + 1;
+  const out = new Float32Array(outW * outH);
+  for (let y = 0; y < outH; y++) {
+    for (let x = 0; x < outW; x++) {
+      let sum = 0;
+      for (let ky = 0; ky < ks; ky++) {
+        for (let kx = 0; kx < ks; kx++) {
+          sum += input[(y + ky) * w + (x + kx)] * kernel[ky][kx];
+        }
+      }
+      out[y * outW + x] = sum;
+    }
+  }
+  return { data: out, w: outW, h: outH };
+}
+
+// ── ReLU ──
+function relu(input) {
+  const out = new Float32Array(input.data.length);
+  for (let i = 0; i < input.data.length; i++) {
+    out[i] = Math.max(0, input.data[i]);
+  }
+  return { data: out, w: input.w, h: input.h };
+}
+
+// ── Max Pooling ──
+function maxPool2d(input, poolSize) {
+  const outW = Math.floor(input.w / poolSize);
+  const outH = Math.floor(input.h / poolSize);
+  const out = new Float32Array(outW * outH);
+  for (let y = 0; y < outH; y++) {
+    for (let x = 0; x < outW; x++) {
+      let maxVal = -Infinity;
+      for (let py = 0; py < poolSize; py++) {
+        for (let px = 0; px < poolSize; px++) {
+          const val = input.data[(y * poolSize + py) * input.w + (x * poolSize + px)];
+          if (val > maxVal) maxVal = val;
+        }
+      }
+      out[y * outW + x] = maxVal;
+    }
+  }
+  return { data: out, w: outW, h: outH };
+}
+
+// ── Render float array to canvas ──
+function renderToCanvas(input, displaySize, colorMap) {
+  const canvas = document.createElement('canvas');
+  canvas.width = input.w;
+  canvas.height = input.h;
+  canvas.style.width = displaySize + 'px';
+  canvas.style.height = displaySize + 'px';
+  const ctx = canvas.getContext('2d');
+  const imgData = ctx.createImageData(input.w, input.h);
+
+  // Normalize
+  let min = Infinity, max = -Infinity;
+  for (let i = 0; i < input.data.length; i++) {
+    if (input.data[i] < min) min = input.data[i];
+    if (input.data[i] > max) max = input.data[i];
+  }
+  const range = max - min || 1;
+
+  for (let i = 0; i < input.data.length; i++) {
+    const v = (input.data[i] - min) / range;
+    let r, g, b;
+    if (colorMap === 'blue') {
+      r = Math.floor(v * 100);
+      g = Math.floor(v * 180);
+      b = Math.floor(50 + v * 205);
+    } else if (colorMap === 'green') {
+      r = Math.floor(v * 80);
+      g = Math.floor(50 + v * 205);
+      b = Math.floor(v * 100);
+    } else if (colorMap === 'red') {
+      r = Math.floor(50 + v * 205);
+      g = Math.floor(v * 100);
+      b = Math.floor(v * 80);
+    } else if (colorMap === 'purple') {
+      r = Math.floor(40 + v * 160);
+      g = Math.floor(v * 80);
+      b = Math.floor(60 + v * 195);
+    } else {
+      r = g = b = Math.floor(v * 255);
+    }
+    imgData.data[i * 4] = r;
+    imgData.data[i * 4 + 1] = g;
+    imgData.data[i * 4 + 2] = b;
+    imgData.data[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(imgData, 0, 0);
+  return canvas;
+}
+
+// ── Kernels ──
+const kernels1 = [
+  { name: '수평 에지', kernel: [[-1,-1,-1],[0,0,0],[1,1,1]], color: 'blue' },
+  { name: '수직 에지', kernel: [[-1,0,1],[-1,0,1],[-1,0,1]], color: 'green' },
+  { name: '대각 에지', kernel: [[-1,-1,0],[-1,0,1],[0,1,1]], color: 'red' }
+];
+
+const kernels2 = [
+  { name: '엣지 강화', kernel: [[0,-1,0],[-1,4,-1],[0,-1,0]], color: 'purple' },
+  { name: '블러', kernel: [[1,1,1],[1,1,1],[1,1,1]].map(r => r.map(v => v/9)), color: 'blue' },
+  { name: '샤프닝', kernel: [[0,-1,0],[-1,5,-1],[0,-1,0]], color: 'green' }
+];
+
+// ── Layer definitions ──
+const layers = [
+  { id: 'input', label: '입력', sub: '28×28' },
+  { id: 'conv1', label: 'Conv2D #1', sub: '26×26×3' },
+  { id: 'relu1', label: 'ReLU', sub: '활성화' },
+  { id: 'pool1', label: 'MaxPool', sub: '13×13' },
+  { id: 'conv2', label: 'Conv2D #2', sub: '11×11×3' },
+  { id: 'relu2', label: 'ReLU 2', sub: '활성화' },
+  { id: 'pool2', label: 'MaxPool 2', sub: '5×5' },
+  { id: 'flatten', label: 'Flatten', sub: '2D→1D' },
+  { id: 'dense', label: 'Dense', sub: 'FC 16' },
+  { id: 'output', label: '출력', sub: 'Softmax' }
+];
+
+// ── Layer explanations ──
+const layerExplanations = {
+  input: {
+    title: '입력 레이어 (Input)',
+    desc: '원본 28×28 픽셀의 손글씨 숫자 이미지입니다. 각 픽셀은 0(검정)부터 1(흰색) 사이의 밝기 값을 가집니다. CNN은 이 이미지를 입력으로 받아 특징을 추출하기 시작합니다.'
+  },
+  conv1: {
+    title: '첫 번째 합성곱 레이어 (Conv2D)',
+    desc: '3×3 필터(커널)를 이미지 위에 슬라이딩하면서 특징을 추출합니다. 수평, 수직, 대각선 방향의 에지(경계선)를 감지합니다. 각 필터는 서로 다른 패턴을 찾아냅니다.'
+  },
+  relu1: {
+    title: 'ReLU 활성화 함수',
+    desc: '음수 값을 모두 0으로 바꿉니다. 수식: f(x) = max(0, x). 이렇게 하면 중요한 특징(양수)만 남기고 불필요한 정보(음수)를 제거합니다. 비선형성을 추가하여 네트워크가 복잡한 패턴을 학습할 수 있게 합니다.'
+  },
+  pool1: {
+    title: '맥스 풀링 (Max Pooling)',
+    desc: '2×2 영역에서 가장 큰 값만 선택하여 이미지 크기를 절반으로 줄입니다. 중요한 특징은 유지하면서 계산량을 줄이고, 작은 위치 변화에 강인해집니다 (이동 불변성).'
+  },
+  conv2: {
+    title: '두 번째 합성곱 레이어 (Conv2D)',
+    desc: '첫 번째 레이어가 찾은 간단한 에지들을 조합하여 더 복잡한 패턴(모서리, 곡선 등)을 감지합니다. 레이어가 깊어질수록 더 추상적인 특징을 학습합니다.'
+  },
+  relu2: {
+    title: 'ReLU 활성화 함수 #2',
+    desc: '두 번째 합성곱 결과에도 ReLU를 적용합니다. 다시 한번 음수를 제거하여 의미 있는 특징만 다음 단계로 전달합니다.'
+  },
+  pool2: {
+    title: '맥스 풀링 #2',
+    desc: '다시 2×2 풀링을 적용하여 크기를 더 줄입니다. 이제 5×5 크기의 작지만 핵심적인 특징 맵이 됩니다.'
+  },
+  flatten: {
+    title: '평탄화 (Flatten)',
+    desc: '2차원 특징 맵들을 1차원 벡터로 펼칩니다. 이렇게 해야 다음 단계인 완전연결 레이어(Dense)에 입력할 수 있습니다. 공간적 구조는 사라지지만, 추출된 특징 정보는 모두 보존됩니다.'
+  },
+  dense: {
+    title: '완전연결 레이어 (Dense)',
+    desc: '모든 입력 뉴런이 모든 출력 뉴런과 연결됩니다. 앞 단계에서 추출한 특징들을 종합하여 "이 이미지가 어떤 숫자인지" 판단하는 데 필요한 패턴을 학습합니다.'
+  },
+  output: {
+    title: '출력 레이어 (Softmax)',
+    desc: 'Softmax 함수를 적용하여 0~9 각 숫자일 확률을 계산합니다. 모든 확률의 합은 100%이며, 가장 높은 확률의 숫자가 CNN의 예측 결과가 됩니다.'
+  }
+};
+
+// ── Build sample grid ──
+function buildSampleGrid() {
+  const grid = document.getElementById('sampleGrid');
+  for (let d = 0; d <= 9; d++) {
+    const numVariants = digitPaths[d].length;
+    for (let v = 0; v < numVariants; v++) {
+      const canvas = generateDigit(d, v);
+      canvas.style.width = '36px';
+      canvas.style.height = '36px';
+      const item = document.createElement('div');
+      item.className = 'sample-item';
+      item.appendChild(canvas);
+      const label = document.createElement('div');
+      label.className = 'sample-label';
+      label.textContent = d;
+      item.appendChild(label);
+      item.addEventListener('click', () => selectSample(item, canvas, d));
+      grid.appendChild(item);
+    }
+  }
+}
+
+function selectSample(item, canvas, digit) {
+  if (isProcessing) return;
+  document.querySelectorAll('.sample-item').forEach(s => s.classList.remove('selected'));
+  item.classList.add('selected');
+
+  selectedSample = { canvas, digit };
+  const preview = document.getElementById('previewCanvas');
+  const pctx = preview.getContext('2d');
+  pctx.clearRect(0, 0, 28, 28);
+  pctx.drawImage(canvas, 0, 0);
+  preview.style.display = 'block';
+  document.getElementById('promptText').style.display = 'none';
+  document.getElementById('btnAnalyze').classList.add('visible');
+  document.getElementById('resultBadge').classList.remove('visible');
+  document.getElementById('processingStatus').textContent = '';
+
+  // Reset pipeline
+  resetPipeline();
+}
+
+
+// ── Build pipeline UI ──
+function buildPipeline() {
+  const pipe = document.getElementById('pipeline');
+  pipe.innerHTML = '';
+  layers.forEach((layer, i) => {
+    if (i > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'connector';
+      conn.id = 'conn-' + i;
+      conn.innerHTML = '<svg viewBox="0 0 28 20"><path d="M2 10 L22 10 M18 5 L24 10 L18 15"/></svg>';
+      pipe.appendChild(conn);
+    }
+    const group = document.createElement('div');
+    group.className = 'layer-group';
+    group.id = 'layer-' + layer.id;
+    group.addEventListener('click', () => showDetail(layer.id));
+
+    const box = document.createElement('div');
+    box.className = 'layer-box';
+    box.innerHTML = `
+      <div class="layer-label">${layer.label}</div>
+      <div class="layer-canvas-wrap" id="canvases-${layer.id}"></div>
+      <div class="layer-sublabel">${layer.sub}</div>
+    `;
+    group.appendChild(box);
+    pipe.appendChild(group);
+  });
+}
+
+function resetPipeline() {
+  layerData = {};
+  selectedLayer = null;
+  document.getElementById('detailPanel').classList.remove('visible');
+  layers.forEach(l => {
+    const el = document.getElementById('layer-' + l.id);
+    el.className = 'layer-group';
+    document.getElementById('canvases-' + l.id).innerHTML = '';
+  });
+  document.querySelectorAll('.connector').forEach(c => {
+    c.className = 'connector';
+  });
+}
+
+// ── Softmax scoring heuristic ──
+function computeScores(flatData, digit) {
+  // Create a heuristic scoring based on feature activation patterns
+  const scores = new Float32Array(10);
+  const total = flatData.reduce((a, b) => a + Math.abs(b), 0) || 1;
+
+  // Sum activations in different spatial regions
+  for (let i = 0; i < 10; i++) {
+    // Base score from hash of features
+    let score = 0;
+    for (let j = 0; j < flatData.length; j++) {
+      score += flatData[j] * Math.sin((i + 1) * (j + 1) * 0.1);
+    }
+    scores[i] = Math.abs(score);
+  }
+
+  // Boost the correct digit significantly to simulate a trained network
+  scores[digit] *= 3.5 + Math.random() * 1.5;
+
+  // Add some noise to nearby digits
+  const nearby = [(digit + 1) % 10, (digit + 9) % 10];
+  nearby.forEach(n => scores[n] *= 1.3 + Math.random() * 0.5);
+
+  // Softmax
+  const maxScore = Math.max(...scores);
+  const exps = scores.map(s => Math.exp(s - maxScore));
+  const sumExp = exps.reduce((a, b) => a + b, 0);
+  return exps.map(e => e / sumExp);
+}
+
+// ── Run analysis ──
+async function runAnalysis() {
+  if (!selectedSample || isProcessing) return;
+  isProcessing = true;
+  resetPipeline();
+
+  const btn = document.getElementById('btnAnalyze');
+  btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
+
+  const status = document.getElementById('processingStatus');
+  const input = getPixelData(selectedSample.canvas);
+
+  async function activateLayer(idx) {
+    const layer = layers[idx];
+    const el = document.getElementById('layer-' + layer.id);
+    if (idx > 0) {
+      const conn = document.getElementById('conn-' + idx);
+      conn.classList.add('active', 'flowing');
+    }
+    el.classList.add('processing');
+    status.textContent = `처리 중: ${layer.label}...`;
+    await delay(250);
+    el.classList.remove('processing');
+    el.classList.add('active');
+    if (idx > 0) {
+      document.getElementById('conn-' + idx).classList.remove('flowing');
+    }
+  }
+
+  // Layer 0: Input
+  await activateLayer(0);
+  const inputCanvas = renderToCanvas(input, 48, 'gray');
+  document.getElementById('canvases-input').appendChild(inputCanvas);
+  layerData.input = [input];
+
+  // Layer 1: Conv1
+  await activateLayer(1);
+  const conv1Results = kernels1.map(k => convolve2d(input.data, input.w, input.h, k.kernel));
+  layerData.conv1 = conv1Results;
+  const wrap1 = document.getElementById('canvases-conv1');
+  conv1Results.forEach((r, i) => {
+    const c = renderToCanvas(r, 40, kernels1[i].color);
+    wrap1.appendChild(c);
+  });
+
+  // Layer 2: ReLU1
+  await activateLayer(2);
+  const relu1Results = conv1Results.map(r => relu(r));
+  layerData.relu1 = relu1Results;
+  layerData.relu1_before = conv1Results;
+  const wrap2 = document.getElementById('canvases-relu1');
+  relu1Results.forEach((r, i) => {
+    const c = renderToCanvas(r, 40, kernels1[i].color);
+    wrap2.appendChild(c);
+  });
+
+  // Layer 3: Pool1
+  await activateLayer(3);
+  const pool1Results = relu1Results.map(r => maxPool2d(r, 2));
+  layerData.pool1 = pool1Results;
+  const wrap3 = document.getElementById('canvases-pool1');
+  pool1Results.forEach((r, i) => {
+    const c = renderToCanvas(r, 36, kernels1[i].color);
+    wrap3.appendChild(c);
+  });
+
+  // Layer 4: Conv2 - apply second set of kernels to first pooled output
+  await activateLayer(4);
+  const conv2Results = kernels2.map((k, i) => {
+    const src = pool1Results[i % pool1Results.length];
+    return convolve2d(src.data, src.w, src.h, k.kernel);
+  });
+  layerData.conv2 = conv2Results;
+  const wrap4 = document.getElementById('canvases-conv2');
+  conv2Results.forEach((r, i) => {
+    const c = renderToCanvas(r, 34, kernels2[i].color);
+    wrap4.appendChild(c);
+  });
+
+  // Layer 5: ReLU2
+  await activateLayer(5);
+  const relu2Results = conv2Results.map(r => relu(r));
+  layerData.relu2 = relu2Results;
+  layerData.relu2_before = conv2Results;
+  const wrap5 = document.getElementById('canvases-relu2');
+  relu2Results.forEach((r, i) => {
+    const c = renderToCanvas(r, 34, kernels2[i].color);
+    wrap5.appendChild(c);
+  });
+
+  // Layer 6: Pool2
+  await activateLayer(6);
+  const pool2Results = relu2Results.map(r => maxPool2d(r, 2));
+  layerData.pool2 = pool2Results;
+  const wrap6 = document.getElementById('canvases-pool2');
+  pool2Results.forEach((r, i) => {
+    const c = renderToCanvas(r, 30, kernels2[i].color);
+    wrap6.appendChild(c);
+  });
+
+  // Layer 7: Flatten
+  await activateLayer(7);
+  const flatData = [];
+  pool2Results.forEach(r => { for (let i = 0; i < r.data.length; i++) flatData.push(r.data[i]); });
+  layerData.flatten = flatData;
+  const flatWrap = document.getElementById('canvases-flatten');
+  const flatVis = document.createElement('div');
+  flatVis.className = 'flatten-visual';
+  const step = Math.max(1, Math.floor(flatData.length / 40));
+  let fMin = Infinity, fMax = -Infinity;
+  flatData.forEach(v => { if (v < fMin) fMin = v; if (v > fMax) fMax = v; });
+  const fRange = fMax - fMin || 1;
+  for (let i = 0; i < flatData.length; i += step) {
+    const cell = document.createElement('div');
+    cell.className = 'flatten-cell';
+    const v = (flatData[i] - fMin) / fRange;
+    cell.style.background = `rgba(33,150,243,${v})`;
+    flatVis.appendChild(cell);
+  }
+  flatWrap.appendChild(flatVis);
+
+  // Layer 8: Dense (simulated)
+  await activateLayer(8);
+  const denseOut = new Float32Array(16);
+  for (let n = 0; n < 16; n++) {
+    let sum = 0;
+    for (let j = 0; j < flatData.length; j++) {
+      sum += flatData[j] * Math.sin((n + 1) * (j + 0.5) * 0.3);
+    }
+    denseOut[n] = Math.max(0, sum / flatData.length);
+  }
+  layerData.dense = denseOut;
+  const denseWrap = document.getElementById('canvases-dense');
+  const denseVis = document.createElement('div');
+  denseVis.className = 'dense-visual';
+  let dMax = Math.max(...denseOut) || 1;
+  for (let i = 0; i < 16; i++) {
+    const node = document.createElement('div');
+    node.className = 'dense-node';
+    const v = denseOut[i] / dMax;
+    node.style.background = `rgba(33,150,243,${0.15 + v * 0.85})`;
+    denseVis.appendChild(node);
+  }
+  denseWrap.appendChild(denseVis);
+
+  // Layer 9: Output (Softmax)
+  await activateLayer(9);
+  const probs = computeScores(flatData, selectedSample.digit);
+  layerData.output = probs;
+  const outWrap = document.getElementById('canvases-output');
+  const bars = document.createElement('div');
+  bars.className = 'output-bars';
+  const maxProb = Math.max(...probs);
+  let predicted = 0;
+  probs.forEach((p, i) => { if (p > probs[predicted]) predicted = i; });
+  for (let i = 0; i < 10; i++) {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <span class="bar-label">${i}</span>
+      <div class="bar-track"><div class="bar-fill ${i === predicted ? 'top' : ''}" style="width:${(probs[i]*100).toFixed(0)}%"></div></div>
+      <span class="bar-pct">${(probs[i]*100).toFixed(1)}%</span>
+    `;
+    bars.appendChild(row);
+  }
+  outWrap.appendChild(bars);
+
+  // Show result
+  status.textContent = '';
+  const badge = document.getElementById('resultBadge');
+  badge.textContent = `예측 결과: ${predicted}`;
+  badge.classList.add('visible');
+
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+  isProcessing = false;
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Detail panel ──
+function showDetail(layerId) {
+  if (!layerData[layerId]) return;
+  selectedLayer = layerId;
+
+  document.querySelectorAll('.layer-group').forEach(g => g.classList.remove('selected'));
+  document.getElementById('layer-' + layerId).classList.add('selected');
+
+  const panel = document.getElementById('detailPanel');
+  const titleEl = document.getElementById('detailTitle');
+  const contentEl = document.getElementById('detailContent');
+
+  const info = layerExplanations[layerId];
+  titleEl.textContent = info.title;
+
+  let mapsHTML = '';
+  let extraHTML = '';
+
+  contentEl.innerHTML = '';
+
+  const mapsDiv = document.createElement('div');
+  mapsDiv.className = 'detail-maps';
+
+  const explDiv = document.createElement('div');
+  explDiv.className = 'detail-explanation';
+
+  if (layerId === 'input') {
+    const c = renderToCanvas(layerData.input[0], 112, 'gray');
+    mapsDiv.appendChild(c);
+  } else if (layerId === 'conv1') {
+    layerData.conv1.forEach((r, i) => {
+      const c = renderToCanvas(r, 90, kernels1[i].color);
+      mapsDiv.appendChild(c);
+    });
+    {
+      const kDiv = document.createElement('div');
+      kDiv.style.marginTop = '0.75rem';
+      kDiv.innerHTML = '<h4 style="font-size:0.85rem;font-weight:700;color:var(--dark);margin-bottom:0.4rem;">사용된 필터 (커널)</h4>';
+      kernels1.forEach(k => {
+        kDiv.innerHTML += `<div style="display:inline-block;margin-right:1rem;margin-bottom:0.5rem;">
+          <div style="font-size:0.75rem;font-weight:600;margin-bottom:0.2rem;">${k.name}</div>
+          ${renderKernelHTML(k.kernel)}
+        </div>`;
+      });
+      explDiv.appendChild(kDiv);
+    }
+  } else if (layerId === 'relu1' || layerId === 'relu2') {
+    const beforeKey = layerId === 'relu1' ? 'relu1_before' : 'relu2_before';
+    const afterKey = layerId;
+    const kernelSet = layerId === 'relu1' ? kernels1 : kernels2;
+    if (layerData[beforeKey]) {
+      const compDiv = document.createElement('div');
+      compDiv.innerHTML = '<div style="font-size:0.8rem;font-weight:600;margin-bottom:0.3rem;">ReLU 적용 전 → 후 비교</div>';
+      layerData[beforeKey].forEach((before, i) => {
+        const pair = document.createElement('div');
+        pair.style.cssText = 'display:inline-flex;align-items:center;gap:4px;margin-right:12px;margin-bottom:8px;';
+        pair.appendChild(renderToCanvas(before, 70, kernelSet[i].color));
+        const arrow = document.createElement('span');
+        arrow.textContent = '→';
+        arrow.style.cssText = 'font-size:1.2rem;color:var(--main);font-weight:700;';
+        pair.appendChild(arrow);
+        pair.appendChild(renderToCanvas(layerData[afterKey][i], 70, kernelSet[i].color));
+        compDiv.appendChild(pair);
+      });
+      mapsDiv.appendChild(compDiv);
+    } else {
+      layerData[afterKey].forEach((r, i) => {
+        mapsDiv.appendChild(renderToCanvas(r, 80, kernelSet[i].color));
+      });
+    }
+  } else if (layerId === 'pool1' || layerId === 'pool2') {
+    const data = layerData[layerId];
+    const kernelSet = layerId === 'pool1' ? kernels1 : kernels2;
+    data.forEach((r, i) => {
+      mapsDiv.appendChild(renderToCanvas(r, 80, kernelSet[i].color));
+    });
+    {
+      const poolExDiv = document.createElement('div');
+      poolExDiv.innerHTML = `<div style="font-size:0.8rem;margin-top:0.5rem;color:var(--text-secondary);">
+        <strong>동작 원리:</strong> 2×2 영역에서 최댓값만 선택<br>
+        <span style="font-family:monospace;font-size:0.75rem;">
+        [3, 1] → max = 7<br>
+        [7, 2]
+        </span>
+      </div>`;
+      explDiv.appendChild(poolExDiv);
+    }
+  } else if (layerId === 'conv2') {
+    layerData.conv2.forEach((r, i) => {
+      mapsDiv.appendChild(renderToCanvas(r, 80, kernels2[i].color));
+    });
+    {
+      const kDiv = document.createElement('div');
+      kDiv.style.marginTop = '0.75rem';
+      kDiv.innerHTML = '<h4 style="font-size:0.85rem;font-weight:700;color:var(--dark);margin-bottom:0.4rem;">사용된 필터</h4>';
+      kernels2.forEach(k => {
+        kDiv.innerHTML += `<div style="display:inline-block;margin-right:1rem;margin-bottom:0.5rem;">
+          <div style="font-size:0.75rem;font-weight:600;margin-bottom:0.2rem;">${k.name}</div>
+          ${renderKernelHTML(k.kernel)}
+        </div>`;
+      });
+      explDiv.appendChild(kDiv);
+    }
+  } else if (layerId === 'flatten') {
+    const flatCanvas = document.createElement('canvas');
+    flatCanvas.width = Math.min(layerData.flatten.length, 300);
+    flatCanvas.height = 30;
+    flatCanvas.style.width = '300px';
+    flatCanvas.style.height = '30px';
+    flatCanvas.style.borderRadius = '4px';
+    const fctx = flatCanvas.getContext('2d');
+    let fMin = Infinity, fMax = -Infinity;
+    layerData.flatten.forEach(v => { if (v < fMin) fMin = v; if (v > fMax) fMax = v; });
+    const fRange = fMax - fMin || 1;
+    const bw = flatCanvas.width / layerData.flatten.length;
+    layerData.flatten.forEach((v, i) => {
+      const nv = (v - fMin) / fRange;
+      fctx.fillStyle = `rgb(${Math.floor(nv*33)},${Math.floor(nv*150)},${Math.floor(50+nv*200)})`;
+      fctx.fillRect(i * bw, 0, Math.max(bw, 1), 30);
+    });
+    mapsDiv.appendChild(flatCanvas);
+    {
+      const lenDiv = document.createElement('div');
+      lenDiv.innerHTML = `<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:0.4rem;">벡터 길이: <strong>${layerData.flatten.length}</strong>개 값</div>`;
+      explDiv.appendChild(lenDiv);
+    }
+  } else if (layerId === 'dense') {
+    const denseCanvas = document.createElement('div');
+    denseCanvas.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:6px;';
+    let dMax = Math.max(...layerData.dense) || 1;
+    layerData.dense.forEach((v, i) => {
+      const node = document.createElement('div');
+      const nv = v / dMax;
+      node.style.cssText = `width:28px;height:28px;border-radius:50%;background:rgba(33,150,243,${0.1+nv*0.9});display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:700;color:${nv>0.5?'white':'var(--text-secondary)'};`;
+      node.textContent = nv.toFixed(1);
+      denseCanvas.appendChild(node);
+    });
+    mapsDiv.appendChild(denseCanvas);
+  } else if (layerId === 'output') {
+    const chartDiv = document.createElement('div');
+    chartDiv.style.width = '100%';
+    let predicted = 0;
+    layerData.output.forEach((p, i) => { if (p > layerData.output[predicted]) predicted = i; });
+    for (let i = 0; i < 10; i++) {
+      const pct = (layerData.output[i] * 100);
+      const isTop = i === predicted;
+      chartDiv.innerHTML += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="font-size:0.85rem;font-weight:700;width:18px;text-align:right;color:${isTop?'var(--dark)':'var(--text-secondary)'}">${i}</span>
+        <div style="flex:1;height:18px;background:#e8e8e8;border-radius:9px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${isTop?'linear-gradient(90deg,var(--main),#7b1fa2)':'#b0bec5'};border-radius:9px;transition:width 0.5s;"></div>
+        </div>
+        <span style="font-size:0.8rem;font-weight:${isTop?700:400};width:48px;color:${isTop?'var(--dark)':'var(--text-secondary)'}">${pct.toFixed(1)}%</span>
+      </div>`;
+    }
+    mapsDiv.appendChild(chartDiv);
+  }
+
+  const pEl = document.createElement('p');
+  pEl.textContent = info.desc;
+  const h4 = document.createElement('h4');
+  h4.textContent = '설명';
+  explDiv.insertBefore(h4, explDiv.firstChild);
+  explDiv.insertBefore(pEl, h4.nextSibling);
+
+  contentEl.appendChild(mapsDiv);
+  contentEl.appendChild(explDiv);
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function renderKernelHTML(kernel) {
+  const size = kernel.length;
+  let html = `<div class="kernel-display" style="grid-template-columns:repeat(${size},1fr);">`;
+  for (const row of kernel) {
+    for (const val of row) {
+      const v = typeof val === 'number' ? val : val;
+      const display = Number.isInteger(v) ? v : v.toFixed(1);
+      const bg = v > 0 ? `rgba(33,150,243,${Math.min(v * 0.3, 0.5)})` : v < 0 ? `rgba(244,67,54,${Math.min(Math.abs(v) * 0.3, 0.5)})` : '#f5f5f5';
+      html += `<div class="kernel-cell" style="background:${bg}">${display}</div>`;
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('visible');
+  document.querySelectorAll('.layer-group').forEach(g => g.classList.remove('selected'));
+  selectedLayer = null;
+}
+
+// ── Init ──
+buildSampleGrid();
+buildPipeline();
+</script>
+</body>
+</html>

@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026학년도 AI 중점학교 운영 안내</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bayon&family=DM+Sans:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --style-bg: #F4CED3;
+      --style-primary: #E33529;
+      --style-accent: #2B6786;
+      --style-text: #924E26;
+      --style-text-secondary: #693413;
+      --card-frame-bg: #F3F3E9;
+      --card-white: #FFFFFF;
+      --card-pink: #F4CED3;
+      --card-cream: #EDE2E2;
+      --pink-mid: #F0B5BE;
+      --pink-deep: #E8A0AD;
+      --highlight-yellow: #FFF500;
+      --near-black: #1A1A1A;
+      --main: #E33529;
+      --white: #FFFFFF;
+      --gray-200: #EDE2E2;
+      --gray-600: #924E26;
+      --gray-700: #693413;
+      --light: #F4CED3;
+    }
+
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'DM Sans', 'Noto Sans KR', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      line-height: 1.65;
+      overflow: hidden; height: 100%;
+    }
+
+    /* Decorative background circles */
+    body::before, body::after {
+      content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+    }
+    body::before {
+      width: 40vw; height: 40vw; top: -10vw; right: -10vw;
+      background: radial-gradient(circle, var(--pink-mid) 0%, transparent 70%);
+      opacity: 0.5;
+    }
+    body::after {
+      width: 30vw; height: 30vw; bottom: -5vw; left: -5vw;
+      background: radial-gradient(circle, var(--card-cream) 0%, transparent 70%);
+      opacity: 0.4;
+    }
+
+    h1, h2, h3 { font-family: 'Noto Sans KR', sans-serif; }
+    h1 { font-size: 2.8rem; font-weight: 800; color: var(--style-primary); }
+    h2 { font-size: 1.5rem; font-weight: 700; color: var(--style-text-secondary); }
+    h3 { font-size: 1.15rem; font-weight: 700; color: var(--style-text-secondary); }
+
+    .display-font { font-family: 'Bayon', sans-serif; text-transform: uppercase; letter-spacing: 0.02em; line-height: 0.95; color: var(--style-primary); }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .skip-link { position: absolute; top: -40px; left: 0; background: var(--style-primary); color: var(--white); padding: 8px 16px; z-index: 9999; font-size: 14px; transition: top 0.2s; text-decoration: none; border-radius: 0 0 4px 0; }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+
+    @media (prefers-contrast: high) {
+      :root { --style-primary: #CC0000; --style-text: #000000; --style-bg: #FFFFFF; }
+      .browser-card { border: 2px solid #000000; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--style-primary), var(--pink-mid));
+      z-index: 1000; transition: width 0.3s ease;
+      will-change: width; transform: translateZ(0);
+    }
+
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transform: translateZ(0); backface-visibility: hidden;
+      transition: opacity 0.4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* macOS-style card frame */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--card-frame-bg);
+      border-radius: 1.8rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      position: relative; z-index: 1;
+    }
+
+    .browser-topbar {
+      display: flex; align-items: center;
+      padding: 0.6rem 1.2rem;
+      background: var(--card-frame-bg);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      gap: 0.4rem;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title {
+      font-family: 'Bayon', sans-serif;
+      font-size: 0.88rem;
+      color: var(--style-primary);
+      letter-spacing: 0.02em;
+      margin: 0 auto;
+      text-transform: uppercase;
+    }
+
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    .browser-card--frameless {
+      background: transparent;
+      border: none; box-shadow: none;
+      border-radius: 0;
+    }
+    .browser-card--frameless .browser-topbar { display: none; }
+
+    /* Section header */
+    .section-header { margin-bottom: 0.5rem; }
+    .section-header h2 { margin-bottom: 0.2rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { font-size: 0.88rem; color: var(--style-text); }
+    .section-num { font-family: 'Bayon', sans-serif; font-size: 2.2rem; color: var(--style-primary); opacity: 0.2; line-height: 1; margin-bottom: 0.2rem; display: block; }
+
+    /* Highlight box */
+    .highlight-box {
+      background: var(--white);
+      border-left: 3px solid var(--style-primary);
+      padding: 0.6rem 1rem;
+      border-radius: 0 1rem 1rem 0;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* Badge */
+    .badge { display: inline-block; padding: 0.2rem 0.8rem; border-radius: 2rem; font-size: 0.82rem; font-weight: 700; }
+    .badge-red { background: var(--style-primary); color: var(--white); }
+    .badge-pink { background: var(--pink-mid); color: var(--style-text-secondary); }
+    .badge-cream { background: var(--card-cream); color: var(--style-text-secondary); }
+    .badge-teal { background: rgba(43,103,134,0.12); color: var(--style-accent); }
+
+    /* Card grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .card {
+      background: var(--white);
+      border-radius: 1.2rem;
+      padding: 0.8rem 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: transform 0.3s ease;
+    }
+    .card:hover { transform: translateY(-2px); }
+    .card-pink { background: var(--card-pink); }
+    .card-cream { background: var(--card-cream); }
+    .card-red { background: var(--style-primary); color: var(--white); }
+    .card-red h3 { color: var(--white); }
+    .card-red .card-desc { color: rgba(255,255,255,0.9); }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 1.15rem; margin-bottom: 0.2rem; }
+    .card-desc { font-size: 0.88rem; color: var(--style-text); line-height: 1.5; }
+
+    /* Stat highlight */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin: 0.5rem 0; }
+    .stat-item { text-align: center; padding: 0.8rem 0.5rem; background: var(--white); border-radius: 1.2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .stat-number { display: block; font-family: 'Bayon', sans-serif; font-size: 3rem; color: var(--style-primary); line-height: 1; }
+    .stat-label { font-size: 0.88rem; color: var(--style-text); margin-top: 0.2rem; }
+
+    /* Timeline */
+    .timeline { display: flex; gap: 0.5rem; margin-top: 0.5rem; position: relative; padding-top: 1.2rem; }
+    .timeline::before {
+      content: ''; position: absolute; top: 0; left: 5%; right: 5%; height: 3px;
+      background: linear-gradient(90deg, var(--style-primary), var(--pink-mid), var(--style-primary));
+      opacity: 0.25; border-radius: 2px;
+    }
+    .timeline-item { flex: 1; text-align: center; position: relative; }
+    .timeline-marker {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 3px solid var(--style-primary); background: var(--white);
+      margin: 0 auto 0.3rem; position: relative; z-index: 1;
+    }
+    .timeline-item.highlight .timeline-marker { background: var(--style-primary); }
+    .timeline-date { font-size: 0.82rem; font-weight: 700; color: var(--style-primary); display: block; }
+    .timeline-title { font-size: 0.95rem; margin: 0.15rem 0; }
+    .timeline-desc { font-size: 0.8rem; color: var(--style-text); }
+
+    /* Two column */
+    .two-col { display: flex; gap: 0.8rem; align-items: flex-start; }
+    .col-left, .col-right { flex: 1; }
+    .col-title { font-size: 1.15rem; margin-bottom: 0.4rem; padding-bottom: 0.3rem; border-bottom: 2px solid var(--pink-mid); }
+    .col-divider { width: 2px; background: var(--pink-mid); align-self: stretch; border-radius: 1px; }
+    .bullet-list { list-style: none; padding: 0; }
+    .bullet-list li { padding: 0.2rem 0; font-size: 0.95rem; display: flex; align-items: baseline; gap: 0.4rem; }
+    .bullet-list li::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--style-primary); flex-shrink: 0; margin-top: 0.4em; }
+
+    /* Cover */
+    .cover-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 60vh; }
+    .cover-badge { font-family: 'Bayon', sans-serif; font-size: 1.2rem; color: var(--style-primary); letter-spacing: 0.05em; }
+    .cover-title { margin: 0.5rem 0 0.3rem; line-height: 1.2; }
+    .cover-subtitle { font-size: 1rem; color: var(--style-text); }
+    .cover-divider { width: 60px; height: 3px; background: var(--style-primary); margin: 0.8rem auto; border-radius: 2px; }
+    .cover-meta { display: flex; gap: 0.5rem; font-size: 0.88rem; color: var(--style-text); flex-wrap: wrap; justify-content: center; }
+    .cover-pills { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; justify-content: center; }
+    .cover-pill { background: var(--white); padding: 0.3rem 1rem; border-radius: 3rem; font-size: 0.88rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); color: var(--style-text-secondary); }
+
+    /* End slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .end-header { margin-bottom: 0.8rem; }
+    .end-title { font-size: 1.8rem; color: var(--style-primary); }
+    .end-subtitle { font-size: 0.95rem; color: var(--style-text); margin-top: 0.3rem; }
+    .end-summary { text-align: left; max-width: 500px; width: 100%; }
+    .summary-title { font-size: 1.05rem; margin-bottom: 0.3rem; }
+    .summary-list { list-style: none; padding: 0; }
+    .summary-list li { padding: 0.15rem 0; font-size: 0.95rem; }
+    .end-contact { margin-top: 0.6rem; font-size: 0.88rem; color: var(--style-text); }
+
+    /* Animations */
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide.active .card, .slide.active .stat-item, .slide.active .timeline-item {
+      animation: popUp 0.55s ease-out both;
+    }
+    .slide.active .card:nth-child(2), .slide.active .stat-item:nth-child(2), .slide.active .timeline-item:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3), .slide.active .stat-item:nth-child(3), .slide.active .timeline-item:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4), .slide.active .timeline-item:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .timeline-item:nth-child(5) { animation-delay: 0.32s; }
+
+    /* Card tilt */
+    .card-tilt { transform: rotate(-2deg); }
+    .card-tilt-r { transform: rotate(1.5deg); }
+    .card-tilt:hover, .card-tilt-r:hover { transform: rotate(0) translateY(-2px); }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(13px, 1.8vw, 18px); }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; height: 2px; }
+      .timeline { flex-direction: column; align-items: flex-start; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .browser-card { border-radius: 1rem; }
+      body::before, body::after { display: none; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      .cover-pill { width: 100%; text-align: center; }
+    }
+
+    /* Nav bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: rgba(243,243,233,0.92);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(0,0,0,0.06);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 2px solid var(--style-primary);
+      border-radius: 50%; background: var(--white);
+      cursor: pointer; font-size: 0;
+      color: var(--style-primary); transition: all 0.2s;
+      padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { background: var(--style-primary); color: var(--white); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--white); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700; color: var(--style-text);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+      font-family: inherit; padding: 0; outline: none; cursor: pointer;
+      transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-primary); background: var(--card-cream); border-radius: 4px; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide.active { animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both; }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="8" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: Cover (frameless) -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <span class="cover-badge display-font">2026 AI SCHOOL</span>
+          <h1 class="cover-title">2026학년도<br>AI 중점학교 운영 안내</h1>
+          <p class="cover-subtitle">학부모님을 위한 안내자료</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>○○고등학교</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-03">2026년 3월</time></span>
+          </div>
+          <div class="cover-pills">
+            <span class="cover-pill">🤖 AI 교육</span>
+            <span class="cover-pill">💻 코딩</span>
+            <span class="cover-pill">🎓 진로</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: AI 중점학교란? (section-overview) -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: AI 중점학교 소개">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI SCHOOL INTRO</span>
+        </div>
+        <div class="browser-content">
+          <span class="section-num" aria-hidden="true">01</span>
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">📌</span> AI 중점학교란?</h2>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>AI 중점학교는 교육부 지정으로 인공지능 교육을 정규 교육과정에 통합하여 운영하는 학교입니다. 학생들이 미래 사회에서 필요한 AI 소양을 기르도록 지원합니다.</p>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card card-tilt" role="listitem">
+              <h3 class="card-title">운영 목표</h3>
+              <p class="card-desc">AI 기초 소양 교육과 실생활 적용 능력을 기르는 것을 목표로 합니다.</p>
+            </div>
+            <div class="card card-tilt-r" role="listitem">
+              <h3 class="card-title">지원 사항</h3>
+              <p class="card-desc">전문 교원 배치, AI 교육 전용 교실, 외부 전문가 특강을 지원합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 주요 프로그램 (card-grid 2x2) -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 주요 프로그램">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">PROGRAMS</span>
+        </div>
+        <div class="browser-content">
+          <span class="section-num" aria-hidden="true">02</span>
+          <div class="section-header">
+            <h2>주요 프로그램 안내</h2>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card card-tilt" role="listitem">
+              <span class="card-icon" aria-hidden="true">🤖</span>
+              <h3 class="card-title">AI 기초 교육</h3>
+              <p class="card-desc">정규 수업 시간에 AI의 원리와 활용법을 배웁니다.</p>
+            </div>
+            <div class="card card-tilt-r" role="listitem">
+              <span class="card-icon" aria-hidden="true">💻</span>
+              <h3 class="card-title">코딩 동아리</h3>
+              <p class="card-desc">방과후 동아리 활동으로 파이썬, 머신러닝을 심화 학습합니다.</p>
+            </div>
+            <div class="card card-pink card-tilt" role="listitem">
+              <span class="card-icon" aria-hidden="true">🎯</span>
+              <h3 class="card-title">AI 프로젝트</h3>
+              <p class="card-desc">학기별 1회 AI를 활용한 문제 해결 프로젝트를 진행합니다.</p>
+            </div>
+            <div class="card card-red card-tilt-r" role="listitem">
+              <h3 class="card-title">외부 연계 프로그램</h3>
+              <p class="card-desc">대학교, 기업과 연계한 특강 및 현장 체험을 운영합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 연간 일정 (timeline) -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 연간 일정">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">SCHEDULE</span>
+        </div>
+        <div class="browser-content">
+          <span class="section-num" aria-hidden="true">03</span>
+          <div class="section-header">
+            <h2>연간 운영 일정</h2>
+          </div>
+          <div class="timeline" role="list" aria-label="연간 일정 타임라인">
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="2026-03">3월</time></span>
+                <h3 class="timeline-title">개강 & OT</h3>
+                <p class="timeline-desc">AI 교육 오리엔테이션</p>
+              </div>
+            </div>
+            <div class="timeline-item highlight" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="2026-06">6월</time></span>
+                <h3 class="timeline-title">1학기 발표회</h3>
+                <p class="timeline-desc">프로젝트 중간 발표</p>
+              </div>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="2026-08">8월</time></span>
+                <h3 class="timeline-title">여름 캠프</h3>
+                <p class="timeline-desc">AI 집중 캠프 (3일)</p>
+              </div>
+            </div>
+            <div class="timeline-item highlight" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="2026-11">11월</time></span>
+                <h3 class="timeline-title">AI 경진대회</h3>
+                <p class="timeline-desc">교내 AI 해커톤</p>
+              </div>
+            </div>
+            <div class="timeline-item" role="listitem">
+              <div class="timeline-marker" aria-hidden="true"></div>
+              <div class="timeline-content">
+                <span class="timeline-date"><time datetime="2026-12">12월</time></span>
+                <h3 class="timeline-title">성과 보고회</h3>
+                <p class="timeline-desc">연간 성과 발표 및 시상</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 학생이 얻는 것 (stat-highlight) -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 학생이 얻는 것">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">BENEFITS</span>
+        </div>
+        <div class="browser-content">
+          <span class="section-num" aria-hidden="true">04</span>
+          <div class="section-header">
+            <h2>자녀가 얻게 되는 성과</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="3종">3종</span>
+              <span class="stat-label">AI 관련 인증서 취득</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="5회">5회</span>
+              <span class="stat-label">교내외 대회 참여 기회</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="4회">4회</span>
+              <span class="stat-label">대학·기업 진로 체험</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>모든 프로그램은 생활기록부 기재가 가능하며, 대입 자기소개서 및 면접 준비에 큰 도움이 됩니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: FAQ (card-grid 2x2) -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 자주 묻는 질문">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">FAQ</span>
+        </div>
+        <div class="browser-content">
+          <span class="section-num" aria-hidden="true">05</span>
+          <div class="section-header">
+            <h2>자주 묻는 질문</h2>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card card-tilt" role="listitem">
+              <h3 class="card-title">코딩을 못해도 되나요?</h3>
+              <p class="card-desc">네, 기초부터 시작하므로 사전 지식이 없어도 참여할 수 있습니다.</p>
+            </div>
+            <div class="card card-tilt-r" role="listitem">
+              <h3 class="card-title">추가 비용이 있나요?</h3>
+              <p class="card-desc">교육부 지원 사업이므로 학생 부담 비용은 없습니다.</p>
+            </div>
+            <div class="card card-cream card-tilt" role="listitem">
+              <h3 class="card-title">수업 시간은 언제인가요?</h3>
+              <p class="card-desc">정규 수업 2시간 + 방과후 동아리 주 1회로 운영됩니다.</p>
+            </div>
+            <div class="card card-pink card-tilt-r" role="listitem">
+              <h3 class="card-title">대입에 도움이 되나요?</h3>
+              <p class="card-desc">생활기록부에 기재되며, AI 관련 학과 진학에 유리합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 가정에서의 지원 (two-column) -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 학교와 가정의 역할">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">COOPERATION</span>
+        </div>
+        <div class="browser-content">
+          <span class="section-num" aria-hidden="true">06</span>
+          <div class="section-header">
+            <h2>학교와 가정의 협력</h2>
+          </div>
+          <div class="two-col">
+            <div class="col-left">
+              <h3 class="col-title">학교에서 지원하는 것</h3>
+              <ul class="bullet-list" role="list">
+                <li role="listitem">전문 교원의 체계적 AI 교육</li>
+                <li role="listitem">최신 장비가 갖추어진 AI 교실</li>
+                <li role="listitem">외부 전문가 특강 및 멘토링</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title">가정에서 협조해 주실 것</h3>
+              <ul class="bullet-list" role="list">
+                <li role="listitem">자녀의 AI 학습에 관심과 격려</li>
+                <li role="listitem">가정 내 노트북/PC 학습 환경</li>
+                <li role="listitem">학교 안내 및 동의서 회신</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 마무리 (end, frameless) -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <div class="end-header">
+            <h2 class="end-title">감사합니다</h2>
+            <p class="end-subtitle">자녀의 AI 교육에 관심을 가져주셔서 감사드립니다.</p>
+          </div>
+          <div class="highlight-box end-summary" role="complementary" aria-label="핵심 안내">
+            <h3 class="summary-title">안내 요약</h3>
+            <ul class="summary-list" role="list">
+              <li>✅ 추가 비용 없이 정규 수업 내 AI 교육</li>
+              <li>✅ 대회·인증·진로 체험으로 생기부 기재</li>
+              <li>✅ 동의서는 3월 15일까지 담임 선생님께</li>
+            </ul>
+          </div>
+          <p class="end-contact">문의: 담임 선생님 또는 정보부 (02-000-0000)</p>
+          <div class="cover-meta" style="margin-top: 0.5rem;">
+            <span class="badge badge-pink">AI 중점학교 운영팀</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">8</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" onclick="toggleFullscreen()" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = `슬라이드 ${current + 1} / ${total}`;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(diff) > 50) { diff < 0 ? nextSlide() : prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', () => { slideInput.select(); });
+    slideInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Enter') { const n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlides) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', () => {
+      const n = parseInt(slideInput.value);
+      if (n >= 1 && n <= totalSlides) goToSlide(n - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    }
+
+    updateNav();
+  </script>
+</body>
+</html>

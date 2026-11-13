@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "entries": {
+    "packet-idle": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        240,
+        62,
+        478,
+        357
+      ],
+      "w": 478,
+      "h": 357,
+      "cropped_at": "2026-08-18"
+    },
+    "packet-walk-a": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        919,
+        76,
+        451,
+        351
+      ],
+      "w": 451,
+      "h": 351,
+      "cropped_at": "2026-08-18"
+    },
+    "packet-walk-b": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        275,
+        495,
+        448,
+        362
+      ],
+      "w": 448,
+      "h": 362,
+      "cropped_at": "2026-08-18"
+    },
+    "packet-worry": {
+      "sheet": "sheet-packet.png",
+      "bbox": [
+        980,
+        484,
+        366,
+        373
+      ],
+      "w": 366,
+      "h": 373,
+      "cropped_at": "2026-08-18"
+    },
+    "keeper-idle": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        281,
+        49,
+        295,
+        407
+      ],
+      "w": 295,
+      "h": 407,
+      "cropped_at": "2026-08-18"
+    },
+    "keeper-point": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        974,
+        49,
+        370,
+        407
+      ],
+      "w": 370,
+      "h": 407,
+      "cropped_at": "2026-08-18"
+    },
+    "server-house": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        251,
+        517,
+        433,
+        374
+      ],
+      "w": 433,
+      "h": 374,
+      "cropped_at": "2026-08-18"
+    },
+    "letter-stack": {
+      "sheet": "sheet-cast.png",
+      "bbox": [
+        907,
+        531,
+        508,
+        345
+      ],
+      "w": 508,
+      "h": 345,
+      "cropped_at": "2026-08-18"
+    },
+    "packet-idle-l": {
+      "sheet": "sheet-closeup.png",
+      "bbox": [
+        87,
+        197,
+        722,
+        557
+      ],
+      "w": 722,
+      "h": 557,
+      "cropped_at": "2026-08-18"
+    },
+    "packet-worry-l": {
+      "sheet": "sheet-closeup.png",
+      "bbox": [
+        935,
+        175,
+        564,
+        574
+      ],
+      "w": 564,
+      "h": 574,
+      "cropped_at": "2026-08-18"
+    }
+  }
+}

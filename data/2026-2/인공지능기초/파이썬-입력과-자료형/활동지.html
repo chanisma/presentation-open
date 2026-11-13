@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파이썬 입력과 자료형 연습 — 인공지능 기초</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧾</text></svg>">
+<script type="module" src="../../../../assets/pyrun/py-runner.js"></script>
+<style>
+  :root {
+    --bg: #f4f4ef;
+    --surface: #fffdf8;
+    --fg: #16201b;
+    --fg-muted: #535c56;
+    --fg-faint: #8a928c;
+    --hair: rgba(22, 32, 27, 0.16);
+    --primary: #0f6e66;
+    --accent: #e8590c;
+    --float: #6741d9;
+    --c-green: #1f7a4d; --c-amber: #b7791f; --c-rose: #c0392b; --c-ok: #1f7a4d;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 12% -5%, rgba(232, 89, 12, 0.08), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(15, 110, 102, 0.08), transparent 55%),
+      var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    padding-bottom: 110px;
+    word-break: keep-all;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 18px 0; }
+  code, .mono { font-family: 'JetBrains Mono', 'D2Coding', Consolas, 'Malgun Gothic', monospace; }
+  code { background: rgba(22, 32, 27, 0.07); padding: 1px 6px; border-radius: 6px; font-size: 0.92em; }
+
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 30px 28px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(22, 32, 27, 0.35);
+  }
+  .hero .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--accent); }
+  .hero h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .i { color: var(--accent); }
+  .hero h1 .t { color: var(--primary); }
+  .hero p.sub { color: var(--fg-muted); font-size: 14.5px; margin-top: 8px; max-width: 760px; }
+  .hero .gear { position: absolute; top: 14px; right: 14px; border: none; background: transparent; font-size: 17px; cursor: pointer; opacity: 0.35; }
+
+  .idrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; position: relative; }
+  .idrow .field { flex: 1 1 150px; }
+
+  #settingsPanel { display: none; background: #fffbe9; border: 1px dashed #d9b53c; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 13px; }
+  #settingsPanel input { width: 100%; margin-top: 6px; }
+  #settingsPanel button { margin-top: 8px; }
+
+  .part { display: flex; align-items: center; gap: 12px; margin: 30px 4px 12px; }
+  .part b { font-size: 15px; font-weight: 800; letter-spacing: 0.04em; }
+  .part span { font-size: 13px; color: var(--fg-muted); }
+  .part::after { content: ''; flex: 1; height: 1.5px; background: var(--hair); }
+
+  section.card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 24px 24px 26px; margin-bottom: 18px;
+    box-shadow: 0 16px 44px -32px rgba(22, 32, 27, 0.3);
+    border-top: 4px solid var(--sec, var(--primary));
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .sec-badge { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 16px; color: #fff; background: var(--sec, var(--primary)); }
+  .sec-head h2 { font-size: 18.5px; font-weight: 800; }
+  .pill { font-size: 12px; font-weight: 800; border-radius: 999px; padding: 2px 10px; border: 1.5px solid; }
+  .pill.auto { color: var(--c-green); border-color: rgba(31, 122, 77, 0.45); }
+  .pill.pred { color: var(--c-amber); border-color: rgba(183, 121, 31, 0.45); }
+  .pill.main { color: var(--accent); border-color: rgba(232, 89, 12, 0.45); }
+  .pill.saved { color: var(--fg-muted); border-color: var(--hair); background: rgba(22, 32, 27, 0.05); }
+  .pill.saved[hidden] { display: none; }
+  .sec-desc { color: var(--fg-muted); font-size: 14px; margin-bottom: 12px; }
+  .sec-desc strong { color: var(--fg); }
+
+  .tips { list-style: none; display: grid; gap: 5px; margin: 6px 0 14px; padding: 12px 16px; background: rgba(15, 110, 102, 0.06); border-radius: 12px; font-size: 13.5px; }
+  .tips li::before { content: '✓ '; color: var(--primary); font-weight: 900; }
+  .example { margin: 4px 0 12px; padding: 12px 16px; background: #1f2430; color: #e9edf5; border-radius: 12px; font: 600 14.5px/1.6 ui-monospace, 'D2Coding', Consolas, monospace; white-space: pre-wrap; }
+  .example::before { content: attr(data-label); display: block; font: 800 11px/1.4 system-ui, sans-serif; letter-spacing: .12em; color: #9aa6bf; margin-bottom: 4px; }
+  .example u { color: #7fe0d4; text-underline-offset: 4px; }
+
+  label.q { display: block; font-weight: 700; font-size: 14.5px; margin: 16px 0 6px; }
+  label.q .req { color: var(--c-rose); }
+  .hint { font-weight: 500; color: var(--fg-faint); font-size: 12.5px; margin-left: 6px; }
+  input[type="text"], input[type="url"], input[type="date"], input[type="password"], textarea {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px;
+    padding: 10px 13px; font: inherit; font-size: 14.5px; color: var(--fg);
+    background: #fffef9; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(15, 110, 102, 0.14); }
+  textarea { resize: vertical; min-height: 74px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .row2 { grid-template-columns: 1fr; } }
+
+  py-runner {
+    margin-top: 6px;
+    --pyrun-font: 15.5px;
+    --pyrun-ui-font: 14px;
+    --pyrun-paper: #fffdf8;
+    --pyrun-primary: #0f6e66;
+    --pyrun-tag: #d6336c;
+    --pyrun-str: #e8590c;
+    --pyrun-num: #0f6e66;
+    --pyrun-float: #6741d9;
+  }
+  .run-note { font-size: 12.5px; color: var(--fg-faint); margin-top: 6px; }
+
+  .guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; }
+  .guide div { border: 1.5px solid var(--hair); border-radius: 12px; padding: 10px 14px; background: #fffef9; font-size: 13.5px; }
+  .guide b { display: block; font-size: 14px; }
+
+  .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(255, 253, 248, 0.92); backdrop-filter: blur(10px); border-top: 1px solid var(--hair); padding: 12px 18px; }
+  .actionbar .inner { max-width: 980px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #draftStatus { font-size: 12px; color: var(--fg-faint); }
+  #draftStatus.pending { color: var(--c-amber); }
+  #draftStatus.saved { color: var(--c-ok); }
+  #draftStatus.failed { color: var(--c-rose); font-weight: 700; }
+  .draft-note { font-size: 11px; color: var(--fg-faint); opacity: 0.8; }
+  .btn { border: none; border-radius: 999px; padding: 12px 22px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; transition: transform 0.12s, opacity 0.15s; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: linear-gradient(115deg, #0f6e66 0%, #1b8a7f 45%, #e8590c 100%); color: #fff; box-shadow: 0 10px 26px -12px rgba(15, 110, 102, 0.6); }
+  .btn-primary:disabled, .btn-mid:disabled { opacity: 0.55; cursor: wait; }
+  .btn-mid { background: #fff; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+
+  .sid-hint { margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px; font-family: 'JetBrains Mono', 'Malgun Gothic', monospace; }
+  .sid-hint.ok { color: var(--c-ok); }
+  .sid-hint.bad { color: var(--c-rose); }
+
+  .backdrop { position: fixed; inset: 0; background: rgba(22, 32, 27, 0.45); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 18px; z-index: 70; }
+  .backdrop[hidden] { display: none; }
+  .modal { width: min(460px, 100%); max-height: 88vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--hair); border-radius: 20px; padding: 24px 24px 20px; box-shadow: 0 30px 80px -30px rgba(22, 32, 27, 0.5); }
+  .modal h3 { font-size: 19px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .modal .btn { padding: 10px 18px; font-size: 14px; }
+  #lkResult { margin-top: 16px; }
+  #lkResult[hidden] { display: none; }
+  .lk-ok { border: 1.5px solid var(--c-ok); background: rgba(31, 122, 77, 0.07); border-radius: 14px; padding: 14px 16px; }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-ok); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--fg); margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { color: var(--fg); overflow-wrap: anywhere; }
+  .lk-bad { border: 1.5px solid var(--c-rose); background: rgba(192, 57, 43, 0.06); border-radius: 14px; padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--c-rose); }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; }
+
+  #submitBanner { display: none; align-items: center; gap: 10px; margin-bottom: 18px; border: 1.5px solid var(--c-ok); background: rgba(31, 122, 77, 0.07); border-radius: 14px; padding: 11px 16px; font-size: 13.5px; font-weight: 700; color: var(--fg); }
+  #submitBanner.show { display: flex; }
+  #submitBanner .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-ok); }
+
+  #toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(16px); background: #16201b; color: #fff; padding: 12px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 60; max-width: 90vw; text-align: center; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #1f7a4d; }
+  #toast.error { background: #c0392b; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    section.card { padding: 18px 14px 20px; }
+    .actionbar .inner { flex-wrap: wrap; gap: 8px; }
+    .draft-wrap { flex: 1 0 100%; order: -1; }
+    .draft-note { display: none; }
+    .actionbar .btn { flex: 1 1 auto; padding: 11px 10px; font-size: 13.5px; }
+    .wide-only { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="gear" id="btnGear" type="button" aria-label="설정">⚙</button>
+    <div class="kicker">인공지능 기초 · 2026-2 · 물어보고, 받아서, 계산한다</div>
+    <h1>파이썬 <span class="i">입력</span>과 <span class="t">자료형</span> 연습</h1>
+    <p class="sub">이 페이지 안에서 바로 파이썬을 쓰고 실행합니다. 과제는 일곱 개이고 <strong>두 번에 나눠</strong> 합니다.
+      수업 중간에 1~3번을 하고 <strong>[중간 저장]</strong>, 수업 뒤쪽에서 4~7번을 마저 하고 <strong>[제출하기]</strong>를 누릅니다. 이 탭은 닫지 말고 두세요.</p>
+    <div class="idrow">
+      <div class="field">
+        <label class="q" for="studentId">학번 <span class="req">*</span></label>
+        <input type="text" id="studentId" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+        <div id="sidPreview" class="sid-hint"></div>
+      </div>
+      <div class="field">
+        <label class="q" for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="이름">
+      </div>
+      <div class="field">
+        <label class="q" for="today">날짜 <span class="req">*</span></label>
+        <input type="date" id="today">
+      </div>
+      <div class="field">
+        <label class="q" for="password">제출 암호 <span class="req">*</span><span class="hint">4자 이상</span></label>
+        <input type="password" id="password" placeholder="4자 이상" autocomplete="off">
+      </div>
+    </div>
+    <p class="sub" style="margin-top:10px; font-size:12.5px;">
+      🎫 <strong>학번</strong>은 학년(1) + 반(2) + 번호(2) 다섯 자리입니다. 2학년 3반 17번이면 <strong>20317</strong>입니다.<br>
+      🔑 <strong>제출 암호</strong>는 이번 활동용으로 직접 정합니다. 나중에 [제출 확인]으로 낸 내용을 불러올 때 씁니다.
+      <span style="color:var(--c-rose); font-weight:700;">평소 쓰는 비밀번호는 쓰지 마세요.</span>
+    </p>
+  </header>
+
+  <div id="submitBanner"><span class="dot"></span><span id="submitBannerText"></span></div>
+
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정 — Apps Script 배포 URL</strong>
+    <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus" style="margin-left:8px;"></span>
+  </div>
+
+  <!-- 실행기 사용법 -->
+  <section class="card" style="--sec:#535c56">
+    <div class="sec-head"><span class="sec-badge">?</span><h2>코드 실행기 사용법</h2></div>
+    <p class="sec-desc">수업 슬라이드에서 본 실행기와 같습니다. 처음 열면 파이썬을 준비하는 데 몇 초 걸립니다. 실행기 위쪽에 <strong>「준비됨」</strong>이 뜨면 시작하세요.</p>
+    <div class="guide">
+      <div><b>실행</b>[▶ 실행] 단추 또는 <code>Ctrl</code>+<code>Enter</code></div>
+      <div><b>입력</b>코드에 <code>input()</code>이 있으면 출력 칸에 입력 줄이 생깁니다. 값을 쓰고 <code>Enter</code>(한글은 조합이 끝난 뒤 Enter) 또는 [보내기]</div>
+      <div><b>변수 상자</b>값의 자료형이 함께 보입니다 · 문자열 str · 정수형 int · 실수형 float</div>
+      <div><b>자동 점검</b>시험 입력 몇 개를 넣어 따로 실행해 보고, 출력의 숫자가 맞는지 확인합니다</div>
+    </div>
+  </section>
+
+  <div class="part"><b>활동 ①</b><span>슬라이드 10장 · 입력과 형 변환</span></div>
+
+  <!-- 1 -->
+  <section class="card" style="--sec:#e8590c">
+    <div class="sec-head"><span class="sec-badge">1</span><h2>이름 묻고 인사하기</h2><span class="pill auto">코드 자동 점검</span><span class="pill saved" data-saved="1" hidden>저장됨</span></div>
+    <p class="sec-desc"><code>input()</code>으로 이름을 입력받아 변수 <code>name</code>에 대입하고, 그 이름을 넣은 인사 문장을 출력하세요. <code>input()</code>은 괄호 안의 <strong>안내 문구</strong>를 보여 주고, 사용자가 친 값을 문자열로 돌려줍니다.</p>
+    <pre class="example" data-label="실행 예시">이름: <u>서연</u>
+반가워, 서연!</pre>
+    <py-runner id="r1" vars types label="1번 과제" rows="4" layout="stack">
+      <script type="text/x-python">
+# input()으로 이름을 묻고 print로 인사하세요
+      </script>
+    </py-runner>
+    <p class="run-note">자동 점검은 「민지」와 「서연」을 차례로 넣어 따로 실행해 보고, 출력에 그 이름이 들어가는지 확인합니다.</p>
+  </section>
+
+  <!-- 2 -->
+  <section class="card" style="--sec:#0f6e66">
+    <div class="sec-head"><span class="sec-badge">2</span><h2>숫자를 받아 10 곱하기</h2><span class="pill auto">코드 자동 점검</span><span class="pill saved" data-saved="2" hidden>저장됨</span></div>
+    <p class="sec-desc">숫자를 입력받아 변수 <code>number</code>에 대입하고, 10을 곱해 출력하세요. 뼈대가 있습니다. 먼저 그대로 실행해 7을 넣어 보고, 무엇이 이상한지 확인하세요.
+      그다음 주석 자리에 <strong>number를 정수로 바꾸는 줄</strong>을 쓰세요. <code>int(number)</code>는 바꾼 새 값을 돌려줄 뿐이라, <code>number = int(number)</code>처럼 다시 대입해야 남습니다.</p>
+    <ul class="tips">
+      <li>다 되면 첫 두 줄을 <code>number = int(input("숫자: "))</code> 한 줄로 줄여 보세요. 결과가 같아야 합니다</li>
+    </ul>
+    <py-runner id="r2" vars types label="2번 과제" rows="5" layout="stack">
+      <script type="text/x-python">
+number = input("숫자: ")
+# 여기에 number를 정수로 바꾸는 줄을 쓰세요
+print(number * 10)
+      </script>
+    </py-runner>
+    <p class="run-note">자동 점검은 7 · 3 · 0을 넣어 70 · 30 · 0이 나오는지 숫자로 확인합니다.</p>
+  </section>
+
+  <!-- 3 -->
+  <section class="card" style="--sec:#c0392b">
+    <div class="sec-head"><span class="sec-badge">3</span><h2>고쳐 보기: 나이와 키</h2><span class="pill auto">코드 자동 점검</span><span class="pill saved" data-saved="3" hidden>저장됨</span></div>
+    <p class="sec-desc">아래 코드는 나이와 키를 물어 계산하는데, 실행되지 않습니다. <strong>키에는 165.5처럼 소수도 입력됩니다.</strong>
+      먼저 나이 두 줄을 고쳐 실행되게 한 뒤, 키 두 줄을 고치세요. 계산은 그대로 두고, 받은 값의 <strong>자료형</strong>만 알맞게 바꾸면 됩니다.</p>
+    <py-runner id="r3" vars types label="3번 과제" rows="5" layout="stack">
+      <script type="text/x-python">
+age = input("나이: ")
+print("내년 나이:", age + 1)
+height = input("키(cm): ")
+print("1m를 넘는 부분:", height - 100, "cm")
+      </script>
+    </py-runner>
+    <p class="run-note">자동 점검은 (17, 165.5)와 (20, 172.3)을 넣어 내년 나이와 1m를 넘는 부분이 맞는지 확인합니다.</p>
+    <label class="q" for="t3Fixes">고친 곳과 이유 <span class="req">*</span><span class="hint">한 줄에 하나씩 · 몇 번째 줄을 어떻게, 왜</span></label>
+    <textarea id="t3Fixes" rows="3" placeholder="예: 1번째 줄 — input()이 문자열을 돌려줘서 int()로 감쌌다"></textarea>
+  </section>
+
+  <div class="part"><b>활동 ②</b><span>슬라이드 16장 · 연산자와 나만의 계산 프로그램</span></div>
+
+  <!-- 4 -->
+  <section class="card" style="--sec:#b7791f">
+    <div class="sec-head"><span class="sec-badge">4</span><h2>예측하고 실행하기</h2><span class="pill pred">예측·결과 비교</span></div>
+    <p class="sec-desc">아래 여섯 줄이 무엇을 출력할지 <strong>실행하기 전에</strong> 실행기 안의 예측 칸에 한 줄에 하나씩 적으세요. 예측을 적어야 실행 단추가 열립니다.
+      출력에는 따옴표가 나오지 않습니다(<code>print("하")</code>의 출력은 <code>하</code>). 다르게 표시된 줄은 틀렸다는 뜻이 아니라 비교일 뿐입니다.</p>
+    <py-runner id="r4" predict readonly label="4번 과제" rows="6" layout="stack">
+      <script type="text/x-python">
+print(17 / 5)
+print(17 // 5)
+print(17 % 5)
+print(2 ** 5)
+print("3" + "4")
+print("하" * 3)
+      </script>
+    </py-runner>
+    <label class="q" for="t4Explain">예측과 다른 줄이 있었나요? 왜 그렇게 나왔는지 적으세요 <span class="req">*</span><span class="hint">모두 같았다면 가장 헷갈렸던 줄을 설명</span></label>
+    <textarea id="t4Explain" rows="3" placeholder="예: 5번째 줄 — 따옴표가 있어서 문자열 연결이 됐다"></textarea>
+  </section>
+
+  <!-- 5 -->
+  <section class="card" style="--sec:#0f6e66">
+    <div class="sec-head"><span class="sec-badge">5</span><h2>사탕 나누기 프로그램</h2><span class="pill auto">코드 자동 점검</span></div>
+    <p class="sec-desc">사탕 수와 사람 수를 입력받아, 한 사람이 받는 사탕 수(<strong>몫</strong> <code>//</code>)와 남는 사탕 수(<strong>나머지</strong> <code>%</code>)를 f-문자열로 출력하세요. 사람 수는 1 이상의 정수로 넣습니다.</p>
+    <pre class="example" data-label="실행 예시">사탕 수: <u>17</u>
+사람 수: <u>5</u>
+한 사람에 3개, 남는 사탕 2개</pre>
+    <py-runner id="r5" vars types label="5번 과제" rows="6" layout="stack">
+      <script type="text/x-python">
+candy =
+people =
+# 몫과 나머지를 f-문자열로 출력하세요
+      </script>
+    </py-runner>
+    <p class="run-note">자동 점검은 (17, 5) · (20, 4) · (3, 5)를 넣어, 출력에 몫이 먼저 · 나머지가 나중에 나오는지 확인합니다.</p>
+  </section>
+
+  <!-- 6 -->
+  <section class="card" style="--sec:#e8590c">
+    <div class="sec-head"><span class="sec-badge">6</span><h2>나만의 계산 프로그램</h2><span class="pill main">오늘의 주인공</span><span class="pill auto">코드 자동 점검</span></div>
+    <p class="sec-desc">주제를 정해 <strong>입력 2개 이상</strong>을 받아 계산하고 결과를 출력하는 프로그램을 만드세요. 형 변환(<code>int()</code>나 <code>float()</code>), 산술 연산자, f-문자열 출력을 한 번 이상 씁니다.
+      그리고 <strong>시험 입력 한 묶음</strong>과 그때 나와야 할 결과를 <strong>손으로 계산해</strong> 적으세요. 자동 점검이 그 값으로 여러분 프로그램을 확인합니다.</p>
+    <ul class="tips">
+      <li>예시: 용돈 계산기(용돈·쓴 돈 → 남은 돈) · 세 과목 평균 · 영상 두 편 길이(분)의 합계를 시간과 분으로</li>
+      <li>나눗셈이 있다면 0으로 나누는 입력은 시험 입력으로 쓰지 마세요</li>
+    </ul>
+    <label class="q" for="t6Topic">주제 <span class="req">*</span></label>
+    <input type="text" id="t6Topic" placeholder="예: 영상 두 편 길이 합계">
+    <py-runner id="r6" vars types label="6번 과제" rows="9" layout="stack">
+      <script type="text/x-python">
+# 입력 → 형 변환 → 계산 → 출력
+
+      </script>
+    </py-runner>
+    <div class="row2">
+      <div>
+        <label class="q" for="t6TestInputs">시험 입력 <span class="req">*</span><span class="hint">input() 순서대로 한 줄에 하나씩</span></label>
+        <textarea id="t6TestInputs" rows="3" class="mono" placeholder="95&#10;48"></textarea>
+      </div>
+      <div>
+        <label class="q" for="t6Expect">손계산 예상값 <span class="req">*</span><span class="hint">출력에 나와야 할 숫자들</span></label>
+        <textarea id="t6Expect" rows="3" placeholder="예: 2시간 23분 → 2, 23"></textarea>
+      </div>
+    </div>
+    <p class="run-note">시험 입력과 예상값을 적은 뒤 [▶ 실행]을 다시 누르면 점검이 갱신됩니다. 예상값과 다르면 프로그램과 손계산 중 어느 쪽이 맞는지 확인하세요.</p>
+  </section>
+
+  <!-- 7 -->
+  <section class="card" style="--sec:#535c56">
+    <div class="sec-head"><span class="sec-badge">7</span><h2>돌아보기</h2></div>
+    <label class="q" for="t7Error">오늘 만난 오류 하나와 고친 방법 <span class="req">*</span><span class="hint">오류의 맨 앞 단어(예: TypeError, ValueError)와 무엇을 고쳤는지</span></label>
+    <textarea id="t7Error" rows="3"></textarea>
+    <label class="q" for="t7Logic">오류 메시지는 없었지만 결과가 이상했던 경험(논리 오류)과 알아챈 방법 <span class="req">*</span></label>
+    <textarea id="t7Logic" rows="3" placeholder="없었다면 수업에서 본 예(2가 3000번, 평균 193점) 가운데 하나를 골라 왜 그렇게 됐는지"></textarea>
+  </section>
+
+</div>
+
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <a class="btn btn-ghost wide-only" href="/data/2026-2/인공지능기초/제출현황.html" style="text-decoration:none; display:inline-block;">제출 현황</a>
+    <button class="btn btn-ghost" id="btnLookup" type="button">제출 확인</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-mid" id="btnMid" type="button">중간 저장<span class="wide-only"> (1~3번)</span></button>
+    <button class="btn btn-primary" id="btnSave" type="button">제출하기<span class="wide-only"> (전체)</span></button>
+  </div>
+</div>
+
+<div class="backdrop" id="lookupBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
+    <h3 id="lookupTitle">제출 확인 · 지난 제출 불러오기</h3>
+    <p class="m-desc">저장할 때 쓴 <strong>학번 · 이름 · 암호</strong>를 넣으면 가장 마지막으로 저장한 내용(중간 저장 포함)을 확인할 수 있어요.</p>
+    <label class="q" for="lkSid">학번</label>
+    <input type="text" id="lkSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label class="q" for="lkName">이름</label>
+    <input type="text" id="lkName" placeholder="이름">
+    <label class="q" for="lkPw">제출 암호</label>
+    <input type="password" id="lkPw" placeholder="저장할 때 정한 암호" autocomplete="off">
+    <div id="lkResult" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="lkClose" type="button">닫기</button>
+      <button class="btn btn-ghost" id="lkFill" type="button" hidden>양식에 불러오기</button>
+      <button class="btn btn-primary" id="lkGo" type="button">확인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script type="module">
+  'use strict';
+  /* py-runner 정의가 끝난 뒤에 실행기를 다룬다 */
+  await customElements.whenDefined('py-runner');
+
+  var SOURCE = 'python_input_types';
+  var DRAFT_KEY = 'draft_python_input_types';
+  var URL_KEY = 'gas_url_ai_basics_2026_2';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec'; // 인공지능 기초(2026-2) 과목 공용 배포 URL
+  var TEXT_IDS = ['studentName', 'studentId', 'today', 't3Fixes', 't4Explain', 't6Topic', 't6TestInputs', 't6Expect', 't7Error', 't7Logic'];
+  var TASKS = [1, 2, 3, 4, 5, 6];
+  var CODE_TASKS = [1, 2, 3, 5, 6];
+
+  function R(n) { return document.getElementById('r' + n); }
+  function v(id) { return document.getElementById(id).value.trim(); }
+
+  /* ── 자동 점검 도우미 — 프로그램 출력(prog)만 보고, 숫자는 값으로 비교한다 ── */
+  function prog(r) { return (r && (r.prog != null ? r.prog : r.out)) || ''; }
+  function nums(s) { return (String(s).match(/-?\d+(?:\.\d+)?(?:e[-+]?\d+)?/gi) || []).map(Number); }
+  function near(a, b) { return Math.abs(a - b) < 1e-6 * Math.max(1, Math.abs(b)); }
+  function hasNum(r, x) { return nums(prog(r)).some(function (n) { return near(n, x); }); }
+  /** 출력에서 숫자들이 이 순서로(사이에 다른 숫자가 있어도) 나오는가 */
+  function inOrder(r, seq) {
+    var ns = nums(prog(r)), i = 0;
+    for (var k = 0; k < ns.length && i < seq.length; k++) if (near(ns[k], seq[i])) i++;
+    return i === seq.length;
+  }
+  function done(r) { return r && r.status === 'completed' && !r.error; }
+  function info(r) { return (r && r.info) || {}; }
+  function calls(r, name) { return (info(r).calls || {})[name] || 0; }
+  function ops(r) { var o = info(r).ops || {}; return Object.keys(o).reduce(function (a, k) { return a + o[k]; }, 0); }
+  function assignFrom(r, target, fn) { return (info(r).assign_from || []).some(function (a) { return a.target === target && a.calls.indexOf(fn) >= 0; }); }
+  function lines(id) { return v(id).split('\n').map(function (s) { return s.trim(); }).filter(function (s) { return s !== ''; }); }
+
+  var CHECKS = {
+    1: [
+      { label: 'input() 결과를 name에 대입', test: function (r, own) { return assignFrom(own, 'name', 'input'); } },
+      { label: '민지를 넣으면 민지에게 인사', inputs: ['민지'], test: function (r) { return done(r) && prog(r).indexOf('민지') >= 0; } },
+      { label: '서연을 넣으면 서연에게 인사', inputs: ['서연'], test: function (r) { return done(r) && prog(r).indexOf('서연') >= 0; } }
+    ],
+    2: [
+      { label: 'input() 결과가 number로', test: function (r, own) { return assignFrom(own, 'number', 'input'); } },
+      { label: 'number를 정수(또는 실수)로 바꿔 다시 대입', test: function (r, own) { return assignFrom(own, 'number', 'int') || assignFrom(own, 'number', 'float'); } },
+      { label: '7 → 70', inputs: ['7'], test: function (r) { return done(r) && hasNum(r, 70) && !hasNum(r, 7777777777); } },
+      { label: '3 → 30', inputs: ['3'], test: function (r) { return done(r) && hasNum(r, 30); } },
+      { label: '0 → 0', inputs: ['0'], test: function (r) { return done(r) && hasNum(r, 0); } }
+    ],
+    3: [
+      { label: '17 · 165.5 → 18 · 65.5', inputs: ['17', '165.5'], test: function (r) { return done(r) && inOrder(r, [18, 65.5]); } },
+      { label: '20 · 172.3 → 21 · 72.3', inputs: ['20', '172.3'], test: function (r) { return done(r) && inOrder(r, [21, 72.3]); } }
+    ],
+    5: [
+      { label: 'input() 2번', test: function (r, own) { return calls(own, 'input') >= 2; } },
+      { label: '// 와 % 를 씀', test: function (r, own) { var o = info(own).ops || {}; return !!(o['//'] && o['%']); } },
+      { label: 'f-문자열로 출력', test: function (r, own) { return (info(own).fstrings || 0) >= 1; } },
+      { label: '17 · 5 → 3 · 2', inputs: ['17', '5'], test: function (r) { return done(r) && inOrder(r, [3, 2]); } },
+      { label: '20 · 4 → 5 · 0', inputs: ['20', '4'], test: function (r) { return done(r) && inOrder(r, [5, 0]); } },
+      { label: '3 · 5 → 0 · 3', inputs: ['3', '5'], test: function (r) { return done(r) && inOrder(r, [0, 3]); } }
+    ],
+    6: [
+      { label: 'input() 2번 이상', test: function (r, own) { return calls(own, 'input') >= 2; } },
+      { label: '형 변환', test: function (r, own) { return calls(own, 'int') + calls(own, 'float') >= 1; } },
+      { label: '산술 연산자', test: function (r, own) { return ops(own) >= 1; } },
+      { label: 'f-문자열 출력', test: function (r, own) { return (info(own).fstrings || 0) >= 1; } },
+      {
+        label: '시험 입력으로 예상값이 나온다',
+        get inputs() { var a = lines('t6TestInputs'); return a.length ? a : null; },
+        test: function (r) {
+          if (!r || !r.status) return false; // 시험 입력을 적지 않았다
+          if (!done(r)) return false;
+          var want = nums(v('t6Expect'));
+          if (!want.length) return v('t6Expect') !== '' && prog(r).indexOf(v('t6Expect')) >= 0;
+          return inOrder(r, want);
+        }
+      }
+    ]
+  };
+  /* 시험 입력이 없는 6번 점검은 화면 결과 대신 빈 결과를 받게 한다 */
+  CHECKS[6][4].test = (function (orig) {
+    return function (r, own) { return lines('t6TestInputs').length ? orig(r) : false; };
+  })(CHECKS[6][4].test);
+  Object.keys(CHECKS).forEach(function (n) { R(n).checks = CHECKS[n]; });
+
+  /* ── 실행 결과 모으기 (실행이 끝났을 때만 온다 — 입력 대기는 완료가 아니다) ── */
+  var runs = {};   // n → {out, checks, prediction, inputs}
+  TASKS.forEach(function (n) {
+    R(n).addEventListener('pyrun-run', function (e) {
+      var d = e.detail;
+      var out = d.error ? (d.output || '') + (d.output ? '\n' : '') + '[오류] ' + d.error.type + ': ' + d.error.msg : (d.output || '');
+      runs[n] = {
+        out: out.replace(/\s+$/, ''),
+        checks: d.checks ? d.checks.filter(function (c) { return c.ok; }).length + '/' + d.checks.length : '',
+        prediction: d.prediction,
+        inputs: d.inputs || []
+      };
+      scheduleDraft();
+    });
+    R(n).addEventListener('pyrun-change', function () { scheduleDraft(); });
+  });
+
+  var SID_RE = /^\d{5}$/;
+  function parseSid(sid) {
+    if (!SID_RE.test(sid)) return null;
+    return { grade: parseInt(sid.slice(0, 1), 10), cls: parseInt(sid.slice(1, 3), 10), no: parseInt(sid.slice(3, 5), 10) };
+  }
+  function sidLabel(sid) { var s = parseSid(sid); return s ? s.grade + '학년 ' + s.cls + '반 ' + s.no + '번' : sid; }
+  function renderSidPreview() {
+    var el = document.getElementById('sidPreview');
+    var sid = v('studentId');
+    if (!sid) { el.textContent = ''; el.className = 'sid-hint'; return; }
+    var s = parseSid(sid);
+    if (!s) { el.textContent = '↳ 숫자 5자리로 입력하세요 (예: 20317)'; el.className = 'sid-hint bad'; return; }
+    var sane = s.grade >= 1 && s.grade <= 3 && s.cls >= 1 && s.no >= 1;
+    el.textContent = '↳ ' + sidLabel(sid) + (sane ? '' : ' — 맞나요?');
+    el.className = 'sid-hint ' + (sane ? 'ok' : 'bad');
+  }
+
+  var todayEl = document.getElementById('today');
+  if (!todayEl.value) {
+    var d0 = new Date();
+    todayEl.value = d0.getFullYear() + '-' + String(d0.getMonth() + 1).padStart(2, '0') + '-' + String(d0.getDate()).padStart(2, '0');
+  }
+
+  function autoText() {
+    return [1, 2, 3, 5, 6].map(function (n) { return n + '번 ' + ((runs[n] && runs[n].checks) || '실행 안 함'); }).join(' · ');
+  }
+  function predText() {
+    var ta = R(4).shadowRoot && R(4).shadowRoot.querySelector('textarea.pred');
+    return (runs[4] && runs[4].prediction) || (ta ? ta.value.trim() : '');
+  }
+
+  function getFormData(kind) {
+    var data = { source: SOURCE, password: v('password'), saveKind: kind || '' };
+    TEXT_IDS.forEach(function (id) { data[id] = v(id); });
+    CODE_TASKS.forEach(function (n) {
+      data['t' + n + 'Code'] = R(n).getCode();
+      data['t' + n + 'Out'] = runs[n] ? runs[n].out : '';
+    });
+    data.t4Pred = predText();
+    data.t4Out = runs[4] ? runs[4].out : '';
+    data.autoChecks = autoText();
+    return data;
+  }
+
+  /* ── 임시저장 ── */
+  var draftTimer = null;
+  var statusEl = document.getElementById('draftStatus');
+  function saveDraft() {
+    try {
+      var dd = getFormData();
+      delete dd.password;
+      dd._runs = runs;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(dd));
+      statusEl.textContent = '임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      statusEl.className = 'saved';
+    } catch (e) {
+      statusEl.textContent = '임시저장 실패 — 이 기기에 저장 공간이 부족해요';
+      statusEl.className = 'failed';
+    }
+  }
+  function scheduleDraft() {
+    statusEl.textContent = '입력 중… 잠시 멈추면 임시저장됩니다';
+    statusEl.className = 'pending';
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function setPred(text) {
+    var ta = R(4).shadowRoot && R(4).shadowRoot.querySelector('textarea.pred');
+    if (!ta) return;
+    ta.value = text || '';
+    ta.dispatchEvent(new Event('input'));
+  }
+  function applyData(dd) {
+    TEXT_IDS.forEach(function (id) { var el = document.getElementById(id); if (el && typeof dd[id] === 'string') el.value = dd[id]; });
+    CODE_TASKS.forEach(function (n) {
+      var code = dd['t' + n + 'Code'];
+      if (typeof code === 'string' && code) R(n).setCode(code);
+      var out = dd['t' + n + 'Out'];
+      if (typeof out === 'string' && out && !runs[n]) runs[n] = { out: out, checks: '' };
+    });
+    if (typeof dd.t4Pred === 'string') setPred(dd.t4Pred);
+    if (typeof dd.t4Out === 'string' && dd.t4Out && !runs[4]) runs[4] = { out: dd.t4Out, checks: '', prediction: dd.t4Pred };
+    if (dd._runs && typeof dd._runs === 'object') {
+      Object.keys(dd._runs).forEach(function (k) { if (!runs[k]) runs[k] = dd._runs[k]; });
+    }
+    renderSidPreview();
+  }
+  function restoreDraft() {
+    var raw = null;
+    try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) { raw = null; }
+    if (!raw) return;
+    try { applyData(JSON.parse(raw)); statusEl.textContent = '임시저장 불러옴'; statusEl.className = 'saved'; } catch (e) { /* 손상된 draft */ }
+  }
+  document.querySelectorAll('.wrap input, .wrap textarea').forEach(function (el) {
+    el.addEventListener('input', scheduleDraft);
+    el.addEventListener('change', scheduleDraft);
+  });
+  /* 4번 예측 칸은 실행기 안에 있다 */
+  R(4).addEventListener('input', scheduleDraft);
+  restoreDraft();
+
+  ['studentId', 'lkSid'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () {
+      var cleaned = el.value.replace(/\D/g, '').slice(0, 5);
+      if (cleaned !== el.value) el.value = cleaned;
+      if (id === 'studentId') renderSidPreview();
+    });
+  });
+  renderSidPreview();
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg, type, ms) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, ms || 2600);
+  }
+
+  /* ── 유효성 검사 — 중간 저장은 1~3번까지, 제출은 전체 ── */
+  var ID_REQ = [{ id: 'studentId', label: '학번' }, { id: 'studentName', label: '이름' }, { id: 'today', label: '날짜' }, { id: 'password', label: '제출 암호' }];
+  var MID_REQ = [{ id: 't3Fixes', label: '3. 고친 곳' }];
+  var FULL_REQ = [
+    { id: 't4Explain', label: '4. 설명' }, { id: 't6Topic', label: '6. 주제' }, { id: 't6TestInputs', label: '6. 시험 입력' }, { id: 't6Expect', label: '6. 예상값' },
+    { id: 't7Error', label: '7. 오류와 고친 방법' }, { id: 't7Logic', label: '7. 논리 오류' }
+  ];
+  function focusEl(el) {
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { el.focus({ preventScroll: true }); }, 120);
+  }
+  function validate(kind) {
+    var req = ID_REQ.concat(MID_REQ, kind === 'full' ? FULL_REQ : []);
+    var mustRun = kind === 'full' ? [1, 2, 3, 4, 5, 6] : [1, 2, 3];
+    var missing = [], first = null;
+    req.forEach(function (f) {
+      if (v(f.id)) return;
+      missing.push(f.label);
+      if (!first) first = document.getElementById(f.id);
+    });
+    mustRun.forEach(function (n) {
+      if (runs[n]) return;
+      missing.push(n + '번 실행');
+      if (!first) first = R(n);
+    });
+    if (missing.length) {
+      var head = missing.slice(0, 3).join(', ');
+      showToast('아직 안 한 곳이 ' + missing.length + '군데 있어요: ' + head + (missing.length > 3 ? ' 외 ' + (missing.length - 3) + '개' : '') + '. 과제는 [▶ 실행]을 끝까지(입력까지) 해야 저장돼요.', 'error', 5200);
+      focusEl(first);
+      return false;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      showToast('학번은 학년(1) + 반(2) + 번호(2) 다섯 자리 숫자예요. 예: 20317', 'error', 4600);
+      focusEl(document.getElementById('studentId'));
+      return false;
+    }
+    if (v('password').length < 4) {
+      showToast('제출 암호는 4자 이상으로 정해 주세요.', 'error', 3800);
+      focusEl(document.getElementById('password'));
+      return false;
+    }
+    return true;
+  }
+
+  /* ── TXT ── */
+  function buildTxt(data) {
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  파이썬 입력과 자료형 연습 — 물어보고, 받아서, 계산한다');
+    L.push('  ' + data.studentId + ' (' + sidLabel(data.studentId) + ') ' + data.studentName + ' · ' + data.today + ' · ' + data.saveKind);
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    var titles = { 1: '이름 묻고 인사하기', 2: '숫자를 받아 10 곱하기', 3: '고쳐 보기: 나이와 키', 5: '사탕 나누기 프로그램', 6: '나만의 계산 프로그램' };
+    [1, 2, 3].forEach(function (n) {
+      L.push(''); L.push('【 ' + n + '. ' + titles[n] + ' 】');
+      L.push(data['t' + n + 'Code']); L.push('--- 실행 화면 ---'); L.push(data['t' + n + 'Out']);
+    });
+    L.push('고친 곳(3): ' + data.t3Fixes);
+    L.push(''); L.push('【 4. 예측하고 실행하기 】');
+    L.push('예측:\n' + data.t4Pred); L.push('출력:\n' + data.t4Out); L.push('설명: ' + data.t4Explain);
+    [5, 6].forEach(function (n) {
+      L.push(''); L.push('【 ' + n + '. ' + titles[n] + ' 】');
+      if (n === 6) L.push('주제: ' + data.t6Topic);
+      L.push(data['t' + n + 'Code']); L.push('--- 실행 화면 ---'); L.push(data['t' + n + 'Out']);
+      if (n === 6) { L.push('시험 입력: ' + data.t6TestInputs.replace(/\n/g, ' / ')); L.push('예상값: ' + data.t6Expect); }
+    });
+    L.push(''); L.push('【 7. 돌아보기 】');
+    L.push('오류와 고친 방법: ' + data.t7Error);
+    L.push('논리 오류: ' + data.t7Logic);
+    L.push(''); L.push('자동 점검: ' + data.autoChecks);
+    return L.join('\n');
+  }
+  function downloadTxt(data) {
+    var blob = new Blob([buildTxt(data)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '파이썬입력과자료형_' + (data.studentId || '') + '_' + (data.studentName || '무명') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── 저장 상태 표시 (저장됨 ≠ 점검 통과) ── */
+  var SUBMIT_KEY = 'submitted_python_input_types';
+  var bannerEl = document.getElementById('submitBanner');
+  var bannerTextEl = document.getElementById('submitBannerText');
+  function showBanner(text) { bannerTextEl.textContent = text; bannerEl.classList.add('show'); }
+  function markSaved(list) {
+    document.querySelectorAll('.pill.saved').forEach(function (p) { p.hidden = list.indexOf(Number(p.dataset.saved)) < 0; });
+  }
+  function recordSubmitted(data, kind) {
+    var stamp = new Date().toLocaleString('ko-KR');
+    var saved = kind === 'full' ? [1, 2, 3, 4, 5, 6, 7] : [1, 2, 3];
+    try { localStorage.setItem(SUBMIT_KEY, JSON.stringify({ at: stamp, kind: kind, saved: saved })); } catch (e) { /* 무시 */ }
+    markSaved(saved);
+    showBanner((kind === 'full' ? '제출을 보냈습니다 · ' : '1~3번을 중간 저장했습니다 · ') + stamp + ' — [제출 확인]으로 서버에 저장됐는지 확인할 수 있어요.' + (kind === 'full' ? '' : ' 4번부터 이어서 하세요.'));
+  }
+  (function restoreBanner() {
+    try {
+      var raw = localStorage.getItem(SUBMIT_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      markSaved(s.saved || []);
+      showBanner('이 기기에서 ' + s.at + '에 ' + (s.kind === 'full' ? '제출을' : '1~3번 중간 저장을') + ' 보냈습니다 — [제출 확인]으로 내용을 다시 볼 수 있어요.');
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* ── 저장 · 제출 (둘 다 시트에 새 행을 쌓는다. 가장 최근 행이 최종본) ── */
+  function send(kind, btn) {
+    if (!validate(kind)) return;
+    var data = getFormData(kind === 'full' ? '제출' : '중간 저장');
+    btn.disabled = true;
+    downloadTxt(data);
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      .then(function () { showToast((kind === 'full' ? '제출 완료!' : '중간 저장 완료!') + ' TXT 파일도 함께 저장됐어요.', 'success', 4200); recordSubmitted(data, kind); })
+      .catch(function (err) { showToast('TXT는 저장됐어요. 시트 전송 오류: ' + err.message, 'error', 5000); })
+      .finally(function () { btn.disabled = false; });
+  }
+  document.getElementById('btnMid').addEventListener('click', function () { send('mid', this); });
+  document.getElementById('btnSave').addEventListener('click', function () { send('full', this); });
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용과 코드를 모두 처음으로 되돌릴까요?')) return;
+    document.querySelectorAll('.wrap input[type="text"], .wrap input[type="password"], .wrap textarea').forEach(function (el) { el.value = ''; });
+    TASKS.forEach(function (n) { R(n).reset(); });
+    setPred('');
+    Object.keys(runs).forEach(function (k) { delete runs[k]; });
+    try { localStorage.removeItem(DRAFT_KEY); } catch (e) { /* 무시 */ }
+    statusEl.textContent = '초기화됨';
+    statusEl.className = '';
+    renderSidPreview();
+    showToast('모든 입력을 지웠어요.');
+  });
+
+  /* ── 제출 확인 · 불러오기 ── */
+  var lookupBackdrop = document.getElementById('lookupBackdrop');
+  var lkResult = document.getElementById('lkResult');
+  var lkFillBtn = document.getElementById('lkFill');
+  var lkGoBtn = document.getElementById('lkGo');
+  var lastLookup = null, lastLookupPw = '';
+  function openLookup() {
+    document.getElementById('lkSid').value = v('studentId');
+    document.getElementById('lkName').value = v('studentName');
+    document.getElementById('lkPw').value = '';
+    lkResult.hidden = true; lkResult.textContent = ''; lkFillBtn.hidden = true; lastLookup = null;
+    lookupBackdrop.hidden = false;
+    document.getElementById('lkPw').focus();
+  }
+  function closeLookup() { lookupBackdrop.hidden = true; }
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'lkcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버 응답이 없습니다.')); }, 20000);
+      function cleanup() { clearTimeout(timer); try { delete window[cb]; } catch (e) { window[cb] = undefined; } if (script.parentNode) script.parentNode.removeChild(script); }
+      window[cb] = function (data) { cleanup(); resolve(data); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결할 수 없습니다.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function requestLookup(p) {
+    var base = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    var qs = 'action=lookup&source=' + SOURCE + '&studentId=' + encodeURIComponent(p.studentId) + '&studentName=' + encodeURIComponent(p.studentName) + '&password=' + encodeURIComponent(p.password);
+    var url = base + '?' + qs;
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).catch(function () { return jsonp(url); });
+  }
+  function renderLookup(res) {
+    lkResult.textContent = '';
+    lkResult.hidden = false;
+    if (res && res.status === 'ok') {
+      lastLookup = res.data;
+      lkFillBtn.hidden = false;
+      var box = document.createElement('div'); box.className = 'lk-ok';
+      var stamp = document.createElement('div'); stamp.className = 'stamp'; stamp.textContent = (res.data.saveKind || '저장') + '이 확인되었습니다';
+      var when = document.createElement('div'); when.className = 'when'; when.textContent = res.submittedAt;
+      box.appendChild(stamp); box.appendChild(when);
+      var dl = document.createElement('dl');
+      [['1 실행', res.data.t1Out], ['2 실행', res.data.t2Out], ['3 실행', res.data.t3Out], ['4 예측', res.data.t4Pred], ['5 실행', res.data.t5Out], ['6 주제', res.data.t6Topic], ['6 실행', res.data.t6Out], ['자동 점검', res.data.autoChecks]].forEach(function (pair) {
+        if (!pair[1] || !String(pair[1]).trim()) return;
+        var dt = document.createElement('dt'); dt.textContent = pair[0];
+        var dd = document.createElement('dd'); dd.textContent = String(pair[1]).split('\n').slice(0, 3).join(' / ');
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      box.appendChild(dl);
+      lkResult.appendChild(box);
+      return;
+    }
+    lkFillBtn.hidden = true; lastLookup = null;
+    var bad = document.createElement('div'); bad.className = 'lk-bad';
+    if (res && res.status === 'denied') bad.textContent = '암호가 일치하지 않습니다. 저장할 때 정한 암호를 다시 확인해 주세요.';
+    else if (res && res.status === 'notfound') bad.textContent = '이 학번·이름으로 저장된 기록이 없습니다. 아직 저장하지 않았거나, 학번·이름이 저장할 때와 다를 수 있어요.';
+    else bad.textContent = '오류: ' + ((res && res.message) || '알 수 없는 오류');
+    lkResult.appendChild(bad);
+  }
+  document.getElementById('btnLookup').addEventListener('click', openLookup);
+  document.getElementById('lkClose').addEventListener('click', closeLookup);
+  lookupBackdrop.addEventListener('click', function (e) { if (e.target === lookupBackdrop) closeLookup(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lookupBackdrop.hidden) closeLookup(); });
+  ['lkSid', 'lkName', 'lkPw'].forEach(function (id) {
+    document.getElementById(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); lkGoBtn.click(); } });
+  });
+  lkGoBtn.addEventListener('click', function () {
+    var p = { studentId: document.getElementById('lkSid').value.trim(), studentName: document.getElementById('lkName').value.trim(), password: document.getElementById('lkPw').value.trim() };
+    if (!p.studentId || !p.studentName || !p.password) { renderLookup({ status: 'error', message: '학번 · 이름 · 암호를 모두 입력해 주세요.' }); return; }
+    if (!SID_RE.test(p.studentId)) { renderLookup({ status: 'error', message: '학번은 숫자 5자리예요 (학년1 + 반2 + 번호2, 예: 20317).' }); return; }
+    lkGoBtn.disabled = true;
+    lkResult.hidden = false; lkResult.textContent = ''; lkFillBtn.hidden = true;
+    var wait = document.createElement('div'); wait.className = 'lk-wait'; wait.textContent = '확인하는 중…'; lkResult.appendChild(wait);
+    requestLookup(p)
+      .then(function (res) { if (res && res.status === 'ok') lastLookupPw = p.password; renderLookup(res); })
+      .catch(function (err) { renderLookup({ status: 'error', message: err.message }); })
+      .finally(function () { lkGoBtn.disabled = false; });
+  });
+  lkFillBtn.addEventListener('click', function () {
+    if (!lastLookup) return;
+    if (!window.confirm('지금 화면의 내용을 지우고, 저장했던 내용을 불러올까요?')) return;
+    Object.keys(runs).forEach(function (k) { delete runs[k]; });
+    applyData(lastLookup);
+    saveDraft();
+    if (lastLookupPw) document.getElementById('password').value = lastLookupPw;
+    closeLookup();
+    showToast('저장했던 코드를 불러왔어요. 다시 실행하고 저장하면 최신 내용으로 쌓여요.', 'success', 4600);
+  });
+
+  /* ── 설정 패널 (⚙ 5번 클릭 — 교사 전용) ── */
+  var gearCount = 0, gearTimer = null;
+  document.getElementById('btnGear').addEventListener('click', function () {
+    gearCount += 1;
+    clearTimeout(gearTimer);
+    gearTimer = setTimeout(function () { gearCount = 0; }, 1600);
+    if (gearCount >= 5) {
+      gearCount = 0;
+      var p = document.getElementById('settingsPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('scriptUrl').value = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    }
+  });
+  document.getElementById('btnSaveUrl').addEventListener('click', function () {
+    var u = document.getElementById('scriptUrl').value.trim();
+    if (u) { localStorage.setItem(URL_KEY, u); document.getElementById('urlStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(URL_KEY); document.getElementById('urlStatus').textContent = '기본값 사용'; }
+  });
+
+  /* ── 제출 현황 페이지에서 넘어온 경우 (?sid=…&restore=1) ── */
+  (function handoff() {
+    var params = new URLSearchParams(location.search);
+    var sid = params.get('sid');
+    if (sid && /^\d{5}$/.test(sid)) { document.getElementById('studentId').value = sid; renderSidPreview(); scheduleDraft(); }
+    if (params.get('restore') !== '1') return;
+    var key = 'handoff_' + SOURCE;
+    var raw = null;
+    try { raw = sessionStorage.getItem(key); sessionStorage.removeItem(key); } catch (e) { /* 무시 */ }
+    if (!raw) return;
+    try {
+      var payload = JSON.parse(raw);
+      if (!payload || !payload.data) return;
+      applyData(payload.data);
+      saveDraft();
+      if (payload.password) document.getElementById('password').value = payload.password;
+      if (payload.at) showBanner(payload.at + '에 낸 내용을 불러왔어요 — 고쳐서 다시 저장하면 최신 내용으로 쌓입니다.');
+      showToast('저장했던 내용을 불러왔어요.', 'success', 3800);
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* 자가 점검 API (헤드리스 검수용) */
+  window.pitSheet = { getFormData: getFormData, runs: runs, validate: validate, CHECKS: CHECKS };
+</script>
+<!-- 제출 마감 — apps-script.js SOURCES의 deadline과 같은 값 (생성일 2026-11-12 + 45일).
+     서버도 마감 뒤 제출을 받지 않는다. 제출 확인(조회)은 마감 뒤에도 쓸 수 있다. -->
+<script>
+(function () {
+  var DEADLINE = '2026-12-27';
+  var end = new Date(DEADLINE + 'T23:59:59+09:00');
+  var closed = Date.now() > end.getTime();
+  var p = DEADLINE.split('-');
+  var label = Number(p[1]) + '월 ' + Number(p[2]) + '일';
+  var lookupBtn = document.getElementById('btnLookup');
+  var lookupName = lookupBtn ? lookupBtn.textContent.trim() : '제출 확인';
+  var box = document.createElement('div');
+  box.id = 'deadlineNotice';
+  box.setAttribute('role', 'status');
+  box.style.cssText = 'margin:14px 0 4px; padding:10px 14px; border-radius:10px; font-size:14px; font-weight:700; line-height:1.5;' +
+    (closed ? 'background:#fde8e8; color:#9b1c1c; border:1px solid #f5b5b5;'
+            : 'background:#eaf6f3; color:#0b4f49; border:1px solid #b9ddd6;');
+  box.textContent = closed
+    ? '⏰ 제출이 마감되었습니다 (' + label + ' 23:59까지). 이미 낸 내용은 [' + lookupName + ']에서 볼 수 있습니다.'
+    : '⏰ 제출 마감: ' + label + ' 23:59까지';
+  var hero = document.querySelector('header');
+  if (hero) hero.appendChild(box);
+  if (!closed) return;
+  ['btnSave', 'btnMid'].forEach(function (id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = '제출 마감';
+    btn.style.opacity = '0.5';
+    btn.style.cursor = 'not-allowed';
+    btn.title = label + '에 마감되었습니다.';
+    btn.addEventListener('click', function (e) { e.stopImmediatePropagation(); e.preventDefault(); }, true);
+  });
+})();
+</script>
+</body>
+</html>

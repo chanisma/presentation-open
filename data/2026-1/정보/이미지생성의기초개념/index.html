@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>이미지 생성의 기초 개념</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Space+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --style-bg: #050510;
+      --style-primary: #00FF88;
+      --style-accent: #7B00FF;
+      --style-accent2: #00B4FF;
+      --style-text: #D0D0F0;
+      --style-text-secondary: #9595b8;
+      --style-panel: rgba(15, 15, 40, 0.85);
+      --style-panel-border: rgba(0, 255, 136, 0.15);
+      --style-glow-green: rgba(0, 255, 136, 0.3);
+      --style-glow-violet: rgba(123, 0, 255, 0.25);
+      --style-glow-cyan: rgba(0, 180, 255, 0.25);
+    }
+    html, body {
+      font-size: clamp(16px, 1.5vw, 28px);
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--style-bg);
+      color: var(--style-text);
+      overflow: hidden;
+      height: 100vh;
+      line-height: 1.6;
+    }
+    h1, h2, h3 { font-family: 'Barlow Condensed', 'Noto Sans KR', sans-serif; }
+    h1 { font-size: 2.4rem; font-weight: 700; letter-spacing: 0.12em; }
+    h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: 0.06em; }
+    h3 { font-size: 1.1rem; font-weight: 600; }
+    code, .mono { font-family: 'Space Mono', monospace; }
+    .gradient-text {
+      background: linear-gradient(90deg, #00FF88, #00B4FF, #7B00FF);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* Accessibility */
+    .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+    .skip-link { position:absolute;top:-40px;left:0;background:var(--style-primary);color:#050510;padding:8px 16px;z-index:9999;font-size:14px;border-radius:0 0 4px 0;transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    :focus-visible { outline: 2px solid var(--style-primary); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:0.01ms!important;transition-duration:0.01ms!important; } }
+
+    /* Progress Bar */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px; z-index: 1000;
+      background: linear-gradient(90deg, #00FF88, #00B4FF, #7B00FF);
+      transition: width 0.4s ease;
+      box-shadow: 0 0 12px var(--style-glow-green);
+    }
+
+    /* Presentation & Slides */
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+
+    /* Browser Card (minimal dark) */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--style-panel);
+      border: 1px solid var(--style-panel-border);
+      border-radius: 1rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 60px rgba(0,255,136,0.06), 0 0 120px rgba(123,0,255,0.04);
+    }
+    .browser-card--frameless {
+      background: transparent; border: none; box-shadow: none; backdrop-filter: none;
+    }
+    .browser-topbar {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.4rem 1rem;
+      border-bottom: 1px solid rgba(0,255,136,0.08);
+      min-height: 35px;
+    }
+    .topbar-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--style-text-secondary);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin: 0 auto;
+    }
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1.2rem 2rem 1rem;
+    }
+    .browser-content::-webkit-scrollbar { width: 4px; }
+    .browser-content::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.2); border-radius: 2px; }
+
+    /* Glow Blobs */
+    .glow-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
+    .glow-blob--green { background: var(--style-glow-green); }
+    .glow-blob--violet { background: var(--style-glow-violet); }
+    .glow-blob--cyan { background: var(--style-glow-cyan); }
+    .deco-blob--tr { right: -5%; top: -10%; width: 35%; aspect-ratio: 1; }
+    .deco-blob--bl { left: -8%; bottom: -5%; width: 30%; aspect-ratio: 1; }
+    .deco-blob--cr { right: 5%; top: 30%; width: 20%; aspect-ratio: 1; }
+
+    /* Section Header */
+    .section-header { margin-bottom: 0.8rem; }
+    .section-header h2 { color: var(--style-text); }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle { color: var(--style-text-secondary); font-size: 0.88rem; margin-top: 0.2rem; }
+    .section-rule { height: 2px; background: linear-gradient(90deg, var(--style-primary), transparent); margin-top: 0.4rem; border: none; }
+
+    /* Highlight Box */
+    .highlight-box {
+      background: rgba(0,255,136,0.06);
+      border-left: 3px solid var(--style-primary);
+      padding: 0.6rem 1rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 0.6rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* Card Grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,255,136,0.1);
+      border-radius: 0.6rem;
+      padding: 0.8rem 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .card:hover { border-color: var(--style-primary); box-shadow: 0 0 20px rgba(0,255,136,0.1); }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--style-text); }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); line-height: 1.5; }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    @keyframes popUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    /* Two Column */
+    .two-col { display: flex; gap: 1rem; align-items: flex-start; }
+    .col-left, .col-right { flex: 1; }
+    .col-divider { width: 1px; background: linear-gradient(180deg, transparent, var(--style-primary), transparent); align-self: stretch; }
+    .col-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .col-list { list-style: none; font-size: 0.92rem; }
+    .col-list li { padding: 0.25rem 0; padding-left: 1.2em; position: relative; }
+    .col-list li::before { content: '▸'; position: absolute; left: 0; color: var(--style-primary); }
+
+    /* Comparison Table */
+    .table-wrapper { overflow-x: auto; margin: 0.6rem 0; }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .comparison-table th, .comparison-table td { padding: 0.5rem 0.8rem; text-align: left; border: 1px solid rgba(0,255,136,0.12); }
+    .comparison-table thead th { background: rgba(0,255,136,0.1); color: var(--style-primary); font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.05em; }
+    .comparison-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+    /* Task List */
+    .task-list { list-style: none; }
+    .task-item {
+      display: flex; gap: 0.8rem; align-items: flex-start;
+      padding: 0.6rem 0; border-left: 3px solid var(--style-accent);
+      padding-left: 0.8rem; margin-bottom: 0.4rem;
+    }
+    .task-num { font-family: 'Space Mono', monospace; font-size: 1.2rem; color: var(--style-primary); font-weight: 700; flex-shrink: 0; }
+    .task-title { font-weight: 700; font-size: 0.98rem; }
+    .task-desc { font-size: 0.88rem; color: var(--style-text-secondary); margin-top: 0.15rem; }
+
+    /* Badge */
+    .badge { display: inline-block; font-family: 'Space Mono', monospace; font-size: 0.75rem; padding: 0.15rem 0.6rem; border-radius: 1rem; letter-spacing: 0.08em; }
+    .main-badge { background: rgba(0,255,136,0.15); color: var(--style-primary); border: 1px solid rgba(0,255,136,0.3); }
+
+    /* Cover */
+    .cover-slide {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; min-height: 60vh; position: relative;
+    }
+    .cover-title {
+      font-size: 2.6rem; font-weight: 700; letter-spacing: 0.15em;
+      background: linear-gradient(90deg, #00FF88, #00B4FF, #7B00FF);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin: 0.5rem 0 0.3rem;
+    }
+    .cover-subtitle { color: var(--style-text-secondary); font-size: 1rem; margin-bottom: 0.8rem; }
+    .cover-divider { width: 80px; height: 2px; background: linear-gradient(90deg, #00FF88, #7B00FF); margin: 0.5rem auto; }
+    .cover-meta { font-size: 0.82rem; color: var(--style-text-secondary); font-family: 'Space Mono', monospace; }
+
+    /* End Slide */
+    .end-slide { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .end-title {
+      font-size: 2rem; font-weight: 700;
+      background: linear-gradient(90deg, #00FF88, #00B4FF);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+    .end-subtitle { color: var(--style-text-secondary); font-size: 0.92rem; margin-bottom: 0.8rem; }
+    .end-summary { max-width: 720px; width: 100%; text-align: left; }
+    .summary-title { font-size: 1rem; color: var(--style-primary); margin-bottom: 0.3rem; }
+    .summary-list { list-style: none; }
+    .summary-list li { padding: 0.2rem 0; font-size: 0.92rem; }
+    .summary-list li::before { content: '✦ '; color: var(--style-primary); }
+
+    /* TOC */
+    .toc-list { list-style: none; }
+    .toc-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      border: 1px solid transparent; margin-bottom: 0.3rem;
+    }
+    .toc-item:hover { background: rgba(0,255,136,0.06); border-color: rgba(0,255,136,0.15); }
+    .toc-num { font-family: 'Space Mono', monospace; color: var(--style-primary); font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+    .toc-text { flex: 1; font-size: 0.95rem; }
+    .toc-arrow { color: var(--style-primary); opacity: 0; transition: opacity 0.2s; }
+    .toc-item:hover .toc-arrow { opacity: 1; }
+
+    /* GAN Interactive - Arena Layout */
+    .gan-viz {
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      background: rgba(0,0,0,0.3); border-radius: 0.8rem; padding: 0.8rem;
+      border: 1px solid rgba(0,255,136,0.1);
+    }
+    .gan-arena {
+      display: grid; grid-template-columns: 1fr 60px 1fr;
+      gap: 0.4rem; width: 100%; align-items: start;
+    }
+    .gan-entity {
+      display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+      padding: 0.5rem; border-radius: 0.6rem; transition: all 0.5s ease;
+    }
+    .gan-entity--gen { background: rgba(0,255,136,0.08); border: 1.5px solid rgba(0,255,136,0.2); }
+    .gan-entity--disc { background: rgba(255,60,60,0.08); border: 1.5px solid rgba(255,60,60,0.2); }
+    .gan-entity.active { transform: scale(1.02); }
+    .gan-entity--gen.active { box-shadow: 0 0 18px rgba(0,255,136,0.2); border-color: var(--style-primary); }
+    .gan-entity--disc.active { box-shadow: 0 0 18px rgba(255,60,60,0.2); border-color: #ff4466; }
+    .gan-entity-header { display: flex; align-items: center; gap: 0.3rem; }
+    .gan-entity-icon { font-size: 1.4rem; }
+    .gan-entity-name { font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 600; }
+    .gan-entity-role { font-size: 0.65rem; color: var(--style-text-secondary); }
+    .gan-monitor {
+      width: 100%; aspect-ratio: 4/3; background: #080810; border-radius: 0.4rem;
+      border: 1px solid rgba(255,255,255,0.08); overflow: hidden; position: relative;
+    }
+    .gan-monitor-label { position: absolute; top: 0.15rem; left: 0.25rem; font-family: 'Space Mono', monospace; font-size: 0.55rem; color: rgba(255,255,255,0.3); z-index: 2; }
+    .gan-monitor-grid {
+      width: 100%; height: 100%; display: grid;
+      grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(3,1fr);
+      gap: 2px; padding: 4px;
+    }
+    .gan-mcell { border-radius: 2px; transition: all 0.6s ease; }
+    .gan-action-btn {
+      font-family: 'Space Mono', monospace; font-size: 0.72rem;
+      padding: 0.35rem 0.7rem; border-radius: 0.35rem; cursor: pointer;
+      transition: all 0.3s; border: none; font-weight: 600; width: 100%;
+    }
+    .gan-action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .gan-btn-gen { background: var(--style-primary); color: #000; }
+    .gan-btn-gen:hover:not(:disabled) { box-shadow: 0 0 12px rgba(0,255,136,0.4); }
+    .gan-btn-judge { background: #ff4466; color: #fff; }
+    .gan-btn-judge:hover:not(:disabled) { box-shadow: 0 0 12px rgba(255,60,60,0.4); }
+    /* Flow column */
+    .gan-flow-col {
+      grid-column: 2; grid-row: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; position: relative; min-height: 120px;
+    }
+    .gan-flow-arrow { font-family: 'Space Mono', monospace; font-size: 1.1rem; color: rgba(255,255,255,0.15); transition: all 0.3s; }
+    .gan-flow-arrow.active { color: #ffb400; text-shadow: 0 0 8px rgba(255,180,0,0.5); }
+    .gan-packet {
+      width: 36px; height: 36px; border-radius: 0.3rem; border: 1.5px solid #ffb400;
+      background: rgba(255,180,0,0.1); display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; position: absolute; opacity: 0; transition: all 0.5s cubic-bezier(.4,0,.2,1); z-index: 10;
+    }
+    .gan-packet.at-gen { opacity: 1; left: -10px; top: 50%; transform: translateY(-50%); }
+    .gan-packet.moving { opacity: 1; left: 50%; top: 50%; transform: translate(-50%,-50%); animation: gan-pulse .4s ease; }
+    .gan-packet.at-disc { opacity: 1; right: -10px; left: auto; top: 50%; transform: translateY(-50%); }
+    /* Verdict & Feedback */
+    .gan-verdict-row { grid-column: 1/4; text-align: center; min-height: 2.2em; display: flex; flex-direction: column; align-items: center; gap: 0.2rem; }
+    .gan-verdict {
+      font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 700;
+      padding: 0.3rem 1rem; border-radius: 1.5rem; display: inline-flex; align-items: center; gap: 0.3rem;
+      opacity: 0; transform: scale(0.8); transition: all 0.4s cubic-bezier(.4,0,.2,1);
+    }
+    .gan-verdict.show { opacity: 1; transform: scale(1); }
+    .gan-verdict--fake { background: rgba(255,60,60,0.12); border: 1px solid #ff4466; color: #ff4466; }
+    .gan-verdict--real { background: rgba(0,255,136,0.1); border: 1px solid var(--style-primary); color: var(--style-primary); }
+    .gan-verdict--confused { background: rgba(255,180,0,0.1); border: 1px solid #ffb400; color: #ffb400; }
+    .gan-verdict-detail { font-size: 0.65rem; color: var(--style-text-secondary); max-width: 90%; }
+    .gan-feedback {
+      grid-column: 1/4; display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+      min-height: 1.8em; opacity: 0; transition: all 0.5s ease;
+    }
+    .gan-feedback.show { opacity: 1; }
+    .gan-feedback-arrow { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--style-accent); }
+    .gan-feedback-msg {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--style-accent);
+      background: rgba(123,0,255,0.1); padding: 0.2rem 0.5rem; border-radius: 0.25rem;
+      border: 1px solid rgba(123,0,255,0.25);
+    }
+    /* Status */
+    .gan-narrative {
+      font-size: 0.7rem; color: var(--style-text); text-align: center;
+      line-height: 1.4; padding: 0.35rem 0.5rem; background: rgba(255,255,255,0.02);
+      border-radius: 0.3rem; border: 1px solid rgba(255,255,255,0.05); min-height: 1.8em; width: 100%;
+    }
+    .gan-status-bar { display: flex; align-items: center; gap: 0.5rem; width: 100%; }
+    .gan-epoch { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--style-accent2); }
+    .gan-quality-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
+    .gan-quality-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; background: linear-gradient(90deg, #7B00FF, #00FF88); }
+    .gan-quality-pct { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--style-text-secondary); }
+    .gan-controls { display: flex; gap: 0.4rem; align-items: center; margin-top: 0.2rem; }
+    .gan-ctrl-btn {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      padding: 0.25rem 0.6rem; border-radius: 0.3rem; cursor: pointer;
+      border: 1px solid var(--style-primary); background: rgba(0,255,136,0.06);
+      color: var(--style-primary); transition: all 0.2s;
+    }
+    .gan-ctrl-btn:hover { background: rgba(0,255,136,0.15); }
+    @keyframes gan-pulse { 0%{box-shadow:0 0 0 rgba(255,180,0,0)} 50%{box-shadow:0 0 14px rgba(255,180,0,0.4)} 100%{box-shadow:0 0 0 rgba(255,180,0,0)} }
+    @keyframes gan-shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-2px)} 40%{transform:translateX(2px)} 60%{transform:translateX(-1px)} 80%{transform:translateX(1px)} }
+    @keyframes gan-celebrate { 0%{transform:scale(1)} 50%{transform:scale(1.04)} 100%{transform:scale(1)} }
+    .gan-shake { animation: gan-shake 0.4s ease; }
+    .gan-celebrate { animation: gan-celebrate 0.5s ease; }
+
+    /* Diffusion Interactive - Two Phase */
+    .diff-viz {
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+      background: rgba(0,0,0,0.3); border-radius: 0.8rem; padding: 0.6rem;
+      border: 1px solid rgba(0,180,255,0.1);
+    }
+    .diff-phase-tabs { display: flex; gap: 0.3rem; }
+    .diff-phase-tab {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem; padding: 0.25rem 0.6rem;
+      border-radius: 1rem; border: 1px solid rgba(255,255,255,0.08); background: transparent;
+      color: var(--style-text-secondary); cursor: pointer; transition: all 0.3s;
+    }
+    .diff-phase-tab.active-train { background: rgba(123,0,255,0.12); border-color: rgba(123,0,255,0.3); color: #b388ff; }
+    .diff-phase-tab.active-gen { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.2); color: var(--style-primary); }
+    .diff-panel { display: none; flex-direction: column; align-items: center; gap: 0.4rem; width: 100%; }
+    .diff-panel.visible { display: flex; }
+    /* Training flow */
+    .diff-train-flow {
+      display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 0.2rem;
+      width: 100%; align-items: center;
+    }
+    .diff-tbox {
+      display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+      padding: 0.3rem; border-radius: 0.5rem; text-align: center;
+    }
+    .diff-tbox-title { font-family: 'Space Mono', monospace; font-size: 0.65rem; font-weight: 600; }
+    .diff-tcanvas {
+      width: 100%; min-width: 100px; aspect-ratio: 1; border-radius: 0.35rem; background: #080810;
+      overflow: hidden; border: 1px solid rgba(255,255,255,0.06);
+      display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(3,1fr);
+      gap: 2px; padding: 4px;
+    }
+    .diff-tcell { border-radius: 2px; transition: all 0.5s ease; }
+    .diff-tarrow { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: rgba(255,255,255,0.15); text-align: center; }
+    .diff-tlabel { font-size: 0.58rem; color: rgba(255,255,255,0.35); font-family: 'Space Mono', monospace; }
+    /* Model entity */
+    .diff-model {
+      display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+      padding: 0.4rem; border-radius: 0.5rem; background: rgba(0,180,255,0.08);
+      border: 1px solid rgba(0,180,255,0.2); width: 100%; max-width: 280px; transition: all 0.5s;
+    }
+    .diff-model.active { box-shadow: 0 0 15px rgba(0,180,255,0.2); border-color: var(--style-accent2); }
+    .diff-model-header { display: flex; align-items: center; gap: 0.25rem; }
+    .diff-model-name { font-family: 'Space Mono', monospace; font-size: 0.68rem; font-weight: 600; color: var(--style-accent2); }
+    .diff-model-thought {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem; color: #ffb400;
+      background: rgba(255,180,0,0.08); padding: 0.2rem 0.5rem; border-radius: 0.25rem;
+      border: 1px solid rgba(255,180,0,0.15); text-align: center; width: 100%; min-height: 1.3em;
+    }
+    /* Generation flow */
+    .diff-gen-row {
+      display: grid; grid-template-columns: 1fr auto 200px auto 1fr; gap: 0.4rem;
+      width: 100%; align-items: center;
+    }
+    .diff-gen-center {
+      display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+      padding: 0.3rem; background: rgba(0,180,255,0.06); border-radius: 0.4rem;
+      border: 1px solid rgba(0,180,255,0.15);
+    }
+    .diff-gen-noise {
+      width: 100px; height: 100px; border-radius: 0.35rem; background: #080810;
+      overflow: hidden; border: 1px solid rgba(255,68,102,0.15);
+      display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(3,1fr);
+      gap: 2px; padding: 4px;
+    }
+    .diff-prompt-bar {
+      display: flex; align-items: center; gap: 0.3rem;
+      background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.12);
+      border-radius: 0.3rem; padding: 0.2rem 0.5rem; font-size: 0.55rem;
+      color: var(--style-primary); font-family: 'Space Mono', monospace;
+    }
+    /* Shared */
+    .diff-narrative {
+      font-size: 0.68rem; color: var(--style-text); text-align: center; line-height: 1.4;
+      padding: 0.3rem 0.5rem; background: rgba(255,255,255,0.02); border-radius: 0.25rem;
+      border: 1px solid rgba(255,255,255,0.04); min-height: 1.6em; width: 100%;
+    }
+    .diff-timeline { display: flex; align-items: center; gap: 2px; width: 100%; max-width: 400px; }
+    .diff-tl-dot { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.05); transition: all 0.4s; }
+    .diff-tl-dot.done { background: linear-gradient(90deg, rgba(123,0,255,0.6), rgba(0,180,255,0.6)); }
+    .diff-tl-dot.current { background: #ffb400; box-shadow: 0 0 6px rgba(255,180,0,0.4); }
+    .diff-controls { display: flex; gap: 0.3rem; align-items: center; }
+    .diff-btn {
+      font-family: 'Space Mono', monospace; font-size: 0.58rem;
+      padding: 0.25rem 0.6rem; border-radius: 0.3rem; cursor: pointer;
+      border: 1px solid var(--style-accent2); background: rgba(0,180,255,0.06);
+      color: var(--style-accent2); transition: all 0.2s;
+    }
+    .diff-btn:hover { background: rgba(0,180,255,0.15); }
+    .diff-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .diff-step-info { font-family: 'Space Mono', monospace; font-size: 0.5rem; color: var(--style-accent2); }
+    .noise-canvas { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+
+    /* Link Button */
+    .link-btn {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-family: 'Space Mono', monospace; font-size: 0.75rem;
+      padding: 0.3rem 0.8rem; border-radius: 0.4rem;
+      background: rgba(0,180,255,0.1); border: 1px solid rgba(0,180,255,0.3);
+      color: var(--style-accent2); text-decoration: none; transition: all 0.2s;
+    }
+    .link-btn:hover { background: rgba(0,180,255,0.2); }
+
+    /* Nav Bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.35rem 1.5rem;
+      background: rgba(5,5,16,0.95); backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(0,255,136,0.08); z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid rgba(0,255,136,0.2); border-radius: 50%;
+      background: rgba(255,255,255,0.03); cursor: pointer;
+      color: var(--style-text); transition: all 0.2s; padding: 0; line-height: 1; font-size: 0;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--style-primary); background: rgba(0,255,136,0.1); }
+    .nav-btn:hover:not(:disabled) svg { fill: var(--style-primary); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-counter { font-size: 13px; font-weight: 700; color: var(--style-text-secondary); min-width: 3rem; text-align: center; display: flex; align-items: center; gap: 0.15rem; line-height: 1; }
+    .slide-input { width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent; background: transparent; font-size: 13px; font-weight: 700; color: var(--style-text-secondary); font-family: inherit; padding: 0; outline: none; cursor: pointer; transition: border-color 0.2s; line-height: 1; }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-primary); background: rgba(0,255,136,0.05); border-radius: 4px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; height: 1px; }
+      .gan-arena { grid-template-columns: 1fr 40px 1fr; }
+      .diff-train-flow { grid-template-columns: 1fr; gap: 0.2rem; }
+      .diff-gen-row { grid-template-columns: 1fr; gap: 0.2rem; }
+    }
+
+    /* Image containers for dark theme */
+    .img-container {
+      background: rgba(240,240,250,0.88); border-radius: 0.6rem;
+      padding: 0.5rem; margin: 0.5rem 0;
+      border: 1px solid rgba(0,255,136,0.12);
+      box-shadow: 0 0 24px rgba(0,255,136,0.06), inset 0 0 0 1px rgba(0,0,0,0.05);
+      display: flex; justify-content: center; align-items: center;
+      overflow: hidden; position: relative;
+    }
+    .img-container::after {
+      content: ''; position: absolute; inset: 0; border-radius: 0.6rem;
+      background: linear-gradient(135deg, rgba(0,255,136,0.03), rgba(123,0,255,0.03));
+      pointer-events: none;
+    }
+    .img-container img {
+      width: 100%; height: auto; display: block; border-radius: 0.4rem;
+      max-height: 280px; object-fit: contain; position: relative; z-index: 1;
+    }
+    .img-container--wide img { max-height: 180px; }
+    .img-container--sm img { max-height: 120px; }
+    .img-container--tall img { max-height: 240px; }
+    .img-caption {
+      font-size: 0.78rem; font-family: 'Space Mono', monospace;
+      color: var(--style-text-secondary); text-align: center;
+      margin-top: 0.3rem; line-height: 1.4;
+    }
+    .img-row {
+      display: flex; gap: 0.6rem; align-items: flex-start;
+    }
+    .img-row > * { flex: 1; }
+
+    /* Animations */
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .slide.active .browser-card { animation: fadeInUp 0.6s ease-out; }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="15" aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- Slide 1: 표지 -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="glow-blob glow-blob--green deco-blob--tr"></div>
+      <div class="glow-blob glow-blob--violet deco-blob--bl"></div>
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <div class="badge main-badge">정보 수업</div>
+          <h1 class="cover-title">이미지 생성의 기초 개념</h1>
+          <p class="cover-subtitle">GAN과 Diffusion으로 이해하는 AI 이미지 생성 원리</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>샘플고등학교</span>
+            <span aria-hidden="true"> · </span>
+            <span><time datetime="2025-09">2025년 9월</time></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 2: 목차 -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 목차">
+      <div class="glow-blob glow-blob--cyan deco-blob--cr"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">table of contents</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 오늘의 학습 내용</h2>
+            <hr class="section-rule">
+          </div>
+          <nav aria-label="슬라이드 목차">
+            <ol class="toc-list">
+              <li class="toc-item" role="button" tabindex="0"><span class="toc-num">01</span><span class="toc-text">인공지능은 어떻게 이미지를 생성할까?</span><span class="toc-arrow">→</span></li>
+              <li class="toc-item" role="button" tabindex="0"><span class="toc-num">02</span><span class="toc-text">GAN — 적대적 생성 신경망</span><span class="toc-arrow">→</span></li>
+              <li class="toc-item" role="button" tabindex="0"><span class="toc-num">03</span><span class="toc-text">Diffusion — 확산 모델</span><span class="toc-arrow">→</span></li>
+              <li class="toc-item" role="button" tabindex="0"><span class="toc-num">04</span><span class="toc-text">GAN vs Diffusion 비교</span><span class="toc-arrow">→</span></li>
+              <li class="toc-item" role="button" tabindex="0"><span class="toc-num">05</span><span class="toc-text">체험 활동 & 마무리</span><span class="toc-arrow">→</span></li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 도입 -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 도입">
+      <div class="glow-blob glow-blob--violet deco-blob--tr"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">introduction</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 인공지능은 어떻게 이미지를 생성할까?</h2>
+            <hr class="section-rule">
+          </div>
+          <div class="highlight-box" role="note">
+            <p>이미지 생성 인공지능은 <strong>노이즈로부터 그림을 생성하는 방법</strong>을 학습한 것입니다.</p>
+          </div>
+          <div class="grid-2 card-grid" role="list" style="margin-top:0.6rem;">
+            <div class="card" role="listitem">
+              <div class="card-title" style="color:var(--style-accent);">노이즈 (Noise)</div>
+              <p class="card-desc">무작위 픽셀 데이터 — 아무런 의미 없는 잡음</p>
+              <div style="margin-top:0.4rem;height:60px;border-radius:6px;overflow:hidden;position:relative;">
+                <canvas id="noiseDemo1" class="noise-canvas"></canvas>
+              </div>
+            </div>
+            <div class="card" role="listitem">
+              <div class="card-title" style="color:var(--style-primary);">생성된 이미지</div>
+              <p class="card-desc">AI가 노이즈에서 만들어낸 의미 있는 사진</p>
+              <div class="img-container--sm" style="margin-top:0.4rem;">
+                <div class="img-container" style="padding:0.2rem;margin:0;"><img src="img-puppy.png" alt="AI가 생성한 강아지 이미지" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div style="display:none;height:60px;align-items:center;justify-content:center;font-size:1.8rem;">🐕</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;border-left-color:var(--style-accent);">
+            <p>이 과정을 가능하게 하는 두 가지 핵심 기술: <strong class="gradient-text">GAN</strong>과 <strong class="gradient-text">Diffusion</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: GAN 개요 -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: GAN 개념">
+      <div class="glow-blob glow-blob--green deco-blob--bl"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">gan — overview</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> GAN — Generative Adversarial Networks</h2>
+            <p class="section-subtitle">적대적 생성 신경망</p>
+            <hr class="section-rule">
+          </div>
+          <div class="two-col" style="margin-top:0.6rem;">
+            <div class="col-left">
+              <h3 class="col-title gradient-text">핵심 아이디어</h3>
+              <p style="font-size:0.92rem;margin-bottom:0.5rem;">두 개의 신경망이 서로 <strong>경쟁(적대)</strong>하면서 학습</p>
+              <ul class="col-list" role="list">
+                <li role="listitem"><strong>생성자(Generator)</strong> — 위조범 역할</li>
+                <li role="listitem"><strong>판별자(Discriminator)</strong> — 경찰 역할</li>
+                <li role="listitem">경쟁을 통해 양쪽 모두 발전</li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <h3 class="col-title" style="color:var(--style-accent2);">비유로 이해하기</h3>
+              <div class="img-container" style="margin-top:0.3rem;"><img src="img-gan-diagram.png" alt="GAN 구조 다이어그램: Generator가 Fake data를 생성하고 Discriminator가 Real data와 비교 판별" loading="lazy" onerror="this.style.display='none';"></div>
+              <p class="img-caption">Generator(위조범) ↔ Discriminator(경찰) 경쟁 구조</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: GAN 학습 과정 인터랙티브 -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: GAN 학습 과정 시각화">
+      <div class="glow-blob glow-blob--green deco-blob--tr"></div>
+      <div class="glow-blob glow-blob--violet deco-blob--bl"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">gan — interactive training</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> GAN 학습 과정 시각화</h2>
+            <p class="section-subtitle">버튼을 클릭하여 학습 단계를 진행하세요</p>
+            <hr class="section-rule">
+          </div>
+          <div class="gan-viz" id="ganViz">
+            <!-- Arena: Generator - Flow - Discriminator -->
+            <div class="gan-arena">
+              <!-- Generator Entity -->
+              <div class="gan-entity gan-entity--gen" id="ganGen">
+                <div class="gan-entity-header">
+                  <span class="gan-entity-icon">🎨</span>
+                  <span class="gan-entity-name" style="color:var(--style-primary)">생성자</span>
+                </div>
+                <div class="gan-entity-role">Generator — 위조범</div>
+                <div class="gan-monitor" id="ganGenMonitor">
+                  <div class="gan-monitor-label">생성자 출력</div>
+                  <div class="gan-monitor-grid" id="ganGenScreen"></div>
+                </div>
+                <button class="gan-action-btn gan-btn-gen" id="ganBtnGen" onclick="ganDoGenerate()">🎨 생성하기</button>
+              </div>
+              <!-- Flow Column -->
+              <div class="gan-flow-col">
+                <div class="gan-flow-arrow" id="ganFlowArrow">&rarr;</div>
+                <div class="gan-packet" id="ganPacket">📦</div>
+              </div>
+              <!-- Discriminator Entity -->
+              <div class="gan-entity gan-entity--disc" id="ganDisc">
+                <div class="gan-entity-header">
+                  <span class="gan-entity-icon">🔍</span>
+                  <span class="gan-entity-name" style="color:#ff4466">판별자</span>
+                </div>
+                <div class="gan-entity-role">Discriminator — 감정사</div>
+                <div class="gan-monitor" id="ganDiscMonitor">
+                  <div class="gan-monitor-label" id="ganDiscLabel">판별자 분석</div>
+                  <div class="gan-monitor-grid" id="ganDiscScreen"></div>
+                </div>
+                <button class="gan-action-btn gan-btn-judge" id="ganBtnJudge" onclick="ganDoJudge()" disabled>🔍 판단하기</button>
+              </div>
+              <!-- Verdict Row -->
+              <div class="gan-verdict-row">
+                <div class="gan-verdict" id="ganVerdict"></div>
+                <div class="gan-verdict-detail" id="ganVerdictDetail"></div>
+              </div>
+              <!-- Feedback Loop -->
+              <div class="gan-feedback" id="ganFeedback">
+                <span class="gan-feedback-arrow">&larr; &larr; &larr;</span>
+                <span class="gan-feedback-msg" id="ganFeedbackMsg">학습 피드백</span>
+                <span class="gan-feedback-arrow">&larr; &larr; &larr;</span>
+              </div>
+            </div>
+            <!-- Narrative -->
+            <div class="gan-narrative" id="ganNarrative">[🎨 생성하기] 버튼을 눌러 GAN 학습을 시작하세요</div>
+            <!-- Status Bar -->
+            <div class="gan-status-bar">
+              <div class="gan-epoch" id="ganEpoch">Epoch 0</div>
+              <div class="gan-quality-bar"><div class="gan-quality-fill" id="ganQuality" style="width:0%"></div></div>
+              <div class="gan-quality-pct" id="ganQualityPct">0%</div>
+            </div>
+            <!-- Controls -->
+            <div class="gan-controls">
+              <button class="gan-ctrl-btn" id="ganAutoBtn" onclick="ganToggleAuto()">▶ 자동 재생</button>
+              <button class="gan-ctrl-btn" id="ganResetBtn" onclick="ganReset()">↻ 초기화</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: GAN 학습 능력 -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: GAN 학습 능력">
+      <div class="glow-blob glow-blob--cyan deco-blob--cr"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">gan — capabilities</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 판별자와 생성자가 학습하는 능력</h2>
+            <hr class="section-rule">
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem" style="border-color:rgba(0,180,255,0.3);">
+              <div class="card-title" style="color:var(--style-accent2);">판별자 (Discriminator)</div>
+              <p class="card-desc">실제 이미지와 가짜 이미지를 <strong>판단하는 능력</strong>을 학습합니다</p>
+            </div>
+            <div class="card" role="listitem" style="border-color:rgba(0,255,136,0.3);">
+              <div class="card-title" style="color:var(--style-primary);">생성자 (Generator)</div>
+              <p class="card-desc">판별자를 속일 수 있는 <strong>가짜 이미지를 생성하는 능력</strong>을 학습합니다</p>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            <p>학습 단계가 진행될수록 판별자와 생성자의 능력이 <strong>함께 향상</strong>됩니다</p>
+          </div>
+          <div class="highlight-box" style="border-left-color:var(--style-accent);">
+            <p>최종적으로 생성자가 만든 가짜 이미지는 <strong>진짜와 구분할 수 없는 수준</strong>에 도달합니다</p>
+          </div>
+          <div class="img-container img-container--wide" style="margin-top:0.4rem;"><img src="img-gan-distribution.png" alt="GAN 학습 단계별 분포 변화 그래프 (a)→(b)→(c)→(d)" loading="lazy" onerror="this.style.display='none';"></div>
+          <p class="img-caption">(a) 초기 → (b) 판별자 학습 → (c) 생성자 학습 → (d) 균형 도달 (검정: 데이터 분포, 녹색: 생성 분포)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: GAN 결과와 활용 -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: GAN 결과와 활용">
+      <div class="glow-blob glow-blob--green deco-blob--bl"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">gan — results</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> GAN의 학습 결과</h2>
+            <hr class="section-rule">
+          </div>
+          <div class="highlight-box" role="note">
+            <p>어느 순간 진짜 이미지와 생성된 이미지를 <strong>판별하지 못하는 단계</strong>에 이르게 됩니다</p>
+          </div>
+          <div class="grid-2 card-grid" role="list" style="margin-top:0.6rem;">
+            <div class="card" role="listitem">
+              <div class="card-title" style="color:var(--style-primary);">얼굴 생성</div>
+              <p class="card-desc">존재하지 않는 사람의 얼굴을 생성 — StyleGAN</p>
+              <a href="https://carpedm20.github.io/faces/" target="_blank" rel="noopener" class="link-btn" style="margin-top:0.3rem;">Neural Face ↗</a>
+            </div>
+            <div class="card" role="listitem">
+              <div class="card-title" style="color:var(--style-accent2);">스타일 변환</div>
+              <p class="card-desc">사진을 특정 화풍으로 변환 — CycleGAN</p>
+            </div>
+          </div>
+          <div class="card" style="margin-top:0.4rem;border-color:rgba(255,100,100,0.3);border-left:3px solid rgba(255,100,100,0.6);">
+            <div class="card-title" style="color:#ff8a80;">⚠ GAN의 한계</div>
+            <p class="card-desc">학습이 불안정하고, 모드 붕괴(mode collapse) 현상이 발생할 수 있음 → 이를 보완한 기술이 <strong style="color:var(--style-primary);">Diffusion</strong> 모델</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: GAN에서 Diffusion으로 — 영상 -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: Diffusion 영상">
+      <div class="glow-blob glow-blob--violet deco-blob--tr"></div>
+      <div class="glow-blob glow-blob--cyan deco-blob--bl"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">diffusion — video</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">▶</span> Diffusion 모델 이해하기</h2>
+            <p class="section-subtitle">GAN의 한계를 넘어선 Diffusion 모델의 원리를 영상으로 살펴봅시다</p>
+            <hr class="section-rule">
+          </div>
+          <div style="display:flex;justify-content:center;margin-top:0.3rem;">
+            <div style="width:100%;max-width:640px;aspect-ratio:16/9;border-radius:0.5rem;overflow:hidden;border:1px solid rgba(0,180,255,0.2);box-shadow:0 0 30px rgba(0,180,255,0.1);">
+              <iframe width="100%" height="100%" src="https://www.youtube.com/embed/p08_KlTKP50" title="Diffusion Model 설명 영상" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block;"></iframe>
+            </div>
+          </div>
+          <div style="margin-top:0.5rem;text-align:center;">
+            <p style="font-size:0.7rem;color:var(--style-text-secondary);font-family:'Space Mono',monospace;">영상을 시청한 후 다음 슬라이드에서 핵심 원리를 자세히 살펴봅니다</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: Diffusion 핵심 원리 -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: Diffusion 핵심 원리">
+      <div class="glow-blob glow-blob--cyan deco-blob--tr"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">diffusion — overview</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> Diffusion의 핵심 원리</h2>
+            <p class="section-subtitle">확산 모델</p>
+            <hr class="section-rule">
+          </div>
+          <div class="highlight-box" role="note">
+            <p>이미지에 <strong>노이즈를 점진적으로 추가(확산)</strong>한 뒤, 그 과정을 <strong>역으로 되돌리는 방법(복원)</strong>을 학습</p>
+          </div>
+          <div class="grid-2 card-grid" role="list" style="margin-top:0.6rem;">
+            <div class="card" role="listitem" style="border-color:rgba(123,0,255,0.3);">
+              <div class="card-title" style="color:#b388ff;">확산 (Forward Process)</div>
+              <p class="card-desc">원본 이미지에 <strong>노이즈를 단계적으로 추가</strong>하여 완전한 노이즈로 만듦</p>
+            </div>
+            <div class="card" role="listitem" style="border-color:rgba(0,255,136,0.3);">
+              <div class="card-title" style="color:var(--style-primary);">복원 (Reverse Process)</div>
+              <p class="card-desc">노이즈에서 <strong>노이즈를 단계적으로 제거</strong>하여 이미지를 복원</p>
+            </div>
+          </div>
+          <div class="img-row" style="margin-top:0.5rem;">
+            <div>
+              <div class="img-container img-container--tall"><img src="img-diff-forward.png" alt="Forward Process: 이미지에 노이즈를 점진적으로 추가" loading="lazy" onerror="this.style.display='none';"></div>
+              <p class="img-caption">▸ Forward: x₀(원본) → xₜ → x_T(노이즈)</p>
+            </div>
+            <div>
+              <div class="img-container img-container--tall"><img src="img-diff-reverse.png" alt="Reverse Process: 노이즈에서 이미지를 복원" loading="lazy" onerror="this.style.display='none';"></div>
+              <p class="img-caption">◂ Reverse: x_T(노이즈) → xₜ₋₁ → x₀(복원)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: Diffusion 인터랙티브 시각화 -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: Diffusion 과정 시각화">
+      <div class="glow-blob glow-blob--cyan deco-blob--tr"></div>
+      <div class="glow-blob glow-blob--violet deco-blob--bl"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">diffusion — training &amp; generation</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> Diffusion 학습과 생성</h2>
+            <p class="section-subtitle">모델이 무엇을 학습하고, 그것이 어떻게 이미지 생성에 활용되는지 체험하세요</p>
+            <hr class="section-rule">
+          </div>
+          <div class="diff-viz" id="diffViz">
+            <!-- Phase Tabs -->
+            <div class="diff-phase-tabs">
+              <button class="diff-phase-tab active-train" id="diffTabTrain" onclick="diffSetPhase('train')">1. 학습 과정</button>
+              <button class="diff-phase-tab" id="diffTabGen" onclick="diffSetPhase('gen')">2. 생성 과정</button>
+            </div>
+
+            <!-- TRAINING PANEL -->
+            <div class="diff-panel visible" id="diffPanelTrain">
+              <div class="diff-train-flow">
+                <div class="diff-tbox" style="border:1px solid rgba(0,255,136,.15);background:rgba(0,255,136,.04)">
+                  <div class="diff-tbox-title" style="color:var(--style-primary)">원본 이미지</div>
+                  <div class="diff-tcanvas" id="diffTrainOrig"></div>
+                  <div class="diff-tlabel">x₀</div>
+                </div>
+                <div class="diff-tarrow">+</div>
+                <div class="diff-tbox" style="border:1px solid rgba(255,60,60,.15);background:rgba(255,60,60,.04)">
+                  <div class="diff-tbox-title" style="color:#ff8a80">추가된 노이즈</div>
+                  <div class="diff-tcanvas" id="diffTrainNoise"></div>
+                  <div class="diff-tlabel">ε (정답)</div>
+                </div>
+                <div class="diff-tarrow">=</div>
+                <div class="diff-tbox" style="border:1px solid rgba(123,0,255,.15);background:rgba(123,0,255,.04)">
+                  <div class="diff-tbox-title" style="color:#b388ff">노이즈 이미지</div>
+                  <div class="diff-tcanvas" id="diffTrainNoisy"></div>
+                  <div class="diff-tlabel" id="diffTrainNoisyLbl">xₜ</div>
+                </div>
+              </div>
+              <div style="font-size:0.55rem;color:var(--style-text-secondary)">↓ 모델에 입력 ↓</div>
+              <div class="diff-model" id="diffTrainModel">
+                <div class="diff-model-header"><span style="font-size:1.1rem">🧠</span><span class="diff-model-name">노이즈 예측 모델 (U-Net)</span></div>
+                <div style="font-size:0.6rem;color:var(--style-text-secondary)">노이즈 이미지(xₜ)를 보고 추가된 노이즈를 예측</div>
+                <div class="diff-model-thought" id="diffTrainThought">모델의 예측: 아직 학습 전...</div>
+              </div>
+              <div style="font-size:0.62rem;font-family:'Space Mono',monospace;color:var(--style-text-secondary)">
+                <span style="color:#ffb400">예측 노이즈</span> vs <span style="color:#ff8a80">실제 노이즈(정답)</span> → <span style="color:var(--style-accent2)">차이를 줄이도록 학습!</span>
+              </div>
+            </div>
+
+            <!-- GENERATION PANEL -->
+            <div class="diff-panel" id="diffPanelGen">
+              <div class="diff-prompt-bar">📝 프롬프트: "귀여운 강아지의 얼굴" ← 노이즈 제거 방향 가이드</div>
+              <div class="diff-gen-row">
+                <div style="text-align:center">
+                  <div class="diff-tlabel">현재 이미지</div>
+                  <div class="diff-tcanvas" id="diffGenCurrent" style="min-width:120px"></div>
+                  <div class="diff-tlabel" id="diffGenCurLbl">x_T</div>
+                </div>
+                <div class="diff-tarrow">→</div>
+                <div class="diff-gen-center">
+                  <div style="font-size:0.6rem;color:var(--style-accent2)">🧠 학습된 노이즈 예측 모델</div>
+                  <div class="diff-model-thought" id="diffGenThought">"이 부분이 노이즈" 예측</div>
+                  <div style="font-size:0.55rem;color:#ff8a80">예측 노이즈 ↓</div>
+                  <div class="diff-gen-noise" id="diffGenPredNoise"></div>
+                </div>
+                <div class="diff-tarrow">→</div>
+                <div style="text-align:center">
+                  <div class="diff-tlabel">노이즈 제거 후</div>
+                  <div class="diff-tcanvas" id="diffGenResult" style="min-width:120px"></div>
+                  <div class="diff-tlabel" id="diffGenResLbl">xₜ₋₁</div>
+                </div>
+              </div>
+              <div style="font-size:0.6rem;font-family:'Space Mono',monospace;color:var(--style-text-secondary)">현재 이미지 − 예측 노이즈 = 더 깨끗한 이미지 → 반복!</div>
+            </div>
+
+            <!-- Shared: Timeline + Narrative + Controls -->
+            <div class="diff-timeline" id="diffTimeline"></div>
+            <div class="diff-narrative" id="diffNarrative">[학습 과정] 탭에서 [다음 단계] 버튼을 눌러 모델의 학습 과정을 체험하세요</div>
+            <div class="diff-step-info" id="diffStepInfo"></div>
+            <div class="diff-controls">
+              <button class="diff-btn" id="diffStepBtn" onclick="diffAdvance()">다음 단계 →</button>
+              <button class="diff-btn" id="diffAutoBtn" onclick="diffToggleAuto()">▶ 자동</button>
+              <button class="diff-btn" id="diffResetBtn" onclick="diffReset()">↻ 초기화</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 10: Diffusion 이미지 생성 과정 -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 이미지 생성 과정">
+      <div class="glow-blob glow-blob--green deco-blob--cr"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">diffusion — generation process</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 이미지 생성 과정</h2>
+            <hr class="section-rule">
+          </div>
+          <div style="display:flex;justify-content:center;gap:0.3rem;align-items:center;margin-bottom:0.6rem;flex-wrap:wrap;">
+            <div style="text-align:center;padding:0.4rem 0.6rem;background:rgba(123,0,255,0.12);border:1px solid rgba(123,0,255,0.25);border-radius:0.4rem;min-width:5rem;">
+              <div style="font-size:1.2rem;">🎲</div>
+              <div style="font-size:0.7rem;font-family:'Space Mono',monospace;color:var(--style-text-secondary);">랜덤 노이즈</div>
+            </div>
+            <span style="color:var(--style-primary);font-size:1rem;">→</span>
+            <div style="text-align:center;padding:0.4rem 0.6rem;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);border-radius:0.4rem;min-width:5rem;">
+              <div style="font-size:1.2rem;">📝</div>
+              <div style="font-size:0.7rem;font-family:'Space Mono',monospace;color:var(--style-text-secondary);">프롬프트</div>
+            </div>
+            <span style="color:var(--style-primary);font-size:1rem;">→</span>
+            <div style="text-align:center;padding:0.4rem 0.6rem;background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.25);border-radius:0.4rem;min-width:5rem;">
+              <div style="font-size:1.2rem;">🔄</div>
+              <div style="font-size:0.7rem;font-family:'Space Mono',monospace;color:var(--style-text-secondary);">노이즈 제거</div>
+            </div>
+            <span style="color:var(--style-primary);font-size:1rem;">→</span>
+            <div style="text-align:center;padding:0.4rem 0.6rem;background:rgba(0,255,136,0.12);border:1px solid rgba(0,255,136,0.3);border-radius:0.4rem;min-width:5rem;">
+              <div style="font-size:1.2rem;">🖼️</div>
+              <div style="font-size:0.7rem;font-family:'Space Mono',monospace;color:var(--style-text-secondary);">완성 이미지</div>
+            </div>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem"><span class="task-num">01</span><div class="task-body"><h3 class="task-title">랜덤 노이즈 생성</h3><p class="task-desc">완전히 무작위인 노이즈 이미지에서 시작합니다</p></div></li>
+            <li class="task-item" role="listitem"><span class="task-num">02</span><div class="task-body"><h3 class="task-title">프롬프트 입력</h3><p class="task-desc">사용자가 원하는 이미지를 텍스트로 설명합니다</p></div></li>
+            <li class="task-item" role="listitem"><span class="task-num">03</span><div class="task-body"><h3 class="task-title">단계적 노이즈 제거</h3><p class="task-desc">프롬프트를 가이드로 삼아 노이즈를 조금씩 제거합니다</p></div></li>
+            <li class="task-item" role="listitem"><span class="task-num">04</span><div class="task-body"><h3 class="task-title">이미지 완성</h3><p class="task-desc">모든 노이즈가 제거되면 프롬프트에 맞는 이미지가 완성됩니다</p></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: Stable Diffusion 구조 -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: Stable Diffusion 구조">
+      <div class="glow-blob glow-blob--violet deco-blob--bl"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">stable diffusion — architecture</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> Stable Diffusion의 구조</h2>
+            <hr class="section-rule">
+          </div>
+          <div class="grid-2" style="margin-top:0.5rem;">
+            <div class="card" style="border-color:rgba(0,255,136,0.3);">
+              <div class="card-title" style="color:var(--style-primary);">Text Representation Generator</div>
+              <p class="card-desc">텍스트 프롬프트를 AI가 이해할 수 있는 <strong>수치적 표현</strong>으로 변환하는 모듈</p>
+              <p class="card-desc" style="margin-top:0.2rem;color:var(--style-accent2);">CLIP 텍스트 인코더 사용</p>
+            </div>
+            <div class="card" style="border-color:rgba(0,180,255,0.3);">
+              <div class="card-title" style="color:var(--style-accent2);">Image Representation Refiner</div>
+              <p class="card-desc">노이즈에서 프롬프트에 맞는 이미지를 <strong>단계적으로 정제</strong>하는 모듈</p>
+              <p class="card-desc" style="margin-top:0.2rem;color:var(--style-accent2);">U-Net + 스케줄러 사용</p>
+            </div>
+          </div>
+          <div class="img-container img-container--wide" style="margin-top:0.5rem;"><img src="img-sd-architecture.png" alt="Stable Diffusion 파이프라인: Text Representation Generator → Image Representation Refiner → Upscale" loading="lazy" onerror="this.style.display='none';"></div>
+          <p class="img-caption">Stable Diffusion 파이프라인: 프롬프트 → 텍스트 인코딩 → 노이즈 + 가이드 → 반복 정제 → 최종 이미지</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 12: 프롬프트와 가이드 -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 13: 프롬프트와 가이드">
+      <div class="glow-blob glow-blob--cyan deco-blob--tr"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">diffusion — guides</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프롬프트와 다양한 가이드</h2>
+            <hr class="section-rule">
+          </div>
+          <div class="highlight-box" role="note">
+            <p>노이즈를 제거하는 과정 속에 <strong>프롬프트의 내용이 가이드 역할</strong>을 수행합니다</p>
+          </div>
+          <div class="grid-3 card-grid" role="list" style="margin-top:0.6rem;">
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-primary);">
+              <div class="card-title">텍스트 프롬프트</div>
+              <p class="card-desc">원하는 이미지를 언어로 설명하여 생성 방향을 결정</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid var(--style-accent2);">
+              <div class="card-title">이미지 가이드</div>
+              <p class="card-desc">참조 이미지를 입력하여 스타일이나 구도를 반영</p>
+            </div>
+            <div class="card" role="listitem" style="border-left:3px solid #b388ff;">
+              <div class="card-title">스켈레톤/포즈</div>
+              <p class="card-desc">인물의 자세나 위치를 지정하여 구도를 제어</p>
+            </div>
+          </div>
+          <div class="img-container img-container--wide" style="margin-top:0.5rem;"><img src="img-openpose.png" alt="OpenPose: 입력 이미지 → 스켈레톤 추출 → AI 이미지 생성" loading="lazy" onerror="this.style.display='none';"></div>
+          <p class="img-caption">OpenPose 예시: 인물 포즈를 스켈레톤으로 추출하여 AI 이미지 생성의 가이드로 활용</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 13: GAN vs Diffusion 비교 -->
+    <div class="slide" data-slide="13" role="region" aria-label="슬라이드 14: GAN vs Diffusion 비교">
+      <div class="glow-blob glow-blob--green deco-blob--tr"></div>
+      <div class="glow-blob glow-blob--cyan deco-blob--bl"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">comparison</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> GAN vs Diffusion 비교</h2>
+            <hr class="section-rule">
+          </div>
+          <div class="table-wrapper" role="region" aria-label="비교 표" tabindex="0">
+            <table class="comparison-table">
+              <caption class="sr-only">GAN과 Diffusion 모델 비교표</caption>
+              <thead><tr><th scope="col">구분</th><th scope="col">GAN</th><th scope="col">Diffusion</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">핵심 원리</th><td>생성자 vs 판별자 경쟁</td><td>노이즈 추가 후 단계적 제거</td></tr>
+                <tr><th scope="row">학습 방식</th><td>적대적 학습 (두 네트워크)</td><td>노이즈 예측 학습 (단일 네트워크)</td></tr>
+                <tr><th scope="row">생성 속도</th><td>빠름 (한 번에 생성)</td><td>느림 (수십~수백 단계)</td></tr>
+                <tr><th scope="row">품질</th><td>높음 (특정 도메인)</td><td>매우 높음 (다양한 도메인)</td></tr>
+                <tr><th scope="row">안정성</th><td>불안정 (모드 붕괴)</td><td>안정적</td></tr>
+                <tr><th scope="row">대표 모델</th><td>StyleGAN, CycleGAN</td><td>DALL-E, Stable Diffusion, Midjourney</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 14: 체험 활동 -->
+    <div class="slide" data-slide="14" role="region" aria-label="슬라이드 15: 체험 활동">
+      <div class="glow-blob glow-blob--violet deco-blob--cr"></div>
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true"><span class="topbar-title">hands-on</span></div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 체험 활동</h2>
+            <p class="section-subtitle">직접 경험해 봅시다</p>
+            <hr class="section-rule">
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card" role="listitem" style="border-color:rgba(0,255,136,0.3);">
+              <div class="card-title" style="color:var(--style-primary);">Diffusion Explainer</div>
+              <p class="card-desc">Stable Diffusion의 작동 원리를 시각적으로 확인</p>
+              <a href="https://poloclub.github.io/diffusion-explainer/" target="_blank" rel="noopener" class="link-btn" style="margin-top:0.4rem;">체험하기 ↗</a>
+            </div>
+            <div class="card" role="listitem" style="border-color:rgba(0,180,255,0.3);">
+              <div class="card-title" style="color:var(--style-accent2);">KREA AI Realtime Editor</div>
+              <p class="card-desc">실시간으로 AI 이미지를 생성하고 편집하는 체험</p>
+              <a href="https://www.krea.ai/apps/image/realtime" target="_blank" rel="noopener" class="link-btn" style="margin-top:0.4rem;">체험하기 ↗</a>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            <p><strong>체험하면서 다음을 관찰해 보세요:</strong></p>
+            <ul style="margin-top:0.3rem;padding-left:1rem;font-size:0.88rem;">
+              <li>프롬프트를 바꾸면 결과가 어떻게 달라지나요?</li>
+              <li>노이즈에서 이미지로 변하는 과정이 보이나요?</li>
+              <li>같은 프롬프트로 여러 번 생성하면 결과가 동일한가요?</li>
+            </ul>
+          </div>
+          <div class="grid-2" style="margin-top:0.5rem;">
+            <div class="card" style="border-color:rgba(0,255,136,0.15);text-align:center;">
+              <div style="font-size:0.82rem;color:var(--style-text-secondary);font-family:'Space Mono',monospace;">TIP</div>
+              <p class="card-desc">영어 프롬프트가 더 다양한 결과를 생성합니다</p>
+            </div>
+            <div class="card" style="border-color:rgba(0,180,255,0.15);text-align:center;">
+              <div style="font-size:0.82rem;color:var(--style-text-secondary);font-family:'Space Mono',monospace;">TIP</div>
+              <p class="card-desc">구체적인 설명일수록 원하는 이미지에 가까워집니다</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 15: 마무리 -->
+    <div class="slide" data-slide="15" role="region" aria-label="슬라이드 16: 마무리">
+      <div class="glow-blob glow-blob--green deco-blob--tr"></div>
+      <div class="glow-blob glow-blob--violet deco-blob--bl"></div>
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <h2 class="end-title">수고하셨습니다</h2>
+          <p class="end-subtitle">이미지 생성 AI의 기초 개념을 함께 알아보았습니다</p>
+          <div class="highlight-box end-summary">
+            <h3 class="summary-title">오늘의 핵심</h3>
+            <ul class="summary-list" role="list">
+              <li role="listitem">이미지 생성 AI는 <strong>노이즈에서 이미지를 만드는 방법</strong>을 학습한 것</li>
+              <li role="listitem"><strong>GAN</strong>은 생성자와 판별자의 적대적 경쟁으로 학습</li>
+              <li role="listitem"><strong>Diffusion</strong>은 노이즈를 단계적으로 제거하며, 프롬프트가 가이드 역할</li>
+              <li role="listitem">현재 대부분의 AI 이미지 생성 서비스는 <strong>Diffusion 기반</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides">15</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    /* Navigation */
+    const slides = document.querySelectorAll('.slide');
+    const totalSlidesCount = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    document.getElementById('totalSlides').textContent = totalSlidesCount;
+
+    function announceSlide(c, t) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '\uC2AC\uB77C\uC774\uB4DC ' + (c + 1) + ' / ' + t;
+    }
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlidesCount) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlidesCount);
+      var content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+    function nextSlide() { if (currentSlide < totalSlidesCount - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+    function updateNav() {
+      var pct = ((currentSlide + 1) / totalSlidesCount) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlidesCount - 1;
+    }
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].indexOf(e.key) !== -1) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key) !== -1) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlidesCount - 1); }
+    });
+
+    var wheelLocked = false;
+    document.addEventListener('wheel', function(e) {
+      if (e.target.closest && e.target.closest('.diff-slider-wrap')) return;
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(function() { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    var touchStartX = 0;
+    document.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) { if (dx < 0) nextSlide(); else prevSlide(); }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', function() { slideInput.select(); });
+    slideInput.addEventListener('keydown', function(e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') { var n = parseInt(slideInput.value); if (n >= 1 && n <= totalSlidesCount) goToSlide(n - 1); slideInput.blur(); }
+      else if (e.key === 'Escape') { slideInput.value = currentSlide + 1; slideInput.blur(); }
+    });
+    slideInput.addEventListener('blur', function() {
+      var n = parseInt(slideInput.value);
+      if (n >= 1 && n <= totalSlidesCount) goToSlide(n - 1);
+      else slideInput.value = currentSlide + 1;
+    });
+
+    /* Fullscreen */
+    document.getElementById('fsBtn').addEventListener('click', function() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(function() {});
+        document.getElementById('fsExpand').style.display = 'none';
+        document.getElementById('fsCompress').style.display = 'block';
+      } else {
+        document.exitFullscreen();
+        document.getElementById('fsExpand').style.display = 'block';
+        document.getElementById('fsCompress').style.display = 'none';
+      }
+    });
+
+    /* TOC navigation */
+    var tocSlideMap = [2, 3, 8, 13, 14];
+    document.querySelectorAll('.toc-item').forEach(function(item, i) {
+      item.addEventListener('click', function() { goToSlide(tocSlideMap[i]); });
+      item.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToSlide(tocSlideMap[i]); } });
+    });
+    updateNav();
+
+    /* Noise Canvas Drawing */
+    function drawNoise(canvas, noiseLevel, hue) {
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var w = canvas.width, h = canvas.height;
+      var imageData = ctx.createImageData(w, h);
+      var data = imageData.data;
+      var baseR = hue === 'green' ? 0 : hue === 'blue' ? 20 : hue === 'violet' ? 60 : 30;
+      var baseG = hue === 'green' ? 100 : hue === 'blue' ? 60 : 20;
+      var baseB = hue === 'green' ? 50 : hue === 'blue' ? 100 : hue === 'violet' ? 120 : 50;
+      for (var i = 0; i < data.length; i += 4) {
+        var px = (i / 4) % w;
+        var py = Math.floor(i / 4 / w);
+        var noise = (Math.random() - 0.5) * 2 * noiseLevel;
+        var cx = w / 2, cy = h / 2;
+        var dist = Math.sqrt(Math.pow(px - cx, 2) + Math.pow(py - cy, 2)) / (w / 2);
+        var signal = Math.max(0, 1 - dist) * (1 - noiseLevel);
+        data[i] = Math.min(255, Math.max(0, baseR + signal * 80 + noise * 255));
+        data[i + 1] = Math.min(255, Math.max(0, baseG + signal * 120 + noise * 255));
+        data[i + 2] = Math.min(255, Math.max(0, baseB + signal * 100 + noise * 255));
+        data[i + 3] = 255;
+      }
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function initNoiseDemo() {
+      var c = document.getElementById('noiseDemo1');
+      if (c) { c.width = c.parentElement.clientWidth; c.height = 60; drawNoise(c, 1.0, 'violet'); }
+    }
+    initNoiseDemo();
+    window.addEventListener('resize', initNoiseDemo);
+
+    /* GAN Interactive Visualization - Arena */
+    var ganState = { epoch: 0, quality: 0, animating: false, autoMode: false };
+    var ganGenScreen = document.getElementById('ganGenScreen');
+    var ganDiscScreen = document.getElementById('ganDiscScreen');
+    var ganPacket = document.getElementById('ganPacket');
+    var ganFlowArrow = document.getElementById('ganFlowArrow');
+    var ganBtnGen = document.getElementById('ganBtnGen');
+    var ganBtnJudge = document.getElementById('ganBtnJudge');
+    var ganVerdict = document.getElementById('ganVerdict');
+    var ganVerdictDetail = document.getElementById('ganVerdictDetail');
+    var ganFeedback = document.getElementById('ganFeedback');
+    var ganFeedbackMsg = document.getElementById('ganFeedbackMsg');
+    var ganNarrative = document.getElementById('ganNarrative');
+    var ganQualityEl = document.getElementById('ganQuality');
+    var ganEpochEl = document.getElementById('ganEpoch');
+    var ganQualityPct = document.getElementById('ganQualityPct');
+    var ganAutoBtn = document.getElementById('ganAutoBtn');
+
+    function ganClearEl(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+
+    function ganRenderMonitor(el, quality) {
+      ganClearEl(el);
+      for (var i = 0; i < 9; i++) {
+        var cell = document.createElement('div');
+        cell.className = 'gan-mcell';
+        var q = quality / 100;
+        if (q < 0.15) {
+          cell.style.background = 'hsl(' + (Math.random()*360) + ',' + (15+Math.random()*25) + '%,' + (8+Math.random()*20) + '%)';
+        } else if (q < 0.4) {
+          var h = 20 + Math.random() * 40;
+          cell.style.background = 'radial-gradient(circle at ' + (30+Math.random()*40) + '% ' + (30+Math.random()*40) + '%, hsl(' + h + ',' + (25+q*30) + '%,' + (35+q*20) + '%), hsl(' + (h+30) + ',20%,15%))';
+        } else if (q < 0.7) {
+          var h = 15 + Math.random() * 20;
+          var n = (1-q) * 15;
+          cell.style.background = 'radial-gradient(ellipse at ' + (45+Math.random()*n) + '% ' + (38+Math.random()*n) + '%, hsl(' + h + ',' + (40+q*25) + '%,' + (50+q*15) + '%), hsl(' + h + ',' + (30+q*20) + '%,' + (30+q*10) + '%) 55%, hsl(' + (h+10) + ',25%,20%) 100%)';
+        } else {
+          var h = 18 + i * 3;
+          var f = (1-q) * 5;
+          cell.style.background = 'radial-gradient(ellipse at ' + (48+Math.random()*f) + '% ' + (40+Math.random()*f) + '%, hsl(' + h + ',' + (55+q*15) + '%,' + (60+q*12) + '%), hsl(' + h + ',' + (45+q*10) + '%,' + (40+q*10) + '%) 50%, hsl(' + (h+8) + ',35%,25%) 85%)';
+          cell.style.boxShadow = 'inset 0 0 ' + (3+q*5) + 'px rgba(255,200,150,' + (q*0.15) + ')';
+        }
+        el.appendChild(cell);
+      }
+    }
+
+    function ganUpdateStatus() {
+      ganEpochEl.textContent = 'Epoch ' + ganState.epoch;
+      ganQualityEl.style.width = Math.round(ganState.quality) + '%';
+      ganQualityPct.textContent = Math.round(ganState.quality) + '%';
+    }
+
+    function ganWait(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+    async function ganDoGenerate() {
+      if (ganState.animating) return;
+      ganState.animating = true;
+      ganVerdict.className = 'gan-verdict';
+      ganVerdict.textContent = '';
+      ganVerdictDetail.textContent = '';
+      ganFeedback.className = 'gan-feedback';
+      ganBtnGen.disabled = true;
+      ganBtnJudge.disabled = true;
+
+      document.getElementById('ganGen').classList.add('active');
+      ganNarrative.textContent = '\uD83C\uDFA8 \uC0DD\uC131\uC790\uAC00 \uB178\uC774\uC988\uB85C\uBD80\uD130 \uAC00\uC9DC \uC5BC\uAD74 \uB370\uC774\uD130\uB97C \uC0DD\uC131\uD569\uB2C8\uB2E4...';
+
+      for (var step = 0; step < 4; step++) {
+        ganRenderMonitor(ganGenScreen, ganState.quality * ((step + 1) / 4));
+        await ganWait(250);
+      }
+      ganRenderMonitor(ganGenScreen, ganState.quality);
+      await ganWait(300);
+
+      ganPacket.className = 'gan-packet at-gen';
+      ganPacket.textContent = ganState.quality < 30 ? '\uD83C\uDF2B\uFE0F' : ganState.quality < 60 ? '\uD83C\uDF05' : ganState.quality < 85 ? '\uD83D\uDDBC\uFE0F' : '\uD83C\uDFA8';
+      await ganWait(250);
+
+      ganNarrative.textContent = '\uD83D\uDCE6 \uC0DD\uC131\uB41C \uAC00\uC9DC \uB370\uC774\uD130\uAC00 \uD310\uBCC4\uC790\uC5D0\uAC8C \uC804\uB2EC\uB429\uB2C8\uB2E4...';
+      ganFlowArrow.classList.add('active');
+      ganPacket.className = 'gan-packet moving';
+      await ganWait(500);
+
+      ganPacket.className = 'gan-packet at-disc';
+      ganFlowArrow.classList.remove('active');
+      await ganWait(250);
+
+      ganRenderMonitor(ganDiscScreen, ganState.quality);
+      document.getElementById('ganDiscLabel').textContent = '\uC218\uC2E0\uB41C \uB370\uC774\uD130';
+      document.getElementById('ganGen').classList.remove('active');
+
+      ganNarrative.textContent = '\uD83D\uDD0D \uD310\uBCC4\uC790\uAC00 \uB370\uC774\uD130\uB97C \uC218\uC2E0\uD588\uC2B5\uB2C8\uB2E4. [\uD310\uB2E8\uD558\uAE30] \uBC84\uD2BC\uC744 \uB20C\uB7EC \uC9C4\uC704\uB97C \uD310\uBCC4\uD558\uC138\uC694!';
+      ganBtnJudge.disabled = false;
+      ganBtnGen.disabled = false;
+      ganState.animating = false;
+
+      if (ganState.autoMode) { await ganWait(600); ganDoJudge(); }
+    }
+
+    async function ganDoJudge() {
+      if (ganState.animating) return;
+      ganState.animating = true;
+      ganBtnJudge.disabled = true;
+      ganBtnGen.disabled = true;
+
+      var discEl = document.getElementById('ganDisc');
+      discEl.classList.add('active');
+      ganNarrative.textContent = '\uD83D\uDD0D \uD310\uBCC4\uC790\uAC00 \uB370\uC774\uD130\uB97C \uBD84\uC11D \uC911... \uC9C4\uC9DC\uC778\uAC00? \uAC00\uC9DC\uC778\uAC00?';
+
+      for (var i = 0; i < 3; i++) {
+        document.getElementById('ganDiscMonitor').style.borderColor = '#ff4466';
+        await ganWait(180);
+        document.getElementById('ganDiscMonitor').style.borderColor = 'rgba(255,255,255,0.08)';
+        await ganWait(180);
+      }
+
+      var catchProb = Math.max(0.05, 1 - (ganState.quality / 110));
+      var caught = Math.random() < catchProb;
+      if (ganState.quality >= 95) caught = Math.random() < 0.05;
+      if (ganState.quality < 15) caught = true;
+
+      ganPacket.className = 'gan-packet';
+      await ganWait(250);
+
+      if (caught) {
+        ganVerdict.className = 'gan-verdict gan-verdict--fake show';
+        ganVerdict.textContent = '\u274C \uAC00\uC9DC \uD310\uC815!';
+        discEl.classList.add('gan-shake');
+
+        var reasons = ganState.quality < 30
+          ? '\uC0C9\uC0C1\uC774 \uBB34\uC791\uC704\uC774\uACE0 \uD615\uD0DC\uAC00 \uC5C6\uC74C'
+          : ganState.quality < 60
+          ? '\uD615\uD0DC\uB294 \uC788\uC73C\uB098 \uC138\uBD80 \uD14D\uC2A4\uCC98\uAC00 \uBD80\uC790\uC5F0\uC2A4\uB7EC\uC6C0'
+          : '\uBBF8\uC138\uD55C \uC0C9\uC0C1 \uACBD\uACC4\uC640 \uD14D\uC2A4\uCC98\uAC00 \uBD80\uC790\uC5F0\uC2A4\uB7EC\uC6C0';
+        ganVerdictDetail.textContent = '\uD310\uBCC4 \uADFC\uAC70: ' + reasons;
+
+        ganNarrative.textContent = '\u274C \uD310\uBCC4\uC790\uAC00 \uAC00\uC9DC\uC784\uC744 \uAC04\uD30C! \uC0DD\uC131\uC790\uC5D0\uAC8C \uD53C\uB4DC\uBC31\uC744 \uBCF4\uB0C5\uB2C8\uB2E4.';
+        await ganWait(500);
+        discEl.classList.remove('gan-shake');
+
+        var fbMsg = ganState.quality < 30
+          ? '\uD615\uD0DC\uBD80\uD130 \uC81C\uB300\uB85C \uB9CC\uB4E4\uC5B4!'
+          : ganState.quality < 60
+          ? '\uC138\uBD80 \uD45C\uD604\uC744 \uB354 \uC790\uC5F0\uC2A4\uB7FD\uAC8C!'
+          : '\uAC70\uC758 \uB2E4 \uC654\uC5B4, \uBBF8\uC138\uD55C \uBD80\uBD84\uC744 \uAC1C\uC120\uD574!';
+        ganFeedbackMsg.textContent = '\uD559\uC2B5 \uD53C\uB4DC\uBC31: "' + fbMsg + '"';
+        ganFeedback.className = 'gan-feedback show';
+        await ganWait(600);
+
+        var improvement = ganState.quality < 30 ? 8 + Math.random() * 7
+          : ganState.quality < 60 ? 5 + Math.random() * 5
+          : ganState.quality < 85 ? 3 + Math.random() * 4 : 1 + Math.random() * 2;
+        ganState.quality = Math.min(99, ganState.quality + improvement);
+        ganState.epoch += Math.floor(10 + Math.random() * 40);
+
+        document.getElementById('ganGen').classList.add('gan-celebrate');
+        ganNarrative.textContent = '\uD83D\uDCC8 \uC0DD\uC131\uC790\uAC00 \uD53C\uB4DC\uBC31\uC744 \uBC1B\uACE0 \uD559\uC2B5! \uD488\uC9C8: ' + Math.round(ganState.quality) + '% (+' + Math.round(improvement) + '%)';
+        await ganWait(400);
+        document.getElementById('ganGen').classList.remove('gan-celebrate');
+
+      } else {
+        if (ganState.quality >= 90) {
+          ganVerdict.className = 'gan-verdict gan-verdict--real show';
+          ganVerdict.textContent = '\u2705 \uC9C4\uC9DC \uD310\uC815!';
+          ganVerdictDetail.textContent = '\uD310\uBCC4\uC790\uAC00 \uAC00\uC9DC\uB97C \uC9C4\uC9DC\uB85C \uCC29\uAC01 \u2014 \uC0DD\uC131\uC790\uC758 \uC2B9\uB9AC!';
+          ganNarrative.textContent = '\u2705 \uD310\uBCC4\uC790\uAC00 \uC18D\uC558\uC2B5\uB2C8\uB2E4! \uC0DD\uC131\uC790\uAC00 \uC9C4\uC9DC\uCC98\uB7FC \uBCF4\uC774\uB294 \uB370\uC774\uD130\uB97C \uB9CC\uB4E4\uC5C8\uC2B5\uB2C8\uB2E4!';
+        } else {
+          ganVerdict.className = 'gan-verdict gan-verdict--confused show';
+          ganVerdict.textContent = '\uD83E\uDD14 \uD655\uC2E0 \uC5C6\uC74C...';
+          ganVerdictDetail.textContent = '\uD310\uBCC4\uC790\uC758 \uD310\uB2E8\uC774 \uBD88\uD655\uC2E4 \u2014 \uC9C4\uC9DC\uC77C\uC218\uB3C4, \uAC00\uC9DC\uC77C\uC218\uB3C4...';
+          ganNarrative.textContent = '\uD83E\uDD14 \uD310\uBCC4\uC790\uAC00 \uD63C\uB780\uC2A4\uB7EC\uC6CC\uD569\uB2C8\uB2E4. \uD310\uBCC4\uC790\uB3C4 \uB354 \uD559\uC2B5\uC774 \uD544\uC694!';
+        }
+        ganState.epoch += Math.floor(5 + Math.random() * 20);
+        await ganWait(500);
+      }
+
+      discEl.classList.remove('active');
+      ganUpdateStatus();
+      ganBtnGen.disabled = false;
+      ganState.animating = false;
+
+      if (ganState.autoMode && ganState.quality < 98) {
+        await ganWait(500);
+        ganDoGenerate();
+      } else if (ganState.autoMode && ganState.quality >= 98) {
+        ganNarrative.textContent = '\uD83C\uDF89 \uD559\uC2B5 \uC644\uB8CC! \uC0DD\uC131\uC790\uAC00 \uD310\uBCC4\uC790\uB97C \uC644\uC804\uD788 \uC18D\uC77C \uC218 \uC788\uB294 \uC218\uC900\uC5D0 \uB3C4\uB2EC\uD588\uC2B5\uB2C8\uB2E4!';
+        ganState.autoMode = false;
+        ganAutoBtn.textContent = '\u25B6 \uC790\uB3D9 \uC7AC\uC0DD';
+      }
+    }
+
+    function ganToggleAuto() {
+      ganState.autoMode = !ganState.autoMode;
+      ganAutoBtn.textContent = ganState.autoMode ? '\u23F8 \uC77C\uC2DC\uC815\uC9C0' : '\u25B6 \uC790\uB3D9 \uC7AC\uC0DD';
+      if (ganState.autoMode && !ganState.animating) ganDoGenerate();
+    }
+
+    function ganReset() {
+      if (ganState.animating) return;
+      ganState = { epoch: 0, quality: 0, animating: false, autoMode: false };
+      ganVerdict.className = 'gan-verdict';
+      ganVerdict.textContent = '';
+      ganVerdictDetail.textContent = '';
+      ganFeedback.className = 'gan-feedback';
+      ganPacket.className = 'gan-packet';
+      ganNarrative.textContent = '[\uD83C\uDFA8 \uC0DD\uC131\uD558\uAE30] \uBC84\uD2BC\uC744 \uB20C\uB7EC GAN \uD559\uC2B5\uC744 \uC2DC\uC791\uD558\uC138\uC694';
+      ganClearEl(ganGenScreen);
+      ganClearEl(ganDiscScreen);
+      document.getElementById('ganDiscLabel').textContent = '\uD310\uBCC4\uC790 \uBD84\uC11D';
+      ganBtnGen.disabled = false;
+      ganBtnJudge.disabled = true;
+      ganAutoBtn.textContent = '\u25B6 \uC790\uB3D9 \uC7AC\uC0DD';
+      ganUpdateStatus();
+      ganRenderMonitor(ganGenScreen, 0);
+    }
+
+    ganRenderMonitor(ganGenScreen, 0);
+    ganUpdateStatus();
+
+    /* Diffusion Interactive - Two Phase Visualization */
+    var DIFF_TRAIN_TOTAL = 6;
+    var DIFF_GEN_TOTAL = 8;
+    var diffState = { phase: 'train', trainStep: 0, genStep: 0, animating: false, autoMode: false };
+
+    function diffClearEl(el) { while (el && el.firstChild) el.removeChild(el.firstChild); }
+
+    function diffRenderGrid(el, quality, hueBase) {
+      if (!el) return;
+      diffClearEl(el);
+      for (var i = 0; i < 9; i++) {
+        var cell = document.createElement('div');
+        cell.className = 'diff-tcell';
+        var q = quality;
+        if (q < 0.15) {
+          cell.style.background = 'hsl(' + (Math.random()*360) + ',' + (12+Math.random()*20) + '%,' + (8+Math.random()*18) + '%)';
+        } else if (q < 0.4) {
+          var h = hueBase + Math.random() * 30;
+          cell.style.background = 'radial-gradient(circle at ' + (30+Math.random()*40) + '% ' + (30+Math.random()*40) + '%, hsl(' + h + ',' + (20+q*35) + '%,' + (30+q*25) + '%), hsl(' + (h+20) + ',15%,12%))';
+        } else if (q < 0.7) {
+          var h = hueBase + Math.random() * 15;
+          var n = (1-q) * 12;
+          cell.style.background = 'radial-gradient(ellipse at ' + (45+Math.random()*n) + '% ' + (40+Math.random()*n) + '%, hsl(' + h + ',' + (35+q*25) + '%,' + (45+q*15) + '%), hsl(' + h + ',' + (25+q*15) + '%,' + (25+q*12) + '%) 60%)';
+        } else {
+          var h = hueBase + i * 2;
+          cell.style.background = 'radial-gradient(ellipse at ' + (48+Math.random()*3) + '% ' + (42+Math.random()*3) + '%, hsl(' + h + ',' + (50+q*15) + '%,' + (55+q*12) + '%), hsl(' + h + ',' + (40+q*10) + '%,' + (38+q*10) + '%) 50%)';
+          cell.style.boxShadow = 'inset 0 0 ' + (2+q*4) + 'px rgba(255,220,180,' + (q*0.1) + ')';
+        }
+        el.appendChild(cell);
+      }
+    }
+
+    function diffRenderNoise(el, intensity) {
+      if (!el) return;
+      diffClearEl(el);
+      var n = el.classList.contains('diff-gen-noise') ? 9 : 9;
+      for (var i = 0; i < n; i++) {
+        var cell = document.createElement('div');
+        cell.className = 'diff-tcell';
+        cell.style.background = 'hsl(' + (Math.random()*360) + ',' + (10+intensity*30) + '%,' + (5+intensity*(20+Math.random()*40)) + '%)';
+        el.appendChild(cell);
+      }
+    }
+
+    function diffRenderMixed(el, quality, noiseAmt) {
+      if (!el) return;
+      diffClearEl(el);
+      for (var i = 0; i < 9; i++) {
+        var cell = document.createElement('div');
+        cell.className = 'diff-tcell';
+        var signal = quality * (1 - noiseAmt);
+        if (signal < 0.1) {
+          cell.style.background = 'hsl(' + (Math.random()*360) + ',' + (10+noiseAmt*25) + '%,' + (6+Math.random()*20) + '%)';
+        } else {
+          var h = 20 + i * 3;
+          var nA = noiseAmt * 15;
+          cell.style.background = 'radial-gradient(ellipse at ' + (45+Math.random()*nA) + '% ' + (40+Math.random()*nA) + '%, hsl(' + h + ',' + (25+signal*35) + '%,' + (30+signal*30) + '%), hsl(' + (h+15) + ',' + (15+signal*15) + '%,' + (12+signal*15) + '%))';
+        }
+        el.appendChild(cell);
+      }
+    }
+
+    function diffBuildTimeline(total, current) {
+      var el = document.getElementById('diffTimeline');
+      diffClearEl(el);
+      for (var i = 0; i < total; i++) {
+        var dot = document.createElement('div');
+        dot.className = 'diff-tl-dot';
+        if (i < current) dot.classList.add('done');
+        else if (i === current) dot.classList.add('current');
+        el.appendChild(dot);
+      }
+    }
+
+    function diffWait(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+    function diffSetPhase(phase) {
+      diffState.phase = phase;
+      diffState.autoMode = false;
+      document.getElementById('diffAutoBtn').textContent = '\u25B6 \uC790\uB3D9';
+      document.getElementById('diffPanelTrain').classList.toggle('visible', phase === 'train');
+      document.getElementById('diffPanelGen').classList.toggle('visible', phase === 'gen');
+      var tabT = document.getElementById('diffTabTrain');
+      var tabG = document.getElementById('diffTabGen');
+      tabT.className = 'diff-phase-tab' + (phase === 'train' ? ' active-train' : '');
+      tabG.className = 'diff-phase-tab' + (phase === 'gen' ? ' active-gen' : '');
+      if (phase === 'train') {
+        diffRenderTrainState();
+        document.getElementById('diffNarrative').textContent = '\uD559\uC2B5: \uBAA8\uB378\uC774 "\uB178\uC774\uC988 \uC608\uCE21 \uB2A5\uB825"\uC744 \uC5B4\uB5BB\uAC8C \uC5BB\uB294\uC9C0 \uCCB4\uD5D8\uD558\uC138\uC694. [\uB2E4\uC74C \uB2E8\uACC4] \uD074\uB9AD!';
+      } else {
+        diffRenderGenState();
+        document.getElementById('diffNarrative').textContent = '\uC0DD\uC131: \uD559\uC2B5\uB41C \uBAA8\uB378\uB85C \uC21C\uC218 \uB178\uC774\uC988\uC5D0\uC11C \uC774\uBBF8\uC9C0\uB97C \uB9CC\uB4ED\uB2C8\uB2E4. [\uB2E4\uC74C \uB2E8\uACC4] \uD074\uB9AD!';
+      }
+    }
+
+    function diffRenderTrainState() {
+      var t = diffState.trainStep / DIFF_TRAIN_TOTAL;
+      diffRenderGrid(document.getElementById('diffTrainOrig'), 0.95, 20);
+      diffRenderNoise(document.getElementById('diffTrainNoise'), 0.3 + t * 0.7);
+      diffRenderMixed(document.getElementById('diffTrainNoisy'), 0.95, t);
+      document.getElementById('diffTrainNoisyLbl').textContent = 'x\u2099 (t=' + Math.round(t * 1000) + ')';
+      diffBuildTimeline(DIFF_TRAIN_TOTAL, diffState.trainStep);
+      document.getElementById('diffStepInfo').textContent = '\uD559\uC2B5 ' + diffState.trainStep + '/' + DIFF_TRAIN_TOTAL;
+    }
+
+    function diffRenderGenState() {
+      var progress = diffState.genStep / DIFF_GEN_TOTAL;
+      var noiseLeft = 1 - progress;
+      diffRenderMixed(document.getElementById('diffGenCurrent'), 0.95, noiseLeft);
+      document.getElementById('diffGenCurLbl').textContent = diffState.genStep === 0 ? 'x_T (\uB178\uC774\uC988)' : 'x\u2099 (t=' + Math.round(noiseLeft * 1000) + ')';
+      diffRenderNoise(document.getElementById('diffGenPredNoise'), noiseLeft * 0.6);
+      if (diffState.genStep < DIFF_GEN_TOTAL) {
+        var nextP = (diffState.genStep + 1) / DIFF_GEN_TOTAL;
+        diffRenderMixed(document.getElementById('diffGenResult'), 0.95, 1 - nextP);
+        document.getElementById('diffGenResLbl').textContent = 'x\u2099\u208B\u2081';
+      } else {
+        diffRenderGrid(document.getElementById('diffGenResult'), 0.95, 20);
+        document.getElementById('diffGenResLbl').textContent = 'x\u2080 (\uC644\uC131!)';
+      }
+      diffBuildTimeline(DIFF_GEN_TOTAL, diffState.genStep);
+      document.getElementById('diffStepInfo').textContent = '\uC0DD\uC131 ' + diffState.genStep + '/' + DIFF_GEN_TOTAL;
+    }
+
+    async function diffAdvance() {
+      if (diffState.animating) return;
+      diffState.animating = true;
+      document.getElementById('diffStepBtn').disabled = true;
+
+      if (diffState.phase === 'train') {
+        if (diffState.trainStep >= DIFF_TRAIN_TOTAL) { diffState.animating = false; document.getElementById('diffStepBtn').disabled = false; return; }
+        diffState.trainStep++;
+        var t = diffState.trainStep / DIFF_TRAIN_TOTAL;
+
+        document.getElementById('diffTrainModel').classList.add('active');
+        document.getElementById('diffNarrative').textContent = '\uD83D\uDD39 Step ' + diffState.trainStep + ': \uB178\uC774\uC988 \uC218\uC900 t=' + Math.round(t*1000) + ' \u2014 \uBAA8\uB378\uC774 \uB178\uC774\uC988\uB97C \uC608\uCE21\uD569\uB2C8\uB2E4...';
+        diffRenderNoise(document.getElementById('diffTrainNoise'), 0.3 + t * 0.7);
+        diffRenderMixed(document.getElementById('diffTrainNoisy'), 0.95, t);
+        document.getElementById('diffTrainNoisyLbl').textContent = 'x\u2099 (t=' + Math.round(t * 1000) + ')';
+        await diffWait(500);
+
+        var acc = diffState.trainStep <= 2 ? '\uBD80\uC815\uD655' : diffState.trainStep <= 4 ? '\uAC1C\uC120 \uC911' : '\uC815\uD655';
+        var icon = diffState.trainStep <= 2 ? '\uD83D\uDFE0' : diffState.trainStep <= 4 ? '\uD83D\uDFE1' : '\uD83D\uDFE2';
+        document.getElementById('diffTrainThought').textContent = icon + ' "\uC774\uB7F0 \uB178\uC774\uC988\uAC00 \uCD94\uAC00\uB41C \uAC83 \uAC19\uB2E4" \u2014 \uC815\uD655\uB3C4: ' + acc;
+        await diffWait(400);
+
+        document.getElementById('diffTrainModel').classList.remove('active');
+        diffBuildTimeline(DIFF_TRAIN_TOTAL, diffState.trainStep);
+        document.getElementById('diffStepInfo').textContent = '\uD559\uC2B5 ' + diffState.trainStep + '/' + DIFF_TRAIN_TOTAL;
+
+        if (diffState.trainStep >= DIFF_TRAIN_TOTAL) {
+          document.getElementById('diffNarrative').textContent = '\uD83C\uDF89 \uD559\uC2B5 \uC644\uB8CC! \uBAA8\uB378\uC774 \uBAA8\uB4E0 \uB178\uC774\uC988 \uC218\uC900\uC744 \uC815\uD655\uD788 \uC608\uCE21\uD560 \uC218 \uC788\uAC8C \uB418\uC5C8\uC2B5\uB2C8\uB2E4. \u2192 [2. \uC0DD\uC131 \uACFC\uC815] \uD0ED\uC744 \uB20C\uB7EC\uBCF4\uC138\uC694!';
+        } else {
+          document.getElementById('diffNarrative').textContent = '\u2705 \uC608\uCE21\uACFC \uC815\uB2F5\uC744 \uBE44\uAD50\uD558\uC5EC \uBAA8\uB378 \uAC00\uC911\uCE58 \uC5C5\uB370\uC774\uD2B8! (Step ' + diffState.trainStep + '/' + DIFF_TRAIN_TOTAL + ')';
+        }
+      } else {
+        if (diffState.genStep >= DIFF_GEN_TOTAL) { diffState.animating = false; document.getElementById('diffStepBtn').disabled = false; return; }
+        var noiseLeft = 1 - (diffState.genStep / DIFF_GEN_TOTAL);
+        var thoughts = ['\uB300\uBD80\uBD84 \uB178\uC774\uC988\u2014\uD615\uD0DC \uC5C6\uC74C','\uD76C\uBBF8\uD55C \uC724\uACFD \uBC1C\uACAC','\uB465\uADFC \uD615\uD0DC \uB098\uD0C0\uB0A8','\uC5BC\uAD74 \uC704\uCE58 \uC608\uCE21','\uD504\uB86C\uD504\uD2B8: \uAC15\uC544\uC9C0 \uD2B9\uC9D5 \uBC18\uC601','\uD138 \uC9C8\uAC10\uACFC \uADC0 \uD615\uD0DC','\uC0C9\uC0C1\uACFC \uADF8\uB9BC\uC790 \uCD94\uAC00','\uBBF8\uC138 \uB178\uC774\uC988 \uC81C\uAC70 \uC644\uB8CC'];
+        document.getElementById('diffGenThought').textContent = '"' + thoughts[Math.min(diffState.genStep, thoughts.length - 1)] + '"';
+        diffRenderNoise(document.getElementById('diffGenPredNoise'), noiseLeft * 0.6);
+        document.getElementById('diffNarrative').textContent = '\uD83E\uDDE0 Step ' + (diffState.genStep+1) + ': \uBAA8\uB378\uC774 \uB178\uC774\uC988\uB97C \uC608\uCE21\uD558\uACE0 \uC81C\uAC70\uD569\uB2C8\uB2E4... (\uD504\uB86C\uD504\uD2B8\uAC00 \uBC29\uD5A5 \uAC00\uC774\uB4DC)';
+        await diffWait(500);
+
+        diffState.genStep++;
+        diffRenderGenState();
+
+        if (diffState.genStep >= DIFF_GEN_TOTAL) {
+          document.getElementById('diffNarrative').textContent = '\uD83C\uDFA8 \uC0DD\uC131 \uC644\uB8CC! \uC21C\uC218 \uB178\uC774\uC988\uC5D0\uC11C \uD504\uB86C\uD504\uD2B8\uC5D0 \uB9DE\uB294 \uC774\uBBF8\uC9C0\uAC00 \uC644\uC131\uB418\uC5C8\uC2B5\uB2C8\uB2E4!';
+        } else {
+          document.getElementById('diffNarrative').textContent = '\u2705 Step ' + diffState.genStep + ' \uC644\uB8CC \u2014 \uB178\uC774\uC988 ' + Math.round((1-diffState.genStep/DIFF_GEN_TOTAL)*100) + '% \uB0A8\uC74C';
+        }
+      }
+
+      document.getElementById('diffStepBtn').disabled = false;
+      diffState.animating = false;
+
+      if (diffState.autoMode) {
+        var maxStep = diffState.phase === 'train' ? DIFF_TRAIN_TOTAL : DIFF_GEN_TOTAL;
+        var curStep = diffState.phase === 'train' ? diffState.trainStep : diffState.genStep;
+        if (curStep < maxStep) { await diffWait(300); diffAdvance(); }
+        else { diffState.autoMode = false; document.getElementById('diffAutoBtn').textContent = '\u25B6 \uC790\uB3D9'; }
+      }
+    }
+
+    function diffToggleAuto() {
+      diffState.autoMode = !diffState.autoMode;
+      document.getElementById('diffAutoBtn').textContent = diffState.autoMode ? '\u23F8 \uC815\uC9C0' : '\u25B6 \uC790\uB3D9';
+      if (diffState.autoMode && !diffState.animating) diffAdvance();
+    }
+
+    function diffReset() {
+      if (diffState.animating) return;
+      diffState = { phase: diffState.phase, trainStep: 0, genStep: 0, animating: false, autoMode: false };
+      document.getElementById('diffAutoBtn').textContent = '\u25B6 \uC790\uB3D9';
+      document.getElementById('diffTrainThought').textContent = '\uBAA8\uB378\uC758 \uC608\uCE21: \uC544\uC9C1 \uD559\uC2B5 \uC804...';
+      document.getElementById('diffGenThought').textContent = '"\uC774 \uBD80\uBD84\uC774 \uB178\uC774\uC988" \uC608\uCE21 \uB300\uAE30 \uC911...';
+      if (diffState.phase === 'train') {
+        diffRenderTrainState();
+        document.getElementById('diffNarrative').textContent = '[\uB2E4\uC74C \uB2E8\uACC4] \uBC84\uD2BC\uC744 \uB20C\uB7EC \uBAA8\uB378\uC758 \uD559\uC2B5 \uACFC\uC815\uC744 \uCCB4\uD5D8\uD558\uC138\uC694';
+      } else {
+        diffRenderGenState();
+        document.getElementById('diffNarrative').textContent = '[\uB2E4\uC74C \uB2E8\uACC4] \uBC84\uD2BC\uC744 \uB20C\uB7EC \uC0DD\uC131 \uACFC\uC815\uC744 \uCCB4\uD5D8\uD558\uC138\uC694';
+      }
+    }
+
+    /* Init diffusion */
+    diffRenderTrainState();
+    diffRenderGenState();
+
+    /* Observe slide activation */
+    var diffObserver = new MutationObserver(function() {
+      var diffSlide = document.querySelector('[data-slide="9"]');
+      if (diffSlide && diffSlide.classList.contains('active')) {
+        if (diffState.phase === 'train') diffRenderTrainState();
+        else diffRenderGenState();
+      }
+    });
+    slides.forEach(function(s) { diffObserver.observe(s, { attributes: true, attributeFilter: ['class'] }); });
+  </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

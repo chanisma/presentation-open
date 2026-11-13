@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>AI × 피지컬컴퓨팅 팀 프로젝트</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══ Reset & CSS Variables ═══ */
+    :root {
+      --style-bg: #0F0F2D;
+      --style-primary: #A78BFA;
+      --style-accent: #67E8F9;
+      --style-text: #FFFFFF;
+      --style-text-secondary: #C8C8E0;
+      --glass-fill: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.15);
+      --glass-fill-strong: rgba(255,255,255,0.12);
+      --color-warn: #FBBF24;
+      --color-success: #34D399;
+      --color-pink: #F472B6;
+      --color-orange: #FB923C;
+      font-size: clamp(16px, 1.5vw, 28px);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ═══ Typography ═══ */
+    body {
+      background: var(--style-bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(167,139,250,0.15), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(103,232,249,0.10), transparent);
+      color: var(--style-text);
+      font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden; line-height: 1.6;
+    }
+    h1, h2, h3 {
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+      font-weight: 700; color: var(--style-text);
+      margin-top: 0; word-break: keep-all;
+    }
+    h1 { font-size: 2.4rem; margin-bottom: 0.5rem; line-height: 1.2; }
+    h2 { font-size: 1.5rem; margin-bottom: 0.6rem; }
+    h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    p { font-size: 1rem; line-height: 1.7; margin-top: 0; margin-bottom: 0.4rem; word-break: keep-all; }
+
+    /* ═══ Accessibility ═══ */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--style-primary); color: var(--style-bg);
+      padding: 8px 16px; z-index: 9999; font-size: 14px;
+      border-radius: 0 0 4px 0; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ═══ Slide Container ═══ */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      z-index: 1000; width: 0%; transition: width 0.3s linear;
+      will-change: width; transform: translateZ(0);
+    }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      transform: translateZ(0); backface-visibility: hidden;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.active .browser-card { animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ═══ Glassmorphism Card ═══ */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--glass-fill);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+    }
+    .browser-card--frameless {
+      background: transparent;
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      border: none;
+    }
+    .browser-topbar {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid var(--glass-border);
+      min-height: 35px; flex-shrink: 0;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FEBC2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title {
+      flex: 1; text-align: center;
+      font-size: 0.82rem; color: var(--style-text-secondary);
+      font-family: 'Space Grotesk', sans-serif; margin: 0 auto;
+    }
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    /* ═══ Section Header ═══ */
+    .section-header { margin-bottom: 0.6rem; }
+    .section-header h2 { display: flex; align-items: center; gap: 0.3rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle {
+      font-size: 0.88rem; color: var(--style-text-secondary);
+      margin-top: 0.15rem; font-weight: 400;
+    }
+
+    /* ═══ Highlight Box ═══ */
+    .highlight-box {
+      background: var(--glass-fill-strong);
+      border: 1px solid var(--glass-border);
+      border-left: 3px solid var(--style-primary);
+      border-radius: 0.5rem;
+      padding: 0.6rem 1rem;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      color: var(--style-text);
+    }
+    .highlight-box p { margin: 0; }
+
+    /* ═══ Card Grid ═══ */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .card {
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem 1rem;
+      contain: layout style;
+    }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .card:nth-child(5) { animation-delay: 0.32s; }
+    .slide.active .card:nth-child(6) { animation-delay: 0.40s; }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.2rem; color: var(--style-accent); }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); margin: 0; line-height: 1.5; }
+    .card--purple { border-left: 3px solid var(--style-primary); }
+    .card--cyan   { border-left: 3px solid var(--style-accent); }
+    .card--green  { border-left: 3px solid var(--color-success); }
+    .card--warn   { border-left: 3px solid var(--color-warn); }
+    .card--pink   { border-left: 3px solid var(--color-pink); }
+    .card--orange { border-left: 3px solid var(--color-orange); }
+
+    /* ═══ Badge ═══ */
+    .badge {
+      display: inline-block; padding: 0.15rem 0.6rem;
+      border-radius: 2rem; font-size: 0.82rem; font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .badge-primary { background: rgba(167,139,250,0.2); color: var(--style-primary); border: 1px solid rgba(167,139,250,0.3); }
+    .badge-accent  { background: rgba(103,232,249,0.15); color: var(--style-accent); border: 1px solid rgba(103,232,249,0.3); }
+    .badge-success { background: rgba(52,211,153,0.15); color: var(--color-success); border: 1px solid rgba(52,211,153,0.3); }
+    .badge-warn    { background: rgba(251,191,36,0.15); color: var(--color-warn); border: 1px solid rgba(251,191,36,0.3); }
+
+    /* ═══ Stat Grid ═══ */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin: 0.5rem 0; }
+    .stat-item {
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem;
+      text-align: center; contain: layout style;
+    }
+    .slide.active .stat-item { animation: popUp 0.5s ease-out both; }
+    .slide.active .stat-item:nth-child(2) { animation-delay: 0.1s; }
+    .slide.active .stat-item:nth-child(3) { animation-delay: 0.2s; }
+    .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; display: block; margin-bottom: 0.15rem;
+    }
+    .stat-label { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* ═══ Activity List ═══ */
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.6rem;
+      padding: 0.5rem 0.8rem;
+    }
+    .slide.active .activity-item { animation: popUp 0.5s ease-out both; }
+    .slide.active .activity-item:nth-child(2) { animation-delay: 0.07s; }
+    .slide.active .activity-item:nth-child(3) { animation-delay: 0.14s; }
+    .slide.active .activity-item:nth-child(4) { animation-delay: 0.21s; }
+    .slide.active .activity-item:nth-child(5) { animation-delay: 0.28s; }
+    .slide.active .activity-item:nth-child(6) { animation-delay: 0.35s; }
+    .activity-icon {
+      font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--style-primary); font-weight: 700; min-width: 1.4rem;
+    }
+    .activity-body { flex: 1; }
+    .activity-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.1rem; color: var(--style-text); }
+    .activity-desc { font-size: 0.85rem; color: var(--style-text-secondary); margin: 0; line-height: 1.5; }
+
+    /* ═══ Task List ═══ */
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
+    .task-item {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      border-left: 3px solid var(--style-primary);
+      padding: 0.5rem 0.8rem;
+      background: var(--glass-fill);
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+    .task-item:nth-child(2) { border-left-color: var(--style-accent); }
+    .task-item:nth-child(3) { border-left-color: var(--color-pink); }
+    .task-item:nth-child(4) { border-left-color: var(--color-warn); }
+    .task-item:nth-child(5) { border-left-color: var(--color-success); }
+    .task-item:nth-child(6) { border-left-color: var(--color-orange); }
+    .task-item:nth-child(7) { border-left-color: var(--style-primary); }
+    .task-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--style-primary); flex-shrink: 0;
+      min-width: 1.6rem;
+    }
+    .task-body { flex: 1; }
+    .task-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.1rem; color: var(--style-text); }
+    .task-desc { font-size: 0.85rem; color: var(--style-text-secondary); margin: 0; line-height: 1.5; }
+
+    /* ═══ Two Column ═══ */
+    .two-col { display: flex; gap: 1rem; align-items: flex-start; }
+    .col-left, .col-right { flex: 1; }
+    .col-title {
+      font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem;
+      color: var(--style-primary);
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+    }
+    .col-title--accent { color: var(--style-accent); }
+    .col-divider {
+      width: 1px; min-height: 100%;
+      background: var(--glass-border); flex-shrink: 0;
+    }
+
+    /* ═══ Comparison Table ═══ */
+    .table-wrapper { overflow-x: auto; border-radius: 0.5rem; }
+    .comparison-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .comparison-table thead th {
+      background: rgba(167,139,250,0.2);
+      color: var(--style-text);
+      padding: 0.5rem 0.7rem;
+      text-align: left;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600; font-size: 0.88rem;
+      border-bottom: 2px solid var(--style-primary);
+    }
+    .comparison-table tbody td,
+    .comparison-table tbody th {
+      padding: 0.4rem 0.7rem;
+      border-bottom: 1px solid var(--glass-border);
+      color: var(--style-text-secondary);
+      font-size: 0.85rem;
+    }
+    .comparison-table tbody th {
+      color: var(--style-text); font-weight: 600;
+      white-space: nowrap;
+    }
+    .comparison-table tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* ═══ Wiring Tip ═══ */
+    .wiring-tip {
+      display: flex; align-items: flex-start; gap: 0.4rem;
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.4rem;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.82rem; color: var(--style-text-secondary);
+      margin-top: 0.4rem;
+    }
+    .wiring-tip__icon { flex-shrink: 0; font-size: 0.9rem; }
+    .wiring-tip strong { color: var(--style-text); }
+
+    /* ═══ Cover Slide ═══ */
+    .cover-slide {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; min-height: 60vh;
+    }
+    .cover-badge { margin-bottom: 0.8rem; }
+    .cover-title {
+      font-size: 2.4rem;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.4rem; line-height: 1.2;
+    }
+    .cover-subtitle {
+      font-size: 1.1rem; color: var(--style-text-secondary);
+      margin-bottom: 0.8rem; font-weight: 300;
+    }
+    .cover-divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      margin: 0.5rem auto;
+    }
+    .cover-meta {
+      display: flex; gap: 0.6rem; align-items: center;
+      font-size: 0.88rem; color: var(--style-text-secondary);
+      margin-top: 0.4rem;
+    }
+    .cover-icons {
+      display: flex; gap: 0.8rem; margin-top: 1rem;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .cover-icon-item {
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+    }
+
+    /* ═══ End Slide ═══ */
+    .end-slide {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .end-icon { font-size: 2rem; margin-bottom: 0.3rem; display: block; }
+    .end-title {
+      font-size: 2rem;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.3rem;
+    }
+    .end-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-bottom: 0.6rem; }
+    .end-summary { text-align: left; max-width: 620px; width: 100%; }
+    .summary-title {
+      font-size: 1rem; margin-bottom: 0.4rem;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--style-accent);
+    }
+    .summary-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+    .summary-list li { font-size: 0.92rem; color: var(--style-text-secondary); padding-left: 0.2rem; }
+
+    /* ═══ Decorative Blobs ═══ */
+    .deco-blob {
+      position: absolute; border-radius: 50%;
+      filter: blur(60px); pointer-events: none; z-index: -1;
+    }
+    .deco-blob--tr { right: -2rem; top: -2rem; width: 38%; aspect-ratio: 1; opacity: 0.12; background: var(--style-primary); }
+    .deco-blob--bl { left: -3rem; bottom: -1rem; width: 28%; aspect-ratio: 1; opacity: 0.10; background: var(--style-accent); }
+
+    /* ═══ Navigation ═══ */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: rgba(15,15,45,0.9);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--glass-border);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--glass-border);
+      border-radius: 50%; background: var(--glass-fill);
+      cursor: pointer; font-size: 0; color: var(--style-text-secondary);
+      transition: all 0.2s; padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) {
+      border-color: var(--style-primary);
+      background: rgba(167,139,250,0.2);
+      color: var(--style-text);
+    }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700;
+      color: var(--style-text-secondary);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700;
+      color: var(--style-text-secondary);
+      font-family: 'Space Grotesk', sans-serif; padding: 0; outline: none;
+      cursor: pointer; transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus { border-bottom-color: var(--style-accent); color: var(--style-text); border-radius: 2px; }
+
+    /* ═══ Responsive ═══ */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .browser-card { border-radius: 0.8rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; min-height: 1px; height: 1px; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+      .browser-topbar { padding: 0.4rem 0.8rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      h1 { font-size: 1.7rem; }
+      h2 { font-size: 1.2rem; }
+      .browser-content { padding: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="14"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ═══ Slide 1: 표지 ═══ -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <div class="deco-blob deco-blob--tr" aria-hidden="true"></div>
+          <div class="deco-blob deco-blob--bl" aria-hidden="true"></div>
+          <div class="cover-badge">
+            <span class="badge badge-primary">인공지능과 피지컬컴퓨팅</span>
+          </div>
+          <h1 class="cover-title">AI × 피지컬컴퓨팅 팀 프로젝트</h1>
+          <p class="cover-subtitle">문제를 발견하고, AI로 해결하자</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>샘플고등학교</span>
+            <span aria-hidden="true">·</span>
+            <span>2026년 4월</span>
+          </div>
+          <div class="cover-icons" role="list" aria-label="주요 기술 요소">
+            <span class="cover-icon-item" role="listitem">📷 웹캠</span>
+            <span class="cover-icon-item" role="listitem">🧠 AI 모델</span>
+            <span class="cover-icon-item" role="listitem">⚡ 아두이노</span>
+            <span class="cover-icon-item" role="listitem">👥 팀 프로젝트</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 2: 기술 스택 ═══ -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 우리가 배운 기술 스택">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 우리가 배운 기술 스택</h2>
+            <p class="section-subtitle">이 모든 것을 조합해 프로젝트를 만듭니다</p>
+          </div>
+          <div class="highlight-box">
+            <p><strong>핵심 흐름:</strong> 웹캠 → Teachable Machine (이미지 분류) → Web Serial API → 아두이노 → 엑추에이터</p>
+          </div>
+          <div class="grid-3" role="list" style="margin-top:0.6rem;">
+            <div class="card card--purple" role="listitem">
+              <h3 class="card-title">이미지 분류 AI</h3>
+              <p class="card-desc">Teachable Machine으로 웹캠 영상을 분류하는 모델을 학습하고 클라우드에 배포합니다.</p>
+            </div>
+            <div class="card card--cyan" role="listitem">
+              <h3 class="card-title">웹 → 시리얼 통신</h3>
+              <p class="card-desc">브라우저에서 Web Serial API로 아두이노에 문자 명령을 전송합니다.</p>
+            </div>
+            <div class="card card--green" role="listitem">
+              <h3 class="card-title">엑추에이터 제어</h3>
+              <p class="card-desc">시리얼로 받은 명령에 따라 LED, 부저, 서보모터를 동작시키는 switch 구문을 작성합니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 3: 팀 프로젝트 개요 ═══ -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 팀 프로젝트 안내">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 팀 프로젝트 안내</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">3~4인</span>
+              <span class="stat-label">팀 구성</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number">3차시</span>
+              <span class="stat-label">프로젝트 기간<br><small style="font-size:0.75rem;">(기획 1 + 제작 2)</small></span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" style="font-size:1.2rem;">시연+발표</span>
+              <span class="stat-label">최종 산출물</span>
+            </div>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            <p><strong>목표:</strong> 실생활의 문제를 발견하고, AI 이미지 분류 + 아두이노 엑추에이터로 해결하는 <strong>작동 프로토타입</strong>을 만듭니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 4: 좋은 주제란? ═══ -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 좋은 프로젝트 주제의 조건">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 좋은 프로젝트 주제의 조건</h2>
+            <p class="section-subtitle">한 문장으로 설명할 수 있어야 합니다</p>
+          </div>
+          <div class="highlight-box">
+            <p><strong>한 문장 문제 정의 공식:</strong> ○○ 상황에서 ○○ 문제를 ○○ 방식으로 해결한다</p>
+          </div>
+          <div class="two-col" style="margin-top:0.6rem;">
+            <div class="col-left">
+              <p class="col-title">좋은 예시</p>
+              <ul class="activity-list" role="list">
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" aria-hidden="true">✔</span>
+                  <div class="activity-body">
+                    <strong class="activity-title">교실에서 졸음을 감지하면 부저로 알림을 준다</strong>
+                    <p class="activity-desc">구체적 상황 + 명확한 해결</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" aria-hidden="true">✔</span>
+                  <div class="activity-body">
+                    <strong class="activity-title">분리수거함 앞에서 쓰레기 종류를 인식하면 해당 LED가 켜진다</strong>
+                    <p class="activity-desc">실용적 문제 + 실현 가능</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="col-divider" aria-hidden="true"></div>
+            <div class="col-right">
+              <p class="col-title col-title--accent">아쉬운 예시</p>
+              <ul class="activity-list" role="list">
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" style="color:var(--color-warn);" aria-hidden="true">✗</span>
+                  <div class="activity-body">
+                    <strong class="activity-title">전 세계 교통사고를 줄인다</strong>
+                    <p class="activity-desc">범위가 너무 넓음</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" style="color:var(--color-warn);" aria-hidden="true">✗</span>
+                  <div class="activity-body">
+                    <strong class="activity-title">AI로 모든 병을 진단한다</strong>
+                    <p class="activity-desc">기술 범위 초과</p>
+                  </div>
+                </li>
+                <li class="activity-item" role="listitem">
+                  <span class="activity-icon" style="color:var(--color-warn);" aria-hidden="true">✗</span>
+                  <div class="activity-body">
+                    <strong class="activity-title">날씨를 예측한다</strong>
+                    <p class="activity-desc">이미지 분류와 무관</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 5: 주제 선정 체크리스트 ═══ -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 주제 선정 체크리스트">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">※</span> 주제 선정 체크리스트</h2>
+            <p class="section-subtitle">6가지 기준을 모두 충족해야 합니다</p>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">①</span>
+              <div class="activity-body">
+                <strong class="activity-title">엑추에이터 화이트리스트</strong>
+                <p class="activity-desc">사용 가능 엑추에이터 8종 안에서 선택 (다음 슬라이드 참고)</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">②</span>
+              <div class="activity-body">
+                <strong class="activity-title">TM 인식 가능성</strong>
+                <p class="activity-desc">웹캠 앞에서 3초 이상 정지된 상태로 구분 가능한 대상인가?</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">③</span>
+              <div class="activity-body">
+                <strong class="activity-title">클래스 수 제한</strong>
+                <p class="activity-desc">Teachable Machine 클래스를 3~5개 이내로 설계</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">④</span>
+              <div class="activity-body">
+                <strong class="activity-title">한 문장 문제 정의</strong>
+                <p class="activity-desc">"○○ 상황에서 ○○ 문제를 ○○ 방식으로 해결한다" 작성 가능</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">⑤</span>
+              <div class="activity-body">
+                <strong class="activity-title">시간 내 완성</strong>
+                <p class="activity-desc">2~3차시(약 100~150분) 안에 작동하는 프로토타입 제작 가능</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">⑥</span>
+              <div class="activity-body">
+                <strong class="activity-title">안전성</strong>
+                <p class="activity-desc">아두이노 USB 5V 전원 범위 내, 고전압·발열·날카로운 기계 부품 사용 금지</p>
+              </div>
+            </li>
+          </ul>
+          <div class="highlight-box" style="margin-top:0.5rem;">
+            <p>리스트에 없는 부품을 사용하고 싶다면 <strong>교사에게 사전 승인</strong>을 받으세요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 6: 엑추에이터 카탈로그 ① ═══ -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: 엑추에이터 카탈로그 Tier 1">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 사용 가능 엑추에이터 카탈로그</h2>
+            <p class="section-subtitle">Tier 1 — 수업에서 이미 사용한 기본 부품</p>
+          </div>
+          <div class="grid-2" role="list">
+            <div class="card card--green" role="listitem">
+              <h3 class="card-title">LED (단색)</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 빛 (ON/OFF, PWM 밝기 조절)<br>
+                <strong>함수:</strong> digitalWrite() / analogWrite()<br>
+                <strong>핀:</strong> 디지털 핀 (PWM 핀 권장)<br>
+                <strong>활용:</strong> 상태 표시등, 경고 신호, 밝기 단계 표현<br>
+                <strong>주의:</strong> 220Ω 저항 필수
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-success">★☆☆ 쉬움</span></div>
+            </div>
+            <div class="card card--green" role="listitem">
+              <h3 class="card-title">RGB LED</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 빛 (R·G·B 색상 조합)<br>
+                <strong>함수:</strong> analogWrite() × 3핀<br>
+                <strong>핀:</strong> PWM 핀 3개 사용<br>
+                <strong>활용:</strong> 감정→색상 매핑, 분류 결과별 색상 표시<br>
+                <strong>주의:</strong> 각 핀에 220Ω 저항 필요
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-success">★☆☆ 쉬움</span></div>
+            </div>
+            <div class="card card--warn" role="listitem">
+              <h3 class="card-title">피에조 부저</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 소리 (주파수로 음높이 제어)<br>
+                <strong>함수:</strong> tone(핀, 주파수) / noTone()<br>
+                <strong>핀:</strong> 디지털 핀 아무 곳이나<br>
+                <strong>활용:</strong> 경고음, 도레미 멜로디, 알림 신호<br>
+                <strong>주의:</strong> +/- 극성 확인
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-warn">★☆☆ 쉬움</span></div>
+            </div>
+            <div class="card card--cyan" role="listitem">
+              <h3 class="card-title">SG90 서보모터</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 회전 (0°~180° 각도 제어)<br>
+                <strong>함수:</strong> Servo.attach() / Servo.write()<br>
+                <strong>핀:</strong> PWM 핀 (D9, D10 등)<br>
+                <strong>활용:</strong> 문 개폐, 방향 지시, 팔 동작<br>
+                <strong>주의:</strong> 5V 전원 필수, 3.3V 부족
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-accent">★★☆ 보통</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 7: 엑추에이터 카탈로그 ② ═══ -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 엑추에이터 카탈로그 Tier 2">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 엑추에이터 카탈로그 (계속)</h2>
+            <p class="section-subtitle">Tier 2 — 추가 학습이 필요하지만 도전할 만한 부품</p>
+          </div>
+          <div class="grid-2" role="list">
+            <div class="card card--pink" role="listitem">
+              <h3 class="card-title">진동 모터</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 진동 (ON/OFF)<br>
+                <strong>함수:</strong> digitalWrite()<br>
+                <strong>핀:</strong> 디지털 핀 + 트랜지스터 권장<br>
+                <strong>활용:</strong> 촉각 알림, 무음 경고, 햅틱 피드백<br>
+                <strong>주의:</strong> 전류 소모 주의, 트랜지스터로 구동 권장
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-primary">★☆☆ 쉬움</span></div>
+            </div>
+            <div class="card card--orange" role="listitem">
+              <h3 class="card-title">5V 릴레이 모듈</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 스위칭 (외부 기기 ON/OFF)<br>
+                <strong>함수:</strong> digitalWrite()<br>
+                <strong>핀:</strong> 디지털 핀 1개<br>
+                <strong>활용:</strong> USB 선풍기·조명 켜기/끄기<br>
+                <strong>주의:</strong> 5V 기기만 제어 (절대 220V 연결 금지)
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-warn">★★☆ 보통</span></div>
+            </div>
+            <div class="card card--purple" role="listitem">
+              <h3 class="card-title">I2C LCD (16×2)</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 텍스트 표시 (2줄 × 16자)<br>
+                <strong>함수:</strong> LiquidCrystal_I2C 라이브러리<br>
+                <strong>핀:</strong> SDA(A4), SCL(A5) — 2핀만 사용<br>
+                <strong>활용:</strong> 인식 결과 문자 출력, 상태 메시지<br>
+                <strong>주의:</strong> I2C 주소 확인 필요 (보통 0x27)
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-primary">★★☆ 보통</span></div>
+            </div>
+            <div class="card card--cyan" role="listitem">
+              <h3 class="card-title">DC 모터 + L298N</h3>
+              <p class="card-desc">
+                <strong>출력:</strong> 연속 회전 (양방향, 속도 제어)<br>
+                <strong>함수:</strong> analogWrite() + digitalWrite()<br>
+                <strong>핀:</strong> PWM 1개 + 디지털 2개<br>
+                <strong>활용:</strong> 바퀴 구동, 팬 회전, 컨베이어<br>
+                <strong>주의:</strong> 외부 전원 필요할 수 있음, 모터 드라이버 필수
+              </p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-accent">★★★ 어려움</span></div>
+            </div>
+          </div>
+          <div class="wiring-tip">
+            <span class="wiring-tip__icon" aria-hidden="true">⚡</span>
+            <span><strong>배선이 궁금하다면? AI에게 물어보세요!</strong> — 프롬프트 예시: "아두이노 전문가로서, [부품명]의 배선도와 기본 예제 코드를 알려주세요"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 8: 프로젝트 아이디어 예시 ═══ -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: 프로젝트 아이디어 모음">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프로젝트 아이디어 모음</h2>
+            <p class="section-subtitle">아래 예시를 참고하되, 나만의 아이디어를 만들어 보세요</p>
+          </div>
+          <div class="grid-3" role="list">
+            <div class="card card--purple" role="listitem">
+              <span class="card-icon" aria-hidden="true">💤</span>
+              <h3 class="card-title">졸음 감지 알리미</h3>
+              <p class="card-desc">눈 감김/뜸을 인식 → 졸면 부저 경고 + LED 빨강</p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-primary">부저 + LED</span></div>
+            </div>
+            <div class="card card--cyan" role="listitem">
+              <span class="card-icon" aria-hidden="true">🗑️</span>
+              <h3 class="card-title">분리수거 도우미</h3>
+              <p class="card-desc">플라스틱/캔/종이를 인식 → 해당 분류 LED 점등 + LCD 안내 문구</p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-accent">LED + LCD</span></div>
+            </div>
+            <div class="card card--green" role="listitem">
+              <span class="card-icon" aria-hidden="true">✋</span>
+              <h3 class="card-title">손동작 잠금장치</h3>
+              <p class="card-desc">특정 손 제스처를 인식 → 서보모터로 잠금/해제 동작</p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-success">서보모터</span></div>
+            </div>
+            <div class="card card--warn" role="listitem">
+              <h3 class="card-title">마스크 착용 확인기</h3>
+              <p class="card-desc">착용/미착용 인식 → 릴레이로 출입 허용 + 부저 경고</p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-warn">릴레이 + 부저</span></div>
+            </div>
+            <div class="card card--pink" role="listitem">
+              <h3 class="card-title">자세 교정기</h3>
+              <p class="card-desc">바른/구부정 자세 인식 → 진동모터 알림 + LED 상태 표시</p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-primary">진동모터 + LED</span></div>
+            </div>
+            <div class="card card--orange" role="listitem">
+              <h3 class="card-title">나만의 아이디어</h3>
+              <p class="card-desc">웹캠이 인식할 수 있는 것이라면 무엇이든! 일상의 불편함에서 출발하세요.</p>
+              <div style="margin-top:0.4rem;"><span class="badge badge-warn">자유 선택</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 9: 기획서 양식 안내 ═══ -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 프로젝트 기획서 작성 가이드">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프로젝트 기획서 작성 가이드</h2>
+            <p class="section-subtitle">아래 7가지 항목을 빠짐없이 채우세요</p>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <strong class="task-title">팀 정보</strong>
+                <p class="task-desc">팀명, 팀원 이름, 역할 분담 (AI학습 / 회로 / 코딩 / 발표)</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <strong class="task-title">문제 정의</strong>
+                <p class="task-desc">한 문장: "○○ 상황에서 ○○ 문제를 ○○ 방식으로 해결한다"</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <strong class="task-title">해결 방법</strong>
+                <p class="task-desc">웹캠으로 무엇을 인식하고, 어떤 엑추에이터가 어떻게 반응하는지 (입력→분류→출력 흐름)</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">04</span>
+              <div class="task-body">
+                <strong class="task-title">클래스 설계</strong>
+                <p class="task-desc">TM 모델의 클래스명과 각 클래스별 엑추에이터 동작 매핑 (표 형태)</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">05</span>
+              <div class="task-body">
+                <strong class="task-title">필요 부품</strong>
+                <p class="task-desc">사용할 엑추에이터 + 기타 부품 목록 (화이트리스트 내 확인)</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">06</span>
+              <div class="task-body">
+                <strong class="task-title">차시별 일정</strong>
+                <p class="task-desc">차시별 할 일 (1차시: 기획, 2차시: 제작+테스트, 3차시: 완성+발표)</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">07</span>
+              <div class="task-body">
+                <strong class="task-title">기대 효과</strong>
+                <p class="task-desc">이 프로젝트가 해결하는 가치 한 줄 + 확장 가능성</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 10: 기획서 작성 예시 ═══ -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 기획서 예시">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 기획서 예시: 졸음 감지 알리미</h2>
+            <p class="section-subtitle">이런 식으로 작성하면 됩니다</p>
+          </div>
+          <div class="card card--purple" style="margin-bottom:0.5rem;">
+            <p class="card-desc"><strong>팀명:</strong> 졸지마조 &nbsp;|&nbsp; <strong>팀원:</strong> 김OO (AI학습), 이OO (회로), 박OO (코딩), 최OO (발표)</p>
+          </div>
+          <div class="highlight-box">
+            <p><strong>문제 정의:</strong> 야간자율학습 시간에 졸음을 감지하면 부저와 LED로 알림을 줘서 집중력을 유지하게 한다</p>
+          </div>
+          <div class="table-wrapper" style="margin:0.5rem 0;">
+            <table class="comparison-table" aria-label="클래스 매핑 표">
+              <thead>
+                <tr>
+                  <th>클래스명</th>
+                  <th>인식 대상</th>
+                  <th>엑추에이터 동작</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>눈 뜬 상태</th>
+                  <td>눈을 뜬 정면 얼굴</td>
+                  <td>LED 초록 점등, 부저 OFF</td>
+                </tr>
+                <tr>
+                  <th>눈 감은 상태</th>
+                  <td>눈을 감은 얼굴</td>
+                  <td>LED 빨강 점등 + 부저 경고음</td>
+                </tr>
+                <tr>
+                  <th>자리 비움</th>
+                  <td>빈 의자/배경</td>
+                  <td>LED OFF, 부저 OFF</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card card--green">
+            <p class="card-desc"><strong>필요 부품:</strong> LED 2개 (빨강, 초록), 피에조 부저 1개, 220Ω 저항 2개, 점퍼선, 브레드보드</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 11: 오늘의 활동 순서 ═══ -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 오늘의 활동 순서">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 오늘의 활동 순서</h2>
+            <p class="section-subtitle">50분 안에 기획서를 완성합니다</p>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <strong class="task-title">팀 구성 <span style="color:var(--style-text-secondary); font-size:0.85rem;">(5분)</span></strong>
+                <p class="task-desc">3~4인 팀을 구성하고 팀명을 정합니다</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <strong class="task-title">아이디어 브레인스토밍 <span style="color:var(--style-text-secondary); font-size:0.85rem;">(10분)</span></strong>
+                <p class="task-desc">각자 일상의 불편함 3가지를 적고 공유합니다</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <strong class="task-title">주제 선정 + 가이드라인 체크 <span style="color:var(--style-text-secondary); font-size:0.85rem;">(10분)</span></strong>
+                <p class="task-desc">아이디어 중 하나를 골라 6가지 기준을 점검합니다</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">04</span>
+              <div class="task-body">
+                <strong class="task-title">기획서 작성 <span style="color:var(--style-text-secondary); font-size:0.85rem;">(20분)</span></strong>
+                <p class="task-desc">7가지 항목을 모두 채웁니다</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">05</span>
+              <div class="task-body">
+                <strong class="task-title">기획서 발표 및 피드백 <span style="color:var(--style-text-secondary); font-size:0.85rem;">(5분)</span></strong>
+                <p class="task-desc">팀별 1분 발표 + 교사·동료 피드백</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 12: 평가 기준 ═══ -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: 프로젝트 평가 기준">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프로젝트 평가 기준</h2>
+          </div>
+          <div class="table-wrapper">
+            <table class="comparison-table" aria-label="평가 기준 표">
+              <thead>
+                <tr>
+                  <th>항목</th>
+                  <th>배점</th>
+                  <th>설명</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>문제 정의 명확성</th>
+                  <td>20점</td>
+                  <td>실제 문제를 구체적으로 정의했는가</td>
+                </tr>
+                <tr>
+                  <th>실현 가능성</th>
+                  <td>20점</td>
+                  <td>가이드라인 6개 기준 충족 여부</td>
+                </tr>
+                <tr>
+                  <th>창의성</th>
+                  <td>20점</td>
+                  <td>기존 예시와 차별화된 아이디어인가</td>
+                </tr>
+                <tr>
+                  <th>기획서 완성도</th>
+                  <td>20점</td>
+                  <td>7개 항목을 빠짐없이 구체적으로 작성했는가</td>
+                </tr>
+                <tr>
+                  <th>팀 협업</th>
+                  <td>20점</td>
+                  <td>역할 분담이 고르고 협력 과정이 보이는가</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="highlight-box" style="margin-top:0.6rem;">
+            <p>각 항목 20점씩, 총 <strong>100점</strong> 만점으로 평가합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 13: FAQ ═══ -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 13: 자주 묻는 질문">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI × 피지컬컴퓨팅 팀 프로젝트</span>
+        </div>
+        <div class="browser-content">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⊕</span> 자주 묻는 질문</h2>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">①</span>
+              <div class="activity-body">
+                <strong class="activity-title">화이트리스트에 없는 부품 써도 되나요?</strong>
+                <p class="activity-desc">교사에게 사전 승인을 받으면 가능합니다. 단, 5V 범위 내 안전한 부품이어야 합니다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">②</span>
+              <div class="activity-body">
+                <strong class="activity-title">TM 모델은 새로 만들어야 하나요?</strong>
+                <p class="activity-desc">지난 시간에 만든 모델을 재사용해도 되고, 새 모델을 학습시켜도 됩니다.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">③</span>
+              <div class="activity-body">
+                <strong class="activity-title">코딩을 잘 못하는데 괜찮을까요?</strong>
+                <p class="activity-desc">AI에게 코드 생성을 요청하는 방법을 이미 배웠습니다. 기존 코드 구조 + 구체적 요구사항을 프롬프트로 제공하세요.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">④</span>
+              <div class="activity-body">
+                <strong class="activity-title">아이디어가 안 떠올라요</strong>
+                <p class="activity-desc">일상에서 불편한 점 3가지를 먼저 적어보세요. 슬라이드 8의 예시도 참고하세요.</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">⑤</span>
+              <div class="activity-body">
+                <strong class="activity-title">발표는 어떻게 하나요?</strong>
+                <p class="activity-desc">프로토타입 시연 + 기획서 기반 2분 발표입니다. 모든 팀원이 한마디씩 참여하세요.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 14: 마무리 ═══ -->
+    <div class="slide" data-slide="13" role="region" aria-label="슬라이드 14: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide">
+          <div class="deco-blob deco-blob--tr" aria-hidden="true"></div>
+          <div class="deco-blob deco-blob--bl" aria-hidden="true"></div>
+          <span class="end-icon" aria-hidden="true">🚀</span>
+          <h2 class="end-title">프로젝트 시작!</h2>
+          <p class="end-subtitle">문제를 발견하고, AI로 해결하는 여정</p>
+          <div class="end-summary highlight-box">
+            <h3 class="summary-title">오늘의 핵심</h3>
+            <ul class="summary-list" role="list">
+              <li role="listitem">✦ 실생활 문제를 AI 이미지 분류 + 아두이노로 해결하는 프로젝트</li>
+              <li role="listitem">✦ 8종 엑추에이터 중 목적에 맞는 부품을 선택</li>
+              <li role="listitem">✦ 6가지 가이드라인으로 실현 가능한 주제 선정</li>
+              <li role="listitem">✦ 기획서 7개 항목을 채워 프로젝트 설계 완성</li>
+              <li role="listitem">✦ 다음 시간부터 본격 제작!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /presentation -->
+
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">14</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    document.getElementById('totalSlides').textContent = totalSlides;
+
+    function announceSlide(c, t) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (c + 1) + ' / ' + t;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      slides[currentSlide].classList.remove('active');
+      currentSlide = index;
+      slides[currentSlide].classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      const content = slides[currentSlide].querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1); }
+    function prevSlide() { if (currentSlide > 0) goToSlide(currentSlide - 1); }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.target === slideInput) return;
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+      else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    let wheelLocked = false;
+    document.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide(); else if (e.deltaY < 0) prevSlide();
+      setTimeout(function() { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      const dy = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+    }, { passive: true });
+
+    slideInput.addEventListener('focus', function() { this.select(); });
+    slideInput.addEventListener('keydown', function(e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        const num = parseInt(this.value);
+        if (num >= 1 && num <= totalSlides) goToSlide(num - 1);
+        else this.value = currentSlide + 1;
+        this.blur();
+      } else if (e.key === 'Escape') { this.value = currentSlide + 1; this.blur(); }
+    });
+    slideInput.addEventListener('blur', function() {
+      const num = parseInt(this.value);
+      if (num >= 1 && num <= totalSlides) goToSlide(num - 1);
+      else this.value = currentSlide + 1;
+    });
+
+    updateNav();
+  </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>바이브코딩 — 프롬프트 기록 · 정보과제연구</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💬</text></svg>">
+<style>
+  :root {
+    --bg: #faf6ec;
+    --surface: #ffffff;
+    --fg: #062a1e;
+    --fg-muted: #3f6657;
+    --fg-faint: #7a9a8c;
+    --hair: rgba(6, 68, 46, 0.16);
+    --primary: #059669;
+    --accent: linear-gradient(115deg, #34d399 0%, #059669 55%, #0891b2 100%);
+    --c-emerald: #059669; --c-cyan: #0891b2; --c-amber: #d97706; --c-rose: #e11d48; --c-slate: #475569; --c-violet: #7c3aed;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { color-scheme: light; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', -apple-system, sans-serif;
+    background:
+      radial-gradient(1000px 500px at 15% -5%, rgba(5, 150, 105, 0.10), transparent 60%),
+      radial-gradient(900px 500px at 95% 8%, rgba(8, 145, 178, 0.10), transparent 55%),
+      var(--bg);
+    color: var(--fg); line-height: 1.65; padding-bottom: 110px; word-break: keep-all;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 18px 0; }
+
+  header.hero {
+    position: relative; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--hair); border-radius: 22px;
+    padding: 30px 28px; margin-bottom: 20px;
+    box-shadow: 0 24px 60px -35px rgba(6, 68, 46, 0.35);
+  }
+  header.hero::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(6, 68, 46, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 68, 46, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px; pointer-events: none;
+  }
+  .hero .kicker { font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: var(--primary); text-transform: uppercase; }
+  .hero h1 { font-size: clamp(24px, 5vw, 34px); font-weight: 800; margin-top: 6px; letter-spacing: -0.02em; }
+  .hero h1 .grad { background: var(--accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.sub { color: var(--fg-muted); font-size: 14.5px; margin-top: 8px; max-width: 680px; }
+  .hero .gear { position: absolute; top: 14px; right: 14px; border: none; background: transparent; font-size: 17px; cursor: pointer; opacity: 0.35; }
+  .idrow { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; position: relative; }
+  .idrow .field { flex: 1 1 150px; }
+
+  .privacy {
+    display: flex; gap: 10px; align-items: flex-start;
+    border: 2px solid var(--c-rose); background: rgba(225, 29, 72, 0.05);
+    border-radius: 14px; padding: 12px 16px; margin-bottom: 18px;
+    font-size: 13.5px; font-weight: 700; color: var(--fg);
+  }
+  .privacy .mark { flex: none; font-weight: 800; color: var(--c-rose); }
+
+  #settingsPanel { display: none; background: #fffbe9; border: 1px dashed #d9b53c; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 13px; }
+  #settingsPanel input { width: 100%; margin-top: 6px; }
+  #settingsPanel button { margin-top: 8px; }
+
+  section.card {
+    background: var(--surface); border: 1px solid var(--hair); border-radius: var(--radius);
+    padding: 24px 24px 26px; margin-bottom: 18px;
+    box-shadow: 0 16px 44px -32px rgba(6, 68, 46, 0.3);
+    border-top: 4px solid var(--sec, var(--primary));
+  }
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .sec-badge { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 15px; color: #fff; background: var(--sec, var(--primary)); }
+  .sec-head h2 { font-size: 18.5px; font-weight: 800; }
+  .sec-time { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 800; color: var(--c-amber); border: 1.5px solid rgba(217, 119, 6, 0.45); border-radius: 8px; padding: 2px 9px; }
+  .sec-desc { color: var(--fg-muted); font-size: 13.5px; margin-bottom: 16px; }
+  .sec-desc strong { color: var(--fg); }
+
+  label.q { display: block; font-weight: 700; font-size: 14.5px; margin: 16px 0 6px; }
+  label.q .req { color: var(--c-rose); }
+  .hint { font-weight: 500; color: var(--fg-faint); font-size: 12.5px; margin-left: 6px; }
+  input[type="text"], input[type="url"], input[type="date"], input[type="password"], textarea, select {
+    width: 100%; border: 1.5px solid var(--hair); border-radius: 10px; padding: 10px 13px;
+    font: inherit; font-size: 14.5px; color: var(--fg); background: #fbfffd; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.13); }
+  textarea { resize: vertical; min-height: 64px; }
+
+  /* 6요소 그리드 (1단계) */
+  .elem-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .elem-box { border: 2px solid var(--tone); border-radius: 14px; padding: 12px 14px 14px; background: color-mix(in srgb, var(--tone) 5%, #fff); }
+  .elem-box .lt { font-weight: 800; color: var(--tone); font-size: 15px; }
+  .elem-box .lq { font-size: 12.5px; color: var(--fg-muted); margin-bottom: 8px; }
+  .elem-box textarea { min-height: 56px; }
+
+  .prompt-preview {
+    margin-top: 16px; border: 2px solid var(--primary); border-radius: 14px; padding: 14px 18px;
+    background: rgba(5, 150, 105, 0.06); font-size: 15px; font-weight: 600; line-height: 1.85; min-height: 58px;
+  }
+  .prompt-preview .seg { border-bottom: 3px solid var(--tone, var(--primary)); padding: 0 3px; color: var(--fg); }
+  .prompt-preview .seg.empty { color: var(--fg-faint); font-weight: 600; font-size: 0.85em; }
+  .prompt-preview .tail { color: var(--fg-muted); font-weight: 600; font-size: 0.92em; }
+  .prompt-tools { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  .btn-mini { border: 1.5px solid var(--primary); background: #fff; color: var(--primary); border-radius: 999px; padding: 7px 16px; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+  .btn-mini:active { transform: scale(0.97); }
+
+  /* 바퀴 기록 (2단계) */
+  .round { border: 1.5px dashed var(--hair); border-radius: 14px; padding: 12px 14px 14px; background: #f8fdfb; margin-top: 12px; }
+  .round .rn { display: flex; align-items: center; gap: 10px; }
+  .round .rn .no { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 800; color: var(--c-cyan); }
+  .round .rn select { width: auto; padding: 6px 10px; font-size: 13px; }
+  .round-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 10px; margin-top: 8px; }
+  .round-grid label.q { margin: 4px 0 4px; font-size: 13px; }
+  .round.optional { opacity: 0.92; }
+
+  .trap-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .trap-chip { display: flex; align-items: center; gap: 7px; border: 1.5px solid var(--hair); border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 700; color: var(--fg-muted); cursor: pointer; background: #fff; }
+  .trap-chip input { width: auto; accent-color: var(--c-rose); }
+
+  .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px); border-top: 1px solid var(--hair); padding: 12px 18px; }
+  .actionbar .inner { max-width: 880px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+  .draft-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  #draftStatus { font-size: 12px; color: var(--fg-faint); }
+  #draftStatus.pending { color: var(--c-amber); }
+  #draftStatus.saved { color: var(--c-emerald); }
+  #draftStatus.failed { color: var(--c-rose); font-weight: 700; }
+  .draft-note { font-size: 11px; color: var(--fg-faint); opacity: 0.8; }
+  .btn { border: none; border-radius: 999px; padding: 12px 26px; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; transition: transform 0.12s, opacity 0.15s; }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 10px 26px -12px rgba(5, 150, 105, 0.6); }
+  .btn-primary:disabled { opacity: 0.55; cursor: wait; }
+  .btn-ghost { background: transparent; color: var(--fg-muted); border: 1.5px solid var(--hair); }
+
+  .sid-hint { margin-top: 5px; font-size: 12.5px; font-weight: 700; min-height: 17px; font-family: 'JetBrains Mono', 'Malgun Gothic', monospace; }
+  .sid-hint.ok { color: var(--c-emerald); }
+  .sid-hint.bad { color: var(--c-rose); }
+
+  .backdrop { position: fixed; inset: 0; background: rgba(6, 40, 28, 0.45); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 18px; z-index: 70; }
+  .backdrop[hidden] { display: none; }
+  .modal { width: min(460px, 100%); max-height: 88vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--hair); border-radius: 20px; padding: 24px 24px 20px; box-shadow: 0 30px 80px -30px rgba(6, 40, 28, 0.5); }
+  .modal h3 { font-size: 19px; font-weight: 800; }
+  .modal .m-desc { color: var(--fg-muted); font-size: 13px; margin: 6px 0 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; flex-wrap: wrap; }
+  .modal .btn { padding: 10px 18px; font-size: 14px; }
+  #lkResult { margin-top: 16px; }
+  #lkResult[hidden] { display: none; }
+  .lk-ok { border: 1.5px solid var(--c-emerald); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 14px 16px; }
+  .lk-ok .stamp { font-weight: 800; color: var(--c-emerald); font-size: 15px; }
+  .lk-ok .when { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--fg); margin-top: 3px; }
+  .lk-ok dl { margin-top: 12px; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 13px; }
+  .lk-ok dt { font-weight: 800; color: var(--fg-muted); white-space: nowrap; }
+  .lk-ok dd { color: var(--fg); overflow-wrap: anywhere; }
+  .lk-bad { border: 1.5px solid var(--c-rose); background: rgba(225, 29, 72, 0.06); border-radius: 14px; padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--c-rose); }
+  .lk-wait { font-size: 13.5px; color: var(--fg-muted); font-weight: 600; }
+
+  #submitBanner { display: none; align-items: center; gap: 10px; margin-bottom: 18px; border: 1.5px solid var(--c-emerald); background: rgba(5, 150, 105, 0.07); border-radius: 14px; padding: 11px 16px; font-size: 13.5px; font-weight: 700; color: var(--fg); }
+  #submitBanner.show { display: flex; }
+  #submitBanner .dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--c-emerald); }
+
+  #toast { position: fixed; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(16px); background: #062a1e; color: #fff; padding: 12px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 60; max-width: 90vw; text-align: center; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.success { background: #059669; }
+  #toast.error { background: #e11d48; }
+
+  @media (max-width: 560px) {
+    .wrap { padding-top: 16px; }
+    section.card { padding: 18px 16px 20px; }
+    .actionbar .inner { flex-wrap: wrap; gap: 8px; }
+    .draft-wrap { flex: 1 0 100%; order: -1; }
+    .draft-note { display: none; }
+    .actionbar .btn { flex: 1 1 auto; padding: 11px 10px; font-size: 13.5px; }
+    .wide-only { display: none; }
+  }
+  @media print {
+    body { padding-bottom: 0; background: #fff; }
+    .actionbar, .hero .gear, #settingsPanel, #toast, .backdrop { display: none !important; }
+    section.card { break-inside: avoid; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="gear" id="btnGear" type="button" aria-label="설정">⚙</button>
+    <div class="kicker">정보과제연구 · 2026-2 · 바이브코딩 (3차시)</div>
+    <h1>바이브코딩 — <span class="grad">프롬프트 기록</span></h1>
+    <p class="sub">한 번에 완벽한 결과는 없다. <strong>계획 → 명령 → 확인 → 피드백</strong>을 돌 때마다 이 기록지에 남긴다.
+      평가받는 건 첫 결과가 아니라 <strong>기록의 완결성</strong>이다.</p>
+    <div class="idrow">
+      <div class="field">
+        <label class="q" for="studentId">학번 <span class="req">*</span></label>
+        <input type="text" id="studentId" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+        <div id="sidPreview" class="sid-hint"></div>
+      </div>
+      <div class="field">
+        <label class="q" for="studentName">이름 <span class="req">*</span></label>
+        <input type="text" id="studentName" placeholder="이름">
+      </div>
+      <div class="field">
+        <label class="q" for="today">날짜 <span class="req">*</span></label>
+        <input type="date" id="today">
+      </div>
+      <div class="field">
+        <label class="q" for="password">제출 암호 <span class="req">*</span></label>
+        <input type="password" id="password" placeholder="4자 이상" autocomplete="off">
+      </div>
+    </div>
+    <p class="sub" style="margin-top:10px; font-size:12.5px;">
+      🎫 <strong>학번</strong>은 <strong>학년(1) + 반(2) + 번호(2)</strong> 다섯 자리 — 2학년 3반 17번이면 <strong>20317</strong>.<br>
+      🔑 <strong>제출 암호</strong>는 <strong>제출 확인·불러오기</strong>에 쓰는 열쇠 —
+      <span style="color:var(--c-rose); font-weight:700;">평소 쓰는 비밀번호는 쓰지 말 것.</span>
+      지난 시간 활동지와 같은 암호를 쓰면 기획서 불러오기가 편하다. 암호를 잊었으면 기획서를 직접 입력해도 된다.
+    </p>
+  </header>
+
+  <div class="privacy">
+    <span class="mark">개인정보 규칙</span>
+    <span>이름·학번·연락처·개인 설문 응답은 <strong>AI 프롬프트에 넣지 않는다.</strong> 이 활동지에는 쓰되, AI 채팅창에는 쓰지 않기.</span>
+  </div>
+
+  <div id="submitBanner"><span class="dot"></span><span id="submitBannerText"></span></div>
+
+  <div id="settingsPanel">
+    <strong>⚙ 교사 설정 — Apps Script 배포 URL</strong>
+    <div style="color:#92400e; margin-top:4px;">정보과제연구 과목 공용 URL (<code>data/2026-2/정보과제연구/apps-script.js</code> 배포). 비어 있으면 TXT 저장만 된다.</div>
+    <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <button class="btn btn-ghost" id="btnSaveUrl" type="button">URL 저장</button>
+    <span id="urlStatus" style="margin-left:8px;"></span>
+  </div>
+
+  <!-- 1단계 — 프롬프트 초안 -->
+  <section class="card" style="--sec: var(--c-emerald);">
+    <div class="sec-head"><span class="sec-badge">1</span><h2>프롬프트 초안 — 여섯 칸을 여섯 요소로</h2><span class="sec-time">1교시 마무리 ~ 2교시 전</span></div>
+    <p class="sec-desc"><strong>종료 조건</strong>: ⓐ 실습 도구(Gemini) 로그인 + 새 채팅 열기 ⓑ 아래 6요소 중 <strong>대상·목적·내용·형식 4칸</strong> 작성.
+      제약·성공 기준까지 채우면 다음 교시가 편해진다.</p>
+
+    <label class="q" for="firstCommand">처음 명령 <span class="req">*</span><span class="hint">수업 첫머리에 떠올린 명령을 다듬지 말고 그대로</span></label>
+    <textarea id="firstCommand" placeholder="예: 급식 앱 만들어 줘"></textarea>
+
+    <label class="q" for="planPitch">내 한 문장 기획서 <span class="req">*</span><span class="hint">지난 시간 활동지의 그 문장 — 아래 버튼으로 불러올 수 있다</span></label>
+    <textarea id="planPitch" placeholder="[누가]가 [어떤 상황]에서 겪는 [문제]를, [데이터 A+B]를 [렌즈]로 써서 [무엇]으로 해결한다."></textarea>
+    <div class="prompt-tools">
+      <button class="btn-mini" id="btnPitchLoad" type="button">지난 시간 기획서 불러오기</button>
+      <span class="hint">지난 활동지의 학번·이름·암호가 필요하다 — 암호를 잊었으면 기획서를 직접 입력해도 된다</span>
+    </div>
+
+    <label class="q" style="margin-top:20px;">6요소 <span class="req">*</span><span class="hint">대상·목적·내용·형식은 필수, 제약·성공 기준은 2교시 시작 전까지</span></label>
+    <div class="elem-grid">
+      <div class="elem-box" style="--tone: var(--c-cyan);">
+        <div class="lt">① 대상</div><div class="lq">누가 보나</div>
+        <textarea id="pTarget" placeholder="예: 야간자율학습을 하는 우리 반 학생"></textarea>
+      </div>
+      <div class="elem-box" style="--tone: var(--c-emerald);">
+        <div class="lt">② 목적</div><div class="lq">왜 만드나 — 언제 어떤 장면에서 쓰나</div>
+        <textarea id="pPurpose" placeholder="예: 밤 9시 하교 때 버스를 놓치지 않게"></textarea>
+      </div>
+      <div class="elem-box" style="--tone: var(--c-amber);">
+        <div class="lt">③ 내용</div><div class="lq">무엇이 들어가나 — 렌즈(보여 주는 방식: 정렬·비교·강조·필터)까지</div>
+        <textarea id="pContent" placeholder="예: 시간표와 버스 도착 표본을 요일별로 묶어(결합) 다음 버스를 보여준다"></textarea>
+      </div>
+      <div class="elem-box" style="--tone: var(--c-slate);">
+        <div class="lt">④ 형식</div><div class="lq">어떤 결과물인가</div>
+        <textarea id="pFormat" placeholder="예: HTML 한 파일, 휴대폰에서도 보이게, 초록 계열"></textarea>
+      </div>
+      <div class="elem-box" style="--tone: var(--c-rose);">
+        <div class="lt">⑤ 제약</div><div class="lq">반드시 지킬 경계 — "표본만 사용, 지어내지 마"는 고정</div>
+        <textarea id="pConstraint" placeholder="예: 아래 표본 데이터만 사용하고 없는 값은 만들지 마. 서버·설치 없이."></textarea>
+      </div>
+      <div class="elem-box" style="--tone: var(--c-violet);">
+        <div class="lt">⑥ 성공 기준</div><div class="lq">완성을 어떻게 시험하나</div>
+        <textarea id="pSuccess" placeholder="예: 완성 후, 요일을 고르면 다음 버스가 보이는지 확인해 줘"></textarea>
+      </div>
+    </div>
+
+    <label class="q" for="pSample">표본 데이터 <span class="hint">표본 = 전체 자료에서 실습용으로 떼어 온 5~10줄 · 숙제한 경로(URL)에서 복사 — 안 되면 아래 공통 표본 중 하나</span></label>
+    <div class="prompt-tools" style="margin-bottom:6px;">
+      <button class="btn-mini sample-fill" type="button" data-sample="급식">공통 표본 · 급식 잔반</button>
+      <button class="btn-mini sample-fill" type="button" data-sample="도서관">공통 표본 · 도서관 대출</button>
+      <button class="btn-mini sample-fill" type="button" data-sample="버스">공통 표본 · 버스 도착</button>
+    </div>
+    <textarea id="pSample" style="font-family:'JetBrains Mono', monospace; font-size:13px;" placeholder="날짜, 메뉴, 잔반량(kg)
+3-02, 제육볶음, 12.4
+3-03, 생선까스, 21.1"></textarea>
+
+    <div class="prompt-preview" id="promptPreview" aria-live="polite"></div>
+    <div class="prompt-tools">
+      <button class="btn-mini" id="btnCopyPrompt" type="button">첫 프롬프트 복사</button>
+      <span class="hint">복사해서 내가 고른 AI 채팅창에 붙여 넣는다 (표본 데이터 포함)</span>
+    </div>
+  </section>
+
+  <!-- 2단계 — 실행 기록 -->
+  <section class="card" style="--sec: var(--c-cyan);">
+    <div class="sec-head"><span class="sec-badge">2</span><h2>실행 기록 — 바퀴마다 4칸</h2><span class="sec-time">⏱ 실습 25분</span></div>
+    <p class="sec-desc">수정 요청은 <strong>한 번에 한 가지</strong>, 최대 <strong>5회</strong>(수업 규칙).
+      횟수에 포함 — 결과를 바꾸려 보낸 요청 / 제외 — 응답 실패·접속 오류·같은 요청 재전송.
+      바퀴마다 <strong>목표 → 보낸 명령 → 확인한 동작 → 다음 수정</strong>을 남긴다. <strong>평가 필수 2바퀴, 도전 3바퀴.</strong>
+      명령은 <strong>오류 수정</strong>(어디서·실제·기대) 또는 <strong>개선 요청</strong>(바꿀 곳·현재·원하는 모습·유지할 것) 카드 중 하나로 쓴다.</p>
+    <div id="rounds"></div>
+
+    <label class="q" style="margin-top:20px;">오늘 내가 빠졌던 함정 <span class="hint">해당하는 것 모두 — 빠졌다는 건 배웠다는 뜻</span></label>
+    <div class="trap-row">
+      <label class="trap-chip"><input type="checkbox" class="trap" value="첫 결과 수용">① 첫 결과를 그대로 받아들일 뻔</label>
+      <label class="trap-chip"><input type="checkbox" class="trap" value="수정 몰아넣기">② 수정 요청에 여러 목표를 몰아넣음</label>
+      <label class="trap-chip"><input type="checkbox" class="trap" value="모호한 피드백">③ "더 예쁘게" 같은 모호한 피드백</label>
+      <label class="trap-chip"><input type="checkbox" class="trap" value="회귀 놓침">④ 고치다 다른 곳이 망가진 걸 늦게 봄</label>
+    </div>
+  </section>
+
+  <!-- 3단계 — 최종 코드 + 성찰 -->
+  <section class="card" style="--sec: var(--c-violet);">
+    <div class="sec-head"><span class="sec-badge">3</span><h2>최종 코드 + 성찰</h2><span class="sec-time">마무리 ~ 과제</span></div>
+    <p class="sec-desc"><strong>최종 코드</strong> = 지금까지의 실행 기록을 거쳐 AI가 만들어 준,
+      지금 시점에서 가장 완성된 코드 <strong>전체</strong>. 다음 수업(프로젝트 제작)의 출발점이 된다.<br>
+      가져오는 법 — AI 채팅창(또는 Canvas 미리보기)의 코드에서 전체를 복사해 그대로 붙여 넣는다. 일부만 복사하면 다음 수업에서 이어 쓸 수 없다.</p>
+
+    <label class="q" for="finalCode">최종 코드 <span class="req">*</span><span class="hint">AI가 마지막으로 만들어 준 코드 전체 — 잘라서 일부만 넣지 않기</span></label>
+    <textarea id="finalCode" style="min-height:200px; font-family:'JetBrains Mono', monospace; font-size:12.5px;" placeholder="AI 채팅창(또는 Canvas)에서 마지막으로 받은 코드 전체를 여기에 붙여넣기 — <!DOCTYPE html>로 시작해서 </html>로 끝나는 전체"></textarea>
+
+    <label class="q" for="revisionCount">수정 요청을 몇 회 썼나 <span class="req">*</span></label>
+    <input type="text" id="revisionCount" inputmode="numeric" placeholder="예: 3" style="max-width:140px;">
+
+    <label class="q" for="bestRequest">가장 효과가 컸던 수정 요청 <span class="req">*</span><span class="hint">그대로 옮겨 적기</span></label>
+    <textarea id="bestRequest" placeholder="예: '제출' 버튼을 누르면 아무 일도 일어나지 않아요. 누르면 입력한 내용이 아래 목록에 추가되어야 해요."></textarea>
+
+    <label class="q" for="nextMust">처음부터 다시 시킨다면, 첫 프롬프트에 꼭 넣을 것 한 가지를 쓰세요 <span class="req">*</span></label>
+    <input type="text" id="nextMust" placeholder="예: 성공 기준 — '빈 입력이면 경고'를 처음부터">
+
+    <label class="q" for="reflection">한 줄 성찰 <span class="hint">선택 — 오늘 깎으면서 알게 된 것</span></label>
+    <input type="text" id="reflection" placeholder="예: AI가 못 알아들은 게 아니라 내가 말 안 한 거였다">
+  </section>
+
+</div>
+
+<div class="actionbar">
+  <div class="inner">
+    <span class="draft-wrap">
+      <span id="draftStatus">임시저장 대기 중…</span>
+      <span class="draft-note">이 기기의 이 브라우저에만 저장돼요</span>
+    </span>
+    <button class="btn btn-ghost" id="btnLookup" type="button">제출 확인</button>
+    <button class="btn btn-ghost" id="btnReset" type="button">초기화</button>
+    <button class="btn btn-primary" id="btnSave" type="button">제출하기<span class="wide-only"> (TXT + 시트 저장)</span></button>
+  </div>
+</div>
+
+<div class="backdrop" id="lookupBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lookupTitle">
+    <h3 id="lookupTitle">제출 확인 · 불러오기</h3>
+    <p class="m-desc" id="lookupDesc">제출할 때 쓴 <strong>학번 · 이름 · 암호</strong>를 넣으면 가장 마지막으로 제출한 내용을 확인할 수 있어요.</p>
+    <label class="q" for="lkSid">학번</label>
+    <input type="text" id="lkSid" placeholder="예: 20317" inputmode="numeric" maxlength="5" autocomplete="off">
+    <label class="q" for="lkName">이름</label>
+    <input type="text" id="lkName" placeholder="이름">
+    <label class="q" for="lkPw">제출 암호</label>
+    <input type="password" id="lkPw" placeholder="제출할 때 정한 암호" autocomplete="off">
+    <div id="lkResult" hidden></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="lkClose" type="button">닫기</button>
+      <button class="btn btn-ghost" id="lkFill" type="button" hidden>양식에 불러오기</button>
+      <button class="btn btn-primary" id="lkGo" type="button">확인하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var SOURCE = 'vibe_coding_log';
+  var PITCH_SOURCE = 'data_service_idea';   /* 지난 시간 기획서 불러오기용 */
+  var DRAFT_KEY = 'draft_vibe_coding_log';
+  var SUBMIT_KEY = 'submitted_vibe_coding_log';
+  var URL_KEY = 'gas_url_info_research_2026_2';
+  var DEFAULT_URL = 'https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec'; // 정보과제연구(2026-2) 과목 공용 배포 URL
+  var TAIL = '완전한 HTML 코드 한 파일로 출력해 줘. 채팅 설명은 쓰지 마.';
+
+  /* ── 바퀴 5개 생성 — id: r{n}Kind / r{n}Goal / r{n}Cmd / r{n}Check / r{n}Next ── */
+  var ROUND_FIELDS = [];
+  (function buildRounds() {
+    var host = document.getElementById('rounds');
+    for (var n = 1; n <= 5; n++) {
+      var box = document.createElement('div');
+      box.className = 'round' + (n > 2 ? ' optional' : '');
+
+      var head = document.createElement('div');
+      head.className = 'rn';
+      var no = document.createElement('span');
+      no.className = 'no';
+      no.textContent = '바퀴 ' + n + (n <= 2 ? ' *' : '');
+      var kind = document.createElement('select');
+      kind.id = 'r' + n + 'Kind';
+      [['', '— 카드 —'], ['오류 수정', '오류 수정 (어디서·실제·기대)'], ['개선 요청', '개선 요청 (바꿀 곳·현재·원하는·유지)']].forEach(function (o) {
+        var opt = document.createElement('option');
+        opt.value = o[0]; opt.textContent = o[1];
+        kind.appendChild(opt);
+      });
+      head.appendChild(no); head.appendChild(kind);
+      box.appendChild(head);
+
+      var grid = document.createElement('div');
+      grid.className = 'round-grid';
+      [['Goal', '이번 목표 (하나만)', '예: 제출 버튼이 동작하게'],
+       ['Cmd', '보낸 명령 (그대로)', '예: 제출을 누르면 목록에 추가되어야 해요'],
+       ['Check', '확인한 동작', '예: 빈 입력으로도 눌러 봄 — 추가됨/경고 없음'],
+       ['Next', '다음 수정', '예: 빈 입력이면 경고 띄우기']].forEach(function (f) {
+        var cell = document.createElement('div');
+        var lab = document.createElement('label');
+        lab.className = 'q';
+        lab.setAttribute('for', 'r' + n + f[0]);
+        lab.textContent = f[1];
+        var ta = document.createElement('textarea');
+        ta.id = 'r' + n + f[0];
+        ta.placeholder = n === 1 ? f[2] : '';
+        cell.appendChild(lab); cell.appendChild(ta);
+        grid.appendChild(cell);
+        ROUND_FIELDS.push('r' + n + f[0]);
+      });
+      box.appendChild(grid);
+      host.appendChild(box);
+    }
+  })();
+
+  /* 텍스트 필드 id 목록 — 임시저장·불러오기·초기화가 함께 쓴다 */
+  var TEXT_IDS = ['studentName', 'studentId', 'today',
+    'firstCommand', 'planPitch', 'pTarget', 'pPurpose', 'pContent', 'pFormat', 'pConstraint', 'pSuccess', 'pSample',
+    'r1Kind', 'r2Kind', 'r3Kind', 'r4Kind', 'r5Kind']
+    .concat(ROUND_FIELDS)
+    .concat(['finalCode', 'revisionCount', 'bestRequest', 'nextMust', 'reflection']);
+
+  /* ── 학번(GCCNN) ── */
+  var SID_RE = /^\d{5}$/;
+  function parseSid(sid) {
+    if (!SID_RE.test(sid)) return null;
+    return { grade: parseInt(sid.slice(0, 1), 10), cls: parseInt(sid.slice(1, 3), 10), no: parseInt(sid.slice(3, 5), 10) };
+  }
+  function sidLabel(sid) {
+    var s = parseSid(sid);
+    return s ? s.grade + '학년 ' + s.cls + '반 ' + s.no + '번' : sid;
+  }
+  function renderSidPreview() {
+    var el = document.getElementById('sidPreview');
+    var sid = v('studentId');
+    if (!sid) { el.textContent = ''; el.className = 'sid-hint'; return; }
+    var s = parseSid(sid);
+    if (!s) { el.textContent = '↳ 숫자 5자리로 입력하세요 (예: 20317)'; el.className = 'sid-hint bad'; return; }
+    var sane = s.grade >= 1 && s.grade <= 3 && s.cls >= 1 && s.no >= 1;
+    el.textContent = '↳ ' + sidLabel(sid) + (sane ? '' : ' — 맞나요?');
+    el.className = 'sid-hint ' + (sane ? 'ok' : 'bad');
+  }
+
+  var todayEl = document.getElementById('today');
+  if (!todayEl.value) {
+    var d = new Date();
+    todayEl.value = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function v(id) { return document.getElementById(id).value.trim(); }
+
+  function trapsHit() {
+    var out = [];
+    document.querySelectorAll('input.trap:checked').forEach(function (el) { out.push(el.value); });
+    return out.join(', ');
+  }
+
+  /* 6요소 → 첫 프롬프트 조립 (표본은 뒤에 붙인다) */
+  function assembledPrompt(d) {
+    var parts = [];
+    if (d.pTarget) parts.push(d.pTarget + '이(가) 쓸 페이지야.');
+    if (d.pPurpose) parts.push('목적은 ' + d.pPurpose + '.');
+    if (d.pContent) parts.push(d.pContent + '.');
+    if (d.pFormat) parts.push('형식은 ' + d.pFormat + '.');
+    if (d.pConstraint) parts.push(d.pConstraint + '.');
+    if (d.pSuccess) parts.push(d.pSuccess + '.');
+    parts.push(TAIL);
+    var text = parts.join(' ');
+    if (d.pSample) text += '\n\n[표본 데이터]\n' + d.pSample;
+    return text;
+  }
+
+  function getFormData() {
+    var data = { source: SOURCE, password: v('password') };
+    TEXT_IDS.forEach(function (id) { data[id] = v(id); });
+    data.trapsHit = trapsHit();
+    data.firstPrompt = assembledPrompt(data);
+    return data;
+  }
+
+  /* ── 첫 프롬프트 미리보기 (textContent만 사용) ── */
+  var SEGS = [
+    ['pTarget', '[① 대상]', '이(가) 쓸 페이지야. ', 'var(--c-cyan)'],
+    ['pPurpose', '[② 목적]', ' — 목적. ', 'var(--c-emerald)'],
+    ['pContent', '[③ 내용·렌즈]', '. ', 'var(--c-amber)'],
+    ['pFormat', '[④ 형식]', ' — 형식. ', 'var(--c-slate)'],
+    ['pConstraint', '[⑤ 제약]', '. ', 'var(--c-rose)'],
+    ['pSuccess', '[⑥ 성공 기준]', '. ', 'var(--c-violet)']
+  ];
+  function renderPrompt() {
+    var box = document.getElementById('promptPreview');
+    box.textContent = '';
+    SEGS.forEach(function (s) {
+      var val = v(s[0]);
+      var span = document.createElement('span');
+      span.className = 'seg' + (val ? '' : ' empty');
+      span.style.setProperty('--tone', s[3]);
+      span.textContent = val || s[1];
+      box.appendChild(span);
+      var tail = document.createElement('span');
+      tail.className = 'tail';
+      tail.textContent = val ? ' · ' : ' ';
+      box.appendChild(tail);
+    });
+    var tailSpan = document.createElement('span');
+    tailSpan.className = 'tail';
+    tailSpan.textContent = TAIL + (v('pSample') ? '  (+ 표본 데이터)' : '');
+    box.appendChild(tailSpan);
+  }
+
+  /* 공통 표본 3종 — 버튼 클릭으로 표본 칸 채우기 (자립 대체 경로) */
+  var SAMPLES = {
+    '급식': '날짜, 메뉴, 잔반량(kg)\n3-02, 제육볶음, 12.4\n3-03, 생선까스, 21.1\n3-04, 닭갈비, 9.8\n3-05, 비빔밥, 15.2\n3-06, 돈까스, 8.9',
+    '도서관': '대출일, 책제목, 분류, 학년\n3-02, 데미안, 소설, 2\n3-02, 코스모스, 과학, 1\n3-03, 미움받을 용기, 인문, 3\n3-04, 아몬드, 소설, 2\n3-05, 팩트풀니스, 사회, 1',
+    '버스': '노선, 정류장, 요일, 도착시각\n752, 학교앞, 월, 21:05\n752, 학교앞, 월, 21:25\n851, 학교앞, 월, 21:12\n752, 학교앞, 화, 21:07\n851, 학교앞, 화, 21:15'
+  };
+  document.querySelectorAll('.sample-fill').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-sample');
+      if (!SAMPLES[key]) return;
+      var ta = document.getElementById('pSample');
+      if (ta.value.trim() && !window.confirm('표본 칸의 내용을 공통 표본으로 바꿀까요?')) return;
+      ta.value = SAMPLES[key];
+      renderPrompt();
+      scheduleDraft();
+      showToast('공통 표본(' + key + ')을 채웠어요.', 'success', 2600);
+    });
+  });
+
+  document.getElementById('btnCopyPrompt').addEventListener('click', function () {
+    var d = getFormData();
+    var missing4 = ['pTarget', 'pPurpose', 'pContent', 'pFormat'].filter(function (id) { return !d[id]; });
+    if (missing4.length) {
+      showToast('필수 4칸 중 ' + missing4.length + '칸이 비어 있어요 — 그래도 복사는 됩니다.', 'error', 3600);
+    }
+    var text = assembledPrompt(d);
+    function done() { showToast('첫 프롬프트 복사 완료 — 총 ' + text.length + '자' + (d.pSample ? ' · 표본 포함' : ' · 표본 없음') + ' — AI 채팅창에 붙여 넣으세요', 'success', 4200); }
+    function fail() { showToast('복사가 안 되면 미리보기를 드래그해서 복사하세요.', 'error', 3600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(fail);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { fail(); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  /* ── 임시저장 ── */
+  var draftTimer = null;
+  var statusEl = document.getElementById('draftStatus');
+  function saveDraft() {
+    try {
+      var d = getFormData();
+      delete d.password;
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+      statusEl.textContent = '임시저장됨 · ' + new Date().toLocaleTimeString('ko-KR');
+      statusEl.className = 'saved';
+    } catch (e) {
+      statusEl.textContent = '임시저장 실패 — 이 기기에 저장 공간이 부족해요';
+      statusEl.className = 'failed';
+    }
+  }
+  function scheduleDraft() {
+    statusEl.textContent = '입력 중… 잠시 멈추면 임시저장됩니다';
+    statusEl.className = 'pending';
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(saveDraft, 1200);
+  }
+  function fillFormFrom(d) {
+    TEXT_IDS.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && typeof d[id] === 'string') el.value = d[id];
+    });
+    if (typeof d.trapsHit === 'string') {
+      var set = {};
+      d.trapsHit.split(',').forEach(function (s) { set[s.trim()] = true; });
+      document.querySelectorAll('input.trap').forEach(function (el) { el.checked = !!set[el.value]; });
+    }
+    renderSidPreview();
+    renderPrompt();
+  }
+  function restoreDraft() {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    try {
+      fillFormFrom(JSON.parse(raw));
+      statusEl.textContent = '임시저장 불러옴';
+      statusEl.className = 'saved';
+    } catch (e) { /* 손상된 draft — 무시 */ }
+  }
+  document.querySelectorAll('input, textarea, select').forEach(function (el) {
+    el.addEventListener('input', scheduleDraft);
+    el.addEventListener('change', scheduleDraft);
+  });
+  ['pTarget', 'pPurpose', 'pContent', 'pFormat', 'pConstraint', 'pSuccess', 'pSample'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', renderPrompt);
+    el.addEventListener('change', renderPrompt);
+  });
+  restoreDraft();
+  renderPrompt();
+
+  ['studentId', 'lkSid'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.addEventListener('input', function () {
+      var cleaned = el.value.replace(/\D/g, '').slice(0, 5);
+      if (cleaned !== el.value) el.value = cleaned;
+      if (id === 'studentId') renderSidPreview();
+    });
+  });
+  renderSidPreview();
+
+  /* ── 토스트 ── */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg, type, ms) {
+    toastEl.textContent = msg;
+    toastEl.className = 'show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.className = ''; }, ms || 2600);
+  }
+
+  /* ── 유효성 — 1단계 4칸 + 바퀴 1~2 + 3단계 ── */
+  var REQUIRED = [
+    ['studentId', '학번'], ['studentName', '이름'], ['today', '날짜'], ['password', '제출 암호'],
+    ['firstCommand', '1. 처음 명령'], ['planPitch', '1. 한 문장 기획서'],
+    ['pTarget', '1. ① 대상'], ['pPurpose', '1. ② 목적'], ['pContent', '1. ③ 내용'], ['pFormat', '1. ④ 형식'],
+    ['r1Goal', '2. 바퀴1 목표'], ['r1Cmd', '2. 바퀴1 명령'], ['r1Check', '2. 바퀴1 확인'], ['r1Next', '2. 바퀴1 다음 수정'],
+    ['r2Goal', '2. 바퀴2 목표'], ['r2Cmd', '2. 바퀴2 명령'], ['r2Check', '2. 바퀴2 확인'], ['r2Next', '2. 바퀴2 다음 수정'],
+    ['finalCode', '3. 최종 코드'], ['revisionCount', '3. 수정 요청 횟수'],
+    ['bestRequest', '3. 효과 컸던 요청'], ['nextMust', '3. 다음에 꼭 넣을 것']
+  ];
+  function focusField(id) {
+    var el = document.getElementById(id);
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function () { el.focus({ preventScroll: true }); }, 120);
+  }
+  function validate() {
+    var missing = [];
+    var first = null;
+    REQUIRED.forEach(function (f) {
+      if (v(f[0])) return;
+      missing.push(f[1]);
+      if (!first) first = f[0];
+    });
+    if (missing.length) {
+      var head = missing.slice(0, 3).join(', ');
+      showToast('아직 안 쓴 곳이 ' + missing.length + '군데 있어요: ' + head + (missing.length > 3 ? ' 외 ' + (missing.length - 3) + '개' : ''), 'error', 5000);
+      focusField(first);
+      return false;
+    }
+    if (!SID_RE.test(v('studentId'))) {
+      showToast('학번은 학년(1) + 반(2) + 번호(2) 다섯 자리 숫자예요. 예: 20317', 'error', 4600);
+      document.getElementById('studentId').focus();
+      return false;
+    }
+    if (v('password').length < 4) {
+      showToast('제출 암호는 4자 이상으로 정해 주세요.', 'error', 3800);
+      return false;
+    }
+    return true;
+  }
+
+  /* ── TXT ── */
+  function buildTxt(d) {
+    var L = [];
+    L.push('═══════════════════════════════════════');
+    L.push('  바이브코딩 — 프롬프트 기록 (정보과제연구)');
+    L.push('  ' + d.studentId + ' (' + sidLabel(d.studentId) + ') ' + d.studentName + ' · ' + d.today);
+    L.push('  작성일시: ' + new Date().toLocaleString('ko-KR'));
+    L.push('═══════════════════════════════════════');
+    L.push('');
+    L.push('【 1. 프롬프트 초안 】');
+    L.push('처음 명령: ' + d.firstCommand);
+    L.push('기획서: ' + d.planPitch);
+    L.push('① 대상: ' + d.pTarget);
+    L.push('② 목적: ' + d.pPurpose);
+    L.push('③ 내용: ' + d.pContent);
+    L.push('④ 형식: ' + d.pFormat);
+    L.push('⑤ 제약: ' + d.pConstraint);
+    L.push('⑥ 성공 기준: ' + d.pSuccess);
+    L.push('');
+    L.push('▶ 조립된 첫 프롬프트');
+    L.push(d.firstPrompt);
+    L.push('');
+    L.push('【 2. 실행 기록 】');
+    [1, 2, 3, 4, 5].forEach(function (n) {
+      var goal = d['r' + n + 'Goal'];
+      if (!goal && !d['r' + n + 'Cmd']) return;
+      L.push('바퀴 ' + n + (d['r' + n + 'Kind'] ? ' [' + d['r' + n + 'Kind'] + ']' : ''));
+      L.push('  목표: ' + goal);
+      L.push('  명령: ' + d['r' + n + 'Cmd']);
+      L.push('  확인: ' + d['r' + n + 'Check']);
+      L.push('  다음: ' + d['r' + n + 'Next']);
+    });
+    if (d.trapsHit) L.push('빠졌던 함정: ' + d.trapsHit);
+    L.push('');
+    L.push('【 3. 최종 코드 + 성찰 】');
+    L.push(d.finalCode);
+    L.push('');
+    L.push('수정 요청 횟수: ' + d.revisionCount);
+    L.push('효과 컸던 요청: ' + d.bestRequest);
+    L.push('다음 첫 프롬프트에: ' + d.nextMust);
+    if (d.reflection) L.push('성찰: ' + d.reflection);
+    return L.join('\n');
+  }
+  function downloadTxt(d) {
+    var blob = new Blob([buildTxt(d)], { type: 'text/plain;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = '바이브코딩기록_' + (d.studentId || '') + '_' + (d.studentName || '무명') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+  }
+
+  /* ── 제출 ── */
+  document.getElementById('btnSave').addEventListener('click', function () {
+    if (!validate()) return;
+    var data = getFormData();
+    var btn = this;
+    btn.disabled = true;
+    downloadTxt(data);
+    var url = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!url) {
+      showToast('TXT 파일로 저장됐어요. (시트 전송은 선생님 설정 후 가능)', 'success', 4200);
+      btn.disabled = false;
+      return;
+    }
+    fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+      .then(function () {
+        showToast('제출 완료! TXT 파일도 함께 저장됐어요.', 'success', 4200);
+        localStorage.removeItem(DRAFT_KEY);
+        recordSubmitted(data);
+      })
+      .catch(function (err) { showToast('TXT는 저장됐어요. 시트 전송 오류: ' + err.message, 'error', 5000); })
+      .finally(function () { btn.disabled = false; });
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    if (!window.confirm('작성한 내용을 모두 지울까요?')) return;
+    document.querySelectorAll('input[type="text"], input[type="url"], input[type="password"], textarea').forEach(function (el) { el.value = ''; });
+    document.querySelectorAll('select').forEach(function (el) { el.value = ''; });
+    document.querySelectorAll('input.trap').forEach(function (el) { el.checked = false; });
+    localStorage.removeItem(DRAFT_KEY);
+    statusEl.textContent = '초기화됨';
+    statusEl.className = '';
+    renderSidPreview();
+    renderPrompt();
+    showToast('모든 입력을 지웠어요.');
+  });
+
+  /* ── 제출 배너 ── */
+  var bannerEl = document.getElementById('submitBanner');
+  var bannerTextEl = document.getElementById('submitBannerText');
+  function showBanner(text) { bannerTextEl.textContent = text; bannerEl.classList.add('show'); }
+  function recordSubmitted(data) {
+    var stamp = new Date().toLocaleString('ko-KR');
+    try { localStorage.setItem(SUBMIT_KEY, JSON.stringify({ at: stamp, name: data.studentName, sid: data.studentId })); } catch (e) { /* 무시 */ }
+    showBanner('제출을 보냈습니다 · ' + stamp + ' — [제출 확인]으로 서버에 저장됐는지 확인할 수 있어요.');
+  }
+  (function restoreBanner() {
+    try {
+      var raw = localStorage.getItem(SUBMIT_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      showBanner('이 기기에서 ' + s.at + '에 제출을 보냈습니다 — [제출 확인]으로 내용을 다시 볼 수 있어요.');
+    } catch (e) { /* 무시 */ }
+  })();
+
+  /* ── 제출 확인 / 기획서 불러오기 (fetch → JSONP 폴백) ──
+     lookupMode: 'self' = 이 활동지 제출 확인 · 'pitch' = 지난 활동지에서 기획서만 */
+  var lookupBackdrop = document.getElementById('lookupBackdrop');
+  var lkResult = document.getElementById('lkResult');
+  var lkFillBtn = document.getElementById('lkFill');
+  var lkGoBtn = document.getElementById('lkGo');
+  var lookupMode = 'self';
+  var lastLookup = null;
+  var lastLookupPw = '';
+
+  function openLookup(mode) {
+    lookupMode = mode;
+    document.getElementById('lookupTitle').textContent = mode === 'pitch' ? '지난 시간 기획서 불러오기' : '제출 확인 · 불러오기';
+    document.getElementById('lookupDesc').textContent = mode === 'pitch'
+      ? '지난 활동지(한 문장 기획서)를 제출할 때 쓴 학번 · 이름 · 암호를 넣으면 기획서 문장을 가져와요.'
+      : '제출할 때 쓴 학번 · 이름 · 암호를 넣으면 가장 마지막으로 제출한 내용을 확인할 수 있어요.';
+    document.getElementById('lkSid').value = v('studentId');
+    document.getElementById('lkName').value = v('studentName');
+    document.getElementById('lkPw').value = '';
+    lkResult.hidden = true; lkResult.textContent = '';
+    lkFillBtn.hidden = true; lastLookup = null;
+    lookupBackdrop.hidden = false;
+    document.getElementById('lkPw').focus();
+  }
+  function closeLookup() { lookupBackdrop.hidden = true; }
+  function jsonp(url) {
+    return new Promise(function (resolve, reject) {
+      var cb = 'lkcb' + Date.now() + Math.floor(Math.random() * 1000);
+      var script = document.createElement('script');
+      var timer = setTimeout(function () { cleanup(); reject(new Error('서버 응답이 없습니다.')); }, 20000);
+      function cleanup() {
+        clearTimeout(timer);
+        try { delete window[cb]; } catch (e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      window[cb] = function (data) { cleanup(); resolve(data); };
+      script.onerror = function () { cleanup(); reject(new Error('서버에 연결할 수 없습니다.')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+  function requestLookup(p) {
+    var base = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    if (!base) return Promise.reject(new Error('서버 주소가 설정되지 않았습니다. 선생님께 문의하세요.'));
+    var src = lookupMode === 'pitch' ? PITCH_SOURCE : SOURCE;
+    var url = base + '?action=lookup&source=' + src +
+      '&studentId=' + encodeURIComponent(p.studentId) +
+      '&studentName=' + encodeURIComponent(p.studentName) +
+      '&password=' + encodeURIComponent(p.password);
+    return fetch(url)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .catch(function () { return jsonp(url); });
+  }
+  function renderLookup(res) {
+    lkResult.textContent = '';
+    lkResult.hidden = false;
+    if (res && res.status === 'ok') {
+      lastLookup = res.data;
+      lkFillBtn.hidden = false;
+      lkFillBtn.textContent = lookupMode === 'pitch' ? '기획서 가져오기' : '양식에 불러오기';
+      var box = document.createElement('div'); box.className = 'lk-ok';
+      var stamp = document.createElement('div'); stamp.className = 'stamp'; stamp.textContent = '제출이 확인되었습니다';
+      var when = document.createElement('div'); when.className = 'when'; when.textContent = res.submittedAt;
+      box.appendChild(stamp); box.appendChild(when);
+      var dl = document.createElement('dl');
+      var pairs = lookupMode === 'pitch'
+        ? [['기획서', res.data.pitch]]
+        : [['처음 명령', res.data.firstCommand], ['최종 코드', res.data.finalCode]];
+      pairs.forEach(function (pair) {
+        if (!pair[1]) return;
+        var dt = document.createElement('dt'); dt.textContent = pair[0];
+        var dd = document.createElement('dd'); dd.textContent = pair[1];
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      box.appendChild(dl);
+      lkResult.appendChild(box);
+      return;
+    }
+    lkFillBtn.hidden = true; lastLookup = null;
+    var bad = document.createElement('div'); bad.className = 'lk-bad';
+    if (res && res.status === 'denied') bad.textContent = '암호가 일치하지 않습니다. 제출할 때 정한 암호를 다시 확인해 주세요.';
+    else if (res && res.status === 'notfound') bad.textContent = '이 학번·이름으로 제출된 기록이 없습니다. 아직 제출하지 않았거나, 학번·이름이 제출할 때와 다를 수 있어요.';
+    else bad.textContent = '오류: ' + ((res && res.message) || '알 수 없는 오류');
+    lkResult.appendChild(bad);
+  }
+  document.getElementById('btnLookup').addEventListener('click', function () { openLookup('self'); });
+  document.getElementById('btnPitchLoad').addEventListener('click', function () { openLookup('pitch'); });
+  document.getElementById('lkClose').addEventListener('click', closeLookup);
+  lookupBackdrop.addEventListener('click', function (e) { if (e.target === lookupBackdrop) closeLookup(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !lookupBackdrop.hidden) closeLookup(); });
+  ['lkSid', 'lkName', 'lkPw'].forEach(function (id) {
+    document.getElementById(id).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); lkGoBtn.click(); } });
+  });
+  lkGoBtn.addEventListener('click', function () {
+    var p = { studentId: document.getElementById('lkSid').value.trim(), studentName: document.getElementById('lkName').value.trim(), password: document.getElementById('lkPw').value.trim() };
+    if (!p.studentId || !p.studentName || !p.password) { renderLookup({ status: 'error', message: '학번 · 이름 · 암호를 모두 입력해 주세요.' }); return; }
+    if (!SID_RE.test(p.studentId)) { renderLookup({ status: 'error', message: '학번은 숫자 5자리예요 (학년1 + 반2 + 번호2, 예: 20317).' }); return; }
+    lkGoBtn.disabled = true;
+    lkResult.hidden = false; lkResult.textContent = ''; lkFillBtn.hidden = true;
+    var wait = document.createElement('div'); wait.className = 'lk-wait'; wait.textContent = '확인하는 중…';
+    lkResult.appendChild(wait);
+    requestLookup(p)
+      .then(function (res) { if (res && res.status === 'ok') lastLookupPw = p.password; renderLookup(res); })
+      .catch(function (err) { renderLookup({ status: 'error', message: err.message }); })
+      .finally(function () { lkGoBtn.disabled = false; });
+  });
+  lkFillBtn.addEventListener('click', function () {
+    if (!lastLookup) return;
+    if (lookupMode === 'pitch') {
+      if (lastLookup.pitch) {
+        document.getElementById('planPitch').value = lastLookup.pitch;
+        saveDraft();
+        closeLookup();
+        showToast('지난 시간 기획서를 가져왔어요.', 'success', 3600);
+      } else {
+        showToast('기획서 문장을 찾지 못했어요 — 직접 붙여 넣어 주세요.', 'error', 3600);
+      }
+      return;
+    }
+    if (!window.confirm('지금 화면의 내용을 지우고, 제출했던 내용을 불러올까요?')) return;
+    fillFormFrom(lastLookup);
+    if (lastLookupPw) document.getElementById('password').value = lastLookupPw;
+    saveDraft();
+    closeLookup();
+    showToast('제출했던 내용을 양식에 불러왔어요. 고친 뒤 다시 제출하면 최신 내용으로 갱신돼요.', 'success', 4200);
+  });
+
+  /* ── 설정 패널 (⚙ 5번 클릭) ── */
+  var gearCount = 0, gearTimer = null;
+  document.getElementById('btnGear').addEventListener('click', function () {
+    gearCount += 1;
+    clearTimeout(gearTimer);
+    gearTimer = setTimeout(function () { gearCount = 0; }, 1600);
+    if (gearCount >= 5) {
+      gearCount = 0;
+      var p = document.getElementById('settingsPanel');
+      p.style.display = p.style.display === 'block' ? 'none' : 'block';
+      document.getElementById('scriptUrl').value = localStorage.getItem(URL_KEY) || DEFAULT_URL;
+    }
+  });
+  document.getElementById('btnSaveUrl').addEventListener('click', function () {
+    var u = document.getElementById('scriptUrl').value.trim();
+    if (u) { localStorage.setItem(URL_KEY, u); document.getElementById('urlStatus').textContent = '저장됨 ✓'; }
+    else { localStorage.removeItem(URL_KEY); document.getElementById('urlStatus').textContent = DEFAULT_URL ? '기본값 사용' : 'URL 없음 — TXT 저장만'; }
+  });
+
+  /* ?sid=20317 로 들어오면 학번을 채운다 */
+  (function handoff() {
+    var sid = new URLSearchParams(location.search).get('sid');
+    if (sid && /^\d{5}$/.test(sid)) { document.getElementById('studentId').value = sid; renderSidPreview(); scheduleDraft(); }
+  })();
+})();
+</script>
+</body>
+</html>

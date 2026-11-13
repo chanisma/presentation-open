@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS 첫걸음 — 웹에 옷 입히기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  /* Deck Contract v1 — 크롬·네비·모션 런타임은 deck.js가 제공 */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif; background: #0e1719; color: #e7f0ee;
+    font-size: clamp(13px, 1.1vw, 20px); }
+  .presentation { width: 100%; height: 100%; position: relative; }
+  .slide { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+    transition: opacity .45s ease; overflow: hidden; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body data-deck-title="CSS 첫걸음 — 웹에 옷 입히기" data-subject="프로그래밍">
+<div class="presentation">
+
+<!-- scene: css-01 | metaphor: 옷 입히기 | intent: 같은 HTML이라는 몸에 CSS라는 옷을 입히면 완전히 달라 보인다는 것을 타이틀에서 예고한다 -->
+<div class="slide active" data-scene="css-01">
+  <style>
+    [data-scene="css-01"] { background: radial-gradient(110% 90% at 22% 25%, #16292c 0%, #0e1719 62%); }
+    [data-scene="css-01"] .kicker { position: absolute; left: 7vw; top: 14vh;
+      letter-spacing: .34em; color: #55c8b2; font-weight: 700; font-size: .95em; }
+    [data-scene="css-01"] h1 { position: absolute; left: 7vw; top: 20vh;
+      font-size: 4.3vw; font-weight: 900; line-height: 1.18; letter-spacing: -.02em; }
+    [data-scene="css-01"] h1 em { font-style: normal; color: #55c8b2; }
+    [data-scene="css-01"] .sub { position: absolute; left: 7vw; top: 43vh;
+      color: #93b3ac; font-size: 1.15em; font-weight: 300; }
+    [data-scene="css-01"] .outfit { position: absolute; width: 15vw; min-width: 160px; height: 34vh;
+      border-radius: 1vw; padding: 2vh 1.2vw; will-change: transform, opacity; opacity: 0;
+      box-shadow: 0 16px 40px rgba(0,0,0,.5); }
+    [data-scene="css-01"] .outfit .t { font-weight: 900; font-size: 1.25vw; }
+    [data-scene="css-01"] .outfit .p { margin-top: 1vh; font-size: .95vw; line-height: 1.6; opacity: .85; }
+    [data-scene="css-01"] .o0 { right: 38vw; bottom: 12vh; background: #f5f2ea; color: #333;
+      border: 2px dashed #b9b2a2; box-shadow: none; }
+    [data-scene="css-01"] .o0 .lab { position: absolute; top: -3.4vh; left: 0; font-size: .8vw;
+      letter-spacing: .22em; color: #93b3ac; font-weight: 700; }
+    [data-scene="css-01"] .o1 { right: 26vw; bottom: 17vh; background: linear-gradient(160deg, #1c3f6e, #14294a);
+      color: #dce9ff; transform: rotate(-4deg); }
+    [data-scene="css-01"] .o2 { right: 15vw; bottom: 12vh; background: linear-gradient(160deg, #7e3a5c, #4f2340);
+      color: #ffe3f0; transform: rotate(3deg); }
+    [data-scene="css-01"] .o3 { right: 5vw; bottom: 19vh; background: linear-gradient(160deg, #2b6e46, #17402a);
+      color: #dcffe9; transform: rotate(-2deg); }
+  </style>
+  <div class="kicker">프로그래밍 · 웹</div>
+  <h1>CSS 첫걸음,<br>웹에 <em>옷</em>을 입히다</h1>
+  <p class="sub">HTML이 몸이라면, CSS는 그날의 스타일이다</p>
+  <div class="outfit o0"><span class="lab">민무늬 HTML</span><div class="t">내 블로그</div><div class="p">오늘 배운 것들을 기록합니다.</div></div>
+  <div class="outfit o1"><div class="t">내 블로그</div><div class="p">오늘 배운 것들을 기록합니다.</div></div>
+  <div class="outfit o2"><div class="t">내 블로그</div><div class="p">오늘 배운 것들을 기록합니다.</div></div>
+  <div class="outfit o3"><div class="t">내 블로그</div><div class="p">오늘 배운 것들을 기록합니다.</div></div>
+</div>
+
+<!-- scene: css-02 | metaphor: 스포트라이트 | intent: 선택자는 무대 위에서 누구를 비출지 지목하는 조명임을 빛의 이동으로 체험시킨다 -->
+<div class="slide" data-scene="css-02">
+  <style>
+    [data-scene="css-02"] { background: #0b1213; }
+    [data-scene="css-02"] .cap { position: absolute; left: 7vw; top: 12vh; }
+    [data-scene="css-02"] .cap .no { letter-spacing: .3em; color: #55c8b2; font-weight: 700; font-size: .9em; }
+    [data-scene="css-02"] .cap h2 { font-size: 2.9vw; font-weight: 900; margin-top: 1vh; line-height: 1.3; }
+    [data-scene="css-02"] .cap h2 b { color: #ffd166; }
+    [data-scene="css-02"] .codecard { position: absolute; right: 7vw; top: 14vh; width: 22vw; min-width: 240px;
+      background: #142221; border: 1px solid #29473f; border-radius: .7vw; padding: 1.6vh 1.4vw;
+      font-family: Consolas, monospace; font-size: 1.15vw; line-height: 1.9; color: #bfe0d6; }
+    [data-scene="css-02"] .codecard .sel { color: #ffd166; font-weight: 700; }
+    [data-scene="css-02"] .codecard .pr { color: #74c0ff; }
+    [data-scene="css-02"] .stage { position: absolute; left: 6vw; right: 6vw; bottom: 12vh; height: 34vh; }
+    [data-scene="css-02"] .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+      background: rgba(85,200,178,.35); }
+    [data-scene="css-02"] .tagbox { position: absolute; bottom: 0; border-radius: .6vw .6vw 0 0;
+      background: #16292c; border: 1px solid #29473f; border-bottom: 0; color: #6e948c;
+      font-family: Consolas, monospace; font-weight: 700; display: flex; align-items: center;
+      justify-content: center; transition: none; }
+    [data-scene="css-02"] .tb-h1 { left: 4%; width: 22%; height: 17vh; font-size: 1.5vw; }
+    [data-scene="css-02"] .tb-p1 { left: 31%; width: 17%; height: 11vh; font-size: 1.2vw; }
+    [data-scene="css-02"] .tb-p2 { left: 52%; width: 17%; height: 11vh; font-size: 1.2vw; }
+    [data-scene="css-02"] .tb-a  { left: 74%; width: 12%; height: 8vh; font-size: 1.1vw; }
+    [data-scene="css-02"] .tagbox.lit { color: #ffd166; border-color: #ffd166;
+      background: rgba(255,209,102,.1); box-shadow: 0 0 30px rgba(255,209,102,.22); }
+    [data-scene="css-02"] .beam { position: absolute; bottom: 0; width: 26%; height: 30vh;
+      background: linear-gradient(180deg, rgba(255,209,102,0) 0%, rgba(255,209,102,.14) 100%);
+      clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); will-change: transform; }
+    [data-scene="css-02"] .note { position: absolute; right: 7vw; top: 40vh; width: 22vw;
+      color: #93b3ac; font-weight: 300; line-height: 1.7; }
+    [data-scene="css-02"] .note b { color: #ffd166; }
+  </style>
+  <div class="cap">
+    <div class="no">SCENE 02 · 선택자</div>
+    <h2>스타일을 주기 전에,<br><b>누구에게</b> 줄지 지목한다</h2>
+  </div>
+  <div class="codecard"><span class="sel">p</span> {<br>&nbsp;&nbsp;<span class="pr">color</span>: gold;<br>}</div>
+  <p class="note">선택자 <b>p</b>라고 쓰는 순간, 무대 위 모든 <b>&lt;p&gt;</b>에게만 조명이 떨어진다.</p>
+  <div class="stage">
+    <div class="beam"></div>
+    <div class="tagbox tb-h1">&lt;h1&gt;</div>
+    <div class="tagbox tb-p1">&lt;p&gt;</div>
+    <div class="tagbox tb-p2">&lt;p&gt;</div>
+    <div class="tagbox tb-a">&lt;a&gt;</div>
+    <div class="floor"></div>
+  </div>
+</div>
+
+<!-- scene: css-03 | metaphor: 이름표와 등번호 | intent: class는 여럿이 나눠 다는 이름표, id는 단 한 명의 등번호라는 구분을 부착 순간으로 각인한다 -->
+<div class="slide" data-scene="css-03">
+  <style>
+    [data-scene="css-03"] { background: linear-gradient(170deg, #10201f 0%, #0c1516 70%); }
+    [data-scene="css-03"] .cap { position: absolute; left: 7vw; top: 11vh; }
+    [data-scene="css-03"] .cap .no { letter-spacing: .3em; color: #55c8b2; font-weight: 700; font-size: .9em; }
+    [data-scene="css-03"] .cap h2 { font-size: 2.8vw; font-weight: 900; margin-top: 1vh; line-height: 1.32; }
+    [data-scene="css-03"] .cap h2 .cls { color: #55c8b2; } [data-scene="css-03"] .cap h2 .idd { color: #ff8fa3; }
+    [data-scene="css-03"] .row { position: absolute; left: 6vw; bottom: 15vh; right: 34vw; height: 34vh; }
+    [data-scene="css-03"] .kid { position: absolute; bottom: 0; width: 9.5vw; min-width: 96px; height: 24vh;
+      background: #152423; border: 1px solid #29473f; border-radius: .8vw .8vw .3vw .3vw; }
+    [data-scene="css-03"] .kid .face { position: absolute; top: 2.4vh; left: 50%; transform: translateX(-50%);
+      width: 3.4vw; height: 3.4vw; border-radius: 50%; background: #223b38; }
+    [data-scene="css-03"] .k1 { left: 0; } [data-scene="css-03"] .k2 { left: 21%; bottom: 4vh; }
+    [data-scene="css-03"] .k3 { left: 42%; } [data-scene="css-03"] .k4 { left: 63%; bottom: 3vh; }
+    [data-scene="css-03"] .k5 { left: 84%; }
+    [data-scene="css-03"] .badge-cls { position: absolute; left: 50%; top: 9vh; transform: translateX(-50%) scale(0);
+      background: #55c8b2; color: #08302a; font-weight: 900; font-size: .9vw; padding: .5vh .8vw;
+      border-radius: .4vw; will-change: transform, opacity; opacity: 0; white-space: nowrap; }
+    [data-scene="css-03"] .badge-id { position: absolute; left: 50%; top: 14.5vh; transform: translateX(-50%) scale(0);
+      background: #ff8fa3; color: #4a0f1c; font-weight: 900; font-size: .9vw; padding: .5vh .8vw;
+      border-radius: 999px; will-change: transform, opacity; opacity: 0; white-space: nowrap; }
+    [data-scene="css-03"] .codes { position: absolute; right: 7vw; top: 34vh; width: 24vw; min-width: 250px; }
+    [data-scene="css-03"] .codes pre { font-family: Consolas, monospace; font-size: 1.15vw; line-height: 1.9;
+      background: #142221; border: 1px solid #29473f; border-radius: .7vw; padding: 1.4vh 1.4vw;
+      color: #bfe0d6; margin-bottom: 1.6vh; }
+    [data-scene="css-03"] .codes .c { color: #55c8b2; font-weight: 700; }
+    [data-scene="css-03"] .codes .i { color: #ff8fa3; font-weight: 700; }
+    [data-scene="css-03"] .warn { position: absolute; right: 7vw; bottom: 13vh; width: 24vw;
+      border-right: .3vw solid #ff8fa3; padding-right: 1.2vw; text-align: right;
+      color: #93b3ac; font-weight: 300; line-height: 1.65; }
+    [data-scene="css-03"] .warn b { color: #ff8fa3; }
+  </style>
+  <div class="cap">
+    <div class="no">SCENE 03 · class와 id</div>
+    <h2><span class="cls">class</span>는 여럿이 다는 이름표,<br><span class="idd">id</span>는 단 한 명의 등번호</h2>
+  </div>
+  <div class="row">
+    <div class="kid k1"><div class="face"></div><span class="badge-cls">.team</span></div>
+    <div class="kid k2"><div class="face"></div><span class="badge-cls">.team</span><span class="badge-id">#captain</span></div>
+    <div class="kid k3"><div class="face"></div></div>
+    <div class="kid k4"><div class="face"></div><span class="badge-cls">.team</span></div>
+    <div class="kid k5"><div class="face"></div></div>
+  </div>
+  <div class="codes">
+    <pre><span class="c">.team</span> { color: teal; }</pre>
+    <pre><span class="i">#captain</span> { border: 2px solid pink; }</pre>
+  </div>
+  <p class="warn"><b>id는 한 페이지에 딱 한 번.</b> 같은 등번호를 두 명이 달면 심판(브라우저)이 헷갈린다.</p>
+</div>
+
+<!-- scene: css-04 | metaphor: 다이얼 콘솔 | intent: 속성과 값은 다이얼을 돌려 색·크기·모양을 조절하는 조작판임을 실시간 변형으로 보여준다 -->
+<div class="slide" data-scene="css-04">
+  <style>
+    [data-scene="css-04"] { background: #0d191b; }
+    [data-scene="css-04"] .cap { position: absolute; left: 7vw; top: 12vh; }
+    [data-scene="css-04"] .cap .no { letter-spacing: .3em; color: #55c8b2; font-weight: 700; font-size: .9em; }
+    [data-scene="css-04"] .cap h2 { font-size: 2.9vw; font-weight: 900; margin-top: 1vh; }
+    [data-scene="css-04"] .cap h2 b { color: #74c0ff; }
+    [data-scene="css-04"] .console { position: absolute; left: 7vw; top: 30vh; width: 26vw; min-width: 270px;
+      background: #13211f; border: 1px solid #29473f; border-radius: 1vw; padding: 3vh 2vw;
+      display: flex; justify-content: space-between; }
+    [data-scene="css-04"] .dial { text-align: center; }
+    [data-scene="css-04"] .dial .knob { width: 5.2vw; min-width: 54px; aspect-ratio: 1; border-radius: 50%;
+      background: conic-gradient(#1d3734 0 75%, #55c8b2 75% 100%); position: relative;
+      margin: 0 auto; will-change: transform; }
+    [data-scene="css-04"] .dial .knob::after { content: ''; position: absolute; top: 6%; left: 50%;
+      width: .5vw; height: 28%; background: #e7f0ee; border-radius: .25vw; transform: translateX(-50%); }
+    [data-scene="css-04"] .dial .nm { margin-top: 1.2vh; font-family: Consolas, monospace;
+      font-size: .95vw; color: #74c0ff; }
+    [data-scene="css-04"] .preview { position: absolute; right: 9vw; top: 26vh; width: 30vw; min-width: 300px;
+      padding: 4.5vh 2.4vw; text-align: center; will-change: background, border-radius, transform;
+      background: #21445c; border-radius: .4vw; box-shadow: 0 18px 44px rgba(0,0,0,.5); }
+    [data-scene="css-04"] .preview .ttl { font-weight: 900; font-size: 2vw; color: #fff; will-change: font-size; }
+    [data-scene="css-04"] .preview .dsc { margin-top: 1vh; color: rgba(255,255,255,.75); font-size: 1vw; }
+    [data-scene="css-04"] .strip { position: absolute; left: 7vw; bottom: 10vh; right: 9vw;
+      font-family: Consolas, monospace; font-size: 1.05vw; color: #bfe0d6;
+      background: #142221; border: 1px solid #29473f; border-radius: .7vw; padding: 1.4vh 1.6vw; }
+    [data-scene="css-04"] .strip .pr { color: #74c0ff; } [data-scene="css-04"] .strip .vl { color: #ffd166; }
+  </style>
+  <div class="cap">
+    <div class="no">SCENE 04 · 속성과 값</div>
+    <h2>CSS는 <b>다이얼 조작판</b>이다</h2>
+  </div>
+  <div class="console">
+    <div class="dial"><div class="knob kb1"></div><div class="nm">background</div></div>
+    <div class="dial"><div class="knob kb2"></div><div class="nm">font-size</div></div>
+    <div class="dial"><div class="knob kb3"></div><div class="nm">radius</div></div>
+  </div>
+  <div class="preview"><div class="ttl">내 프로필</div><div class="dsc">다이얼을 돌리면 이 카드가 변한다</div></div>
+  <div class="strip"><span class="pr">background</span>: <span class="vl">teal</span>; &nbsp; <span class="pr">font-size</span>: <span class="vl">32px</span>; &nbsp; <span class="pr">border-radius</span>: <span class="vl">24px</span>;</div>
+</div>
+
+<!-- scene: css-05 | metaphor: 포장 상자 단면 | intent: 내용-패딩-테두리-마진의 겹 구조를 상자 단면이 펼쳐지듯 확장하며 위치 감각으로 새긴다 -->
+<div class="slide" data-scene="css-05">
+  <style>
+    [data-scene="css-05"] { background: linear-gradient(200deg, #122224 0%, #0c1516 65%); }
+    [data-scene="css-05"] .cap { position: absolute; right: 7vw; top: 13vh; width: 34vw; text-align: right; }
+    [data-scene="css-05"] .cap .no { letter-spacing: .3em; color: #55c8b2; font-weight: 700; font-size: .9em; }
+    [data-scene="css-05"] .cap h2 { font-size: 2.9vw; font-weight: 900; margin-top: 1vh; line-height: 1.3; }
+    [data-scene="css-05"] .cap h2 b { color: #ffd166; }
+    [data-scene="css-05"] .cap p { margin-top: 1.6vh; color: #93b3ac; font-weight: 300; line-height: 1.7; }
+    [data-scene="css-05"] .box { position: absolute; left: 10vw; top: 22vh; width: 34vw; height: 56vh; }
+    [data-scene="css-05"] .layer { position: absolute; left: 50%; top: 50%; will-change: transform, opacity;
+      transform: translate(-50%, -50%); border-radius: .8vw; opacity: 0; }
+    [data-scene="css-05"] .ly-margin { width: 100%; height: 100%; border: .22vw dashed #6e948c; }
+    [data-scene="css-05"] .ly-border { width: 76%; height: 76%; border: .5vw solid #ffd166; }
+    [data-scene="css-05"] .ly-padding { width: 56%; height: 56%; background: rgba(85,200,178,.13);
+      border: 1px solid rgba(85,200,178,.4); }
+    [data-scene="css-05"] .ly-content { width: 34%; height: 34%; background: #1d3a44;
+      display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2vw; }
+    [data-scene="css-05"] .tagl { position: absolute; font-family: Consolas, monospace; font-size: 1vw;
+      font-weight: 700; opacity: 0; will-change: opacity; }
+    [data-scene="css-05"] .tg-content { left: 41%; top: 69%; color: #9fc4bb; }
+    [data-scene="css-05"] .tg-padding { left: 16%; top: 26%; color: #55c8b2; }
+    [data-scene="css-05"] .tg-border { right: 5%; top: 13%; color: #ffd166; }
+    [data-scene="css-05"] .tg-margin { left: 2%; top: 1%; color: #6e948c; }
+  </style>
+  <div class="cap">
+    <div class="no">SCENE 05 · 박스 모델</div>
+    <h2>모든 요소는<br><b>네 겹 포장 상자</b>다</h2>
+    <p>안쪽부터 내용 → 패딩(안쪽 여백) → 테두리 → 마진(바깥 여백). 여백이 어느 겹인지가 레이아웃의 절반이다.</p>
+  </div>
+  <div class="box">
+    <div class="layer ly-margin"></div>
+    <div class="layer ly-border"></div>
+    <div class="layer ly-padding"></div>
+    <div class="layer ly-content">내용</div>
+    <span class="tagl tg-content">content</span>
+    <span class="tagl tg-padding">padding</span>
+    <span class="tagl tg-border">border</span>
+    <span class="tagl tg-margin">margin</span>
+  </div>
+</div>
+
+<!-- scene: css-06 | metaphor: 옷 태그 | intent: 오늘의 세 가지를 옷에 달린 라벨 태그처럼 매달아 스타일 배움을 매듭짓는다 -->
+<div class="slide" data-scene="css-06">
+  <style>
+    [data-scene="css-06"] { background: radial-gradient(100% 100% at 80% 90%, #16292c 0%, #0e1719 55%); }
+    [data-scene="css-06"] .head { position: absolute; left: 7vw; top: 16vh; width: 40vw; }
+    [data-scene="css-06"] .head .no { letter-spacing: .3em; color: #55c8b2; font-weight: 700; font-size: .9em; }
+    [data-scene="css-06"] .head h2 { font-size: 3vw; font-weight: 900; line-height: 1.3; margin-top: 1.2vh; }
+    [data-scene="css-06"] .head h2 b { color: #55c8b2; }
+    [data-scene="css-06"] .rack { position: absolute; right: 8vw; top: 12vh; width: 38vw; height: 60vh; }
+    [data-scene="css-06"] .wire { position: absolute; top: 0; left: 0; right: 0; height: .4vh;
+      background: #29473f; border-radius: .2vh; }
+    [data-scene="css-06"] .tagit { position: absolute; top: .4vh; width: 30%; transform-origin: 50% 0;
+      will-change: transform, opacity; opacity: 0; }
+    [data-scene="css-06"] .tagit .string { width: 1px; height: 6vh; background: #6e948c; margin: 0 auto; }
+    [data-scene="css-06"] .tagit .paper { background: #f5f2ea; color: #223; border-radius: .5vw;
+      padding: 2vh 1.2vw; text-align: center; box-shadow: 0 12px 30px rgba(0,0,0,.45); }
+    [data-scene="css-06"] .tagit .paper::before { content: ''; display: block; width: .9vw; height: .9vw;
+      border-radius: 50%; background: #0e1719; margin: -1vh auto 1vh; }
+    [data-scene="css-06"] .tagit .t { font-weight: 900; font-size: 1.25vw; }
+    [data-scene="css-06"] .tagit .d { margin-top: .8vh; font-size: .9vw; color: #667; line-height: 1.5; }
+    [data-scene="css-06"] .t1 { left: 0; } [data-scene="css-06"] .t2 { left: 35%; top: 8vh; } [data-scene="css-06"] .t3 { left: 70%; top: 2vh; }
+    [data-scene="css-06"] .next { position: absolute; left: 7vw; bottom: 11vh; color: #93b3ac; }
+    [data-scene="css-06"] .next b { color: #74c0ff; }
+  </style>
+  <div class="head">
+    <div class="no">SCENE 06 · 정리</div>
+    <h2>오늘 산 옷,<br><b>태그 세 장</b>만 기억하자</h2>
+  </div>
+  <div class="rack">
+    <div class="wire"></div>
+    <div class="tagit t1"><div class="string"></div><div class="paper"><div class="t">지목</div><div class="d">선택자 — 태그 · .class · #id</div></div></div>
+    <div class="tagit t2"><div class="string"></div><div class="paper"><div class="t">조절</div><div class="d">속성: 값; — 색·크기·여백 다이얼</div></div></div>
+    <div class="tagit t3"><div class="string"></div><div class="paper"><div class="t">포장</div><div class="d">박스 모델 — 패딩 안, 마진 밖</div></div></div>
+  </div>
+  <p class="next">다음 차시 — 상자들을 줄 세우는 기술, <b>레이아웃과 Flexbox</b></p>
+</div>
+
+</div>
+
+<!-- Deck Contract v1: 네비·크롬·모션 런타임·라이브 연동은 공통 컨트롤러가 제공 -->
+<script type="module" src="../../../../live/runtime/deck.js?v=1"></script>
+<script type="module">
+/* 씬 타임라인 — deck.js 전역(SceneMotion·interpolate·easeOut·easeInOut·springy) 사용 */
+
+/* css-01 옷 입히기: 민무늬 → 스타일 카드 3벌 순차 팬 */
+SceneMotion.register('css-01', (t, el) => {
+  const base = el.querySelector('.o0');
+  base.style.opacity = Math.min(1, interpolate(t, [0.1, 0.5], [0, 1]));
+  ['.o1', '.o2', '.o3'].forEach((sel, i) => {
+    const card = el.querySelector(sel);
+    const s = springy(t, 0.55 + i * 0.3, 0.55);
+    card.style.opacity = Math.min(1, s * 1.5);
+    const rot = [-4, 3, -2][i];
+    card.style.transform = `rotate(${rot}deg) translateY(${(1 - s) * 6}vh)`;
+  });
+});
+
+/* css-02 스포트라이트: 빔이 h1을 지나 p들 위에 멈추고 p만 점등 */
+SceneMotion.register('css-02', (t, el) => {
+  const stage = el.querySelector('.stage');
+  const W = stage.clientWidth;
+  const x = interpolate(t, [0.3, 1.3], [0.02 * W, 0.34 * W], easeInOut);
+  el.querySelector('.beam').style.transform = `translateX(${x}px)`;
+  const litP = t >= 1.15;
+  el.querySelector('.tb-p1').classList.toggle('lit', litP);
+  el.querySelector('.tb-p2').classList.toggle('lit', t >= 1.35);
+  el.querySelector('.tb-h1').classList.toggle('lit', t >= 0.45 && t < 1.0);
+});
+
+/* css-03 이름표: .team 이름표 3장 순차 부착 → #captain 등번호 쾅 */
+SceneMotion.register('css-03', (t, el) => {
+  el.querySelectorAll('.badge-cls').forEach((b, i) => {
+    const s = springy(t, 0.3 + i * 0.3, 0.5);
+    b.style.opacity = Math.min(1, s * 1.6);
+    b.style.transform = `translateX(-50%) scale(${s})`;
+  });
+  const id = el.querySelector('.badge-id');
+  const s = springy(t, 1.35, 0.5);
+  id.style.opacity = Math.min(1, s * 1.8);
+  id.style.transform = `translateX(-50%) scale(${s})`;
+});
+
+/* css-04 다이얼: 세 다이얼이 돌며 미리보기 카드의 색·크기·모서리가 변한다 */
+SceneMotion.register('css-04', (t, el) => {
+  const k1 = interpolate(t, [0.3, 1.0], [0, 150], easeInOut);
+  const k2 = interpolate(t, [0.7, 1.3], [0, 120], easeInOut);
+  const k3 = interpolate(t, [1.0, 1.5], [0, 200], easeInOut);
+  el.querySelector('.kb1').style.transform = `rotate(${k1}deg)`;
+  el.querySelector('.kb2').style.transform = `rotate(${k2}deg)`;
+  el.querySelector('.kb3').style.transform = `rotate(${k3}deg)`;
+  const pv = el.querySelector('.preview');
+  const hue = interpolate(t, [0.3, 1.0], [207, 178], easeInOut);       // 파랑 → teal
+  pv.style.background = `hsl(${hue} 46% 30%)`;
+  pv.style.borderRadius = interpolate(t, [1.0, 1.5], [6, 24], easeInOut) + 'px';
+  el.querySelector('.ttl').style.fontSize = interpolate(t, [0.7, 1.3], [1.6, 2.2], easeInOut) + 'vw';
+});
+
+/* css-05 박스 모델: 안쪽부터 바깥으로 겹이 펼쳐지고 라벨 점등 */
+SceneMotion.register('css-05', (t, el) => {
+  const order = ['.ly-content', '.ly-padding', '.ly-border', '.ly-margin'];
+  const tags = ['.tg-content', '.tg-padding', '.tg-border', '.tg-margin'];
+  order.forEach((sel, i) => {
+    const ly = el.querySelector(sel);
+    const s = springy(t, 0.2 + i * 0.3, 0.55);
+    ly.style.opacity = Math.min(1, s * 1.5);
+    ly.style.transform = `translate(-50%, -50%) scale(${0.6 + 0.4 * s})`;
+    el.querySelector(tags[i]).style.opacity = interpolate(t, [0.45 + i * 0.3, 0.75 + i * 0.3], [0, 1]);
+  });
+});
+
+/* css-06 옷 태그: 태그 세 장이 살짝 흔들리며 걸린다 (감쇠 스윙 = t의 순수 함수) */
+SceneMotion.register('css-06', (t, el) => {
+  ['.t1', '.t2', '.t3'].forEach((sel, i) => {
+    const tag = el.querySelector(sel);
+    const d = 0.3 + i * 0.32;
+    const k = Math.max(0, Math.min(1, (t - d) / 0.5));
+    tag.style.opacity = Math.min(1, k * 1.5);
+    const swing = k >= 1 ? Math.exp(-(t - d - 0.5) * 2.2) * Math.cos((t - d - 0.5) * 9) * 7 : (1 - k) * 14;
+    tag.style.transform = `rotate(${swing}deg)`;
+  });
+});
+</script>
+</body>
+</html>

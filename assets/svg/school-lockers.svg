@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 560" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <!-- 의도: 정면에서 본 세 칸짜리 학교 사물함 몸체. 문은 없고 칸 안쪽이 보인다. 문은 locker-door.svg를
+       덱이 칸마다 따로 얹어 열고 닫는다 (vibe-github-supabase 20장 RLS · 내 열쇠로 내 칸만).
+       완성도 높은 손그림: 일정한 윤곽선, 평평한 면. 밝은 배경용 잉크 #1f2430. 텍스트 없음.
+       팔레트: ink #1f2430 · steel #a9bbcd · steelShade #8499ae · cap #c4d2e0 · inside #2b3446 · insideShade #1f2633 · base #5b6c80
+       앵커: 칸 세 개 x 44~182 · 201~339 · 358~496 (폭 138), y 62~496. 문(locker-door.svg viewBox 0 0 138 434)을 같은 배율로 그 자리에 얹는다 -->
+
+  <ellipse cx="270" cy="548" rx="250" ry="9" fill="#1f2430" opacity=".08" stroke="none" />
+  <rect x="22" y="40" width="496" height="478" rx="10" fill="#a9bbcd" stroke="#1f2430" stroke-width="2.4" />
+  <path d="M14 26 L526 26 C530 26 532 28 532 32 L532 44 L8 44 L8 32 C8 28 10 26 14 26 Z" fill="#c4d2e0" stroke="#1f2430" stroke-width="2.2" />
+  <path d="M22 504 L518 504 L518 530 C518 534 516 536 512 536 L28 536 C24 536 22 534 22 530 Z" fill="#5b6c80" stroke="#1f2430" stroke-width="2.2" />
+  <path d="M184 62 L199 62 L199 496 L184 496 Z" fill="#8499ae" stroke="none" />
+  <path d="M341 62 L356 62 L356 496 L341 496 Z" fill="#8499ae" stroke="none" />
+  <g stroke="#1f2430" stroke-width="2.2">
+    <rect x="44" y="62" width="138" height="434" rx="4" fill="#2b3446" />
+    <rect x="201" y="62" width="138" height="434" rx="4" fill="#2b3446" />
+    <rect x="358" y="62" width="138" height="434" rx="4" fill="#2b3446" />
+  </g>
+  <g fill="#1f2633" stroke="none">
+    <path d="M45 63 L181 63 L181 78 L45 78 Z" /><path d="M202 63 L338 63 L338 78 L202 78 Z" /><path d="M359 63 L495 63 L495 78 L359 78 Z" />
+    <path d="M45 172 L60 172 L60 495 L45 495 Z" /><path d="M202 172 L217 172 L217 495 L202 495 Z" /><path d="M359 172 L374 172 L374 495 L359 495 Z" />
+  </g>
+  <g stroke="#1f2430" stroke-width="1.8">
+    <path d="M44 170 L182 170" /><path d="M201 170 L339 170" /><path d="M358 170 L496 170" />
+  </g>
+  <g stroke="#a9bbcd" stroke-width="2.4">
+    <path d="M113 186 L113 200 C113 208 123 208 123 200" /><path d="M270 186 L270 200 C270 208 280 208 280 200" /><path d="M427 186 L427 200 C427 208 437 208 437 200" />
+  </g>
+  <path d="M30 56 L30 300" stroke="#ffffff" stroke-width="3" opacity=".3" />
+  <path d="M40 34 L200 34" stroke="#ffffff" stroke-width="3" opacity=".4" />
+</svg>

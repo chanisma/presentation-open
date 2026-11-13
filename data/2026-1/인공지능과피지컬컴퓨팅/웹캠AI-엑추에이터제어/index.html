@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>if(!location.pathname.endsWith('/')&&!location.pathname.endsWith('.html')){var b=document.createElement('base');b.href=location.pathname+'/';document.head.appendChild(b);}</script>
+  <title>웹캠 AI × 엑추에이터 제어</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══ Reset & CSS Variables ═══ */
+    :root {
+      --style-bg: #0F0F2D;
+      --style-primary: #A78BFA;
+      --style-accent: #67E8F9;
+      --style-text: #FFFFFF;
+      --style-text-secondary: #C8C8E0;
+      --glass-fill: rgba(255,255,255,0.08);
+      --glass-border: rgba(255,255,255,0.15);
+      --glass-fill-strong: rgba(255,255,255,0.12);
+      --color-warn: #FBBF24;
+      --color-success: #34D399;
+      --color-pink: #F472B6;
+      --color-orange: #FB923C;
+      font-size: clamp(16px, 1.5vw, 28px);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ═══ Typography ═══ */
+    body {
+      background: var(--style-bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 20% 30%, rgba(167,139,250,0.15), transparent),
+        radial-gradient(ellipse 50% 40% at 80% 70%, rgba(103,232,249,0.10), transparent);
+      color: var(--style-text);
+      font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden; line-height: 1.6;
+    }
+    h1, h2, h3 {
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+      font-weight: 700; color: var(--style-text);
+      margin-top: 0; word-break: keep-all;
+    }
+    h1 { font-size: 2.4rem; margin-bottom: 0.5rem; line-height: 1.2; }
+    h2 { font-size: 1.5rem; margin-bottom: 0.6rem; }
+    h3 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+    p { font-size: 1rem; line-height: 1.7; margin-top: 0; margin-bottom: 0.4rem; word-break: keep-all; }
+
+    /* ═══ Accessibility ═══ */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    .skip-link {
+      position: absolute; top: -40px; left: 0;
+      background: var(--style-primary); color: var(--style-bg);
+      padding: 8px 16px; z-index: 9999; font-size: 14px;
+      border-radius: 0 0 4px 0; transition: top 0.2s;
+    }
+    .skip-link:focus { top: 0; }
+    :focus-visible { outline: 3px solid var(--style-accent); outline-offset: 2px; border-radius: 4px; }
+    :focus:not(:focus-visible) { outline: none; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ═══ Slide Container ═══ */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      z-index: 1000; width: 0%; transition: width 0.3s linear;
+      will-change: width; transform: translateZ(0);
+    }
+    .presentation { height: calc(100vh - 42px); position: relative; overflow: hidden; }
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.8rem 1.2rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      transform: translateZ(0); backface-visibility: hidden;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; }
+    .slide.active .browser-card { animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1) both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popUp {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ═══ Glassmorphism Card ═══ */
+    .browser-card {
+      width: 100%; max-width: 1200px;
+      max-height: calc(100vh - 4.8rem);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--glass-fill);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 1rem;
+    }
+    .browser-card--frameless {
+      background: transparent;
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      border: none;
+    }
+    .browser-topbar {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid var(--glass-border);
+      min-height: 35px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FEBC2E; }
+    .dot.green { background: #28C840; }
+    .topbar-title {
+      flex: 1; text-align: center;
+      font-size: 0.82rem; color: var(--style-text-secondary);
+      font-family: 'Space Grotesk', sans-serif; margin: 0 auto;
+    }
+    .browser-content {
+      flex: 1; overflow-y: auto;
+      padding: 1rem 2rem 0.8rem;
+    }
+
+    /* ═══ Section Header ═══ */
+    .section-header { margin-bottom: 0.6rem; }
+    .section-header h2 { display: flex; align-items: center; gap: 0.3rem; }
+    .section-icon { display: inline; font-size: 1.2em; margin-right: 0.4em; vertical-align: -0.1em; }
+    .section-subtitle {
+      font-size: 0.88rem; color: var(--style-text-secondary);
+      margin-top: 0.15rem; font-weight: 400;
+    }
+
+    /* ═══ Highlight Box ═══ */
+    .highlight-box {
+      background: var(--glass-fill-strong);
+      border: 1px solid var(--glass-border);
+      border-left: 3px solid var(--style-primary);
+      border-radius: 0.5rem;
+      padding: 0.6rem 1rem;
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      color: var(--style-text);
+    }
+    .highlight-box p { margin: 0; }
+
+    /* ═══ Card Grid ═══ */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .card {
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem 1rem;
+      contain: layout style;
+    }
+    .slide.active .card { animation: popUp 0.5s ease-out both; }
+    .slide.active .card:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .card:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .card:nth-child(4) { animation-delay: 0.24s; }
+    .slide.active .card:nth-child(5) { animation-delay: 0.32s; }
+    .slide.active .card:nth-child(6) { animation-delay: 0.40s; }
+    .card-icon { font-size: 1.4rem; display: block; margin-bottom: 0.3rem; }
+    .card-title { font-size: 1rem; margin-bottom: 0.2rem; color: var(--style-accent); }
+    .card-desc { font-size: 0.88rem; color: var(--style-text-secondary); margin: 0; line-height: 1.5; }
+
+    /* card border-left color variants */
+    .card--purple { border-left: 3px solid var(--style-primary); }
+    .card--cyan { border-left: 3px solid var(--style-accent); }
+    .card--green { border-left: 3px solid var(--color-success); }
+    .card--warn { border-left: 3px solid var(--color-warn); }
+    .card--pink { border-left: 3px solid var(--color-pink); }
+    .card--orange { border-left: 3px solid var(--color-orange); }
+
+    /* ═══ Badge ═══ */
+    .badge {
+      display: inline-block; padding: 0.15rem 0.6rem;
+      border-radius: 2rem; font-size: 0.82rem; font-weight: 600;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .badge-primary { background: rgba(167,139,250,0.2); color: var(--style-primary); border: 1px solid rgba(167,139,250,0.3); }
+    .badge-accent { background: rgba(103,232,249,0.15); color: var(--style-accent); border: 1px solid rgba(103,232,249,0.3); }
+    .badge-success { background: rgba(52,211,153,0.15); color: var(--color-success); border: 1px solid rgba(52,211,153,0.3); }
+    .badge-warn { background: rgba(251,191,36,0.15); color: var(--color-warn); border: 1px solid rgba(251,191,36,0.3); }
+
+    /* ═══ Stat Grid ═══ */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin: 0.5rem 0; }
+    .stat-item {
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.7rem;
+      padding: 0.8rem;
+      text-align: center;
+      contain: layout style;
+    }
+    .slide.active .stat-item { animation: popUp 0.5s ease-out both; }
+    .slide.active .stat-item:nth-child(2) { animation-delay: 0.1s; }
+    .slide.active .stat-item:nth-child(3) { animation-delay: 0.2s; }
+    .stat-icon { font-size: 1.4rem; display: block; margin-bottom: 0.2rem; }
+    .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block; margin-bottom: 0.15rem;
+    }
+    .stat-label { font-size: 0.88rem; color: var(--style-text-secondary); }
+
+    /* ═══ Activity List ═══ */
+    .activity-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.6rem;
+      padding: 0.6rem 0.8rem;
+    }
+    .slide.active .activity-item { animation: popUp 0.5s ease-out both; }
+    .slide.active .activity-item:nth-child(2) { animation-delay: 0.08s; }
+    .slide.active .activity-item:nth-child(3) { animation-delay: 0.16s; }
+    .slide.active .activity-item:nth-child(4) { animation-delay: 0.24s; }
+    .activity-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+    .activity-body { flex: 1; }
+    .activity-title { font-size: 1rem; margin-bottom: 0.15rem; }
+    .activity-desc { font-size: 0.88rem; color: var(--style-text-secondary); margin: 0; line-height: 1.5; }
+
+    /* ═══ Task List ═══ */
+    .task-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+    .task-item {
+      display: flex; align-items: flex-start; gap: 0.7rem;
+      border-left: 3px solid var(--style-primary);
+      padding: 0.5rem 0.8rem;
+      background: var(--glass-fill);
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
+    .task-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--style-primary); flex-shrink: 0;
+      min-width: 1.6rem;
+    }
+    .task-body { flex: 1; }
+    .task-title { font-size: 1rem; margin-bottom: 0.15rem; }
+    .task-desc { font-size: 0.88rem; color: var(--style-text-secondary); margin: 0; line-height: 1.5; }
+
+    /* ═══ Two Column ═══ */
+    .two-col { display: flex; gap: 1rem; align-items: flex-start; }
+    .col-left, .col-right { flex: 1; }
+    .col-title {
+      font-size: 1.05rem; margin-bottom: 0.4rem;
+      color: var(--style-accent);
+      font-family: 'Space Grotesk', 'Noto Sans KR', sans-serif;
+    }
+    .col-divider {
+      width: 1px; min-height: 100%;
+      background: var(--glass-border); flex-shrink: 0;
+    }
+
+    /* ═══ Code Block ═══ */
+    .code-block {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      font-family: 'Space Grotesk', 'Courier New', monospace;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      color: var(--style-text);
+      white-space: pre;
+    }
+    .code-block .kw { color: var(--style-primary); }
+    .code-block .fn { color: var(--style-accent); }
+    .code-block .cm { color: rgba(200,200,224,0.5); }
+    .code-block .str { color: var(--color-success); }
+    .code-block .num { color: var(--color-warn); }
+
+    /* ═══ Prompt Box ═══ */
+    .prompt-box {
+      background: rgba(167,139,250,0.08);
+      border: 1px solid rgba(167,139,250,0.25);
+      border-radius: 0.6rem;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--style-text);
+      position: relative;
+    }
+    .prompt-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--style-primary);
+      margin-bottom: 0.3rem; display: block;
+    }
+
+    /* ═══ Comparison Table ═══ */
+    .table-wrapper { overflow-x: auto; border-radius: 0.5rem; }
+    .comparison-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .comparison-table thead th {
+      background: rgba(167,139,250,0.2);
+      color: var(--style-text);
+      padding: 0.5rem 0.6rem;
+      text-align: left;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600; font-size: 0.88rem;
+      border-bottom: 2px solid var(--style-primary);
+    }
+    .comparison-table tbody td,
+    .comparison-table tbody th {
+      padding: 0.4rem 0.6rem;
+      border-bottom: 1px solid var(--glass-border);
+      color: var(--style-text-secondary);
+      font-size: 0.85rem;
+    }
+    .comparison-table tbody th {
+      color: var(--style-text); font-weight: 600;
+      white-space: nowrap;
+    }
+    .comparison-table tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* ═══ Visual Wiring Diagram ═══ */
+    .wiring-diagram {
+      display: flex; align-items: stretch; justify-content: center;
+      gap: 0; position: relative;
+      padding: 0.4rem 0;
+    }
+    .wiring-board {
+      background: rgba(0,0,0,0.35);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 0.6rem;
+      padding: 0.5rem 0.7rem;
+      min-width: 7rem;
+      display: flex; flex-direction: column; gap: 0.3rem;
+      position: relative; z-index: 2;
+    }
+    .wiring-board--arduino {
+      border-color: rgba(103,232,249,0.35);
+      background: rgba(103,232,249,0.06);
+    }
+    .wiring-board--component {
+      border-color: rgba(167,139,250,0.35);
+      background: rgba(167,139,250,0.06);
+    }
+    .wiring-board__label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem; font-weight: 700;
+      text-align: center; padding-bottom: 0.25rem;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 0.15rem;
+    }
+    .wiring-board__label--cyan { color: var(--style-accent); }
+    .wiring-board__label--purple { color: var(--style-primary); }
+    .wiring-board__label--warn { color: var(--color-warn); }
+    .wiring-pin {
+      display: flex; align-items: center; gap: 0.3rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem; padding: 0.2rem 0.3rem;
+      border-radius: 0.3rem;
+      background: rgba(255,255,255,0.04);
+    }
+    .wiring-pin__dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .wiring-pin__name { color: var(--style-text); font-weight: 500; }
+    .wiring-pin__desc { color: var(--style-text-secondary); font-size: 0.8rem; margin-left: auto; }
+    .wiring-wires {
+      flex: 1; min-width: 4rem; max-width: 8rem;
+      position: relative; z-index: 1;
+    }
+    .wiring-wires svg { width: 100%; height: 100%; display: block; }
+    .wire-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 9px; font-weight: 600;
+    }
+    /* tip row under diagram */
+    .wiring-tip {
+      display: flex; align-items: flex-start; gap: 0.4rem;
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.4rem;
+      padding: 0.35rem 0.6rem;
+      font-size: 0.82rem; color: var(--style-text-secondary);
+      margin-top: 0.35rem;
+    }
+    .wiring-tip__icon { flex-shrink: 0; font-size: 0.9rem; }
+    .wiring-tip strong { color: var(--style-text); }
+    /* multi-component stacked layout */
+    .wiring-stack { display: flex; flex-direction: column; gap: 0.5rem; }
+    .wiring-stack .wiring-diagram { padding: 0.2rem 0; }
+    .wiring-stack .wiring-board { min-width: 6.5rem; padding: 0.35rem 0.6rem; }
+    .wiring-stack .wiring-board__label { font-size: 0.8rem; padding-bottom: 0.2rem; }
+    .wiring-stack .wiring-pin { font-size: 0.8rem; padding: 0.15rem 0.25rem; }
+    .wiring-stack .wiring-wires { min-width: 3.5rem; max-width: 7rem; }
+    .wiring-stack .wiring-tip { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
+    .wiring-divider-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--style-text-secondary);
+      text-align: center; padding: 0.1rem 0;
+      border-top: 1px solid var(--glass-border);
+      margin-top: 0.1rem;
+    }
+    @media (max-width: 768px) {
+      .wiring-diagram { flex-direction: column; align-items: center; }
+      .wiring-wires { min-width: unset; max-width: unset; width: 100%; height: 3rem; }
+      .wiring-stack .wiring-wires { min-width: unset; max-width: unset; width: 100%; height: 2.5rem; }
+    }
+
+    /* ═══ Cover ═══ */
+    .cover-slide {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; min-height: 60vh;
+    }
+    .cover-badge {
+      margin-bottom: 0.8rem;
+    }
+    .cover-title {
+      font-size: 2.4rem;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.4rem;
+    }
+    .cover-subtitle {
+      font-size: 1.1rem; color: var(--style-text-secondary);
+      margin-bottom: 0.8rem; font-weight: 300;
+    }
+    .cover-divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, var(--style-primary), var(--style-accent));
+      margin: 0.5rem auto;
+    }
+    .cover-meta {
+      display: flex; gap: 0.6rem; align-items: center;
+      font-size: 0.88rem; color: var(--style-text-secondary);
+      margin-top: 0.4rem;
+    }
+    .cover-icons {
+      display: flex; gap: 0.8rem; margin-top: 1rem;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .cover-icon-item {
+      background: var(--glass-fill);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.88rem;
+      color: var(--style-text-secondary);
+    }
+
+    /* ═══ End Slide ═══ */
+    .end-slide {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .end-icon { font-size: 2rem; margin-bottom: 0.3rem; display: block; }
+    .end-title {
+      font-size: 2rem;
+      background: linear-gradient(135deg, var(--style-primary), var(--style-accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.3rem;
+    }
+    .end-subtitle { font-size: 1rem; color: var(--style-text-secondary); margin-bottom: 0.6rem; }
+    .end-summary {
+      text-align: left; max-width: 600px; width: 100%;
+    }
+    .summary-title {
+      font-size: 1rem; margin-bottom: 0.4rem;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .summary-list {
+      list-style: none; padding: 0;
+      display: flex; flex-direction: column; gap: 0.25rem;
+    }
+    .summary-list li {
+      font-size: 0.92rem; color: var(--style-text-secondary);
+      padding-left: 0.2rem;
+    }
+
+    /* ═══ Navigation ═══ */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.5rem; padding: 0.35rem 1.5rem;
+      background: rgba(15,15,45,0.9);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--glass-border);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--glass-border);
+      border-radius: 50%; background: var(--glass-fill);
+      cursor: pointer; font-size: 0; color: var(--style-text-secondary);
+      transition: all 0.2s; padding: 0; line-height: 1;
+    }
+    .nav-btn svg { width: 0.55rem; height: 0.55rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) {
+      border-color: var(--style-primary);
+      background: rgba(167,139,250,0.2);
+      color: var(--style-text);
+    }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .nav-counter {
+      font-size: 13px; font-weight: 700;
+      color: var(--style-text-secondary);
+      min-width: 3rem; text-align: center;
+      display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none;
+      border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700;
+      color: var(--style-text-secondary);
+      font-family: 'Space Grotesk', sans-serif; padding: 0; outline: none;
+      cursor: pointer; transition: border-color 0.2s; line-height: 1;
+    }
+    .slide-input:hover { border-bottom-color: var(--style-primary); }
+    .slide-input:focus {
+      border-bottom-color: var(--style-accent);
+      color: var(--style-text);
+      border-radius: 2px;
+    }
+
+    /* ═══ Decorative Blobs ═══ */
+    .deco-blob {
+      position: absolute; border-radius: 50%;
+      filter: blur(60px); pointer-events: none; z-index: -1;
+    }
+    .deco-blob--tr {
+      right: -2rem; top: -2rem; width: 38%;
+      aspect-ratio: 1; opacity: 0.12;
+      background: var(--style-primary);
+    }
+    .deco-blob--bl {
+      left: -3rem; bottom: -1rem; width: 28%;
+      aspect-ratio: 1; opacity: 0.10;
+      background: var(--style-accent);
+    }
+
+    /* ═══ Responsive ═══ */
+    @media (max-width: 1024px) {
+      html, body { font-size: clamp(15px, 2vw, 22px); }
+      .browser-card { border-radius: 0.8rem; }
+    }
+    @media (max-width: 768px) {
+      html, body { font-size: clamp(14px, 3vw, 20px); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { flex-direction: column; }
+      .col-divider { width: 100%; min-height: 1px; height: 1px; }
+      h1 { font-size: 2rem; }
+      h2 { font-size: 1.3rem; }
+      .browser-topbar { padding: 0.4rem 0.8rem; }
+    }
+    @media (max-width: 480px) {
+      html, body { font-size: clamp(14px, 3.5vw, 18px); }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .nav-btn { width: 1.5rem; height: 1.5rem; }
+      .nav-bar { padding: 0.25rem 0.75rem; }
+      h1 { font-size: 1.7rem; }
+      h2 { font-size: 1.2rem; }
+      .browser-content { padding: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#presentation" class="skip-link">본문으로 바로가기</a>
+
+  <div class="progress-bar" id="progressBar" role="progressbar"
+       aria-valuenow="1" aria-valuemin="1" aria-valuemax="13"
+       aria-label="프레젠테이션 진행률"></div>
+
+  <div class="presentation" id="presentation" role="main">
+
+    <!-- ═══ Slide 1: Cover ═══ -->
+    <div class="slide active" data-slide="0" role="region" aria-label="슬라이드 1: 표지">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content cover-slide">
+          <div class="deco-blob deco-blob--tr"></div>
+          <div class="deco-blob deco-blob--bl"></div>
+          <div class="cover-badge">
+            <span class="badge badge-primary">인공지능과 피지컬컴퓨팅</span>
+          </div>
+          <h1 class="cover-title">웹캠 AI × 엑추에이터 제어</h1>
+          <p class="cover-subtitle">Teachable Machine 모델로 부저, LED, 서보모터를 제어하자</p>
+          <div class="cover-divider" aria-hidden="true"></div>
+          <div class="cover-meta">
+            <span>샘플고등학교</span>
+            <span aria-hidden="true">·</span>
+            <span><time datetime="2026-03">2026년 3월</time></span>
+          </div>
+          <div class="cover-icons">
+            <span class="cover-icon-item">📷 웹캠</span>
+            <span class="cover-icon-item">🧠 AI 모델</span>
+            <span class="cover-icon-item">⚡ 아두이노</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 2: 지난 시간 복습 ═══ -->
+    <div class="slide" data-slide="1" role="region" aria-label="슬라이드 2: 지난 시간 복습">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">지난 시간 복습</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 지난 프로젝트 되돌아보기</h2>
+            <p class="section-subtitle">손동작 인식 스마트 조명 프로젝트</p>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>Teachable Machine으로 학습시킨 손동작 모델이 웹캠 영상을 분석하고, Web Serial API를 통해 아두이노에 명령을 보내 <strong>RGB LED</strong>를 제어했습니다.</p>
+          </div>
+          <div class="grid-2 card-grid" role="list" style="margin-top:0.5rem;">
+            <div class="card card--purple" role="listitem">
+              <h3 class="card-title">웹 → 시리얼 통신</h3>
+              <p class="card-desc">브라우저에서 Web Serial API로 아두이노에 문자('R', 'G', 'B', 'O')를 전송</p>
+            </div>
+            <div class="card card--cyan" role="listitem">
+              <h3 class="card-title">아두이노 → LED 제어</h3>
+              <p class="card-desc">시리얼로 받은 문자에 따라 해당 색상 LED를 ON/OFF하는 switch 구문</p>
+            </div>
+            <div class="card card--green" role="listitem">
+              <h3 class="card-title">핵심 흐름</h3>
+              <p class="card-desc">웹캠 → AI 분류 → 시리얼 전송 → 아두이노 → LED 동작</p>
+            </div>
+            <div class="card card--warn" role="listitem">
+              <h3 class="card-title">이번 시간 확장</h3>
+              <p class="card-desc">LED 외의 다양한 엑추에이터로 확장하여 더 창의적인 프로젝트 만들기</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 3: 학습 목표 ═══ -->
+    <div class="slide" data-slide="2" role="region" aria-label="슬라이드 3: 학습 목표">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">학습 목표</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 오늘의 학습 목표</h2>
+          </div>
+          <div class="stat-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <div class="stat-number">01</div>
+              <span class="stat-label">다양한 엑추에이터의 종류와 특성을 이해한다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <div class="stat-number">02</div>
+              <span class="stat-label">서보모터 회로를 연결하고 동작을 확인한다</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <div class="stat-number">03</div>
+              <span class="stat-label">AI를 활용해 아두이노 코드를 생성하고 응용한다</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>지난 시간의 <strong>LED 제어</strong> 코드 구조를 그대로 활용하되, 엑추에이터만 바꿔서 다양한 프로젝트를 만듭니다. AI에게 코드를 요청하는 <strong>프롬프트 작성법</strong>도 함께 연습합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 4: 엑추에이터 소개 ═══ -->
+    <div class="slide" data-slide="3" role="region" aria-label="슬라이드 4: 엑추에이터란">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">엑추에이터 소개</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⊕</span> 엑추에이터란?</h2>
+            <p class="section-subtitle">전기 신호를 물리적 동작으로 바꾸는 출력 장치</p>
+          </div>
+          <div class="grid-3 card-grid" role="list">
+            <div class="card card--warn" role="listitem">
+              <h3 class="card-title">피에조 부저</h3>
+              <p class="card-desc">전기 신호 → <strong>소리</strong> 출력. tone() 함수로 주파수 조절 가능. 경고음, 멜로디 등에 활용</p>
+              <span class="badge badge-warn">난이도 ★☆☆</span>
+            </div>
+            <div class="card card--green" role="listitem">
+              <h3 class="card-title">LED (발광 다이오드)</h3>
+              <p class="card-desc">전기 신호 → <strong>빛</strong> 출력. analogWrite()로 밝기 조절(PWM). 지난 시간에 사용한 부품</p>
+              <span class="badge badge-success">난이도 ★☆☆</span>
+            </div>
+            <div class="card card--cyan" role="listitem">
+              <h3 class="card-title">SG90 서보모터</h3>
+              <p class="card-desc">전기 신호 → <strong>회전</strong> 동작. 0°~180° 각도 제어. 문 개폐, 팔 움직임 등 동작 표현</p>
+              <span class="badge badge-accent">난이도 ★★☆</span>
+            </div>
+          </div>
+          <div class="highlight-box" role="note">
+            <p>이 외에도 DC 모터, 진동 모터, 릴레이 등 다양한 엑추에이터가 있지만, 오늘은 위 세 가지를 활용합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 5: 서보모터 회로 연결 (시각적) ═══ -->
+    <div class="slide" data-slide="4" role="region" aria-label="슬라이드 5: 서보모터 회로 연결">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">서보모터 회로 연결</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">※</span> SG90 서보모터 연결 방법</h2>
+            <p class="section-subtitle">3개의 선만 연결하면 완성됩니다</p>
+          </div>
+          <!-- Visual Wiring Diagram -->
+          <div class="wiring-diagram" role="img" aria-label="SG90 서보모터와 아두이노 UNO 배선도: 갈색선은 GND, 빨간선은 5V, 주황선은 D9 핀에 연결">
+            <div class="wiring-board wiring-board--component">
+              <div class="wiring-board__label wiring-board__label--purple">SG90 서보모터</div>
+              <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#795548;"></span><span class="wiring-pin__name">갈색선</span><span class="wiring-pin__desc">GND</span></div>
+              <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#E53935;"></span><span class="wiring-pin__name">빨간선</span><span class="wiring-pin__desc">VCC</span></div>
+              <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#FB923C;"></span><span class="wiring-pin__name">주황선</span><span class="wiring-pin__desc">Signal</span></div>
+            </div>
+            <div class="wiring-wires">
+              <svg viewBox="0 0 120 90" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <defs>
+                  <marker id="arr-brn" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#795548"/></marker>
+                  <marker id="arr-red" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#E53935"/></marker>
+                  <marker id="arr-org" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#FB923C"/></marker>
+                </defs>
+                <line x1="0" y1="18" x2="114" y2="18" stroke="#795548" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arr-brn)"/>
+                <text x="57" y="13" text-anchor="middle" fill="#795548" class="wire-label">GND</text>
+                <line x1="0" y1="45" x2="114" y2="45" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arr-red)"/>
+                <text x="57" y="40" text-anchor="middle" fill="#E53935" class="wire-label">5V</text>
+                <line x1="0" y1="72" x2="114" y2="72" stroke="#FB923C" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arr-org)"/>
+                <text x="57" y="67" text-anchor="middle" fill="#FB923C" class="wire-label">Signal</text>
+              </svg>
+            </div>
+            <div class="wiring-board wiring-board--arduino">
+              <div class="wiring-board__label wiring-board__label--cyan">아두이노 UNO</div>
+              <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#795548;"></span><span class="wiring-pin__name">GND</span><span class="wiring-pin__desc">접지</span></div>
+              <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#E53935;"></span><span class="wiring-pin__name">5V</span><span class="wiring-pin__desc">전원</span></div>
+              <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#FB923C;"></span><span class="wiring-pin__name">D9~</span><span class="wiring-pin__desc">PWM</span></div>
+            </div>
+          </div>
+          <!-- Tips -->
+          <div class="wiring-tip">
+            <span class="wiring-tip__icon" aria-hidden="true">⚡</span>
+            <span><strong>전원은 반드시 5V</strong> — SG90은 3.3V로는 힘이 부족합니다. 신호선은 PWM 핀(~표시: D9, D10, D11)에 연결해야 합니다.</span>
+          </div>
+          <div class="wiring-tip">
+            <span class="wiring-tip__icon" aria-hidden="true">↻</span>
+            <span><strong>각도 범위 0°~180°</strong> — 범위를 초과하면 모터가 손상될 수 있습니다. 제조사마다 선 색상이 다를 수 있으니 확인하세요.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 6: LED · 부저 회로 연결 ═══ -->
+    <div class="slide" data-slide="5" role="region" aria-label="슬라이드 6: LED 부저 회로 연결">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">LED · 부저 회로 연결</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">⊕</span> LED와 피에조 부저 연결 방법</h2>
+            <p class="section-subtitle">가장 쉬운 엑추에이터 2종의 배선</p>
+          </div>
+          <div class="wiring-stack">
+            <!-- LED Diagram (horizontal) -->
+            <div class="wiring-diagram" role="img" aria-label="LED 배선도: 긴 다리(+)는 220옴 저항을 거쳐 D9 핀에, 짧은 다리(-)는 GND에 연결">
+              <div class="wiring-board wiring-board--component">
+                <div class="wiring-board__label wiring-board__label--warn">LED (발광 다이오드)</div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#E53935;"></span><span class="wiring-pin__name">긴 다리 (+)</span><span class="wiring-pin__desc">Anode</span></div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#607D8B;"></span><span class="wiring-pin__name">짧은 다리 (−)</span><span class="wiring-pin__desc">Cathode</span></div>
+              </div>
+              <div class="wiring-wires">
+                <svg viewBox="0 0 120 60" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <defs>
+                    <marker id="al1" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#E53935"/></marker>
+                    <marker id="al2" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#607D8B"/></marker>
+                  </defs>
+                  <line x1="0" y1="20" x2="114" y2="20" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" marker-end="url(#al1)"/>
+                  <rect x="35" y="12" width="45" height="16" rx="3" fill="rgba(251,191,36,0.12)" stroke="#FBBF24" stroke-width="1"/>
+                  <text x="57" y="24" text-anchor="middle" fill="#FBBF24" class="wire-label">220Ω</text>
+                  <line x1="0" y1="44" x2="114" y2="44" stroke="#607D8B" stroke-width="2.5" stroke-linecap="round" marker-end="url(#al2)"/>
+                  <text x="57" y="39" text-anchor="middle" fill="#607D8B" class="wire-label">GND</text>
+                </svg>
+              </div>
+              <div class="wiring-board wiring-board--arduino">
+                <div class="wiring-board__label wiring-board__label--cyan">아두이노 UNO</div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#E53935;"></span><span class="wiring-pin__name">D9~</span><span class="wiring-pin__desc">PWM</span></div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#607D8B;"></span><span class="wiring-pin__name">GND</span><span class="wiring-pin__desc">접지</span></div>
+              </div>
+            </div>
+            <div class="wiring-tip">
+              <span class="wiring-tip__icon" aria-hidden="true">✦</span>
+              <span><strong>220Ω 저항 필수</strong> — LED의 긴 다리(+)와 디지털 핀 사이에 저항을 연결합니다. 저항 없이 연결하면 LED가 타버릴 수 있습니다.</span>
+            </div>
+            <!-- Divider -->
+            <div class="wiring-divider-label">피에조 부저</div>
+            <!-- Buzzer Diagram (horizontal) -->
+            <div class="wiring-diagram" role="img" aria-label="피에조 부저 배선도: 플러스 단자는 D8 핀에, 마이너스 단자는 GND에 연결">
+              <div class="wiring-board wiring-board--component">
+                <div class="wiring-board__label wiring-board__label--warn">피에조 부저</div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#E53935;"></span><span class="wiring-pin__name">+ 단자</span><span class="wiring-pin__desc">Signal</span></div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#607D8B;"></span><span class="wiring-pin__name">− 단자</span><span class="wiring-pin__desc">GND</span></div>
+              </div>
+              <div class="wiring-wires">
+                <svg viewBox="0 0 120 60" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <defs>
+                    <marker id="ab1" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#E53935"/></marker>
+                    <marker id="ab2" markerWidth="6" markerHeight="4" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4Z" fill="#607D8B"/></marker>
+                  </defs>
+                  <line x1="0" y1="20" x2="114" y2="20" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" marker-end="url(#ab1)"/>
+                  <text x="57" y="15" text-anchor="middle" fill="#E53935" class="wire-label">D8</text>
+                  <line x1="0" y1="44" x2="114" y2="44" stroke="#607D8B" stroke-width="2.5" stroke-linecap="round" marker-end="url(#ab2)"/>
+                  <text x="57" y="39" text-anchor="middle" fill="#607D8B" class="wire-label">GND</text>
+                </svg>
+              </div>
+              <div class="wiring-board wiring-board--arduino">
+                <div class="wiring-board__label wiring-board__label--cyan">아두이노 UNO</div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#E53935;"></span><span class="wiring-pin__name">D8</span><span class="wiring-pin__desc">Digital</span></div>
+                <div class="wiring-pin"><span class="wiring-pin__dot" style="background:#607D8B;"></span><span class="wiring-pin__name">GND</span><span class="wiring-pin__desc">접지</span></div>
+              </div>
+            </div>
+            <div class="wiring-tip">
+              <span class="wiring-tip__icon" aria-hidden="true">✦</span>
+              <span><strong>저항 불필요</strong> — 피에조 부저는 저항 없이 바로 연결합니다. +/− 극성 표시를 확인하세요.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 7: 프로젝트 아이디어 ═══ -->
+    <div class="slide" data-slide="6" role="region" aria-label="슬라이드 7: 프로젝트 아이디어">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">프로젝트 아이디어</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 웹캠 상태별 프로젝트 아이디어</h2>
+            <p class="section-subtitle">Teachable Machine 클래스에 따라 다른 동작을 매핑합니다</p>
+          </div>
+          <div class="grid-2 card-grid" role="list">
+            <div class="card card--purple" role="listitem">
+              <h3 class="card-title">감정 인식 알리미</h3>
+              <p class="card-desc">표정(웃음/무표정/찡그림)에 따라 부저가 다른 멜로디를 재생</p>
+              <span class="badge badge-primary">부저</span>
+            </div>
+            <div class="card card--cyan" role="listitem">
+              <h3 class="card-title">손동작 방향 표시기</h3>
+              <p class="card-desc">손가락 방향(좌/우/정면)에 따라 서보모터가 해당 방향을 가리킴</p>
+              <span class="badge badge-accent">서보모터</span>
+            </div>
+            <div class="card card--green" role="listitem">
+              <h3 class="card-title">자세 경고 시스템</h3>
+              <p class="card-desc">바른 자세/구부정한 자세를 인식하여 LED 색상 변경 + 경고음</p>
+              <span class="badge badge-success">LED + 부저</span>
+            </div>
+            <div class="card card--orange" role="listitem">
+              <h3 class="card-title">나만의 아이디어</h3>
+              <p class="card-desc">웹캠이 인식할 수 있는 것이라면 무엇이든! 사물, 동작, 색상 등</p>
+              <span class="badge badge-warn">자유 선택</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 8: AI 프롬프트 가이드 ═══ -->
+    <div class="slide" data-slide="7" role="region" aria-label="슬라이드 8: AI 프롬프트 가이드">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">AI 프롬프트 가이드</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> AI에게 코드를 잘 요청하는 법</h2>
+            <p class="section-subtitle">ChatGPT, Claude 등에 아두이노 코드를 요청할 때의 핵심 요소</p>
+          </div>
+          <ul class="activity-list" role="list">
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">①</span>
+              <div class="activity-body">
+                <h3 class="activity-title">역할 지정</h3>
+                <p class="activity-desc">"아두이노 프로그래밍 전문가로서" — AI에게 맥락을 제공합니다</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">②</span>
+              <div class="activity-body">
+                <h3 class="activity-title">기존 코드 제공</h3>
+                <p class="activity-desc">지난 시간의 코드를 붙여넣고 "이 코드를 기반으로"라고 시작합니다</p>
+              </div>
+            </li>
+            <li class="activity-item" role="listitem">
+              <span class="activity-icon" aria-hidden="true">③</span>
+              <div class="activity-body">
+                <h3 class="activity-title">구체적 요구사항 명시</h3>
+                <p class="activity-desc">사용할 엑추에이터, 핀 번호, 동작 조건을 명확하게 작성합니다</p>
+              </div>
+            </li>
+          </ul>
+          <div class="highlight-box" role="note">
+            <p>핵심: <strong>기존 코드 구조(시리얼 수신 → switch 분기)</strong>를 기본 틀로 제공하면 AI가 훨씬 정확한 코드를 생성합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 9: 프롬프트 예시 - 부저 ═══ -->
+    <div class="slide" data-slide="8" role="region" aria-label="슬라이드 9: 부저 프롬프트 예시">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">프롬프트 예시 — 부저</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 프롬프트 예시: 피에조 부저 제어</h2>
+          </div>
+          <div class="prompt-box">
+            <span class="prompt-label">AI에게 보낼 프롬프트</span>
+            아두이노 프로그래밍 전문가로서, 아래 코드를 기반으로 수정해 주세요.<br><br>
+            [기존 코드 구조]<br>
+            시리얼로 문자를 수신하면 switch문으로 분기하는 구조입니다.<br><br>
+            [요청 사항]<br>
+            ✦ 엑추에이터: 피에조 부저 (8번 핀 연결)<br>
+            ✦ 동작 조건:<br>
+            &nbsp;&nbsp;- 'A' 수신 → 도레미 멜로디 재생<br>
+            &nbsp;&nbsp;- 'B' 수신 → 경고음(높은 주파수 반복)<br>
+            &nbsp;&nbsp;- 'C' 수신 → 소리 정지<br>
+            ✦ tone() 함수를 사용해 주세요.<br>
+          </div>
+          <div class="code-block" style="margin-top:0.5rem;">
+<span class="cm">// 기본 코드 틀 (이 코드를 프롬프트에 함께 붙여넣기)</span>
+<span class="kw">const int</span> BUZZER_PIN = <span class="num">8</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial.begin</span>(<span class="num">9600</span>);
+  <span class="fn">pinMode</span>(BUZZER_PIN, <span class="kw">OUTPUT</span>);
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (<span class="fn">Serial.available</span>() > <span class="num">0</span>) {
+    <span class="kw">char</span> cmd = <span class="fn">Serial.read</span>();
+    <span class="kw">switch</span> (cmd) {
+      <span class="kw">case</span> <span class="str">'A'</span>: <span class="cm">/* 멜로디 재생 */</span> <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="str">'B'</span>: <span class="cm">/* 경고음 */</span> <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="str">'C'</span>: <span class="fn">noTone</span>(BUZZER_PIN); <span class="kw">break</span>;
+    }
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 10: 프롬프트 예시 - 서보모터 ═══ -->
+    <div class="slide" data-slide="9" role="region" aria-label="슬라이드 10: 서보모터 프롬프트 예시">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">프롬프트 예시 — 서보모터</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">◆</span> 프롬프트 예시: SG90 서보모터 제어</h2>
+          </div>
+          <div class="prompt-box">
+            <span class="prompt-label">AI에게 보낼 프롬프트</span>
+            아두이노 전문가로서, 아래 코드를 기반으로 수정해 주세요.<br><br>
+            [요청 사항]<br>
+            ✦ 엑추에이터: SG90 서보모터 (9번 핀 연결)<br>
+            ✦ Servo 라이브러리를 사용해 주세요.<br>
+            ✦ 동작 조건:<br>
+            &nbsp;&nbsp;- 'L' 수신 → 서보 0° (왼쪽)<br>
+            &nbsp;&nbsp;- 'C' 수신 → 서보 90° (중앙)<br>
+            &nbsp;&nbsp;- 'R' 수신 → 서보 180° (오른쪽)<br>
+            ✦ 각도 이동은 부드럽게(10ms 딜레이로 점진 이동)<br>
+          </div>
+          <div class="code-block" style="margin-top:0.5rem;">
+<span class="cm">// 기본 코드 틀 (이 코드를 프롬프트에 함께 붙여넣기)</span>
+<span class="kw">#include</span> <span class="str">&lt;Servo.h&gt;</span>
+
+<span class="kw">Servo</span> myServo;
+<span class="kw">const int</span> SERVO_PIN = <span class="num">9</span>;
+<span class="kw">int</span> currentAngle = <span class="num">90</span>;
+
+<span class="kw">void</span> <span class="fn">setup</span>() {
+  <span class="fn">Serial.begin</span>(<span class="num">9600</span>);
+  myServo.<span class="fn">attach</span>(SERVO_PIN);
+  myServo.<span class="fn">write</span>(<span class="num">90</span>); <span class="cm">// 중앙 위치로 초기화</span>
+}
+
+<span class="kw">void</span> <span class="fn">loop</span>() {
+  <span class="kw">if</span> (<span class="fn">Serial.available</span>() > <span class="num">0</span>) {
+    <span class="kw">char</span> cmd = <span class="fn">Serial.read</span>();
+    <span class="kw">switch</span> (cmd) {
+      <span class="kw">case</span> <span class="str">'L'</span>: <span class="cm">/* 0도로 이동 */</span> <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="str">'C'</span>: <span class="cm">/* 90도로 이동 */</span> <span class="kw">break</span>;
+      <span class="kw">case</span> <span class="str">'R'</span>: <span class="cm">/* 180도로 이동 */</span> <span class="kw">break</span>;
+    }
+  }
+}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 11: 실습 진행 안내 ═══ -->
+    <div class="slide" data-slide="10" role="region" aria-label="슬라이드 11: 실습 진행 안내">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">실습 안내</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">✦</span> 실습 진행 순서</h2>
+            <p class="section-subtitle">단계별로 따라 하면 완성됩니다</p>
+          </div>
+          <ol class="task-list" role="list">
+            <li class="task-item" role="listitem">
+              <span class="task-num">01</span>
+              <div class="task-body">
+                <h3 class="task-title">프로젝트 구상</h3>
+                <p class="task-desc">웹캠으로 인식할 대상(손동작, 표정, 사물 등)과 사용할 엑추에이터를 결정합니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">02</span>
+              <div class="task-body">
+                <h3 class="task-title">Teachable Machine 모델 준비</h3>
+                <p class="task-desc">지난 시간에 만든 모델을 재사용하거나, 새 모델을 학습시킵니다. 클래스를 3개 이상 만드세요.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">03</span>
+              <div class="task-body">
+                <h3 class="task-title">AI로 아두이노 코드 생성</h3>
+                <p class="task-desc">앞서 배운 프롬프트 예시를 참고하여 AI에게 코드를 요청하고, 생성된 코드를 아두이노에 업로드합니다.</p>
+              </div>
+            </li>
+            <li class="task-item" role="listitem">
+              <span class="task-num">04</span>
+              <div class="task-body">
+                <h3 class="task-title">회로 연결 + 테스트</h3>
+                <p class="task-desc">엑추에이터를 아두이노에 연결하고, 웹 앱에서 시리얼 연결 후 동작을 확인합니다.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 12: 트러블슈팅 ═══ -->
+    <div class="slide" data-slide="11" role="region" aria-label="슬라이드 12: 트러블슈팅">
+      <div class="browser-card">
+        <div class="browser-topbar" aria-hidden="true">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <span class="topbar-title">트러블슈팅</span>
+        </div>
+        <div class="browser-content" tabindex="-1">
+          <div class="section-header">
+            <h2><span class="section-icon" aria-hidden="true">※</span> 자주 발생하는 문제 해결</h2>
+          </div>
+          <div class="table-wrapper" role="region" aria-label="트러블슈팅 가이드" tabindex="0">
+            <table class="comparison-table">
+              <caption class="sr-only">문제별 원인과 해결 방법</caption>
+              <thead>
+                <tr>
+                  <th scope="col">증상</th>
+                  <th scope="col">원인</th>
+                  <th scope="col">해결 방법</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">시리얼 연결 안 됨</th>
+                  <td>아두이노 IDE 시리얼 모니터가 열려 있음</td>
+                  <td>시리얼 모니터를 닫고 웹에서 다시 연결</td>
+                </tr>
+                <tr>
+                  <th scope="row">서보모터가 떨림</th>
+                  <td>전원 부족 또는 명령 연속 전송</td>
+                  <td>USB 전원 확인 / 명령 전송 간격 늘리기</td>
+                </tr>
+                <tr>
+                  <th scope="row">부저에서 소리 안 남</th>
+                  <td>극성 반대 또는 핀 번호 불일치</td>
+                  <td>+/- 확인, 코드의 핀 번호와 실제 연결 대조</td>
+                </tr>
+                <tr>
+                  <th scope="row">AI 인식이 부정확</th>
+                  <td>학습 데이터 부족 또는 조명 차이</td>
+                  <td>클래스당 200장 이상 촬영, 실습 환경에서 학습</td>
+                </tr>
+                <tr>
+                  <th scope="row">웹 앱에서 포트 선택 불가</th>
+                  <td>Chrome이 아니거나 드라이버 미설치</td>
+                  <td>Chrome 브라우저 사용 + CH340 드라이버 설치</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide 13: 마무리 ═══ -->
+    <div class="slide" data-slide="12" role="region" aria-label="슬라이드 13: 마무리">
+      <div class="browser-card browser-card--frameless">
+        <div class="browser-content end-slide" tabindex="-1">
+          <div class="deco-blob deco-blob--tr"></div>
+          <div class="deco-blob deco-blob--bl"></div>
+          <span class="end-icon" aria-hidden="true">🚀</span>
+          <h2 class="end-title">오늘의 수업 완료!</h2>
+          <p class="end-subtitle">웹캠 AI와 엑추에이터를 연결하는 피지컬 AI의 세계</p>
+          <div class="highlight-box end-summary" role="complementary" aria-label="핵심 요약">
+            <h3 class="summary-title">오늘의 핵심</h3>
+            <ul class="summary-list" role="list">
+              <li role="listitem">✦ 엑추에이터는 전기 신호를 물리적 동작(소리, 빛, 회전)으로 변환하는 장치</li>
+              <li role="listitem">✦ 서보모터는 3선(GND, 5V, Signal) 연결로 0°~180° 각도 제어 가능</li>
+              <li role="listitem">✦ AI에게 코드를 요청할 때는 기존 코드 + 구체적 요구사항을 함께 제공</li>
+              <li role="listitem">✦ 웹캠 AI 분류 결과 → 시리얼 전송 → 아두이노 → 엑추에이터 동작</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 접근성: 슬라이드 상태 알림 -->
+  <div id="slideAnnounce" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-bar" aria-label="슬라이드 네비게이션">
+    <button class="nav-btn" id="prevBtn" disabled aria-label="이전 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+      </svg>
+    </button>
+    <span class="nav-counter" aria-label="슬라이드 위치">
+      <input type="text" class="slide-input" id="slideInput" value="1"
+             aria-label="슬라이드 번호 입력" inputmode="numeric" pattern="[0-9]*">
+      / <span id="totalSlides" aria-hidden="true">13</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" aria-label="다음 슬라이드">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+      </svg>
+    </button>
+    <button class="nav-btn" id="fsBtn" aria-label="전체화면 전환" style="margin-left:0.3rem;">
+      <svg id="fsExpand" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+      </svg>
+      <svg id="fsCompress" viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="display:none">
+        <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+      </svg>
+    </button>
+  </nav>
+
+  <script>
+    /* ═══ Slide Navigation ═══ */
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+    const progressBar = document.getElementById('progressBar');
+    const slideInput = document.getElementById('slideInput');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function announceSlide(current, total) {
+      const el = document.getElementById('slideAnnounce');
+      if (el) el.textContent = '슬라이드 ' + (current + 1) + ' / ' + total;
+    }
+
+    function updateNav() {
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('aria-valuenow', currentSlide + 1);
+      slideInput.value = currentSlide + 1;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= totalSlides) return;
+      const current = slides[currentSlide];
+      const next = slides[index];
+      current.classList.add('will-animate');
+      next.classList.add('will-animate');
+      current.classList.remove('active');
+      currentSlide = index;
+      next.classList.add('active');
+      updateNav();
+      announceSlide(currentSlide, totalSlides);
+      setTimeout(function() {
+        current.classList.remove('will-animate');
+        next.classList.remove('will-animate');
+      }, 400);
+      var content = next.querySelector('.browser-content');
+      if (content) content.focus();
+    }
+
+    function nextSlide() { goToSlide(currentSlide + 1); }
+    function prevSlide() { goToSlide(currentSlide - 1); }
+
+    /* Keyboard */
+    document.addEventListener('keydown', function(e) {
+      if (e.target === slideInput) return;
+      if (['ArrowRight','ArrowDown',' ','PageDown'].indexOf(e.key) !== -1) {
+        e.preventDefault(); nextSlide();
+      } else if (['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key) !== -1) {
+        e.preventDefault(); prevSlide();
+      } else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+      else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+    });
+
+    /* Mouse wheel */
+    var wheelLocked = false;
+    document.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      if (wheelLocked) return;
+      wheelLocked = true;
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      setTimeout(function() { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    /* Touch swipe */
+    var touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+    document.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].screenX - touchStartX;
+      var dy = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+        if (dx < 0) nextSlide(); else prevSlide();
+      }
+    }, { passive: true });
+
+    /* Slide input */
+    slideInput.addEventListener('focus', function() { this.select(); });
+    slideInput.addEventListener('keydown', function(e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') {
+        var num = parseInt(this.value);
+        if (num >= 1 && num <= totalSlides) goToSlide(num - 1);
+        else this.value = currentSlide + 1;
+        this.blur();
+      } else if (e.key === 'Escape') {
+        this.value = currentSlide + 1;
+        this.blur();
+      }
+    });
+    slideInput.addEventListener('blur', function() {
+      var num = parseInt(this.value);
+      if (num >= 1 && num <= totalSlides) goToSlide(num - 1);
+      else this.value = currentSlide + 1;
+    });
+
+    /* Button click handlers */
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    /* Fullscreen */
+    var fsBtn = document.getElementById('fsBtn');
+    var fsExpand = document.getElementById('fsExpand');
+    var fsCompress = document.getElementById('fsCompress');
+    fsBtn.addEventListener('click', function() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(function(){});
+      } else {
+        document.exitFullscreen();
+      }
+    });
+    document.addEventListener('fullscreenchange', function() {
+      if (document.fullscreenElement) {
+        fsExpand.style.display = 'none';
+        fsCompress.style.display = 'block';
+      } else {
+        fsExpand.style.display = 'block';
+        fsCompress.style.display = 'none';
+      }
+    });
+
+    /* Init */
+    updateNav();
+    announceSlide(0, totalSlides);
+  </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

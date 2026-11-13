@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "entries": {
+    "wb-person-think": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        191,
+        22,
+        175,
+        484
+      ],
+      "w": 175,
+      "h": 484,
+      "cropped_at": "2026-08-18"
+    },
+    "wb-person-cook": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        630,
+        26,
+        308,
+        484
+      ],
+      "w": 308,
+      "h": 484,
+      "cropped_at": "2026-08-18"
+    },
+    "wb-pot": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        1079,
+        115,
+        351,
+        347
+      ],
+      "w": 351,
+      "h": 347,
+      "cropped_at": "2026-08-18"
+    },
+    "wb-recipe-card": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        100,
+        609,
+        349,
+        292
+      ],
+      "w": 349,
+      "h": 292,
+      "cropped_at": "2026-08-18"
+    },
+    "wb-robot": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        603,
+        540,
+        294,
+        390
+      ],
+      "w": 294,
+      "h": 390,
+      "cropped_at": "2026-08-18"
+    },
+    "wb-laptop": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        1033,
+        594,
+        425,
+        345
+      ],
+      "w": 425,
+      "h": 345,
+      "cropped_at": "2026-08-18"
+    },
+    "wb-write-hand": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        211,
+        236,
+        518,
+        520
+      ],
+      "w": 518,
+      "h": 520,
+      "cropped_at": "2026-08-18"
+    },
+    "wb-stopwatch": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        901,
+        220,
+        418,
+        490
+      ],
+      "w": 418,
+      "h": 490,
+      "cropped_at": "2026-08-18"
+    }
+  }
+}

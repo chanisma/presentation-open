@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>수업 참여 — 이동 중</title>
+    <script>
+      // 학생 참여는 React 앱(?app=join)으로 통합됨 — 인쇄된 QR·구 링크
+      // 보존용 리다이렉트(code 등 쿼리 유지). 클래식은 classic.html에 보존.
+      const p = new URLSearchParams(location.search);
+      p.set('app', 'join');
+      location.replace(new URL('../../?' + p.toString(), location.href));
+    </script>
+  </head>
+  <body>
+    <a href="../../?app=join">수업 참여로 이동</a>
+  </body>
+</html>

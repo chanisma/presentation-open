@@ -1,0 +1,7 @@
+[
+  { "name": "01-hero-start", "set": { "t": 0, "playing": false, "camera": "HERO" } },
+  { "name": "02-hero-mid", "set": { "t": 0.5 } },
+  { "name": "03-hero-end", "set": { "t": 1 } },
+  { "name": "04-top-end", "set": { "camera": "TOP" } },
+  { "name": "05-hidden", "set": { "overlays": { "CALLOUTS": false, "CHARTS": false, "LABELS": false }, "camera": "HERO" } }
+]

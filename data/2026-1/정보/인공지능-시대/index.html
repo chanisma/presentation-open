@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인공지능 시대 - 정보 1차시</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --main: #3aaa5c;
+  --dark: #2d8a49;
+  --light: #e8f5e9;
+  --accent: #43b867;
+  --bg: #f0f7f2;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #e8eaed;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-600: #6b7280;
+  --gray-700: #4b5563;
+  --gray-800: #374151;
+  --gray-900: #1f2937;
+  --blue-accent: #2196f3;
+  --orange-accent: #ff9800;
+  --purple-accent: #9c27b0;
+  --red-accent: #e53935;
+  --green-sub: #43b867;
+  --blue-bg: #e3f2fd;
+  --orange-bg: #fff3e0;
+  --purple-bg: #f3e5f5;
+  --red-bg: #fce4ec;
+  --green-bg: #e8f5e9;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  overflow: hidden;
+  font-size: clamp(14px, 1.15vw, 22px);
+}
+@media (max-width: 1024px) { html { font-size: clamp(13px, 1.8vw, 18px); } }
+@media (max-width: 768px)  { html { font-size: clamp(13px, 2.8vw, 17px); } }
+@media (max-width: 480px)  { html { font-size: clamp(13px, 3.5vw, 16px); } }
+
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--main), var(--accent));
+  z-index: 1000;
+  transition: width 0.4s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+.presentation { width: 100%; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 0.8rem 2rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.slide.active { opacity: 1; pointer-events: auto; }
+
+.browser-card {
+  width: 100%; max-width: 1600px;
+  max-height: calc(100vh - 4.5rem);
+  background: var(--white);
+  border-radius: 1rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.browser-topbar {
+  display: flex; align-items: center;
+  padding: 0.7rem 1rem;
+  background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  flex-shrink: 0;
+}
+.browser-dots { display: flex; gap: 0.4rem; margin-right: 1rem; }
+.browser-dots span { width: 0.7rem; height: 0.7rem; border-radius: 50%; }
+.browser-dots span:nth-child(1) { background: #ff5f57; }
+.browser-dots span:nth-child(2) { background: #ffbd2e; }
+.browser-dots span:nth-child(3) { background: #28c840; }
+.browser-title {
+  flex: 1; text-align: center;
+  font-size: 0.8rem; font-weight: 600; color: var(--gray-600);
+}
+.browser-content {
+  padding: 1.8rem 3rem;
+  overflow-y: auto; flex: 1;
+}
+
+h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.3; }
+h2 { font-size: 1.7rem; font-weight: 700; line-height: 1.4; margin-bottom: 1.2rem; }
+h3 { font-size: 1.3rem; font-weight: 600; line-height: 1.4; }
+p  { font-size: 1.05rem; line-height: 1.7; color: var(--gray-700); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.3rem 0.85rem; border-radius: 2rem;
+  font-size: 0.82rem; font-weight: 600;
+}
+.badge-green { background: var(--light); color: var(--dark); }
+.badge-blue { background: var(--blue-bg); color: #1565c0; }
+.badge-orange { background: var(--orange-bg); color: #e65100; }
+.badge-purple { background: var(--purple-bg); color: #6200ea; }
+
+.year-badge {
+  display: inline-block; padding: 0.4rem 1.2rem;
+  border-radius: 2rem; background: var(--light);
+  color: var(--dark); font-weight: 700; font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+}
+
+.section-divider { text-align: center; margin-bottom: 2rem; }
+.section-divider .icon { font-size: 2.8rem; margin-bottom: 0.8rem; }
+.section-divider h2 { margin-bottom: 0.4rem; }
+.section-divider .subtitle { font-size: 1.05rem; color: var(--gray-600); }
+
+.highlight-box {
+  background: linear-gradient(135deg, var(--light), #c8e6c933);
+  border: 1px solid #a5d6a7;
+  border-radius: 0.8rem; padding: 1.2rem 1.5rem;
+  margin: 1.2rem 0; font-size: 1.05rem;
+  color: var(--dark); font-weight: 500; text-align: center;
+}
+
+.info-box {
+  background: var(--gray-50);
+  border-left: 4px solid var(--main);
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 1rem 1.2rem; margin-top: 1.2rem;
+  font-size: 0.95rem; color: var(--gray-700);
+}
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; margin-top: 1.2rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-top: 1.2rem; }
+
+.card {
+  background: var(--white); border: 1px solid var(--gray-200);
+  border-radius: 0.8rem; padding: 1.5rem; transition: all 0.25s;
+}
+.card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(58,170,92,0.1);
+  transform: translateY(-2px);
+}
+.card .card-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+.card h3 { margin-bottom: 0.4rem; }
+.card p { font-size: 0.95rem; }
+
+.cover-content { text-align: center; padding: 2rem 0; }
+.cover-content .year-badge { margin-bottom: 1.5rem; }
+.cover-content h1 {
+  font-size: 2.8rem;
+  background: linear-gradient(135deg, var(--dark), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 0.8rem;
+}
+.cover-content .cover-subtitle {
+  font-size: 1.3rem; color: var(--gray-600);
+  font-weight: 400; margin-bottom: 2rem;
+}
+.cover-tags { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; }
+
+.end-content { text-align: center; padding: 2rem 0; }
+.end-content h1 {
+  font-size: 2.6rem; margin-bottom: 0.8rem;
+  background: linear-gradient(135deg, var(--dark), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.end-content .end-message {
+  font-size: 1.15rem; color: var(--gray-600); margin-bottom: 1.8rem;
+}
+
+/* ── 타임라인 (가로) ── */
+.timeline {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  gap: 0.8rem; margin-top: 1.5rem;
+}
+.timeline-item {
+  text-align: center; position: relative;
+  padding: 1rem 0.6rem; border-radius: 0.8rem;
+  background: var(--white); border: 1px solid var(--gray-200);
+  transition: all 0.2s;
+}
+.timeline-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+.timeline-item.highlight {
+  border-color: var(--orange-accent); background: var(--orange-bg);
+}
+.timeline-item.highlight-green {
+  border-color: var(--main); background: var(--light);
+}
+.timeline-marker {
+  width: 2.4rem; height: 2.4rem; border-radius: 50%;
+  background: var(--light); color: var(--dark);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.85rem; margin: 0 auto 0.6rem;
+}
+.timeline-item.highlight .timeline-marker {
+  background: var(--orange-accent); color: var(--white);
+}
+.timeline-item.highlight-green .timeline-marker {
+  background: var(--main); color: var(--white);
+}
+.timeline-emoji { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.timeline-period { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.3rem; }
+.timeline-desc { font-size: 0.8rem; color: var(--gray-600); line-height: 1.4; }
+
+/* ── 알파고 슬라이드 ── */
+.alphago-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+.alphago-visual {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+}
+.match-photo-wrapper {
+  width: 100%; max-width: 340px;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.match-photo {
+  width: 100%; height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.match-label {
+  text-align: center;
+  font-size: 0.85rem; color: var(--gray-600);
+  font-weight: 500;
+}
+.match-label strong { color: var(--gray-900); font-size: 1rem; }
+
+.alphago-impacts { display: flex; flex-direction: column; gap: 0.8rem; }
+.impact-card {
+  display: flex; gap: 0.8rem; align-items: flex-start;
+  padding: 1rem 1.2rem; border-radius: 0.8rem;
+  background: var(--white); border: 1px solid var(--gray-200);
+  transition: all 0.25s;
+}
+.impact-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(58,170,92,0.08);
+  transform: translateX(4px);
+}
+.impact-icon { font-size: 1.6rem; flex-shrink: 0; }
+.impact-body h3 { font-size: 1rem; margin-bottom: 0.2rem; }
+.impact-body p { font-size: 0.88rem; color: var(--gray-600); line-height: 1.5; }
+
+.vs-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.5rem 1.2rem; border-radius: 2rem;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff; font-weight: 700; font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+.vs-badge .vs { color: var(--orange-accent); font-weight: 800; }
+
+/* ── 영상 슬라이드 ── */
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  aspect-ratio: 16/9;
+  border-radius: 0.8rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+.video-container iframe {
+  width: 100%; height: 100%;
+  border: none;
+}
+.video-info {
+  text-align: center;
+  margin-top: 1.2rem;
+  font-size: 0.92rem;
+  color: var(--gray-600);
+}
+
+/* ── 활동 안내 슬라이드 ── */
+.activity-steps {
+  display: flex; flex-direction: column; gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+.step-card {
+  display: flex; gap: 1rem; align-items: center;
+  padding: 1.2rem 1.5rem; border-radius: 0.8rem;
+  background: var(--white); border: 1px solid var(--gray-200);
+  transition: all 0.25s;
+}
+.step-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(58,170,92,0.08);
+}
+.step-num {
+  width: 2.4rem; height: 2.4rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 1rem; flex-shrink: 0;
+  color: var(--white);
+}
+.step-body h3 { font-size: 1.05rem; margin-bottom: 0.2rem; }
+.step-body p { font-size: 0.9rem; color: var(--gray-600); }
+
+.form-callout {
+  display: flex; align-items: center; gap: 1.2rem;
+  padding: 1.5rem 2rem; border-radius: 0.8rem;
+  background: linear-gradient(135deg, var(--light), #c8e6c9);
+  border: 2px solid var(--main);
+  margin-top: 1.5rem;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.form-callout .form-icon { font-size: 2.5rem; }
+.form-callout p { font-size: 1rem; color: var(--dark); font-weight: 600; }
+.form-callout .form-link {
+  display: inline-block; margin-top: 0.5rem;
+  padding: 0.5rem 1.5rem; border-radius: 2rem;
+  background: var(--main); color: #fff;
+  text-decoration: none; font-weight: 700; font-size: 0.95rem;
+  transition: all 0.2s;
+}
+.form-callout .form-link:hover {
+  background: var(--dark); transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(45,138,73,0.3);
+}
+
+/* ── 네비게이션 ── */
+.nav-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 1rem; padding: 0.8rem 1.5rem;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--gray-200);
+  z-index: 999;
+}
+.nav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 2.6rem; height: 2.6rem;
+  border: 1px solid var(--gray-200); border-radius: 0.5rem;
+  background: var(--white); cursor: pointer;
+  font-size: 1.1rem; color: var(--gray-700); transition: all 0.2s;
+}
+.nav-btn:hover:not(:disabled) {
+  border-color: var(--main); color: var(--main); background: var(--light);
+}
+.nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.nav-counter {
+  font-size: 0.85rem; font-weight: 600; color: var(--gray-600);
+  min-width: 5rem; text-align: center;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 768px) {
+  .slide { padding: 1rem; }
+  .browser-content { padding: 1.5rem 1.2rem; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .timeline { grid-template-columns: repeat(3, 1fr); }
+  .alphago-layout { grid-template-columns: 1fr; }
+  .alphago-visual { order: -1; }
+  .match-photo-wrapper { max-width: 250px; }
+  .cover-content h1 { font-size: 2rem; }
+}
+@media (max-width: 480px) {
+  .browser-content { padding: 1.2rem 0.8rem; }
+  .timeline { grid-template-columns: repeat(2, 1fr); }
+  .nav-btn { width: 2.2rem; height: 2.2rem; font-size: 0.9rem; }
+  .cover-content h1 { font-size: 1.7rem; }
+}
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="presentation" id="presentation">
+
+  <!-- ═══ 슬라이드 1: 표지 ═══ -->
+  <div class="slide active" data-slide="0">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">정보 · 1차시</div>
+      </div>
+      <div class="browser-content">
+        <div class="cover-content">
+          <div class="year-badge">📐 2026학년도 정보</div>
+          <h1>인공지능 시대</h1>
+          <p class="cover-subtitle">AI는 어떻게 발전해왔고, 우리의 미래를 어떻게 바꿀까?</p>
+          <div class="cover-tags">
+            <span class="badge badge-green">🤖 인공지능</span>
+            <span class="badge badge-blue">🧠 알파고</span>
+            <span class="badge badge-orange">💬 ChatGPT</span>
+            <span class="badge badge-purple">🔮 AGI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 슬라이드 2: AI 발전 역사 타임라인 ═══ -->
+  <div class="slide" data-slide="1">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">인공지능의 발전 역사</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🕰️</div>
+          <h2>인공지능, 어떻게 발전해왔을까?</h2>
+          <p class="subtitle">70년의 도전과 혁신</p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-emoji">💡</div>
+            <div class="timeline-marker">1</div>
+            <div class="timeline-period">1950년</div>
+            <div class="timeline-desc"><strong>튜링 테스트</strong><br>앨런 튜링이 "기계가 생각할 수 있는가?" 질문을 던짐</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-emoji">♟️</div>
+            <div class="timeline-marker">2</div>
+            <div class="timeline-period">1997년</div>
+            <div class="timeline-desc"><strong>딥블루 vs 카스파로프</strong><br>IBM 컴퓨터가 체스 세계 챔피언에게 승리</div>
+          </div>
+          <div class="timeline-item highlight">
+            <div class="timeline-emoji">⚫</div>
+            <div class="timeline-marker">3</div>
+            <div class="timeline-period">2016년</div>
+            <div class="timeline-desc"><strong>알파고 vs 이세돌</strong><br>구글 딥마인드 AI가 바둑 세계 최고수에게 4:1 승리</div>
+          </div>
+          <div class="timeline-item highlight-green">
+            <div class="timeline-emoji">💬</div>
+            <div class="timeline-marker">4</div>
+            <div class="timeline-period">2022년</div>
+            <div class="timeline-desc"><strong>ChatGPT 등장</strong><br>대화형 AI가 일반인도 사용 가능하게 되면서 AI 대중화</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-emoji">🔮</div>
+            <div class="timeline-marker">5</div>
+            <div class="timeline-period">미래</div>
+            <div class="timeline-desc"><strong>AGI (범용 인공지능)</strong><br>인간 수준의 사고력을 가진 AI — 아직 도달하지 못한 목표</div>
+          </div>
+        </div>
+
+        <div class="highlight-box" style="margin-top: 1.5rem;">
+          💡 AI는 특정 분야에서 인간을 넘어서기 시작했고, 이제 우리 일상 속으로 빠르게 들어오고 있습니다
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 슬라이드 3: 알파고의 충격 ═══ -->
+  <div class="slide" data-slide="2">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">알파고가 세상에 던진 질문</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider" style="margin-bottom: 1.5rem;">
+          <h2>2016년 3월, 세상이 멈춘 순간</h2>
+          <p class="subtitle">이세돌 9단 vs 알파고 — 인류와 AI의 역사적 대국</p>
+        </div>
+
+        <div class="alphago-layout">
+          <!-- 왼쪽: 실제 대국 사진 -->
+          <div class="alphago-visual">
+            <div class="vs-badge">
+              이세돌 9단 <span class="vs">VS</span> AlphaGo
+            </div>
+            <div class="match-photo-wrapper">
+              <img src="https://gomagic.org/files/images/lee-sedol-and-alphago-the-legacy-of-a-historic-fight.jpg"
+                   alt="이세돌 vs 알파고 대국 장면"
+                   class="match-photo">
+            </div>
+            <div class="match-photo-wrapper" style="margin-top:0.6rem;">
+              <img src="https://storage.googleapis.com/gweb-uniblog-publish-prod/images/AlphaGo_hero.width-1300.jpg"
+                   alt="알파고 챌린지 매치"
+                   class="match-photo">
+            </div>
+            <div class="match-label">
+              <strong>최종 결과: AlphaGo 4 : 1 이세돌</strong><br>
+              2016. 3. 9 ~ 15 · 서울 포시즌스 호텔
+            </div>
+          </div>
+
+          <!-- 오른쪽: 사회적 충격 카드 -->
+          <div class="alphago-impacts">
+            <div class="impact-card">
+              <div class="impact-icon">🌍</div>
+              <div class="impact-body">
+                <h3>전 세계 2억 명이 시청</h3>
+                <p>바둑이라는 동양 문화 속 게임이 전 세계적 관심사로 부상하며 AI에 대한 대중적 인식이 전환됨</p>
+              </div>
+            </div>
+            <div class="impact-card">
+              <div class="impact-icon">😰</div>
+              <div class="impact-body">
+                <h3>"AI가 인간을 넘어설 수 있다"는 충격</h3>
+                <p>바둑은 경우의 수가 우주 원자 수보다 많아 AI가 정복할 수 없다고 여겨졌던 영역</p>
+              </div>
+            </div>
+            <div class="impact-card">
+              <div class="impact-icon">🏛️</div>
+              <div class="impact-body">
+                <h3>각국 정부의 AI 전략 수립 계기</h3>
+                <p>한국·미국·중국 등 주요 국가들이 AI를 국가 핵심 전략 기술로 지정하고 대규모 투자 시작</p>
+              </div>
+            </div>
+            <div class="impact-card">
+              <div class="impact-icon">✨</div>
+              <div class="impact-body">
+                <h3>이세돌의 "신의 한 수" (4국 78수)</h3>
+                <p>AI도 예측하지 못한 창의적 수를 두며 인간 고유의 창의성과 직관의 가치를 증명</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 슬라이드 4: 영상 시청 ═══ -->
+  <div class="slide" data-slide="3">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">영상 시청</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">🎬</div>
+          <h2>영상을 함께 시청해봅시다</h2>
+          <p class="subtitle">인공지능 시대를 이해하기 위한 핵심 영상</p>
+        </div>
+
+        <div class="video-container">
+          <iframe
+            src="https://www.youtube.com/embed/MCJyk3ZmKLw"
+            title="인공지능 시대 영상"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <div class="video-info">
+          📌 영상을 보면서 <strong>인상 깊었던 장면</strong>이나 <strong>새롭게 알게 된 점</strong>을 메모해보세요
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 슬라이드 5: 활동 안내 ═══ -->
+  <div class="slide" data-slide="4">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">활동 안내</div>
+      </div>
+      <div class="browser-content">
+        <div class="section-divider">
+          <div class="icon">✍️</div>
+          <h2>생각을 나눠봅시다</h2>
+          <p class="subtitle">영상을 보고 느낀 점을 정리하여 제출해주세요</p>
+        </div>
+
+        <div class="activity-steps">
+          <div class="step-card">
+            <div class="step-num" style="background: var(--main);">1</div>
+            <div class="step-body">
+              <h3>영상 내용 돌아보기</h3>
+              <p>방금 시청한 영상에서 가장 인상 깊었던 내용을 떠올려보세요</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num" style="background: var(--blue-accent);">2</div>
+            <div class="step-body">
+              <h3>질문에 답변하기</h3>
+              <p>아래 폼 링크를 클릭하여 질문에 대한 나의 생각을 자유롭게 작성해주세요</p>
+            </div>
+          </div>
+          <div class="step-card">
+            <div class="step-num" style="background: var(--purple-accent);">3</div>
+            <div class="step-body">
+              <h3>제출하기</h3>
+              <p>작성이 끝나면 제출 버튼을 눌러주세요. 정답은 없으니 솔직한 생각을 적어주세요!</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-callout">
+          <div class="form-icon">📋</div>
+          <p>아래 버튼을 눌러 생각을 제출해주세요</p>
+          <a href="https://docs.google.com/forms/d/e/YOUR_GOOGLE_DOC_ID/viewform" class="form-link" target="_blank">📝 생각 제출하기</a>
+        </div>
+
+        <div class="info-box">
+          💡 <strong>Tip:</strong> "맞는 답"보다 "나만의 생각"이 중요합니다. AI 시대에 대한 여러분의 솔직한 의견을 들려주세요.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 슬라이드 6: 마무리 ═══ -->
+  <div class="slide" data-slide="5">
+    <div class="browser-card">
+      <div class="browser-topbar">
+        <div class="browser-dots"><span></span><span></span><span></span></div>
+        <div class="browser-title">정보 · 1차시 마무리</div>
+      </div>
+      <div class="browser-content">
+        <div class="end-content">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+          <h1>수고하셨습니다!</h1>
+          <p class="end-message">인공지능 시대의 시작, 함께 탐구해봐요</p>
+          <div class="highlight-box">
+            오늘 배운 것: AI는 <strong>튜링 테스트</strong>에서 시작해 <strong>알파고</strong>를 거쳐 <strong>ChatGPT</strong>까지,<br>
+            이제 우리의 일상 속으로 들어왔습니다. 다음 시간에는 AI를 직접 체험해봅시다! 🚀
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 네비게이션 -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>◀</button>
+  <span class="nav-counter" id="navCounter">1 / 6</span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()">▶</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const totalSlides = slides.length;
+let currentSlide = 0;
+
+function goToSlide(n) {
+  if (n < 0 || n >= totalSlides) return;
+  slides[currentSlide].classList.remove('active');
+  currentSlide = n;
+  slides[currentSlide].classList.add('active');
+  updateNav();
+}
+
+function nextSlide() { goToSlide(currentSlide + 1); }
+function prevSlide() { goToSlide(currentSlide - 1); }
+
+function updateNav() {
+  document.getElementById('prevBtn').disabled = currentSlide === 0;
+  document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+  document.getElementById('navCounter').textContent = (currentSlide + 1) + ' / ' + totalSlides;
+  document.getElementById('progressBar').style.width = ((currentSlide + 1) / totalSlides * 100) + '%';
+}
+
+// 키보드 네비게이션
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  else if (e.key === 'Home') { e.preventDefault(); goToSlide(0); }
+  else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides - 1); }
+});
+
+// 터치 스와이프
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].screenX;
+  if (Math.abs(diff) > 50) { diff > 0 ? nextSlide() : prevSlide(); }
+});
+
+updateNav();
+</script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

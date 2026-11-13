@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#eef1f4">
+<title>모형 제목 — 3D 모형</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   ① 색 토큰 — UI 컨셉은 여기서 정한다. 라이트/다크, 액센트, 무대 배경을 소재에 맞게 바꾼다.
+   아래 골격 CSS는 토큰만 참조하므로 토큰을 바꾸면 전체가 따라온다.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{--ink:#17202a;--muted:#6f7a86;--line:#d3dae2;--paper:rgba(255,255,255,.84);--accent:#e8442a;--bg:#e9edf1;--stage:radial-gradient(120% 90% at 50% 40%,#f6f7f8 0%,#e3e8ee 60%,#d6dde5 100%);--btn:rgba(255,255,255,.6);--btn-line:#c3cbd3}
+/* ═══ ② 골격 — 보통 손대지 않는다 (아트보드 스케일·카드·콜아웃·라벨·재생 바) ═══ */
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,-apple-system,'Segoe UI',sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;color:var(--ink);border:1px solid var(--btn-line);background:var(--btn);border-radius:3px;min-height:30px;padding:4px 10px;white-space:nowrap;font-size:12px;letter-spacing:.02em;font-weight:500}
+button:hover{border-color:var(--ink)}
+button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.accent[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+select{border:1px solid var(--btn-line);background:var(--btn);border-radius:3px;min-height:30px;padding:2px 6px;font-size:12px;color:var(--ink)}
+#stage{position:absolute;inset:0;touch-action:none;background:var(--stage)}
+#stage canvas{width:100%;height:100%;display:block;outline:none}
+#ui{position:absolute;inset:0;pointer-events:none}
+#artboard{position:absolute;left:50%;top:50%;width:1672px;height:941px;transform:translate(-50%,-50%) scale(var(--scale,1));transform-origin:center;pointer-events:none}
+#artboard>*{pointer-events:auto}
+#callouts{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.callout-line{fill:none;stroke:var(--accent);stroke-width:1;opacity:.75}
+.callout-back{fill:var(--paper);stroke:var(--line);stroke-width:.8}
+.callout-text{font-weight:700;font-size:13px;fill:var(--ink)}
+.callout-small{font-size:10px;letter-spacing:.12em;fill:var(--muted)}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;padding:4px 10px;border-radius:5px;background:var(--paper);border:1.5px solid var(--line);font-size:14px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.lbl.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.title{position:absolute;left:48px;top:38px;width:520px;pointer-events:none}
+.kicker{font-size:11px;letter-spacing:.22em;color:var(--accent);font-weight:700}
+.title h1{margin:4px 0 6px;font-size:34px;line-height:1.1;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+.micro{font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.subtle{font-weight:400;letter-spacing:.02em;color:var(--muted)}
+.subtle b{color:var(--ink);font-weight:700}
+.card{padding:12px 13px;background:var(--paper);border:1px solid var(--line);backdrop-filter:blur(6px);border-radius:4px}
+.card-title{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:11px;font-weight:700;letter-spacing:.14em}
+.card-title .subtle{letter-spacing:.02em;font-size:11px}
+.note{margin:8px 0 0;font-size:11px;line-height:1.55;color:var(--muted);word-break:keep-all}
+.diagram{width:100%;display:block;margin-top:6px}
+.control-label{font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:700;margin:6px 0 4px}
+.control-label:first-child{margin-top:0}
+.control-row{display:flex;flex-wrap:wrap;gap:5px}
+.control-row button{flex:1 1 auto}
+.formula{margin-top:8px;font-size:14px;font-weight:700;text-align:center;padding:5px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.calc{font-size:11.5px;line-height:1.7;font-variant-numeric:tabular-nums;margin-top:6px}
+.transport{position:absolute;left:50%;bottom:40px;transform:translateX(-50%);width:720px;padding:10px 12px}
+.transport-buttons{display:flex;gap:6px}
+.transport-buttons button{flex:1;height:34px;font-weight:700}
+.scrub-row{display:flex;gap:8px;align-items:center;margin-top:9px}
+.scrub-row input[type=range]{flex:1;accent-color:var(--accent);height:26px}
+.range-label{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.06em;color:var(--muted);margin-top:2px;padding:0 12px}
+.mode-switch{position:absolute;right:48px;bottom:40px;display:flex;gap:6px}
+.hints{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:10px;letter-spacing:.1em;color:var(--muted);white-space:nowrap}
+#restore{position:absolute;right:16px;bottom:16px;display:none;z-index:5}
+.hidden-overlays #ui{display:none}.hidden-overlays #restore{display:block}
+.loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);z-index:9;font-size:13px;color:var(--muted)}
+.loading b{font-size:20px;color:var(--ink);font-weight:900}
+.loading[hidden]{display:none}
+@media(max-width:700px){
+  html,body{overflow:auto;height:auto;min-height:100%}
+  #stage{height:58vh;position:fixed}
+  #ui{position:relative;top:0;height:auto;padding:14px;pointer-events:auto}
+  #artboard{position:static;width:auto;height:auto;transform:none!important;display:flex;flex-direction:column;gap:10px;padding-top:58vh}
+  .title{position:fixed;top:12px;left:14px;width:auto;pointer-events:none}.title h1{font-size:22px}
+  .card,.right-col,.transport,.mode-switch{position:static;width:auto;transform:none}
+  .hints,#callouts,#labels{display:none}
+}
+/* ═══ ③ 모형 고유 카드 위치 — 소재에 맞게 다시 짠다. 좌 열 48~348 · 우 열 1294~1624 · 무대 자유 영역 350~1290 × 110~790 ═══ */
+.card-left{position:absolute;left:48px;top:150px;width:300px}
+.right-col{position:absolute;right:48px;top:38px;width:330px;display:flex;flex-direction:column;gap:12px}
+/* embed 모드(?embed=1) — 덱 iframe용: 제목·차트·계산 카드는 숨기고 무대 + 소재 고유 손잡이 + 재생 바만 남긴다 */
+.embed .title,.embed .card-left,.embed .right-col{display:none}
+#embed-bar{display:none;position:absolute;left:48px;top:28px;align-items:center;gap:10px;padding:10px 12px}
+.embed #embed-bar{display:flex}
+#embed-bar .control-row{flex-wrap:nowrap}
+#embed-bar .embed-title{font-size:14px;font-weight:900;letter-spacing:-.01em;margin-right:6px;white-space:nowrap}
+</style>
+</head>
+<body data-deck-title="모형 제목 — 3D 모형" data-subject="과목">
+<main id="stage" aria-label="3D 모형. 드래그로 회전하고 휠로 확대합니다."></main>
+<div id="ui"><div id="artboard">
+
+<header class="title">
+  <div class="kicker">KICKER · WHAT THIS MODEL IS</div>
+  <h1>모형 제목</h1>
+  <div class="micro">핵심 수식 · 조건 · 장난감 데이터 표기</div>
+</header>
+
+<!-- ▼▼ 모형 고유 카드 — 수식 카드(살아 있는 숫자) 1개는 필수, 나머지는 소재가 요구하는 것만 ▼▼ -->
+<section class="card card-left">
+  <div class="card-title">차트 제목 <span class="subtle">부제 <b id="chart-sub">0.00</b></span></div>
+  <svg class="diagram" id="chart" viewBox="0 0 300 150" aria-label="차트"></svg>
+  <p class="note">무대가 쓰는 함수와 같은 함수를 샘플링해서 그린다. 두 벌의 데이터를 두지 않는다.</p>
+</section>
+<aside class="right-col">
+  <section class="card">
+    <div class="card-title">계산 <span class="subtle" id="calc-sub"></span></div>
+    <div class="formula">y = f(t)</div>
+    <div class="calc" id="calc"></div>
+    <p class="note">화면의 모든 숫자는 실제 계산이다. 장난감 데이터라면 여기에 그렇게 쓴다.</p>
+  </section>
+  <section class="card">
+    <div class="control-label">카메라</div><div class="control-row" id="camera-controls"></div>
+    <div class="control-label">표시</div><div class="control-row" id="overlay-controls"></div>
+  </section>
+</aside>
+<!-- ▲▲ 모형 고유 카드 ▲▲ -->
+
+<!-- embed 모드 바 — 시작 시 소재 고유 손잡이(예: 헤드 선택·프레임 선택)를 여기로 옮긴다. 카메라·표시 토글은 넣지 않는다 -->
+<section class="card" id="embed-bar"><span class="embed-title">모형 제목</span></section>
+
+<section class="card transport">
+  <div class="transport-buttons">
+    <button id="play" class="accent" aria-pressed="true">▶ 재생</button>
+    <select id="speed" aria-label="재생 속도"><option value="8">느리게 · 8초</option><option value="4" selected>보통 · 4초</option><option value="2">빠르게 · 2초</option></select>
+  </div>
+  <div class="scrub-row"><input type="range" id="t-range" min="0" max="1000" step="1" value="0" aria-label="진행도"></div>
+  <div class="range-label"><span>t = 0</span><span>t = 1</span></div>
+</section>
+<div class="mode-switch"><button id="interactive-mode" aria-pressed="true">인터랙티브</button><button id="demo-mode" aria-pressed="false">↻ 자동 시연</button></div>
+<div class="hints">드래그 회전 · 휠 확대 · Space 재생 · ← → 단계 · H 오버레이 숨김</div>
+<svg id="callouts" viewBox="0 0 1672 941" aria-hidden="true"></svg>
+<div id="labels"></div>
+</div></div>
+<button id="restore">오버레이 표시 · H</button>
+<div class="loading" id="loading"><b>모형 제목</b><span id="loading-msg">무대를 준비하는 중…</span></div>
+
+<script>
+// 모듈 import는 file:// 에서 동작하지 않는다 — 8초 뒤에도 API가 없으면 안내한다.
+setTimeout(function(){var l=document.getElementById('loading');if(l&&!l.hidden&&!window.modelApp){document.getElementById('loading-msg').innerHTML='3D 라이브러리를 불러오지 못했습니다.<br>이 페이지는 허브(웹 서버)에서 열어야 합니다. 파일을 직접 두 번 클릭해 열면 동작하지 않습니다.';}},8000);
+</script>
+<script type="module">
+import * as THREE from '../../../../assets/vendor/three/three.module.min.js';
+const APP='modelApp';                               // window에 노출할 자가 점검 API 이름 — 소재에 맞게 바꾼다
+const PI=Math.PI,TAU=PI*2,DEG=PI/180;
+const $=id=>document.getElementById(id);
+const clamp=THREE.MathUtils.clamp,lerp=THREE.MathUtils.lerp;
+const V=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z);
+const fmt=(v,d=2)=>(v<0?'−':'')+Math.abs(v).toFixed(d);
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+
+// ───────────────────────── 상태 — t 하나가 주인이다. 손잡이는 여기 추가한다 ─────────────────────────
+const params=new URLSearchParams(location.search);
+const state={t:0,playing:true,speed:4,camera:'HERO',mode:'interactive',overlays:{CALLOUTS:true,CHARTS:true,LABELS:true}};
+if(params.has('t'))state.t=clamp(Number(params.get('t')),0,1);
+if(params.get('paused')==='1')state.playing=false;
+if(params.get('mode')==='demo')state.mode='demo';
+const EMBED=params.get('embed')==='1';if(EMBED)document.body.classList.add('embed');   // 덱 iframe 모드 — 아래 '시작'에서 손잡이를 #embed-bar로 옮긴다
+
+// ───────────────────────── 렌더러·환경·조명·바닥 (교체 가능한 기본값) ─────────────────────────
+const stage=$('stage');let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance',preserveDrawingBuffer:true});}
+catch(e){$('loading-msg').innerHTML='<b>WebGL을 사용할 수 없습니다.</b><br>브라우저의 하드웨어 가속을 켜고 다시 열어 주세요.';console.error(e);throw e;}
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setClearColor(0xeef1f4,0);
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.domElement.tabIndex=0;stage.append(renderer.domElement);
+const canvas=renderer.domElement,scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(32,16/9,.05,120);
+const target=V(0,.5,0),targetGoal=target.clone(),spherical=new THREE.Spherical(),sphericalGoal=new THREE.Spherical();
+{ // 스튜디오를 코드로 지어 환경맵으로 굽는다 — HDR 파일 없이 소프트박스 반사. 다크 컨셉이면 광량을 낮추거나 생략
+  const studio=new THREE.Scene();studio.background=new THREE.Color(0x7d858d);
+  studio.add(new THREE.Mesh(new THREE.BoxGeometry(26,20,26),new THREE.MeshBasicMaterial({color:0x3b444d,side:THREE.BackSide})));
+  for(const [x,y,z,w,h,k] of [[-6,7,4,5,9,4.5],[6,6,-2,4,8,4],[0,10,-5,9,4,3.5],[2,2,9,3,6,1.8]]){const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(0xffffff).multiplyScalar(k),side:THREE.DoubleSide}));p.position.set(x,y,z);p.lookAt(0,.5,0);studio.add(p);}
+  const pmrem=new THREE.PMREMGenerator(renderer),env=pmrem.fromScene(studio,.02,.1,60);scene.environment=env.texture;pmrem.dispose();studio.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
+}
+scene.add(new THREE.HemisphereLight(0xf4f8ff,0x8a97a5,1.5));
+const keyLight=new THREE.DirectionalLight(0xffffff,2.4);keyLight.position.set(-6,11,6);keyLight.castShadow=true;
+keyLight.shadow.mapSize.set(2048,2048);Object.assign(keyLight.shadow.camera,{left:-8,right:8,top:8,bottom:-8,near:.5,far:40});keyLight.shadow.bias=-.0004;keyLight.shadow.normalBias=.02;
+scene.add(keyLight,keyLight.target);
+const fill=new THREE.DirectionalLight(0xdbe8ff,.9);fill.position.set(6,5,-4);scene.add(fill);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.ShadowMaterial({opacity:.12}));floor.rotation.x=-PI/2;floor.position.y=-.141;floor.receiveShadow=true;scene.add(floor);
+const blob=new THREE.Mesh(new THREE.PlaneGeometry(14,10),new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{strength:{value:.16}},
+  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  fragmentShader:'varying vec2 vUv;uniform float strength;void main(){vec2 p=(vUv-.5)*2.;float a=exp(-3.2*dot(p,p))*(1.-smoothstep(.6,1.,length(p)));gl_FragColor=vec4(.20,.26,.33,a*strength);}'}));
+blob.rotation.x=-PI/2;blob.position.y=-.143;scene.add(blob);
+
+// ───────────────────────── 카메라 — 프리셋·지수 보간·궤도·휠 ─────────────────────────
+const preset={HERO:{radius:18,phi:58,theta:24,target:[0,.2,0]},TOP:{radius:16,phi:3,theta:0,target:[0,0,.1]},SIDE:{radius:15,phi:64,theta:90,target:[0,.3,0]}};
+function setCamera(name,immediate=false){state.camera=name;const p=preset[name];targetGoal.set(...p.target);sphericalGoal.set(p.radius,p.phi*DEG,p.theta*DEG);if(immediate){target.copy(targetGoal);spherical.copy(sphericalGoal);moveCamera(0,true);}syncControls();}
+function moveCamera(dt=0,immediate=false){const k=immediate?1:1-Math.exp(-dt*6);target.lerp(targetGoal,k);spherical.radius+=(sphericalGoal.radius-spherical.radius)*k;spherical.phi+=(sphericalGoal.phi-spherical.phi)*k;const delta=((sphericalGoal.theta-spherical.theta+PI)%TAU+TAU)%TAU-PI;spherical.theta+=delta*k;camera.position.setFromSpherical(spherical).add(target);camera.lookAt(target);camera.updateMatrixWorld();}
+let pointer=null,moved=0;const raycaster=new THREE.Raycaster(),ndc=new THREE.Vector2();
+canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;manual();canvas.setPointerCapture(e.pointerId);pointer={x:e.clientX,y:e.clientY};moved=0;sphericalGoal.copy(spherical);targetGoal.copy(target);});
+canvas.addEventListener('pointermove',e=>{if(!pointer)return;const dx=e.clientX-pointer.x,dy=e.clientY-pointer.y;moved+=Math.abs(dx)+Math.abs(dy);sphericalGoal.theta-=dx*.006;sphericalGoal.phi=clamp(sphericalGoal.phi-dy*.006,.05,PI/2-.02);pointer={x:e.clientX,y:e.clientY};});
+canvas.addEventListener('pointerup',e=>{if(pointer&&moved<6){const r=canvas.getBoundingClientRect();ndc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);raycaster.setFromCamera(ndc,camera);pick(raycaster);}pointer=null;});
+for(const n of ['pointercancel','lostpointercapture'])canvas.addEventListener(n,()=>pointer=null);
+canvas.addEventListener('wheel',e=>{e.preventDefault();manual();sphericalGoal.radius=clamp(sphericalGoal.radius*Math.exp(e.deltaY*.001),4,40);},{passive:false});
+
+// ───────────────────────── 아트보드 투영·SVG·라벨·콜아웃 헬퍼 ─────────────────────────
+let artScale=1,viewport={width:1,height:1};
+function project(v){const p=v.clone().project(camera);return{x:((p.x+1)*viewport.width/2-(viewport.width-1672*artScale)/2)/artScale,y:((-p.y+1)*viewport.height/2-(viewport.height-941*artScale)/2)/artScale};}
+function resize(){const r=stage.getBoundingClientRect();viewport.width=r.width;viewport.height=r.height;renderer.setSize(r.width,r.height);camera.aspect=r.width/r.height;artScale=Math.min(innerWidth/1672,innerHeight/941);camera.fov=r.width<700?54:2*Math.atan(Math.tan(16*DEG)*r.height/(941*artScale))/DEG;camera.updateProjectionMatrix();document.documentElement.style.setProperty('--scale',artScale);}
+addEventListener('resize',resize);resize();
+const xmlns='http://www.w3.org/2000/svg';
+function el(tag,attrs={},parent){const o=document.createElementNS(xmlns,tag);for(const [k,v] of Object.entries(attrs))o.setAttribute(k,v);if(parent)parent.append(o);return o;}
+const textEl=(parent,x,y,text,attrs={})=>{const o=el('text',{x,y,...attrs},parent);o.textContent=text;return o;};
+function pathAt(fn,start,end,steps){let d='';for(let k=0;k<=steps;k++){const [x,y]=fn(start+(end-start)*k/steps);d+=`${k?'L':'M'}${x.toFixed(2)},${y.toFixed(2)} `;}return d;}
+function clearSvg(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+// HTML 라벨: {el, point:()=>Vector3, cls} 목록을 매 프레임 투영한다 (한글은 3D 텍스트 대신 이것으로)
+const labels=[];
+function addLabel(text,point,onClick){const d=document.createElement('div');d.className='lbl';d.textContent=text;if(onClick)d.onclick=onClick;$('labels').append(d);const L={el:d,point};labels.push(L);return L;}
+function updateLabels(){const on=state.overlays.LABELS;$('labels').style.display=on?'':'none';if(!on)return;for(const L of labels){const p=project(L.point());L.el.style.left=`${p.x}px`;L.el.style.top=`${p.y}px`;}}
+let calloutNodes=[];
+function buildCallouts(specs){$('callouts').innerHTML='';calloutNodes=specs.map(s=>{const g=el('g',{},$('callouts'));const back=el('rect',{class:'callout-back',rx:3},g);return{spec:s,group:g,back,line:el('path',{class:'callout-line'},g),dot:el('circle',{r:2.4,fill:'var(--accent)'},g),text:textEl(g,s.label[0],s.label[1],s.text,{class:'callout-text'}),small:textEl(g,s.label[0],s.label[1]+15,s.detail,{class:'callout-small'}),sized:false,underY:s.label[1]+21};});}
+function updateCallouts(){const on=state.overlays.CALLOUTS;$('callouts').style.display=on?'':'none';if(!on)return;
+  for(const n of calloutNodes){const pt=n.spec.point(),[lx,ly]=n.spec.label;n.group.style.display=pt?'':'none';if(!pt)continue;
+    if(!n.sized){try{const b1=n.text.getBBox(),b2=n.small.getBBox();const x=Math.min(b1.x,b2.x)-7,y=b1.y-4,w=Math.max(b1.width,b2.width)+14,h=b2.y+b2.height-b1.y+8;if(w>14){n.back.setAttribute('x',x);n.back.setAttribute('y',y);n.back.setAttribute('width',w);n.back.setAttribute('height',h);n.underY=y+h+2;n.sized=true;}}catch(e){}}
+    const p=project(pt);n.dot.setAttribute('cx',p.x);n.dot.setAttribute('cy',p.y);n.line.setAttribute('d',`M${p.x.toFixed(1)} ${p.y.toFixed(1)} L${lx-14} ${n.underY} H${lx+150}`);}}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ▼▼ 모형 고유 ▼▼  — 아래 함수들만 소재에 맞게 다시 쓴다. 자리표시자: 12개 큐브 링이 t에 따라 차례로 솟는다.
+// ═══════════════════════════════════════════════════════════════════════════
+const DATA={n:12,radius:3};
+const stageGroup=new THREE.Group();scene.add(stageGroup);let cubes=[];
+function compute(t){return Array.from({length:DATA.n},(_,i)=>({i,h:.2+1.4*Math.sin(PI/2*clamp(t*DATA.n-i,0,1))}));}   // 모든 숫자의 원천 — i번째 큐브는 t가 i/n을 지날 때 솟는다
+function buildStage(){stageGroup.clear();cubes=[];const plate=new THREE.Mesh(new THREE.CylinderGeometry(DATA.radius+.9,DATA.radius+.9,.14,48),new THREE.MeshStandardMaterial({color:0x2c343d,roughness:.62}));plate.position.y=-.07;plate.receiveShadow=true;stageGroup.add(plate);
+  for(let i=0;i<DATA.n;i++){const a=i/DATA.n*TAU,m=new THREE.Mesh(new THREE.BoxGeometry(.6,1,.6),new THREE.MeshStandardMaterial({color:new THREE.Color().setHSL(i/DATA.n,.6,.55),roughness:.5}));m.castShadow=m.receiveShadow=true;m.position.set(Math.cos(a)*DATA.radius,.5,Math.sin(a)*DATA.radius);m.userData.index=i;stageGroup.add(m);cubes.push(m);}
+  labels.length=0;$('labels').innerHTML='';addLabel('큐브 0',()=>cubes[0].position.clone().add(V(0,cubes[0].scale.y/2+.35,0)),()=>{manual();state.selected=0;});
+  buildCallouts([{text:'솟는 높이 = f(t)',detail:'같은 함수가 차트를 그린다',label:[640,86],point:()=>cubes[3].position.clone().add(V(0,cubes[3].scale.y/2,0))}]);}
+function updateStage(){const rows=compute(state.t);for(const r of rows){const c=cubes[r.i];c.scale.y=r.h;c.position.y=r.h/2;}stageGroup.updateMatrixWorld(true);}
+const chart=$('chart');let cursor;
+function buildChart(){clearSvg(chart);el('line',{x1:26,x2:290,y1:118,y2:118,stroke:'#cfd6de'},chart);el('path',{d:pathAt(t=>[26+t*264,118-compute(t)[3].h/1.6*104],0,1,120),fill:'none',stroke:'var(--accent)','stroke-width':1.8},chart);cursor=el('line',{y1:8,y2:120,stroke:'var(--accent)','stroke-width':1.2},chart);textEl(chart,290,140,'t (0 → 1)',{'text-anchor':'end','font-size':8,fill:'#7b8590'});}
+function updateUI(){const rows=compute(state.t);$('chart-sub').textContent=fmt(rows[3].h);$('calc-sub').textContent=`t = ${fmt(state.t)}`;$('calc').innerHTML=`h₃ = 0.2 + 1.4·sin(π·clamp(12t − 3)) = <b>${fmt(rows[3].h)}</b>`;const x=26+state.t*264;cursor.setAttribute('x1',x);cursor.setAttribute('x2',x);}
+function pick(ray){const hit=ray.intersectObjects(cubes,false)[0];if(hit){state.selected=hit.object.userData.index;uiDirty=true;}}
+function extraSnapshot(){return{heights:compute(state.t).map(r=>+r.h.toFixed(3)),selected:state.selected??null};}
+function applyState(p){ /* setState가 받는 소재 고유 항목을 여기서 state에 반영한다. 데이터 크기가 바뀌면 buildStage()·buildChart()를 다시 부른다 */ if(p.selected!==undefined)state.selected=Number(p.selected); }
+const demo={hold:0};
+function startDemo(){state.mode='demo';state.t=0;state.playing=true;demo.hold=0;setCamera('HERO');syncControls();}
+function demoTick(dt){sphericalGoal.theta+=dt*.06;if(state.playing)return;demo.hold+=dt;if(demo.hold<1.2)return;demo.hold=0;state.t=0;state.playing=true;setCamera(['HERO','SIDE','TOP'][(Math.random()*3)|0]);}   // 시연 순서는 소재에 맞게
+// ═══════════════════════════════════════════════════════════════════════════
+// ▲▲ 모형 고유 ▲▲
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ───────────────────────── 조작·재생·키보드 (공용) ─────────────────────────
+function controls(container,items,onClick){for(const it of items){const b=document.createElement('button');b.textContent=it.label;b.dataset.value=it.value;b.setAttribute('aria-pressed','false');if(it.cls)b.classList.add(it.cls);b.onclick=()=>{manual();onClick(it.value);syncControls();};$(container).append(b);}}
+controls('camera-controls',Object.keys(preset).map(k=>({value:k,label:{HERO:'입체',TOP:'위에서',SIDE:'옆에서'}[k]||k})),v=>setCamera(v));
+controls('overlay-controls',[['LABELS','라벨'],['CALLOUTS','콜아웃'],['CHARTS','차트']].map(([value,label])=>({value,label})),v=>{state.overlays[v]=!state.overlays[v];applyVisibility();});
+function applyVisibility(){for(const c of document.querySelectorAll('.card-left'))c.style.visibility=state.overlays.CHARTS?'visible':'hidden';$('callouts').style.display=state.overlays.CALLOUTS?'':'none';$('labels').style.display=state.overlays.LABELS?'':'none';}
+function syncControls(){for(const b of $('camera-controls').children)b.setAttribute('aria-pressed',b.dataset.value===state.camera);for(const b of $('overlay-controls').children)b.setAttribute('aria-pressed',!!state.overlays[b.dataset.value]);
+  $('play').setAttribute('aria-pressed',state.playing);$('play').textContent=state.playing?'Ⅱ 정지':(state.t>=1?'↺ 다시 재생':'▶ 재생');$('demo-mode').setAttribute('aria-pressed',state.mode==='demo');$('interactive-mode').setAttribute('aria-pressed',state.mode==='interactive');$('speed').value=String(state.speed);}
+const range=$('t-range');let scrubbing=false,uiDirty=true;
+function manual(){state.mode='interactive';}
+$('play').onclick=()=>{manual();if(state.playing)state.playing=false;else{if(state.t>=1)state.t=0;state.playing=true;}syncControls();};
+$('speed').onchange=e=>{manual();state.speed=Number(e.target.value);};
+range.addEventListener('pointerdown',()=>{scrubbing=true;manual();state.playing=false;syncControls();});
+range.addEventListener('input',()=>{state.t=Number(range.value)/1000;uiDirty=true;});
+for(const n of ['pointerup','pointercancel','blur'])range.addEventListener(n,()=>scrubbing=false);
+function hideUI(){document.body.classList.toggle('hidden-overlays');}$('restore').onclick=hideUI;
+addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;const key=e.key.toLowerCase();
+  if(key==='h')hideUI();else if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();$('play').click();}
+  else if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();manual();state.playing=false;state.t=clamp(state.t+(e.key==='ArrowRight'?.05:-.05),0,1);uiDirty=true;syncControls();}});
+$('demo-mode').onclick=startDemo;$('interactive-mode').onclick=()=>{manual();syncControls();};
+
+// ───────────────────────── 프레임 루프 (공용) ─────────────────────────
+const frameDurations=[];let previous=performance.now(),uiElapsed=0,renderCount=0;
+function renderFrame(now){const raw=(now-previous)/1000,dt=Math.min(raw,.1);previous=now;if(document.hidden){requestAnimationFrame(renderFrame);return;}
+  if(state.mode==='demo')demoTick(dt);
+  if(state.playing){const nt=clamp(state.t+dt/state.speed,0,1);if(nt!==state.t){state.t=nt;uiDirty=true;}if(nt>=1){state.playing=false;syncControls();}}
+  updateStage();moveCamera(dt);updateLabels();
+  uiElapsed+=dt;if(uiElapsed>.05){if(uiDirty){updateUI();if(!scrubbing)range.value=String(Math.round(state.t*1000));uiDirty=false;}updateCallouts();uiElapsed=0;}
+  renderer.render(scene,camera);if(raw>0&&raw<1){frameDurations.push(raw*1000);if(frameDurations.length>180)frameDurations.shift();}renderCount++;requestAnimationFrame(renderFrame);}
+
+// ───────────────────────── 자가 점검 API (공용 + extraSnapshot) ─────────────────────────
+function bounds(){const b=new THREE.Box3().setFromObject(stageGroup),pts=[];for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z]){const p=V(x,y,z).project(camera);pts.push([(p.x+1)*viewport.width/2,(-p.y+1)*viewport.height/2]);}return{minX:Math.min(...pts.map(p=>p[0])),maxX:Math.max(...pts.map(p=>p[0])),minY:Math.min(...pts.map(p=>p[1])),maxY:Math.max(...pts.map(p=>p[1]))};}
+function snapshot(){return{state:JSON.parse(JSON.stringify(state)),...extraSnapshot(),renderer:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,frames:renderCount,meanFrameMs:frameDurations.length?frameDurations.reduce((a,b)=>a+b)/frameDurations.length:0,dpr:renderer.getPixelRatio()},camera:{position:camera.position.toArray(),target:target.toArray()},bounds:bounds()};}
+function refresh(){updateStage();updateUI();updateLabels();updateCallouts();syncControls();renderer.render(scene,camera);}
+window[APP]={snapshot,
+  setState(p={}){if(p.t!==undefined)state.t=clamp(Number(p.t),0,1);if(p.playing!==undefined)state.playing=Boolean(p.playing);if(p.speed!==undefined)state.speed=Number(p.speed);
+    if(p.overlays)for(const k of Object.keys(state.overlays))if(p.overlays[k]!==undefined)state.overlays[k]=Boolean(p.overlays[k]);if(['demo','interactive'].includes(p.mode))state.mode=p.mode;
+    applyState(p);applyVisibility();if(p.camera in preset)setCamera(p.camera,true);else setCamera(state.camera,true);refresh();return snapshot();},
+  advance(seconds){if(state.playing)state.t=clamp(state.t+seconds/state.speed,0,1);refresh();return snapshot();},
+  capture(){renderer.render(scene,camera);return canvas.toDataURL('image/png');}};
+
+// ───────────────────────── 시작 ─────────────────────────
+if(EMBED){/* 예: $('embed-bar').append($('head-controls'),$('frame-pick')); 자동 시연 버튼이 있으면 함께 */}
+buildStage();buildChart();applyVisibility();setCamera('HERO',true);refresh();
+$('loading').hidden=true;if(state.mode==='demo')startDemo();requestAnimationFrame(renderFrame);
+</script>
+</body>
+</html>

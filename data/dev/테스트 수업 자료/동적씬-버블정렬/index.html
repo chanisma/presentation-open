@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>(function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html$/.test(p)){var b=document.createElement('base');b.href=p+'/';document.head.appendChild(b);}})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>버블 정렬 — 눈으로 이해하기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  /* Deck Contract v1 — 크롬·네비는 deck.js가 제공. 여기는 이 덱의 디자인 언어만. */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Noto Sans KR', sans-serif; background: #10182b; color: #e8ecf6;
+    font-size: clamp(13px, 1.1vw, 20px); }
+  .presentation { width: 100%; height: 100%; position: relative; }
+  .slide { position: absolute; inset: 0; opacity: 0; pointer-events: none;
+    transition: opacity .45s ease; overflow: hidden; }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body data-deck-title="버블 정렬 — 눈으로 이해하기" data-subject="정보">
+<div class="presentation">
+
+<!-- scene: sc-01 | metaphor: 카드 정돈 | intent: 흩어진 카드가 스스로 줄을 맞추는 장면으로 '정렬'이라는 주제를 몸으로 예고한다 -->
+<div class="slide active" data-scene="sc-01">
+  <style>
+    [data-scene="sc-01"] { background: radial-gradient(120% 90% at 78% 18%, #1b2742 0%, #10182b 58%); }
+    [data-scene="sc-01"] .card { position: absolute; width: 6.2vw; min-width: 64px; aspect-ratio: 3/4;
+      background: #f4f0e6; color: #1d2433; border-radius: .55vw;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4vw; font-weight: 900; box-shadow: 0 14px 30px rgba(0,0,0,.45);
+      will-change: transform; }
+    [data-scene="sc-01"] .card i { position: absolute; top: 6%; left: 10%; font-style: normal;
+      font-size: .8vw; color: #9aa3b5; font-weight: 700; }
+    [data-scene="sc-01"] .stage { position: absolute; top: 10vh; right: 6vw; width: 46vw; height: 46vh; }
+    [data-scene="sc-01"] .kicker { position: absolute; left: 7vw; bottom: 41vh;
+      font-size: .95em; letter-spacing: .34em; color: #5ea2f6; font-weight: 700; }
+    [data-scene="sc-01"] h1 { position: absolute; left: 7vw; bottom: 20vh;
+      font-size: 4.4vw; font-weight: 900; line-height: 1.16; letter-spacing: -.02em; }
+    [data-scene="sc-01"] h1 em { font-style: normal; color: #34d399; }
+    [data-scene="sc-01"] .sub { position: absolute; left: 7vw; bottom: 13.5vh;
+      color: #93a1bd; font-size: 1.15em; font-weight: 300; }
+    [data-scene="sc-01"] .baseline { position: absolute; left: 0; right: 0; bottom: -2.4vh;
+      height: 1px; background: rgba(148,163,184,.3); }
+  </style>
+  <div class="stage">
+    <div class="card" data-card="3"><i>NO.3</i>3</div>
+    <div class="card" data-card="1"><i>NO.1</i>1</div>
+    <div class="card" data-card="4"><i>NO.4</i>4</div>
+    <div class="card" data-card="2"><i>NO.2</i>2</div>
+    <div class="card" data-card="5"><i>NO.5</i>5</div>
+    <div class="baseline"></div>
+  </div>
+  <div class="kicker">정보 · 알고리즘</div>
+  <h1>버블 정렬,<br><em>눈으로</em> 이해하기</h1>
+  <p class="sub">숫자들이 스스로 줄을 서는 가장 단순한 방법</p>
+</div>
+
+<!-- scene: sc-02 | metaphor: 저울 | intent: 정렬의 원자 행동이 '두 값의 비교' 하나뿐임을 저울질로 보여준다 -->
+<div class="slide" data-scene="sc-02">
+  <style>
+    [data-scene="sc-02"] { background: linear-gradient(160deg, #131c33 0%, #0e1526 70%); }
+    [data-scene="sc-02"] .scale { position: absolute; left: 6vw; top: 16vh; width: 46vw; height: 60vh; }
+    [data-scene="sc-02"] .pillar { position: absolute; left: 50%; bottom: 8vh; width: .9vw; height: 30vh;
+      transform: translateX(-50%); background: #2c3a58; border-radius: .45vw; }
+    [data-scene="sc-02"] .pillar::after { content: ''; position: absolute; bottom: -1.2vh; left: 50%;
+      transform: translateX(-50%); width: 12vw; height: 1.2vh; background: #2c3a58; border-radius: .6vw; }
+    [data-scene="sc-02"] .beam { position: absolute; left: 50%; top: 22vh; width: 34vw; height: .7vw;
+      background: #7d8db0; border-radius: .35vw; transform-origin: 50% 50%;
+      transform: translateX(-50%); will-change: transform; }
+    [data-scene="sc-02"] .plate { position: absolute; top: 1vw; width: 9vw; height: 5.4vh;
+      border-radius: 0 0 3vw 3vw; background: #2c3a58; }
+    [data-scene="sc-02"] .plate--l { left: -1.4vw; } [data-scene="sc-02"] .plate--r { right: -1.4vw; }
+    [data-scene="sc-02"] .weight { position: absolute; top: -6.6vh; left: 50%; transform: translateX(-50%);
+      width: 5.6vw; min-width: 56px; aspect-ratio: 1; border-radius: .8vw;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4vw; font-weight: 900; will-change: transform, opacity; }
+    [data-scene="sc-02"] .weight--seven { background: #f5b04c; color: #3a2b10; }
+    [data-scene="sc-02"] .weight--three { background: #f4f0e6; color: #1d2433; }
+    [data-scene="sc-02"] .headline { position: absolute; right: 7vw; top: 17vh; width: 36vw; text-align: right; }
+    [data-scene="sc-02"] .headline .no { font-size: .9em; letter-spacing: .3em; color: #5ea2f6; font-weight: 700; }
+    [data-scene="sc-02"] .headline h2 { font-size: 3.2vw; font-weight: 900; line-height: 1.25; margin-top: 1.2vh; }
+    [data-scene="sc-02"] .headline h2 b { color: #f5b04c; }
+    [data-scene="sc-02"] .rule { position: absolute; right: 7vw; bottom: 16vh; width: 30vw;
+      border-right: .3vw solid #f5b04c; padding-right: 1.4vw; text-align: right; }
+    [data-scene="sc-02"] .rule p { color: #93a1bd; line-height: 1.7; font-weight: 300; }
+    [data-scene="sc-02"] .rule p strong { color: #e8ecf6; font-weight: 700; }
+  </style>
+  <div class="scale">
+    <div class="pillar"></div>
+    <div class="beam">
+      <div class="plate plate--l"><div class="weight weight--seven">7</div></div>
+      <div class="plate plate--r"><div class="weight weight--three">3</div></div>
+    </div>
+  </div>
+  <div class="headline">
+    <div class="no">SCENE 02 · 원자 행동</div>
+    <h2>버블 정렬이 하는 일은<br><b>딱 하나, 저울질</b></h2>
+  </div>
+  <div class="rule">
+    <p>이웃한 두 수를 올려놓고 <strong>무거운(큰) 쪽이 오른쪽</strong>이 되게 자리를 바꾼다.<br>이 단순한 비교가 정렬의 전부다.</p>
+  </div>
+</div>
+
+<!-- scene: sc-03 | metaphor: 거품 상승 | intent: 한 패스가 끝나면 가장 큰 값이 물속 거품처럼 맨 오른쪽 수면에 도달함을 실제 스왑 애니메이션으로 체험시킨다 -->
+<div class="slide" data-scene="sc-03">
+  <style>
+    [data-scene="sc-03"] { background: linear-gradient(180deg, #0e1526 0%, #12203a 100%); }
+    [data-scene="sc-03"] .tank { position: absolute; left: 8vw; bottom: 14vh; width: 62vw; height: 52vh;
+      border-bottom: 2px solid rgba(94,162,246,.45); }
+    [data-scene="sc-03"] .surface { position: absolute; right: -2vw; top: -3.2vh; color: #5ea2f6;
+      font-size: .85em; letter-spacing: .22em; font-weight: 700; }
+    [data-scene="sc-03"] .bar { position: absolute; bottom: 0; width: 8vw;
+      background: #223152; border-radius: .6vw .6vw 0 0;
+      display: flex; align-items: flex-start; justify-content: center;
+      color: #cdd7ea; font-weight: 900; font-size: 1.7vw; padding-top: 1vh;
+      will-change: transform; }
+    [data-scene="sc-03"] .bar--max { background: linear-gradient(180deg, #35d9a2 0%, #1f8a68 100%);
+      color: #06281c; box-shadow: 0 0 26px rgba(53,217,162,.35); }
+    [data-scene="sc-03"] .cap { position: absolute; left: 8vw; top: 13vh; width: 50vw; }
+    [data-scene="sc-03"] .cap .no { font-size: .9em; letter-spacing: .3em; color: #5ea2f6; font-weight: 700; }
+    [data-scene="sc-03"] .cap h2 { font-size: 2.9vw; font-weight: 900; margin-top: 1vh; line-height: 1.3; }
+    [data-scene="sc-03"] .cap h2 b { color: #35d9a2; }
+    [data-scene="sc-03"] .pass-label { position: absolute; right: 7vw; top: 40vh; text-align: right; }
+    [data-scene="sc-03"] .pass-label .big { font-size: 5.4vw; font-weight: 900; color: #35d9a2;
+      line-height: 1; font-variant-numeric: tabular-nums; }
+    [data-scene="sc-03"] .pass-label .lab { color: #93a1bd; font-size: .95em; margin-top: .6vh; }
+  </style>
+  <div class="cap">
+    <div class="no">SCENE 03 · 왜 '버블'인가</div>
+    <h2>한 바퀴 돌면, 가장 큰 수가<br><b>거품처럼 끝까지 떠오른다</b></h2>
+  </div>
+  <div class="tank">
+    <span class="surface">수면 (맨 오른쪽)</span>
+    <div class="bar" data-bar="0" style="height:52%">5</div>
+    <div class="bar" data-bar="1" style="height:24%">2</div>
+    <div class="bar bar--max" data-bar="2" style="height:88%">8</div>
+    <div class="bar" data-bar="3" style="height:34%">3</div>
+    <div class="bar" data-bar="4" style="height:64%">6</div>
+  </div>
+  <div class="pass-label">
+    <div class="big" data-swaps>0</div>
+    <div class="lab">자리 바꿈 횟수</div>
+  </div>
+</div>
+
+<!-- scene: sc-04 | metaphor: 굳는 벽돌 | intent: 패스가 반복될수록 오른쪽부터 정렬이 '확정'되어 다시 건드릴 필요가 없음을 굳어가는 벽돌로 각인한다 -->
+<div class="slide" data-scene="sc-04">
+  <style>
+    [data-scene="sc-04"] { background: #101827; }
+    [data-scene="sc-04"] .passnum { position: absolute; left: 7vw; top: 29vh; }
+    [data-scene="sc-04"] .passnum .word { color: #93a1bd; letter-spacing: .3em; font-size: .9em; font-weight: 700; }
+    [data-scene="sc-04"] .passnum .n { font-size: 13vw; font-weight: 900; line-height: 1; color: #f47a6a;
+      font-variant-numeric: tabular-nums; }
+    [data-scene="sc-04"] .passnum .of { color: #55617c; font-size: 1.4em; font-weight: 300; }
+    [data-scene="sc-04"] .track { position: absolute; right: 7vw; top: 37vh; width: 48vw; }
+    [data-scene="sc-04"] .slot { position: absolute; top: 0; width: 8.4vw; height: 12vh;
+      border-radius: .7vw; border: 1px dashed rgba(148,163,184,.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4vw; color: #55617c; transition: none; will-change: background, border-color; }
+    [data-scene="sc-04"] .slot span.done { display: none; color: #ffd9a8; font-weight: 700; font-size: 1vw; }
+    [data-scene="sc-04"] .slot.locked { border: 1px solid #b4763a;
+      background: linear-gradient(180deg, #7a4f22 0%, #5b3a17 100%); box-shadow: inset 0 2px 8px rgba(0,0,0,.4); }
+    [data-scene="sc-04"] .slot.locked span.wait { display: none; }
+    [data-scene="sc-04"] .slot.locked span.done { display: block; }
+    [data-scene="sc-04"] .note { position: absolute; right: 7vw; top: 57vh; width: 42vw; text-align: left;
+      border-left: .3vw solid #f47a6a; padding-left: 1.4vw; }
+    [data-scene="sc-04"] .note p { color: #93a1bd; line-height: 1.75; font-weight: 300; }
+    [data-scene="sc-04"] .note p b { color: #e8ecf6; }
+    [data-scene="sc-04"] .no { position: absolute; left: 7vw; top: 20vh;
+      font-size: .9em; letter-spacing: .3em; color: #5ea2f6; font-weight: 700; }
+  </style>
+  <div class="no">SCENE 04 · 반복의 의미</div>
+  <div class="passnum">
+    <div class="word">PASS</div>
+    <div class="n" data-pass>1</div>
+    <div class="of">/ 전체 4바퀴 (원소 5개)</div>
+  </div>
+  <div class="track" data-track>
+    <div class="slot" style="left:0"><span class="wait">?</span><span class="done">확정</span></div>
+    <div class="slot" style="left:9.8vw"><span class="wait">?</span><span class="done">확정</span></div>
+    <div class="slot" style="left:19.6vw"><span class="wait">?</span><span class="done">확정</span></div>
+    <div class="slot" style="left:29.4vw"><span class="wait">?</span><span class="done">확정</span></div>
+    <div class="slot" style="left:39.2vw"><span class="wait">?</span><span class="done">확정</span></div>
+  </div>
+  <div class="note">
+    <p>패스가 한 번 끝날 때마다 <b>오른쪽 끝 자리 하나가 벽돌처럼 굳는다.</b><br>
+    다음 패스는 굳은 구역을 다시 볼 필요가 없다 — 그래서 갈수록 한 바퀴가 짧아진다.</p>
+  </div>
+</div>
+
+<!-- scene: sc-05 | metaphor: 비용 계량기 | intent: 비교 횟수가 n(n-1)/2로 자라는 것을 계량기와 성장 곡선으로 보여 효율 개념의 문을 연다 -->
+<div class="slide" data-scene="sc-05">
+  <style>
+    [data-scene="sc-05"] { background: linear-gradient(200deg, #141d34 0%, #0e1526 60%); }
+    [data-scene="sc-05"] .meter { position: absolute; right: 8vw; top: 18vh; text-align: right; }
+    [data-scene="sc-05"] .meter .label { color: #93a1bd; letter-spacing: .26em; font-size: .85em; font-weight: 700; }
+    [data-scene="sc-05"] .meter .value { font-size: 9vw; font-weight: 900; line-height: 1.05;
+      color: #a78bfa; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+    [data-scene="sc-05"] .meter .cond { color: #55617c; font-size: 1em; margin-top: .4vh; }
+    [data-scene="sc-05"] .meter .cond b { color: #e8ecf6; }
+    [data-scene="sc-05"] .graph { position: absolute; left: 7vw; top: 20vh; width: 40vw; height: 52vh; }
+    [data-scene="sc-05"] .graph svg { width: 100%; height: 100%; overflow: visible; }
+    [data-scene="sc-05"] .axis { stroke: rgba(148,163,184,.4); stroke-width: 1; }
+    [data-scene="sc-05"] .curve { stroke: #a78bfa; stroke-width: 3; fill: none; stroke-linecap: round; }
+    [data-scene="sc-05"] .dot { fill: #f5b04c; }
+    [data-scene="sc-05"] .tag { fill: #cdd7ea; font-size: 13px; font-family: 'Noto Sans KR', sans-serif; }
+    [data-scene="sc-05"] .punch { position: absolute; left: 7vw; bottom: 10vh; width: 52vw;
+      color: #93a1bd; font-weight: 300; font-size: 1.15em; }
+    [data-scene="sc-05"] .punch b { color: #f5b04c; font-weight: 700; }
+    [data-scene="sc-05"] .formula { position: absolute; right: 8vw; bottom: 11vh;
+      background: rgba(167,139,250,.12); border: 1px solid rgba(167,139,250,.4);
+      padding: 1vh 1.4vw; border-radius: .6vw; font-size: 1.5vw; font-weight: 700; color: #cbb8ff; }
+  </style>
+  <div class="graph">
+    <svg viewBox="0 0 400 380">
+      <line class="axis" x1="30" y1="350" x2="390" y2="350"></line>
+      <line class="axis" x1="30" y1="350" x2="30" y2="10"></line>
+      <path class="curve" data-curve d="M 30 350 Q 160 340 260 220 T 390 20"></path>
+      <circle class="dot" data-dot1 cx="150" cy="318" r="0"></circle>
+      <text class="tag" x="158" y="312">n=10 → 45번</text>
+      <circle class="dot" data-dot2 cx="352" cy="72" r="0"></circle>
+      <text class="tag" x="252" y="60">n=30 → 435번</text>
+    </svg>
+  </div>
+  <div class="meter">
+    <div class="label">비교 횟수 계량기</div>
+    <div class="value" data-meter>0</div>
+    <div class="cond">학생 <b>30명</b>을 키 순서로 세운다면</div>
+  </div>
+  <div class="formula">비교 횟수 = n(n−1) ÷ 2</div>
+  <p class="punch">줄이 <b>2배</b> 길어지면 비교는 <b>약 4배</b>로 는다. — 이 무거움이 다음 시간, 더 빠른 정렬을 배우는 이유가 된다.</p>
+</div>
+
+<!-- scene: sc-06 | metaphor: 확인 도장 | intent: 핵심 세 줄이 영수증처럼 인쇄되고 도장이 찍히며 오늘 배운 것을 확정 짓는다 -->
+<div class="slide" data-scene="sc-06">
+  <style>
+    [data-scene="sc-06"] { background: radial-gradient(100% 100% at 20% 90%, #182238 0%, #10182b 55%); }
+    [data-scene="sc-06"] .receipt { position: absolute; left: 12vw; top: 12vh; width: 34vw; min-width: 330px;
+      background: #f4f0e6; color: #232a3a; padding: 3.2vh 2.2vw 8vh; transform: rotate(-2deg);
+      box-shadow: 0 24px 50px rgba(0,0,0,.5); }
+    [data-scene="sc-06"] .receipt::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1.6vh;
+      height: 1.8vh; background: repeating-linear-gradient(-45deg, #f4f0e6 0 8px, transparent 8px 16px); }
+    [data-scene="sc-06"] .receipt h3 { font-size: 1.15vw; letter-spacing: .3em; color: #8a8371;
+      border-bottom: 2px dashed #c9c2b0; padding-bottom: 1.2vh; margin-bottom: 2vh; }
+    [data-scene="sc-06"] .line { display: flex; justify-content: space-between; gap: 1vw;
+      font-size: 1.25vw; font-weight: 700; padding: 1.3vh 0; border-bottom: 1px dotted #d8d2c2;
+      opacity: 0; will-change: opacity, transform; }
+    [data-scene="sc-06"] .line small { font-weight: 400; color: #6d6753; }
+    [data-scene="sc-06"] .stamp { position: absolute; right: 14vw; top: 30vh; width: 15vw; min-width: 150px;
+      aspect-ratio: 1; border: .55vw solid #d94f3d; border-radius: 50%; color: #d94f3d;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-weight: 900; transform: rotate(-14deg) scale(0); will-change: transform, opacity;
+      background: rgba(217,79,61,.06); }
+    [data-scene="sc-06"] .stamp .t1 { font-size: 1.9vw; letter-spacing: .12em; }
+    [data-scene="sc-06"] .stamp .t2 { font-size: .72vw; letter-spacing: .13em; margin-top: .7vh; white-space: nowrap; }
+    [data-scene="sc-06"] .next { position: absolute; right: 9vw; bottom: 11vh; text-align: right; color: #93a1bd; }
+    [data-scene="sc-06"] .next b { color: #5ea2f6; }
+  </style>
+  <div class="receipt">
+    <h3>오늘의 영수증 · BUBBLE SORT</h3>
+    <div class="line" data-line="0"><span>비교</span><small>이웃한 둘을 저울질한다</small></div>
+    <div class="line" data-line="1"><span>교환</span><small>큰 쪽을 오른쪽으로 보낸다</small></div>
+    <div class="line" data-line="2"><span>확정</span><small>패스마다 오른쪽 끝이 굳는다</small></div>
+  </div>
+  <div class="stamp"><span class="t1">이해 완료</span><span class="t2">COMPARE · SWAP · LOCK</span></div>
+  <div class="next">다음 차시 — 비교를 <b>절반으로 줄이는</b> 방법이 있을까?</div>
+</div>
+
+</div>
+
+<!-- Deck Contract v1: 네비·크롬·모션 런타임·라이브 연동은 공통 컨트롤러가 제공 -->
+<script type="module" src="../../../../live/runtime/deck.js?v=1"></script>
+<script type="module">
+/* 씬 타임라인 — deck.js가 전역으로 제공하는 SceneMotion·interpolate·easeOut·easeInOut·springy 사용 */
+/* ── sc-01 카드 정돈: 흩어진 카드 → 제자리 (staggered) ── */
+SceneMotion.register('sc-01', (t, el) => {
+  const stage = el.querySelector('.stage');
+  const W = stage.clientWidth, H = stage.clientHeight;
+  // [흩어진 시작 상태 x%, y%, 회전] → [정렬된 끝 상태: 하단 일렬]
+  const scatter = [
+    [8, 12, -17], [52, 4, 11], [30, 38, -6], [72, 30, 21], [14, 58, 8],
+  ];
+  el.querySelectorAll('.card').forEach((card, i) => {
+    const order = Number(card.dataset.card) - 1;         // 값 순서 = 목표 슬롯
+    const d = 0.15 + order * 0.16;                        // 작은 카드부터 자리 잡기
+    const k = easeInOut(Math.max(0, Math.min(1, (t - d) / 0.9)));
+    const [sx, sy, sr] = scatter[i];
+    const ex = order * 19.5, ey = 72;
+    const x = (sx + (ex - sx) * k) / 100 * W;
+    const y = (sy + (ey - sy) * k) / 100 * H;
+    const r = sr * (1 - k);
+    card.style.transform = `translate(${x}px, ${y}px) rotate(${r}deg)`;
+  });
+});
+
+/* ── sc-02 저울: 무거운 7 쪽으로 기울기 + 추 스프링 등장 ── */
+SceneMotion.register('sc-02', (t, el) => {
+  const s7 = springy(t, 0.2, 0.7), s3 = springy(t, 0.45, 0.7);
+  const w7 = el.querySelector('.weight--seven'), w3 = el.querySelector('.weight--three');
+  w7.style.opacity = Math.min(1, s7 * 1.5);
+  w7.style.transform = `translateX(-50%) scale(${0.5 + 0.5 * s7})`;
+  w3.style.opacity = Math.min(1, s3 * 1.5);
+  w3.style.transform = `translateX(-50%) scale(${0.5 + 0.5 * s3})`;
+  const tilt = interpolate(t, [1.0, 1.5], [0, -7], easeInOut);
+  el.querySelector('.beam').style.transform = `translateX(-50%) rotate(${tilt}deg)`;
+});
+
+/* ── sc-03 거품: 1패스 스왑 시퀀스 — 각 막대의 [시각, 슬롯] 키프레임 ── */
+SceneMotion.register('sc-03', (t, el) => {
+  const KF = [ // [5,2,8,3,6] 1패스: 5↔2, (5<8), 8↔3, 8↔6
+    [[0, 0], [0.5, 0], [0.95, 1]],                       // 5
+    [[0, 1], [0.5, 1], [0.95, 0]],                       // 2
+    [[0, 2], [1.45, 2], [1.9, 3], [2.4, 3], [2.85, 4]],  // 8 (거품)
+    [[0, 3], [1.45, 3], [1.9, 2]],                       // 3
+    [[0, 4], [2.4, 4], [2.85, 3]],                       // 6
+  ];
+  const tank = el.querySelector('.tank');
+  const slotW = tank.clientWidth / 5;
+  const slotOf = (kfs) => {
+    let slot = kfs[0][1], dir = 0;
+    for (let i = 1; i < kfs.length; i++) {
+      const [pt, pv] = kfs[i - 1], [ct, cv] = kfs[i];
+      if (t >= ct) { slot = cv; continue; }
+      if (t > pt) { slot = pv + (cv - pv) * easeInOut((t - pt) / (ct - pt)); dir = Math.sign(cv - pv); }
+      break;
+    }
+    return { slot, dir };
+  };
+  el.querySelectorAll('.bar').forEach((bar, i) => {
+    const { slot, dir } = slotOf(KF[i]);
+    const x = slot * slotW + (slotW - bar.clientWidth) / 2;
+    // 교차 시 호 그리기: 오른쪽 이동 = 위로 떠오르고, 왼쪽 이동 = 아래로 비켜간다
+    const frac = Math.abs(slot - Math.round(slot)) * 2;   // 이동 중 0→1→0
+    const y = dir > 0 ? -frac * 34 : dir < 0 ? frac * 20 : 0;
+    bar.style.transform = `translate(${x}px, ${y}px)`;
+  });
+  const swaps = t >= 2.85 ? 3 : t >= 1.9 ? 2 : t >= 0.95 ? 1 : 0;
+  el.querySelector('[data-swaps]').textContent = swaps;
+});
+
+/* ── sc-04 굳는 벽돌: 패스 숫자 증가 + 오른쪽부터 확정 ── */
+SceneMotion.register('sc-04', (t, el) => {
+  const pass = t < 0.9 ? 1 : t < 1.7 ? 2 : t < 2.5 ? 3 : 4;
+  el.querySelector('[data-pass]').textContent = pass;
+  const slots = el.querySelectorAll('.slot');
+  const lockedCount = Math.min(pass - (t < 0.45 ? 1 : 0), slots.length);
+  slots.forEach((slot, i) => {
+    slot.classList.toggle('locked', i >= slots.length - lockedCount);
+  });
+});
+
+/* ── sc-05 계량기: 카운트업 + n² 곡선 드로잉 ── */
+SceneMotion.register('sc-05', (t, el) => {
+  el.querySelector('[data-meter]').textContent =
+    Math.round(interpolate(t, [0.3, 1.4], [0, 435], easeOut)).toLocaleString();
+  const curve = el.querySelector('[data-curve]');
+  const len = curve.getTotalLength();
+  curve.style.strokeDasharray = len;
+  curve.style.strokeDashoffset = interpolate(t, [0.2, 1.4], [len, 0], easeInOut);
+  el.querySelector('[data-dot1]').setAttribute('r', 5 * springy(t, 0.8, 0.5));
+  el.querySelector('[data-dot2]').setAttribute('r', 6 * springy(t, 1.25, 0.5));
+});
+
+/* ── sc-06 영수증: 항목 순차 인쇄 + 도장 쾅 ── */
+SceneMotion.register('sc-06', (t, el) => {
+  el.querySelectorAll('.line').forEach((line, i) => {
+    const k = easeOut(Math.max(0, Math.min(1, (t - 0.25 - i * 0.3) / 0.4)));
+    line.style.opacity = k;
+    line.style.transform = `translateY(${(1 - k) * 12}px)`;
+  });
+  const s = springy(t, 1.2, 0.6);
+  const stamp = el.querySelector('.stamp');
+  stamp.style.opacity = Math.min(1, s * 2);
+  stamp.style.transform = `rotate(-14deg) scale(${s})`;
+});
+</script>
+</body>
+</html>

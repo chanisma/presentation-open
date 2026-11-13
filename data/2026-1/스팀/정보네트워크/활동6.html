@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>활동 6 · 데이터로 만드는 심화 결과물 — 디지털 네트워크와 행렬 [정보편]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FDFDFB;--card:#FFFFFF;--ink:#33415C;--ink-soft:#7B8698;--rule:#D5DBE1;--teal:#3E9C93;--coral:#E8705A;--mustard:#E4B04A;--teal-wash:rgba(62,156,147,0.09);--coral-wash:rgba(232,112,90,0.10);--mustard-wash:rgba(228,176,74,0.16);}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Noto Sans KR',sans-serif;line-height:1.6;padding-bottom:96px;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  header{background:var(--paper);border-bottom:1px solid var(--rule);padding:20px 28px 0;position:relative;}
+  .backlink{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--teal);text-decoration:none;font-weight:500;margin-bottom:12px;}
+  .backlink:hover{text-decoration:underline;}
+  header h1{font-size:24px;font-weight:700;color:var(--teal);letter-spacing:-0.01em;}
+  header .sub{font-size:13.5px;color:var(--ink-soft);margin-top:5px;}
+  .head-actions{position:absolute;top:18px;right:28px;display:flex;gap:8px;}
+  .icon-btn{background:transparent;border:1px solid var(--rule);color:var(--ink-soft);padding:6px 12px;border-radius:8px;cursor:pointer;font:500 13px 'Noto Sans KR';}
+  .icon-btn:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttabs{display:flex;gap:4px;margin-top:16px;flex-wrap:wrap;}
+  .acttab{font-size:12.5px;padding:8px 14px;border:1px solid var(--rule);border-bottom:none;border-radius:9px 9px 0 0;background:var(--paper);color:var(--ink-soft);text-decoration:none;}
+  .acttab:hover{background:var(--teal-wash);color:var(--teal);}
+  .acttab.on{background:var(--card);color:var(--teal);font-weight:700;border-color:var(--teal);border-bottom:1px solid var(--card);position:relative;top:1px;}
+  #settingsPanel{display:none;max-width:1000px;margin:16px auto 0;padding:16px 18px;background:var(--card);border:1px dashed var(--rule);border-radius:12px;}
+  #settingsPanel label{font-size:13px;font-weight:500;display:block;margin-bottom:6px;}
+  #settingsPanel input{width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:8px;font:14px 'Noto Sans KR';color:var(--ink);}
+  #settingsPanel .row{display:flex;gap:8px;margin-top:10px;}
+  main{max-width:1000px;margin:0 auto;padding:24px 28px;}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:22px 24px;margin-bottom:20px;}
+  .card>h2{font-size:18px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .badge{font-size:12px;font-weight:700;letter-spacing:0.04em;background:var(--teal);color:#fff;padding:3px 10px;border-radius:20px;flex:none;}
+  .badge.b2{background:var(--mustard);color:#3D2E06;}.badge.b3{background:var(--coral);}
+  .card>.hint{font-size:13.5px;color:var(--ink-soft);margin-bottom:16px;}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;}
+  .field label .req{color:var(--coral);}.field label .tag{font-size:11.5px;color:var(--ink-soft);font-weight:400;}
+  .field input,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:9px;font:14px 'Noto Sans KR';color:var(--ink);background:var(--paper);}
+  .field textarea{resize:vertical;min-height:64px;line-height:1.7;}
+  .field input:focus,.field textarea:focus{outline:none;border-color:var(--teal);background:#fff;}
+
+  /* 의의 설명 — 데이터 과학 관찰 */
+  .why{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:640px){.why{grid-template-columns:1fr;}}
+  .whycol{border:1px solid var(--rule);border-radius:12px;padding:14px 16px;background:var(--paper);}
+  .whycol.prog{border-top:3px solid var(--teal);}
+  .whycol.analy{border-top:3px solid var(--coral);}
+  .whycol h3{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+  .whycol p{font-size:12.5px;color:var(--ink-soft);line-height:1.65;}
+  .whycol p b{color:var(--ink);}
+
+  /* 심화 유형 카드 */
+  .kinds{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media(max-width:720px){.kinds{grid-template-columns:1fr;}}
+  .kind{border:1.5px solid var(--rule);border-radius:12px;padding:14px 15px;cursor:pointer;transition:border-color .12s,background .12s;position:relative;}
+  .kind:hover{border-color:var(--teal);}
+  .kind.on{border-color:var(--teal);background:var(--teal-wash);}
+  .kind input{position:absolute;opacity:0;pointer-events:none;}
+  .kind .kt{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:5px;display:flex;align-items:center;gap:7px;}
+  .kind .ke{font-size:15px;}
+  .kind .kd{font-size:12.5px;color:var(--ink-soft);line-height:1.55;}
+
+  /* 관심 분야 확장 — 영감 예시 */
+  .inspire{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:18px;}
+  .insp{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:11px 13px;font-size:12.5px;line-height:1.6;}
+  .insp .idom{font-weight:700;color:var(--coral);}
+  .insp .ine{color:var(--ink-soft);}
+  .insp .ine b{color:var(--teal);}
+
+  /* 프롬프트 박스 */
+  .promptbox{background:#2C3444;color:#E7ECF3;border-radius:10px;padding:16px 18px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow-y:auto;}
+  .promptbox .ph{color:var(--mustard);}
+  .promptbar{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap;}
+  .copiedmsg{font-size:12.5px;color:var(--teal);font-weight:600;opacity:0;transition:opacity .2s;}
+  .copiedmsg.on{opacity:1;}
+
+  /* AI 안내 스텝 */
+  .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px;}
+  @media(max-width:640px){.steps3{grid-template-columns:1fr;}}
+  .s3{background:var(--teal-wash);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--ink);line-height:1.6;}
+  .s3 b{color:var(--teal);display:block;margin-bottom:4px;font-size:13px;}
+
+  /* 코드 제출 + 미리보기 */
+  .codearea{width:100%;min-height:180px;padding:12px 14px;border:1px solid var(--rule);border-radius:9px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;line-height:1.6;color:var(--ink);background:var(--paper);resize:vertical;}
+  .codearea:focus{outline:none;border-color:var(--teal);background:#fff;}
+  .previewbar{display:flex;gap:8px;align-items:center;margin:12px 0;flex-wrap:wrap;}
+  .previewwrap{border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:#fff;display:none;}
+  .previewwrap.on{display:block;}
+  .previewwrap .pv-h{font-size:11.5px;color:var(--ink-soft);padding:7px 12px;background:var(--paper);border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;}
+  .preview-frame{width:100%;height:460px;border:0;display:block;background:#fff;}
+  .codestat{font-size:12px;color:var(--ink-soft);}
+
+  .btn{padding:10px 18px;border:none;border-radius:9px;cursor:pointer;font:600 14px 'Noto Sans KR';transition:opacity .15s;}
+  .btn:hover{opacity:.88;}.btn:active{transform:translateY(1px);}
+  .btn-teal{background:var(--teal);color:#fff;}.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}
+  .btn-coral{background:var(--coral);color:#fff;}
+  .btn-draft{background:var(--mustard);color:#3D2E06;}.btn-load{background:#7C3AED;color:#fff;}
+  .btn-reset{background:transparent;color:var(--ink-soft);border:1px solid var(--rule);}.btn-submit{background:var(--teal);color:#fff;padding:10px 24px;}
+  .btn-sm{padding:8px 14px;font-size:13px;}
+  .actionbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(253,253,251,0.97);border-top:1px solid var(--rule);padding:12px 28px;}
+  .actionbar .inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+  .actionbar .spacer{flex:1;}.draft-label{font-size:12.5px;color:var(--ink-soft);}
+  #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:all .25s;z-index:60;max-width:88vw;text-align:center;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}#toast.success{background:var(--teal);}#toast.error{background:var(--coral);}
+  @media print{.head-actions,.actionbar,#settingsPanel,.acttabs,.backlink,#toast,.promptbar,.previewbar{display:none!important;}body{padding-bottom:0;}.card{break-inside:avoid;}}
+  @media(max-width:640px){main{padding:18px 14px;}.card{padding:18px 16px;}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <g id="a-cat"><path d="M-14-16l4 10-10-2z" fill="#7B8698"/><path d="M14-16l-4 10 10-2z" fill="#7B8698"/><circle cx="0" cy="0" r="16" fill="#9AA6B4"/><circle cx="-6" cy="-1" r="2.3" fill="#33415C"/><circle cx="6" cy="-1" r="2.3" fill="#33415C"/><path d="M0 5l-3 3h6z" fill="#E8705A"/></g>
+</defs></svg>
+
+<header>
+  <div class="wrap">
+    <a class="backlink" href="index.html">← 슬라이드덱으로 돌아가기</a>
+    <h1>활동 6 · 데이터로 만드는 심화 결과물</h1>
+    <div class="sub">내 데이터로 <b>조작 가능한 프로그램 + 분석 결과</b>를 AI와 함께 만들어 봅니다 — 데이터 과학이 어디까지 가능한지 직접 관찰하기</div>
+    <div class="acttabs">
+      <a class="acttab" href="활동1.html">활동 1 · 파이썬 실습</a>
+      <a class="acttab" href="활동2.html">활동 2 · 중심성 비교</a>
+      <a class="acttab" href="활동3.html">활동 3 · AI 프롬프트</a>
+      <a class="acttab" href="활동4.html">활동 4 · 프로젝트 설계</a>
+      <a class="acttab" href="활동5.html">활동 5 · 프로젝트 진행</a>
+      <a class="acttab on" href="활동6.html">활동 6 · 심화 결과물</a>
+    </div>
+  </div>
+  <div class="head-actions">
+    <button class="icon-btn" id="btnPrint" type="button">인쇄</button>
+    <button class="icon-btn" id="btnSettings" type="button" title="교사 설정">⚙</button>
+  </div>
+</header>
+
+<div id="settingsPanel">
+  <label for="urlInput">Apps Script 배포 URL (교사 전용)</label>
+  <input type="text" id="urlInput" placeholder="https://script.google.com/macros/s/.../exec">
+  <div class="row"><button class="btn btn-teal" id="btnSaveUrl" type="button">URL 저장</button><button class="btn btn-ghost" id="btnClearUrl" type="button">초기화</button></div>
+</div>
+
+<main>
+  <section class="card">
+    <h2>기본 정보</h2>
+    <div class="grid2">
+      <div class="field" style="margin-bottom:0;"><label for="studentName">이름 <span class="req">*</span></label><input type="text" id="studentName" placeholder="홍길동"></div>
+      <div class="field" style="margin-bottom:0;"><label for="classInfo">반 / 번호 <span class="req">*</span></label><input type="text" id="classInfo" placeholder="1학년 3반 12번"></div>
+    </div>
+    <div class="field" style="margin-top:14px;margin-bottom:0;"><label for="teamName">모둠 이름 <span class="tag">(개인이면 비워도 됩니다)</span></label><input type="text" id="teamName" placeholder="예) 3반 연결고리팀"></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge b3">왜 하나</span> '심화 결과물'이란 무엇일까?</h2>
+    <div class="hint">지금까지는 값을 <b>구하는</b> 데까지 왔습니다. 이번엔 그 데이터로 <b>움직이는 결과물</b>을 만들어 봅니다. 코드는 직접 짜지 않아요 — 잘 만든 <b>프롬프트</b>를 AI에게 주고, 나온 결과물을 관찰합니다.</div>
+    <div class="why">
+      <div class="whycol prog">
+        <h3>🕹️ 조작 가능한 프로그램</h3>
+        <p>클릭·드래그·버튼으로 <b>내가 직접 만져 보는</b> 결과물. 노드를 눌러 중심성을 보고, 노드를 끄면 네트워크가 갈라지는 걸 실시간으로 확인하는 것. "만약에?"를 눈으로 실험합니다.</p>
+      </div>
+      <div class="whycol analy">
+        <h3>📊 분석 결과</h3>
+        <p>프로그램이 <b>자동으로 뽑아 주는 해석</b>. 누가 다리 역할인지, 어느 노드가 사라지면 위험한지, 몇 단계면 전체에 퍼지는지 — 데이터가 스스로 답을 보여 줍니다.</p>
+      </div>
+    </div>
+    <div class="hint" style="margin:14px 0 0;">🔭 <b>이 활동의 의의</b> — 짧게 배운 파이썬만으로는 여기까지 못 가지만, 데이터와 좋은 질문만 있으면 <b>데이터 과학이 어디까지 할 수 있는지</b> 직접 볼 수 있습니다. 도구는 AI가, <b>무엇을 물을지는 여러분</b>이 정합니다.</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge">1단계</span> 어떤 심화 결과물을 만들까?</h2>
+    <div class="hint">활동 4에서 고른 유형과 이어집니다. 하나를 고르면 아래 프롬프트가 그에 맞게 바뀝니다.</div>
+    <div class="kinds">
+      <label class="kind"><input type="radio" name="kind" value="dashboard"><div class="kt"><span class="ke">📊</span> 분석 대시보드</div><div class="kd">네트워크 그래프 + 세 중심성 순위표. 노드를 클릭하면 그 사람의 값이 뜨는 <b>한눈에 보는 종합판</b>. (유형 A와 잘 어울림)</div></label>
+      <label class="kind"><input type="radio" name="kind" value="simulator"><div class="kt"><span class="ke">🕹️</span> 취약성 시뮬레이터</div><div class="kd">노드·선을 켜고 끄면 네트워크가 <b>몇 조각으로 갈라지는지</b> 실시간 계산. "이 사람이 빠지면?" 실험. (유형 C와 잘 어울림)</div></label>
+      <label class="kind"><input type="radio" name="kind" value="diffusion"><div class="kt"><span class="ke">🌊</span> 확산 시뮬레이션</div><div class="kd">한 노드에서 시작해 <b>단계마다 색이 번지는</b> 애니메이션 (x₊₁=A·x). 몇 단계면 전체 도달? (유형 B와 잘 어울림)</div></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge">2단계</span> 내 데이터 넣기</h2>
+    <div class="hint">활동 5에서 만든 노드와 관계를 <b>가져오기</b> 버튼으로 불러오거나, 직접 옮겨 적으세요. 아래를 채우면 프롬프트에 자동으로 들어갑니다. <button class="btn btn-teal btn-sm" id="btnImport" type="button" style="margin-left:6px;">📥 활동 5에서 가져오기</button></div>
+    <div class="field"><label for="topic">프로젝트 주제 <span class="req">*</span></label><input type="text" id="topic" placeholder="예) 우리 반에서 누가 두 무리를 잇는 다리일까?"></div>
+    <div class="field"><label for="nodeNames">노드(점) 이름 <span class="req">*</span> <span class="tag">— 쉼표로 구분</span></label><input type="text" id="nodeNames" placeholder="예) 가은, 나래, 다온, 라온, 마루"></div>
+    <div class="field" style="margin-bottom:0;"><label for="edgeList">관계(선) 목록 <span class="req">*</span> <span class="tag">— 이름-이름, 쉼표로 구분</span></label><textarea id="edgeList" placeholder="예) 가은-나래, 가은-다온, 나래-다온, 나래-라온, 다온-라온, 다온-마루"></textarea>
+      <div class="codestat" id="matrixStat" style="margin-top:8px;">노드 0개 · 관계 0개</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge b2">3단계</span> 스킬형 프롬프트 (복사해서 AI에게)</h2>
+    <div class="hint">아래는 위 정보로 자동 완성된 <b>프롬프트</b>입니다. <b>복사</b> 버튼을 눌러 Claude·Gemini 같은 AI에게 그대로 붙여넣으면, 조작 가능한 결과물 HTML을 만들어 줍니다.</div>
+    <div class="promptbox" id="promptBox">위의 주제·노드·관계를 채우면 여기에 프롬프트가 만들어집니다.</div>
+    <div class="promptbar">
+      <button class="btn btn-teal btn-sm" id="btnCopy" type="button">📋 프롬프트 복사</button>
+      <button class="btn btn-ghost btn-sm" id="btnCopyTxt" type="button">프롬프트 .txt 저장</button>
+      <span class="copiedmsg" id="copiedMsg">복사됐어요!</span>
+    </div>
+    <div class="steps3">
+      <div class="s3"><b>① 복사</b>위 프롬프트를 복사합니다.</div>
+      <div class="s3"><b>② AI에게</b>AI 대화창에 붙여넣고 결과 HTML을 받습니다.</div>
+      <div class="s3"><b>③ 붙여넣기</b>받은 코드를 아래 4단계에 붙여넣어 제출합니다.</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge b3">4단계</span> AI가 만든 결과 코드 제출</h2>
+    <div class="hint">AI가 준 HTML 코드를 통째로 아래에 붙여넣으세요. <b>미리보기</b>로 바로 확인할 수 있고, 제출하면 결과물이 <b>.html 파일</b>로 저장됩니다.</div>
+    <div class="field" style="margin-bottom:0;"><label for="resultCode">결과 HTML 코드 <span class="req">*</span></label>
+      <textarea id="resultCode" class="codearea" placeholder="여기에 AI가 만들어 준 &lt;!DOCTYPE html&gt; ... &lt;/html&gt; 전체를 붙여넣으세요"></textarea>
+      <div class="codestat" id="codeStat" style="margin-top:8px;">코드 0자</div>
+    </div>
+    <div class="previewbar">
+      <button class="btn btn-coral btn-sm" id="btnPreview" type="button">▶ 미리보기</button>
+      <button class="btn btn-ghost btn-sm" id="btnPreviewOff" type="button">닫기</button>
+      <button class="btn btn-ghost btn-sm" id="btnDownloadHtml" type="button">결과물 .html 저장</button>
+    </div>
+    <div class="previewwrap" id="previewWrap">
+      <div class="pv-h"><span>미리보기 (내 코드가 실제로 동작하는 모습)</span><span>sandbox 격리 실행</span></div>
+      <iframe class="preview-frame" id="previewFrame" sandbox="allow-scripts" title="결과물 미리보기"></iframe>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge">5단계</span> 관찰하고 생각하기</h2>
+    <div class="hint">데이터 과학의 눈으로 결과물을 돌아봅니다.</div>
+    <div class="field"><label for="q1">① 이 결과물에서 <b>직접 손으로 계산할 때는 못 봤던</b>, 새롭게 알게 된 것은 무엇인가요?</label><textarea id="q1" placeholder="예) 노드를 하나씩 꺼 보니, 눈에 안 띄던 학생이 사실은 두 무리를 잇는 숨은 다리였다."></textarea></div>
+    <div class="field" style="margin-bottom:0;"><label for="q2">② 데이터와 AI가 <b>여기까지</b> 할 수 있다는 걸 보고 든 생각은?</label><textarea id="q2" placeholder="예) 데이터만 잘 모으면 복잡한 계산은 도구가 해 주고, 나는 무엇을 물을지에 집중하면 되겠다."></textarea></div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge b3">6단계</span> 내 관심 분야로 확장하기</h2>
+    <div class="hint">오늘 배운 <b>네트워크 분석</b>은 사람 관계 말고도 어디에나 쓸 수 있어요. <b>내가 관심 있는 분야·진로</b>로 이 기술을 넓힌다면 무엇을 할 수 있을까요? 아래 예시에서 영감을 얻어 상상해 보세요.</div>
+    <div class="inspire">
+      <div class="insp"><span class="idom">🧬 의학·생명</span><br><span class="ine">노드 <b>단백질·유전자</b> · 엣지 <b>상호작용</b> → 신약 표적 찾기</span></div>
+      <div class="insp"><span class="idom">🎮 게임</span><br><span class="ine">노드 <b>플레이어</b> · 엣지 <b>함께 플레이</b> → 팀 매칭·이탈 예측</span></div>
+      <div class="insp"><span class="idom">🎵 음악</span><br><span class="ine">노드 <b>곡</b> · 엣지 <b>같은 재생목록</b> → 추천·장르 지도</span></div>
+      <div class="insp"><span class="idom">⚽ 스포츠</span><br><span class="ine">노드 <b>선수</b> · 엣지 <b>패스</b> → 핵심 선수·전술 분석</span></div>
+      <div class="insp"><span class="idom">🌱 환경</span><br><span class="ine">노드 <b>지역</b> · 엣지 <b>사람·바람 이동</b> → 오염·감염 확산</span></div>
+      <div class="insp"><span class="idom">💰 경제·사회</span><br><span class="ine">노드 <b>회사·국가</b> · 엣지 <b>거래</b> → 위기 전파·취약점</span></div>
+    </div>
+    <div class="field"><label for="ext_field">① 내가 관심 있는 <b>분야·진로</b>는 무엇인가요?</label><input type="text" id="ext_field" placeholder="예) 의학 / 게임 개발 / 음악 / 축구 / 환경 / 경제 ..."></div>
+    <div class="field"><label for="ext_ne">② 그 분야에서 <b>무엇을 노드로, 무엇을 엣지로</b> 볼 수 있을까요?</label><textarea id="ext_ne" placeholder="예) 노드 = 축구 선수, 엣지 = 경기 중 패스를 주고받은 관계"></textarea></div>
+    <div class="field"><label for="ext_q">③ 그 연결망으로 <b>답하고 싶은 질문</b>은 무엇인가요?</label><textarea id="ext_q" placeholder="예) 우리 팀에서 공격을 이끄는 핵심 연결고리 선수는 누구일까? 그 선수가 빠지면 어떻게 될까?"></textarea></div>
+    <div class="field" style="margin-bottom:0;"><label for="ext_idea">④ 어떤 <b>심화 결과물</b>을 만들면 좋을까요? <span class="tag">대시보드·시뮬레이터·확산 중 + 데이터가 아주 많다면?</span></label><textarea id="ext_idea" placeholder="예) 패스망 대시보드로 핵심 선수를 찾고, 그 선수를 뺀 시뮬레이터로 전술 약점을 실험한다. 리그 전체 데이터가 있다면 상대팀 분석까지 가능할 것 같다."></textarea></div>
+  </section>
+</main>
+
+<div class="actionbar"><div class="inner">
+  <button class="btn btn-load" id="btnLoad" type="button">불러오기</button>
+  <span class="draft-label" id="draftLabel">임시저장: —</span>
+  <span class="spacer"></span>
+  <button class="btn btn-reset" id="btnReset" type="button">초기화</button>
+  <button class="btn btn-draft" id="btnDraft" type="button">임시저장</button>
+  <button class="btn btn-submit" id="btnSubmit" type="button">제출하기</button>
+</div></div>
+<input type="file" id="fileInput" accept=".json" hidden>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var DEFAULT_URL='https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec';var URL_KEY='sheets_url_net_activities';var DRAFT_KEY='draft_net_advanced_2026';var INFO_KEY='net_student_info';var SOURCE='net_advanced';
+  var FIELDS=['studentName','classInfo','teamName','topic','nodeNames','edgeList','resultCode','q1','q2','ext_field','ext_ne','ext_q','ext_idea'];
+  function val(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+  function kindVal(){var e=document.querySelector('input[name="kind"]:checked');return e?e.value:'';}
+  function setKind(v){document.querySelectorAll('input[name="kind"]').forEach(function(r){r.checked=(r.value===v);});syncKind();}
+  function syncKind(){document.querySelectorAll('.kind').forEach(function(k){k.classList.toggle('on',k.querySelector('input').checked);});}
+
+  function parseNodes(){return val('nodeNames').split(',').map(function(s){return s.trim();}).filter(Boolean);}
+  function parseEdges(){
+    return val('edgeList').split(',').map(function(s){return s.trim();}).filter(Boolean)
+      .map(function(p){return p.split(/[-–—~]/).map(function(x){return x.trim();});})
+      .filter(function(a){return a.length===2&&a[0]&&a[1];});
+  }
+  function buildMatrix(){
+    var nodes=parseNodes(),idx={};nodes.forEach(function(n,i){idx[n]=i;});
+    var A=nodes.map(function(){return nodes.map(function(){return 0;});});
+    var cnt=0;
+    parseEdges().forEach(function(e){var a=idx[e[0]],b=idx[e[1]];if(a!=null&&b!=null&&a!==b){A[a][b]=1;A[b][a]=1;cnt++;}});
+    return {nodes:nodes,A:A,edgeCount:cnt};
+  }
+  function matrixLiteral(A){return '['+A.map(function(r){return '['+r.join(',')+']';}).join(', ')+']';}
+
+  var KIND_SPEC={
+    dashboard:{name:'분석 대시보드',make:
+      '1. 네트워크 그래프: 노드는 원, 관계는 선으로 그린다. 노드를 클릭하면 그 사람의 세 중심성(연결·근접·매개) 값을 옆 패널에 표시한다.\n'+
+      '2. 세 중심성 순위표: 각 중심성별로 1위부터 순서대로 이름과 값을 보여 준다.\n'+
+      '3. 노드의 크기나 색을 매개 중심성에 비례하게 해서 다리 역할이 큰 사람이 눈에 띄게 한다.'},
+    simulator:{name:'취약성 시뮬레이터',make:
+      '1. 네트워크 그래프: 노드를 클릭하면 그 노드를 껐다 켤 수 있다(제거/복구).\n'+
+      '2. 노드를 끌 때마다 남은 네트워크가 몇 개의 그룹(연결 성분)으로 갈라지는지 실시간으로 다시 계산해 크게 표시한다.\n'+
+      '3. 각 노드의 중심성 값도 조작할 때마다 다시 계산해 갱신한다. 네트워크를 갈라지게 만드는 "단절점"은 특별한 색으로 표시한다.'},
+    diffusion:{name:'확산 시뮬레이션',make:
+      '1. 네트워크 그래프: 시작 노드를 하나 고르면, x(다음) = A · x(현재) 규칙에 따라 단계마다 이웃으로 색이 번지는 애니메이션을 보여 준다.\n'+
+      '2. "다음 단계" 버튼과 "처음부터" 버튼을 두고, 지금 몇 단계인지와 전체에 도달하기까지 몇 단계가 걸리는지 표시한다.\n'+
+      '3. 시작 노드를 바꿔 가며 어디서 시작해야 가장 빨리 퍼지는지 비교할 수 있게 한다.'}
+  };
+
+  function buildPrompt(){
+    var kind=kindVal();var m=buildMatrix();
+    var topic=val('topic')||'(주제를 적어 주세요)';
+    var nodesTxt=m.nodes.length?m.nodes.join(', '):'(노드 이름을 적어 주세요)';
+    var matTxt=m.nodes.length?matrixLiteral(m.A):'(관계를 적으면 인접행렬이 만들어집니다)';
+    var spec=KIND_SPEC[kind];
+    var makeTxt=spec?spec.make:'(위에서 심화 유형을 먼저 골라 주세요. 고르면 만들 내용이 채워집니다.)';
+    var kindName=spec?spec.name:'심화 결과물';
+    return (
+'당신은 데이터 시각화 전문가입니다. 아래 네트워크 데이터로, 조작 가능한 "'+kindName+'"을(를) 만들어 주세요.\n'+
+'결과물은 브라우저에서 바로 열리는 HTML 파일 하나여야 합니다.\n'+
+'\n'+
+'[내 데이터]\n'+
+'- 주제: '+topic+'\n'+
+'- 노드(점) 이름: '+nodesTxt+'\n'+
+'- 인접행렬 A (1=관계 있음, 0=없음, 무방향): '+matTxt+'\n'+
+'\n'+
+'[만들 것 — 조작 가능한 프로그램]\n'+
+makeTxt+'\n'+
+'\n'+
+'[분석 결과 — 화면에 자동으로 보여 줄 것]\n'+
+'- 매개 중심성이 가장 높은 사람(가장 다리 역할을 하는 사람)과 그 이유를 한 문장으로.\n'+
+'- 단절점(그 노드가 사라지면 네트워크가 갈라지는 노드) 목록.\n'+
+'- 주제 "'+topic+'"에 대해 이 네트워크가 말해 주는 결론 한 줄.\n'+
+'\n'+
+'[제약]\n'+
+'- 외부 라이브러리·인터넷 연결 없이, 순수 HTML/CSS/JavaScript 한 파일로 만든다.\n'+
+'- 중심성·연결성 계산은 자바스크립트로 직접 구현한다(라이브러리 사용 금지).\n'+
+'- 화면 글자는 모두 한국어. 흰 바탕에 teal(#3E9C93)·coral(#E8705A)·mustard(#E4B04A) 색을 쓴다.\n'+
+'- 코드의 각 부분이 무슨 일을 하는지 주석으로 짧게 설명한다.\n'+
+'- 내가 코드를 몰라도 이해할 수 있도록, 화면에 사용법을 한 줄 안내한다.'
+    );
+  }
+
+  function refreshPrompt(){
+    var m=buildMatrix();
+    document.getElementById('matrixStat').textContent='노드 '+m.nodes.length+'개 · 관계 '+m.edgeCount+'개';
+    document.getElementById('promptBox').textContent=buildPrompt();
+  }
+  function refreshCodeStat(){
+    var c=val('resultCode');
+    document.getElementById('codeStat').textContent='코드 '+c.length.toLocaleString('ko-KR')+'자'+(c.length>0&&!/</.test(c)?' — HTML이 맞는지 확인하세요':'');
+  }
+
+  function getFormData(){
+    var m=buildMatrix();var d={source:SOURCE,activity:'6_심화결과물'};
+    FIELDS.forEach(function(k){d[k]=val(k);});
+    d.kind=kindVal();d.kindName=(KIND_SPEC[kindVal()]||{}).name||'';
+    d.nodeCount=String(m.nodes.length);d.edgeCount=String(m.edgeCount);
+    d.matrix=m.nodes.length?matrixLiteral(m.A):'';
+    d.codeLength=String(val('resultCode').length);
+    d.hasCode=val('resultCode').length>0?'제출됨':'없음';
+    return d;
+  }
+  function setFormData(d){
+    if(!d)return;
+    FIELDS.forEach(function(k){var e=document.getElementById(k);if(e&&typeof d[k]==='string')e.value=d[k];});
+    if(d.kind)setKind(d.kind);
+    syncKind();refreshPrompt();refreshCodeStat();saveInfo();
+  }
+  function validate(){
+    if(!val('studentName'))return '이름을 입력해 주세요.';
+    if(!val('classInfo'))return '반 / 번호를 입력해 주세요.';
+    if(!kindVal())return '만들 심화 결과물 유형을 골라 주세요.';
+    if(!val('topic'))return '프로젝트 주제를 적어 주세요.';
+    if(parseNodes().length<2)return '노드(점) 이름을 2개 이상 적어 주세요.';
+    if(!val('resultCode'))return 'AI가 만든 결과 HTML 코드를 붙여넣어 주세요.';
+    return '';
+  }
+  function buildTxt(d){
+    var L=[];L.push('═══════════════════════════════════════');
+    L.push('  디지털 네트워크와 행렬 [정보편]');L.push('  활동 6 · 데이터로 만드는 심화 결과물');
+    L.push('  작성일시: '+new Date().toLocaleString('ko-KR'));L.push('═══════════════════════════════════════');L.push('');
+    L.push('이름: '+d.studentName+'   반/번호: '+d.classInfo+'   모둠: '+(d.teamName||'(개인)'));
+    L.push('주제: '+d.topic);L.push('심화 유형: '+d.kindName+' ('+d.kind+')');
+    L.push('노드('+d.nodeCount+'): '+d.nodeNames);L.push('관계: '+d.edgeList);
+    L.push('인접행렬: '+d.matrix);L.push('결과 코드 길이: '+d.codeLength+'자');L.push('');
+    L.push('[관찰]');
+    L.push('① 새로 알게 된 것: '+d.q1);L.push('② AI·데이터 소감: '+d.q2);L.push('');
+    L.push('[내 관심 분야로 확장]');
+    L.push('① 관심 분야·진로: '+d.ext_field);L.push('② 노드·엣지: '+d.ext_ne);L.push('③ 답하고 싶은 질문: '+d.ext_q);L.push('④ 심화 결과물 아이디어: '+d.ext_idea);L.push('');
+    L.push('═══════════════════════════════════════');return L.join('\n');
+  }
+  function saveInfo(){try{localStorage.setItem(INFO_KEY,JSON.stringify({studentName:val('studentName'),classInfo:val('classInfo')}));}catch(e){}}
+  function loadInfo(){try{var r=localStorage.getItem(INFO_KEY);if(!r)return;var d=JSON.parse(r);if(!val('studentName')&&d.studentName)document.getElementById('studentName').value=d.studentName;if(!val('classInfo')&&d.classInfo)document.getElementById('classInfo').value=d.classInfo;}catch(e){}}
+  function downloadBlob(c,fn,mime){var b=new Blob([c],{type:mime});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+  function stamp(){return new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');}
+  function safeName(d){return (d.studentName||'학생').replace(/[\\/:*?"<>|\s]/g,'');}
+  var draftTimer=null;function scheduleDraft(){clearTimeout(draftTimer);draftTimer=setTimeout(saveDraft,1200);}
+  function saveDraft(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(getFormData()));document.getElementById('draftLabel').textContent='임시저장: '+new Date().toLocaleTimeString('ko-KR');saveInfo();}catch(e){}}
+  function loadDraft(){try{var r=localStorage.getItem(DRAFT_KEY);if(!r)return;setFormData(JSON.parse(r));document.getElementById('draftLabel').textContent='임시저장: 복원됨';}catch(e){}}
+  var toastTimer=null;function showToast(m,t,ms){var el=document.getElementById('toast');el.textContent=m;el.className='show'+(t?' '+t:'');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.className='';},ms||2600);}
+  function sendToSheet(data){var url=localStorage.getItem(URL_KEY)||DEFAULT_URL;if(!url){showToast('결과물 파일은 저장됐습니다. (시트 URL 미설정)','error',4200);return;}fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(function(){showToast('제출 완료! 결과물 저장 + 시트 전송','success',4200);}).catch(function(e){showToast('파일은 저장됐습니다. 시트 오류: '+e.message,'error',4600);});}
+
+  function copyPrompt(){
+    var txt=buildPrompt();
+    function done(){var m=document.getElementById('copiedMsg');m.classList.add('on');setTimeout(function(){m.classList.remove('on');},1800);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){fallbackCopy(txt);done();});}
+    else{fallbackCopy(txt);done();}
+  }
+  function fallbackCopy(txt){var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);}
+
+  function showPreview(){
+    var code=val('resultCode');
+    if(!code){showToast('먼저 결과 코드를 붙여넣어 주세요.','error');return;}
+    var fr=document.getElementById('previewFrame');
+    fr.srcdoc=code;
+    document.getElementById('previewWrap').classList.add('on');
+    document.getElementById('previewWrap').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  function hidePreview(){document.getElementById('previewWrap').classList.remove('on');document.getElementById('previewFrame').srcdoc='';}
+
+  /* 활동 5(프로젝트 진행)의 임시저장 데이터를 그대로 가져온다.
+     활동 5의 s1_nodes/s1_edges 형식이 활동 6의 nodeNames/edgeList와 동일해 변환 없이 채운다.
+     순수 localStorage 읽기 → 입력칸 채우기라 제출 구조·apps-script에는 영향 없음. */
+  var ACT5_DRAFT_KEY='draft_net_projectlog_2026';
+  function importFromAct5(){
+    var raw=null;try{raw=localStorage.getItem(ACT5_DRAFT_KEY);}catch(e){}
+    if(!raw){showToast('활동 5에서 저장된 데이터가 없어요. 같은 브라우저에서 활동 5를 먼저 진행하거나, 활동 5의 임시저장 JSON을 불러오세요.','error',5200);return;}
+    var d;try{d=JSON.parse(raw);}catch(e){showToast('활동 5 데이터를 읽을 수 없어요.','error',4200);return;}
+    var nodes=(typeof d.s1_nodes==='string'?d.s1_nodes:'').trim();
+    var edges=(typeof d.s1_edges==='string'?d.s1_edges:'').trim();
+    if(!nodes){showToast('활동 5에 아직 노드가 없어요. 활동 5의 ‘데이터 모으기’를 먼저 완성하세요.','error',5200);return;}
+    document.getElementById('nodeNames').value=nodes;
+    document.getElementById('edgeList').value=edges;
+    if(typeof d.topic==='string'&&d.topic)document.getElementById('topic').value=d.topic;
+    if(typeof d.teamName==='string'&&d.teamName&&!val('teamName'))document.getElementById('teamName').value=d.teamName;
+    refreshPrompt();scheduleDraft();
+    showToast('활동 5의 데이터를 가져왔어요 — 노드 '+parseNodes().length+'개 · 관계 '+parseEdges().length+'개','success',3800);
+  }
+
+  function init(){
+    loadInfo();loadDraft();syncKind();refreshPrompt();refreshCodeStat();
+    document.querySelectorAll('input[name="kind"]').forEach(function(r){r.addEventListener('change',function(){syncKind();refreshPrompt();scheduleDraft();});});
+    ['topic','nodeNames','edgeList'].forEach(function(id){document.getElementById(id).addEventListener('input',refreshPrompt);});
+    document.getElementById('resultCode').addEventListener('input',refreshCodeStat);
+    document.getElementById('btnImport').addEventListener('click',importFromAct5);
+    document.getElementById('btnCopy').addEventListener('click',copyPrompt);
+    document.getElementById('btnCopyTxt').addEventListener('click',function(){downloadBlob(buildPrompt(),(safeName(getFormData()))+'_활동6_프롬프트_'+stamp()+'.txt','text/plain;charset=utf-8');showToast('프롬프트 .txt 저장됨','success');});
+    document.getElementById('btnPreview').addEventListener('click',showPreview);
+    document.getElementById('btnPreviewOff').addEventListener('click',hidePreview);
+    document.getElementById('btnDownloadHtml').addEventListener('click',function(){var c=val('resultCode');if(!c){showToast('먼저 결과 코드를 붙여넣어 주세요.','error');return;}downloadBlob(c,safeName(getFormData())+'_활동6_결과물_'+stamp()+'.html','text/html;charset=utf-8');showToast('결과물 .html 저장됨','success');});
+    document.getElementById('btnPrint').addEventListener('click',function(){window.print();});
+    document.getElementById('btnSettings').addEventListener('click',function(){var p=document.getElementById('settingsPanel');p.style.display=(p.style.display==='block')?'none':'block';document.getElementById('urlInput').value=localStorage.getItem(URL_KEY)||'';});
+    document.getElementById('btnSaveUrl').addEventListener('click',function(){var u=document.getElementById('urlInput').value.trim();if(!u){showToast('URL을 입력해 주세요.','error');return;}localStorage.setItem(URL_KEY,u);showToast('URL이 저장되었습니다.','success');});
+    document.getElementById('btnClearUrl').addEventListener('click',function(){localStorage.removeItem(URL_KEY);document.getElementById('urlInput').value='';showToast('URL이 초기화되었습니다.');});
+    document.getElementById('btnDraft').addEventListener('click',function(){var d=getFormData();d._draftMeta={savedAt:new Date().toISOString(),source:SOURCE,version:1};downloadBlob(JSON.stringify(d,null,2),safeName(d)+'_활동6_심화결과물_'+stamp()+'.json','application/json;charset=utf-8');saveDraft();showToast('임시저장 파일(.json) 다운로드됨','success');});
+    var fi=document.getElementById('fileInput');
+    document.getElementById('btnLoad').addEventListener('click',function(){fi.click();});
+    fi.addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(ev){try{setFormData(JSON.parse(ev.target.result));saveDraft();showToast('불러왔습니다.','success');}catch(err){showToast('파일을 읽을 수 없습니다: '+err.message,'error');}};rd.readAsText(f,'utf-8');e.target.value='';});
+    document.getElementById('btnReset').addEventListener('click',function(){if(!confirm('작성한 내용을 지웁니다. 계속할까요?'))return;localStorage.removeItem(DRAFT_KEY);location.reload();});
+    document.getElementById('btnSubmit').addEventListener('click',function(){var msg=validate();if(msg){showToast(msg,'error',3400);return;}if(!confirm('제출하시겠습니까?\n· 결과물 .html 파일 다운로드\n· 관찰 기록 .txt 다운로드\n· 구글 시트로 전송'))return;var btn=this;btn.disabled=true;var d=getFormData();downloadBlob(val('resultCode'),safeName(d)+'_활동6_결과물_'+stamp()+'.html','text/html;charset=utf-8');downloadBlob(buildTxt(d),safeName(d)+'_활동6_관찰_'+stamp()+'.txt','text/plain;charset=utf-8');sendToSheet(d);setTimeout(function(){btn.disabled=false;},1500);});
+    document.querySelectorAll('input, textarea').forEach(function(el){el.addEventListener('input',scheduleDraft);el.addEventListener('change',function(){scheduleDraft();saveInfo();});});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body>
+</html>

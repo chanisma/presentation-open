@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>테스트 수업 자료</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #f0f2f5;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-800: #424242;
+  --gray-900: #212121;
+  --blue: #2196f3;
+  --blue-dark: #1565c0;
+  --blue-light: #e3f2fd;
+  --green: #3aaa5c;
+  --green-dark: #2d8a49;
+  --green-light: #e8f5e9;
+  --purple: #7c4dff;
+  --purple-light: #ede7f6;
+  --orange: #ff9800;
+  --orange-light: #fff3e0;
+}
+
+html, body {
+  width: 100%; min-height: 100vh;
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--gray-900);
+  font-size: clamp(14px, 1.2vw, 18px);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.header {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem;
+}
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin-bottom: 0.4rem;
+}
+.header p {
+  font-size: 1.05rem;
+  color: var(--gray-600);
+}
+.header .badge-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+.header .badge-row .stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.8rem;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+.header .badge-row .stat .num {
+  color: var(--blue-dark);
+}
+
+.subject-section {
+  margin-bottom: 2rem;
+}
+.subject-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--gray-200);
+}
+.subject-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.subject-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.subject-header .count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  background: var(--gray-100);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 0.8rem;
+  overflow: hidden;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.card:hover {
+  border-color: var(--blue);
+  box-shadow: 0 4px 20px rgba(33,150,243,0.12);
+  transform: translateY(-2px);
+}
+.card-color {
+  height: 4px;
+}
+.card-body {
+  padding: 1.2rem 1.3rem;
+}
+.card-body .card-emoji {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.card-body h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+.card-body .card-desc {
+  font-size: 0.9rem;
+  color: var(--gray-600);
+  line-height: 1.5;
+  margin-bottom: 0.8rem;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.card-tag {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.card-arrow {
+  margin-left: auto;
+  font-size: 1.1rem;
+  color: var(--gray-300);
+  transition: all 0.2s;
+}
+.card:hover .card-arrow {
+  color: var(--blue);
+  transform: translateX(3px);
+}
+
+.footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--gray-600);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--gray-200);
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .container { padding: 1.5rem 1rem 3rem; }
+  .header h1 { font-size: 1.7rem; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header" id="header"></div>
+  <div id="content"></div>
+  <div class="footer" id="footer"></div>
+</div>
+
+<script>
+const JSON_PATH = '/test/pages.json';
+
+const COLOR_MAP = {
+  blue:   { bg: 'var(--blue-light)',   text: 'var(--blue-dark)' },
+  green:  { bg: 'var(--green-light)',  text: 'var(--green-dark)' },
+  purple: { bg: 'var(--purple-light)', text: '#6200ea' },
+  orange: { bg: 'var(--orange-light)', text: '#e65100' },
+};
+
+function createTextEl(tag, text, className) {
+  const el = document.createElement(tag);
+  el.textContent = text;
+  if (className) el.className = className;
+  return el;
+}
+
+function renderHeader(container, data) {
+  const totalPages = data.subjects.reduce((sum, s) => sum + s.pages.length, 0);
+
+  container.appendChild(createTextEl('h1', data.title));
+  container.appendChild(createTextEl('p', data.description));
+
+  const badgeRow = document.createElement('div');
+  badgeRow.className = 'badge-row';
+
+  [
+    ['과목 ', data.subjects.length],
+    ['자료 ', totalPages],
+    [data.year, null]
+  ].forEach(([label, num]) => {
+    const stat = document.createElement('span');
+    stat.className = 'stat';
+    if (num !== null) {
+      stat.textContent = label;
+      const numSpan = document.createElement('span');
+      numSpan.className = 'num';
+      numSpan.textContent = num;
+      stat.appendChild(numSpan);
+    } else {
+      stat.textContent = label;
+    }
+    badgeRow.appendChild(stat);
+  });
+
+  container.appendChild(badgeRow);
+}
+
+function createCard(page) {
+  const a = document.createElement('a');
+  a.className = 'card';
+  a.href = page.path;
+
+  const colorBar = document.createElement('div');
+  colorBar.className = 'card-color';
+  colorBar.style.background = page.gradient;
+  a.appendChild(colorBar);
+
+  const body = document.createElement('div');
+  body.className = 'card-body';
+
+  body.appendChild(createTextEl('div', page.emoji, 'card-emoji'));
+  body.appendChild(createTextEl('h3', page.title));
+  body.appendChild(createTextEl('p', page.description, 'card-desc'));
+
+  const meta = document.createElement('div');
+  meta.className = 'card-meta';
+
+  page.tags.forEach(t => {
+    const tag = document.createElement('span');
+    tag.className = 'card-tag';
+    tag.textContent = t.label;
+    const c = COLOR_MAP[t.color];
+    if (c) {
+      tag.style.background = c.bg;
+      tag.style.color = c.text;
+    }
+    meta.appendChild(tag);
+  });
+
+  const arrow = document.createElement('span');
+  arrow.className = 'card-arrow';
+  arrow.textContent = '\u2192';
+  meta.appendChild(arrow);
+
+  body.appendChild(meta);
+  a.appendChild(body);
+  return a;
+}
+
+function renderSubject(subject) {
+  const section = document.createElement('div');
+  section.className = 'subject-section';
+
+  const header = document.createElement('div');
+  header.className = 'subject-header';
+
+  const icon = document.createElement('div');
+  icon.className = 'subject-icon';
+  icon.textContent = subject.icon;
+  const iconBg = COLOR_MAP[subject.color]?.bg || 'var(--gray-100)';
+  icon.style.background = iconBg;
+  header.appendChild(icon);
+
+  header.appendChild(createTextEl('h2', subject.name));
+  header.appendChild(createTextEl('span', subject.pages.length + '개 자료', 'count'));
+  section.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.className = 'card-grid';
+  subject.pages.forEach(page => grid.appendChild(createCard(page)));
+  section.appendChild(grid);
+
+  return section;
+}
+
+async function init() {
+  try {
+    const res = await fetch(JSON_PATH);
+    const data = await res.json();
+
+    renderHeader(document.getElementById('header'), data);
+
+    const content = document.getElementById('content');
+    data.subjects.forEach(s => content.appendChild(renderSubject(s)));
+
+    document.getElementById('footer').textContent = data.school + ' \u00B7 ' + data.year + ' 테스트 수업 자료';
+    document.title = data.title;
+  } catch (e) {
+    document.getElementById('content').textContent = 'pages.json을 불러올 수 없습니다.';
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>

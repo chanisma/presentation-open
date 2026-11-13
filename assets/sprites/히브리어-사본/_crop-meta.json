@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "entries": {
+    "scribe-idle": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        210,
+        28,
+        242,
+        575
+      ],
+      "w": 242,
+      "h": 575,
+      "cropped_at": "2026-08-18"
+    },
+    "scribe-write": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        763,
+        47,
+        231,
+        554
+      ],
+      "w": 231,
+      "h": 554,
+      "cropped_at": "2026-08-18"
+    },
+    "scribe-point": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        199,
+        635,
+        319,
+        574
+      ],
+      "w": 319,
+      "h": 574,
+      "cropped_at": "2026-08-18"
+    },
+    "scribe-wonder": {
+      "sheet": "sheet-a.png",
+      "bbox": [
+        737,
+        646,
+        292,
+        563
+      ],
+      "w": 292,
+      "h": 563,
+      "cropped_at": "2026-08-18"
+    },
+    "serpent": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        128,
+        148,
+        400,
+        402
+      ],
+      "w": 400,
+      "h": 402,
+      "cropped_at": "2026-08-18"
+    },
+    "scale-balance": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        677,
+        112,
+        497,
+        438
+      ],
+      "w": 497,
+      "h": 438,
+      "cropped_at": "2026-08-18"
+    },
+    "hover-bird": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        77,
+        682,
+        539,
+        425
+      ],
+      "w": 539,
+      "h": 425,
+      "cropped_at": "2026-08-18"
+    },
+    "seal-stamp": {
+      "sheet": "sheet-b.png",
+      "bbox": [
+        767,
+        662,
+        349,
+        448
+      ],
+      "w": 349,
+      "h": 448,
+      "cropped_at": "2026-08-18"
+    }
+  }
+}

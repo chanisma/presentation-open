@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "activities": [
+    {
+      "id": "warmup-repeat",
+      "slide": 0,
+      "kind": "wordcloud",
+      "prompt": "일상에서 '반복'하면 떠오르는 것을 한 단어로 적어보세요!"
+    },
+    {
+      "id": "q-range5",
+      "slide": 2,
+      "kind": "choice",
+      "prompt": "for x in range(5): print(x) — 화면에 출력되는 숫자는?",
+      "options": ["1 2 3 4 5", "0 1 2 3 4", "0 1 2 3 4 5", "1 2 3 4"],
+      "answer": 1,
+      "misconceptions": {
+        "0": "1부터 시작한다고 생각 — range는 0부터 시작",
+        "2": "끝값 5가 포함된다고 생각 — range(N)은 N 미포함",
+        "3": "0 시작과 N 미포함 규칙을 섞어 4개로 착각"
+      }
+    },
+    {
+      "id": "q-range-step",
+      "slide": 3,
+      "kind": "choice",
+      "prompt": "range(0, 10, 2)가 만드는 숫자는?",
+      "options": ["0 2 4 6 8", "2 4 6 8 10", "0 2 4 6 8 10", "0 1 2 3 4 5 6 7 8 9"],
+      "answer": 0,
+      "misconceptions": {
+        "1": "시작값 0을 건너뛰고 간격 2부터 시작한다고 생각",
+        "2": "끝값 10이 포함된다고 생각 (off-by-one)",
+        "3": "세 번째 인자(간격 2)를 무시"
+      }
+    },
+    {
+      "id": "q-while-infinite",
+      "slide": 5,
+      "kind": "choice",
+      "peerInstruction": true,
+      "prompt": "x = 0으로 시작해서 「while x < 3: print(x)」 를 실행하면 print는 몇 번 실행될까?",
+      "options": ["3번", "2번", "4번", "영원히 멈추지 않는다"],
+      "answer": 3,
+      "misconceptions": {
+        "0": "조건의 숫자만 보고 3번 — 반복 안에서 x를 바꾸는 줄이 없다는 걸 놓침",
+        "1": "x < 3이니까 2까지 두 번만 돈다고 생각",
+        "2": "0, 1, 2, 3으로 네 번 돈다고 생각"
+      }
+    },
+    {
+      "id": "q-continue",
+      "slide": 7,
+      "kind": "choice",
+      "prompt": "range(5) 반복에서 x가 2일 때만 continue, 아니면 x를 출력하면 — 화면에 나오는 숫자는?",
+      "options": ["0 1 3 4", "0 1 2 3 4", "0 1", "3 4"],
+      "answer": 0,
+      "misconceptions": {
+        "1": "continue가 출력을 건너뛰지 않는다고 생각",
+        "2": "continue를 break(반복 즉시 종료)로 착각",
+        "3": "건너뛴 다음 회차부터만 출력된다고 생각"
+      }
+    },
+    {
+      "id": "code-loop5",
+      "slide": 8,
+      "kind": "code",
+      "language": "python",
+      "prompt": "연습 1·2 — 변수 text에 아무 문자 데이터나 저장하고, 반복문(for 또는 while)으로 다섯 번 출력하는 프로그램을 작성하세요.",
+      "starter": "text = \"파이썬\"\n# 아래에 반복문으로 text를 다섯 번 출력해 보세요\n",
+      "solution": "text = \"파이썬\"\nfor i in range(5):\n    print(text)\n\n# while 버전\n# i = 0\n# while i < 5:\n#     print(text)\n#     i = i + 1"
+    },
+    {
+      "id": "exit",
+      "slide": "last",
+      "kind": "exit",
+      "prompt": "오늘 반복문 수업을 마무리하며"
+    }
+  ]
+}

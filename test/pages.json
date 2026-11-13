@@ -1,0 +1,638 @@
+{
+  "title": "테스트 수업 자료",
+  "description": "다양한 주제의 테스트 수업 프레젠테이션 모음",
+  "school": "샘플고등학교",
+  "year": "2026학년도",
+  "subjects": [
+    {
+      "name": "사회·역사",
+      "icon": "📜",
+      "color": "orange",
+      "pages": [
+        {
+          "title": "조선시대 과거제도",
+          "path": "/test/test2-joseon-exam/index.html",
+          "emoji": "📜",
+          "description": "조선시대 과거제도 — 한국사 수업자료",
+          "tags": [
+            {
+              "label": "한국사",
+              "color": "orange"
+            },
+            {
+              "label": "조선시대",
+              "color": "purple"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #e65100, #ff9800)"
+        },
+        {
+          "title": "민주주의와 시민 참여",
+          "path": "/test/test13-democracy/index.html",
+          "emoji": "🗳️",
+          "description": "민주주의의 개념과 시민 참여의 중요성을 배웁니다.",
+          "tags": [
+            {
+              "label": "사회",
+              "color": "orange"
+            },
+            {
+              "label": "민주주의",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #e65100, #ff9800)"
+        },
+        {
+          "title": "경제 기초 — 수요와 공급",
+          "path": "/test/test17-economics/index.html",
+          "emoji": "💰",
+          "description": "수요와 공급의 기본 원리를 이해하는 경제 입문 수업입니다.",
+          "tags": [
+            {
+              "label": "경제",
+              "color": "orange"
+            },
+            {
+              "label": "수요·공급",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #e65100, #ffa726)"
+        }
+      ]
+    },
+    {
+      "name": "과학·기술",
+      "icon": "🔬",
+      "color": "blue",
+      "pages": [
+        {
+          "title": "데이터 과학 입문",
+          "path": "/test/test10-data-science/index.html",
+          "emoji": "📊",
+          "description": "데이터 과학의 기초 개념과 분석 방법을 소개합니다.",
+          "tags": [
+            {
+              "label": "데이터",
+              "color": "blue"
+            },
+            {
+              "label": "과학",
+              "color": "purple"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #1565c0, #42a5f5)"
+        },
+        {
+          "title": "기후변화와 우리의 미래",
+          "path": "/test/test7-climate/index.html",
+          "emoji": "🌍",
+          "description": "기후변화의 원인과 영향, 우리가 할 수 있는 일을 알아봅니다.",
+          "tags": [
+            {
+              "label": "환경",
+              "color": "green"
+            },
+            {
+              "label": "기후",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #1565c0, #2196f3)"
+        },
+        {
+          "title": "화학 결합의 원리",
+          "path": "/test/test20-chemistry/index.html",
+          "emoji": "⚗️",
+          "description": "이온 결합, 공유 결합 등 화학 결합의 기본 원리를 학습합니다.",
+          "tags": [
+            {
+              "label": "화학",
+              "color": "blue"
+            },
+            {
+              "label": "결합",
+              "color": "purple"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #1565c0, #7c4dff)"
+        },
+        {
+          "title": "로봇공학의 세계",
+          "path": "/test/test28-robotics/index.html",
+          "emoji": "🤖",
+          "description": "로봇의 구조와 원리, 다양한 활용 분야를 탐구합니다.",
+          "tags": [
+            {
+              "label": "로봇공학",
+              "color": "blue"
+            },
+            {
+              "label": "공학",
+              "color": "orange"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #1565c0, #00897b)"
+        },
+        {
+          "title": "코딩의 첫걸음",
+          "path": "/test/test14-coding-intro/index.html",
+          "emoji": "💻",
+          "description": "프로그래밍의 기본 개념과 첫 코딩 체험 수업입니다.",
+          "tags": [
+            {
+              "label": "코딩",
+              "color": "blue"
+            },
+            {
+              "label": "입문",
+              "color": "purple"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #1565c0, #42a5f5)"
+        }
+      ]
+    },
+    {
+      "name": "수학",
+      "icon": "📐",
+      "color": "purple",
+      "pages": [
+        {
+          "title": "수학 학부모 설명회",
+          "path": "/test/test3-math-parent/index.html",
+          "emoji": "👨‍👩‍👧",
+          "description": "수학 교육과정과 학습 방법을 안내하는 학부모 설명회 자료입니다.",
+          "tags": [
+            {
+              "label": "학부모",
+              "color": "orange"
+            },
+            {
+              "label": "수학",
+              "color": "purple"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #6200ea, #9c27b0)"
+        },
+        {
+          "title": "함수의 개념과 그래프",
+          "path": "/test/test25-math-functions/index.html",
+          "emoji": "📈",
+          "description": "함수의 정의와 다양한 그래프 표현을 학습합니다.",
+          "tags": [
+            {
+              "label": "수학",
+              "color": "purple"
+            },
+            {
+              "label": "함수",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #6200ea, #7c4dff)"
+        }
+      ]
+    },
+    {
+      "name": "국어·영어",
+      "icon": "📖",
+      "color": "green",
+      "pages": [
+        {
+          "title": "영어 문법 기초 — 시제 완전정복",
+          "path": "/test/test19-english-grammar/index.html",
+          "emoji": "🔤",
+          "description": "영어의 기본 시제를 체계적으로 학습합니다.",
+          "tags": [
+            {
+              "label": "영어",
+              "color": "green"
+            },
+            {
+              "label": "문법",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #2d8a49, #43b867)"
+        },
+        {
+          "title": "독서의 힘 — 효과적인 독서 방법",
+          "path": "/test/test27-reading/index.html",
+          "emoji": "📚",
+          "description": "효과적인 독서 전략과 습관을 기르는 방법을 안내합니다.",
+          "tags": [
+            {
+              "label": "국어",
+              "color": "green"
+            },
+            {
+              "label": "독서",
+              "color": "purple"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #3aaa5c, #28c840)"
+        }
+      ]
+    },
+    {
+      "name": "예체능",
+      "icon": "🎵",
+      "color": "purple",
+      "pages": [
+        {
+          "title": "한국 전통 음악의 세계",
+          "path": "/test/test8-korean-music/index.html",
+          "emoji": "🎶",
+          "description": "한국 전통 음악의 역사와 다양한 악기, 장단을 소개합니다.",
+          "tags": [
+            {
+              "label": "음악",
+              "color": "purple"
+            },
+            {
+              "label": "전통",
+              "color": "orange"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #6200ea, #e91e63)"
+        },
+        {
+          "title": "클래식 음악 감상법",
+          "path": "/test/test18-music-appreciation/index.html",
+          "emoji": "🎻",
+          "description": "클래식 음악을 감상하는 방법과 주요 작곡가를 배웁니다.",
+          "tags": [
+            {
+              "label": "음악",
+              "color": "purple"
+            },
+            {
+              "label": "감상",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #6200ea, #9c27b0)"
+        },
+        {
+          "title": "체육 활동 안전 수칙",
+          "path": "/test/test15-sports-safety/index.html",
+          "emoji": "⚽",
+          "description": "안전한 체육 활동을 위한 준비 운동과 주의사항을 안내합니다.",
+          "tags": [
+            {
+              "label": "체육",
+              "color": "orange"
+            },
+            {
+              "label": "안전",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #e65100, #ff9800)"
+        }
+      ]
+    },
+    {
+      "name": "진로·안전·건강",
+      "icon": "🧭",
+      "color": "green",
+      "pages": [
+        {
+          "title": "자녀 진로 탐색 안내",
+          "path": "/test/test12-career-parent/index.html",
+          "emoji": "👨‍👩‍👧",
+          "description": "학부모를 위한 자녀 진로 탐색 안내 설명회 자료입니다.",
+          "tags": [
+            {
+              "label": "학부모",
+              "color": "orange"
+            },
+            {
+              "label": "진로",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #2d8a49, #43b867)"
+        },
+        {
+          "title": "나의 꿈 찾기 — 진로 탐색 워크숍",
+          "path": "/test/test29-career-ed/index.html",
+          "emoji": "🧭",
+          "description": "자기 이해와 직업 탐색을 통한 진로 설계 워크숍입니다.",
+          "tags": [
+            {
+              "label": "진로",
+              "color": "green"
+            },
+            {
+              "label": "워크숍",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #3aaa5c, #28c840)"
+        },
+        {
+          "title": "학교 안전 교육",
+          "path": "/test/test9-school-safety/index.html",
+          "emoji": "🛡️",
+          "description": "재난 대비와 응급 처치 등 학교 안전 교육 자료입니다.",
+          "tags": [
+            {
+              "label": "안전",
+              "color": "orange"
+            },
+            {
+              "label": "응급처치",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #e65100, #ff9800)"
+        },
+        {
+          "title": "영양과 건강한 식습관",
+          "path": "/test/test11-nutrition/index.html",
+          "emoji": "🥗",
+          "description": "올바른 영양 섭취와 건강한 식습관의 중요성을 배웁니다.",
+          "tags": [
+            {
+              "label": "건강",
+              "color": "green"
+            },
+            {
+              "label": "영양",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #2d8a49, #66bb6a)"
+        }
+      ]
+    },
+    {
+      "name": "Cycle 2 - 이미지 검색 테스트",
+      "icon": "🖼️",
+      "color": "purple",
+      "pages": [
+        {
+          "title": "태양계 행성 탐험",
+          "path": "/test/cycle2-1-solar-system/index.html",
+          "emoji": "🌍",
+          "description": "Bento Grid 스타일, Playwright 웹 이미지 검색 적용. 중학교 1학년 과학 수업자료.",
+          "tags": [
+            {
+              "label": "과학",
+              "color": "blue"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Bento Grid",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #1565c0, #42a5f5)"
+        },
+        {
+          "title": "조선시대 과학과 발명",
+          "path": "/test/cycle2-2-joseon-science/index.html",
+          "emoji": "🔬",
+          "description": "Editorial Magazine 스타일, Playwright 웹 이미지 검색 적용. 고등학교 한국사 수업자료.",
+          "tags": [
+            {
+              "label": "한국사",
+              "color": "orange"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Editorial",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #e65100, #ff9800)"
+        },
+        {
+          "title": "우리 학교 탄소 발자국 줄이기",
+          "path": "/test/cycle2-3-carbon-footprint/index.html",
+          "emoji": "🌿",
+          "description": "Nordic Minimalism 스타일, Playwright 웹 이미지 검색 적용. 중학교 프로젝트 발표.",
+          "tags": [
+            {
+              "label": "환경",
+              "color": "green"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Nordic",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #2d8a49, #66bb6a)"
+        },
+        {
+          "title": "2026 방과후학교 프로그램 안내",
+          "path": "/test/cycle2-4-afterschool/index.html",
+          "emoji": "📋",
+          "description": "K-에듀 클린 스타일, 이모지 전용 (이미지 검색 미사용). 학부모 안내.",
+          "tags": [
+            {
+              "label": "학부모",
+              "color": "orange"
+            },
+            {
+              "label": "K-에듀클린",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #3aaa5c, #43b867)"
+        },
+        {
+          "title": "디지털 리터러시 교육 전략",
+          "path": "/test/cycle2-5-digital-literacy/index.html",
+          "emoji": "💻",
+          "description": "Typographic Bold 스타일, placeholder 이미지. 교사 연수용.",
+          "tags": [
+            {
+              "label": "교사연수",
+              "color": "blue"
+            },
+            {
+              "label": "Typographic",
+              "color": "purple"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #6200ea, #9c27b0)"
+        }
+      ]
+    },
+    {
+      "name": "Cycle 3 - 이미지 검색 개선 테스트",
+      "icon": "🔍",
+      "color": "blue",
+      "pages": [
+        {
+          "title": "세계의 명소와 문화유산",
+          "path": "/test/cycle3-1-world-heritage/index.html",
+          "emoji": "🏛️",
+          "description": "Editorial Magazine 스타일, Playwright 웹 이미지 검색 적용 (14장). 중학교 2학년 사회 수업자료.",
+          "tags": [
+            {
+              "label": "사회",
+              "color": "orange"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Editorial",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #c62828, #e53935)"
+        },
+        {
+          "title": "인공지능과 미래 직업",
+          "path": "/test/cycle3-2-ai-careers/index.html",
+          "emoji": "🤖",
+          "description": "Glassmorphism 스타일, 이미지+이모지 혼합 방식 (11장+이모지). 고등학교 1학년 진로 수업자료.",
+          "tags": [
+            {
+              "label": "진로",
+              "color": "green"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Glassmorphism",
+              "color": "blue"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #6200ea, #00bcd4)"
+        },
+        {
+          "title": "한국의 전통 음식과 영양",
+          "path": "/test/cycle3-3-korean-food/index.html",
+          "emoji": "🍚",
+          "description": "Soft Pink Card UI 스타일, 한국 음식 사진 검색 (16장). 학부모 영양 교육 안내.",
+          "tags": [
+            {
+              "label": "학부모",
+              "color": "orange"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Soft Pink",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #e91e63, #f48fb1)"
+        },
+        {
+          "title": "온톨로지의 이해",
+          "path": "/test/cycle3-4-ontology/index.html",
+          "emoji": "🏷️",
+          "description": "Swiss International 스타일, 15슬라이드. 온톨로지 개념·RDF·OWL·시맨틱웹·지식그래프 수업자료. Wikimedia 이미지 2장 + CSS 다이어그램.",
+          "tags": [
+            {
+              "label": "정보과학",
+              "color": "blue"
+            },
+            {
+              "label": "Swiss",
+              "color": "orange"
+            },
+            {
+              "label": "이미지+CSS",
+              "color": "green"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #E8000D, #111111)"
+        }
+      ]
+    },
+    {
+      "name": "이미지검색 테스트 (Cycle4)",
+      "icon": "🖼️",
+      "color": "purple",
+      "pages": [
+        {
+          "title": "태양계 탐험: 행성과 우주의 신비",
+          "path": "/test/cycle4-1-solar-system/index.html",
+          "emoji": "🪐",
+          "description": "Glassmorphism 스타일, 고등학생 대상. 태양계 구조와 행성 탐사를 이미지와 함께 학습합니다.",
+          "tags": [
+            {
+              "label": "과학",
+              "color": "blue"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Cycle4",
+              "color": "orange"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #2196f3, #7c4dff)"
+        },
+        {
+          "title": "유네스코 세계 문화유산으로 떠나는 여행",
+          "path": "/test/cycle4-2-world-heritage/index.html",
+          "emoji": "🏛️",
+          "description": "Dark Academia 스타일, 중학생 대상. 세계 문화유산을 실제 사진과 함께 탐방합니다.",
+          "tags": [
+            {
+              "label": "역사",
+              "color": "orange"
+            },
+            {
+              "label": "이미지검색",
+              "color": "purple"
+            },
+            {
+              "label": "Cycle4",
+              "color": "orange"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #5d4037, #8d6e63)"
+        },
+        {
+          "title": "인공지능의 이해와 교육적 활용",
+          "path": "/test/cycle4-3-ai-education/index.html",
+          "emoji": "🤖",
+          "description": "Bento Grid 스타일, 교사연수 대상. AI의 교육 현장 활용과 실습 가이드를 이미지와 함께 제공합니다.",
+          "tags": [
+            {
+              "label": "AI",
+              "color": "blue"
+            },
+            {
+              "label": "교사연수",
+              "color": "green"
+            },
+            {
+              "label": "Cycle4",
+              "color": "orange"
+            }
+          ],
+          "gradient": "linear-gradient(90deg, #1565c0, #42a5f5)"
+        }
+      ]
+    }
+  ]
+}

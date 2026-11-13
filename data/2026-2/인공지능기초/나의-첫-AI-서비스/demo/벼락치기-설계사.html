@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>벼락치기 설계사</title>
+<style>
+  :root {
+    --bg: #0f1d19; --card: #16281f; --line: #24483a;
+    --fg: #e7f4ec; --faint: #9db8a9;
+    --accent: #fb923c; --mint: #5eead4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+    line-height: 1.6; min-height: 100vh; padding: 24px 16px 48px;
+  }
+  main { max-width: 640px; margin: 0 auto; display: grid; gap: 16px; }
+  header h1 { font-size: 1.7rem; letter-spacing: -0.02em; }
+  .tag { color: var(--mint); font-size: 0.85rem; margin-top: 2px; }
+  .desc { color: var(--faint); margin-top: 8px; font-size: 0.95rem; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  label { display: block; font-weight: 700; font-size: 0.95rem; }
+  label + label { margin-top: 12px; }
+  textarea, input[type=text] {
+    width: 100%; margin-top: 6px; padding: 10px 12px; border-radius: 10px;
+    border: 1px solid var(--line); background: #0c1714; color: var(--fg);
+    font: inherit; resize: vertical;
+  }
+  button.run {
+    margin-top: 12px; width: 100%; padding: 12px; border: 0; border-radius: 10px;
+    background: var(--accent); color: #241203; font-weight: 800; font-size: 1rem; cursor: pointer;
+  }
+  button.run:disabled { background: #57493c; color: #a99e93; cursor: not-allowed; }
+  #status { margin-top: 8px; font-size: 0.85rem; color: var(--faint); min-height: 1.2em; }
+  #status.err { color: #fda4af; }
+  #result h2 { font-size: 1rem; color: var(--mint); margin-bottom: 8px; }
+  #out { white-space: pre-wrap; font-size: 1.02rem; }
+  .inside > button {
+    width: 100%; text-align: left; background: none; border: 0; color: var(--accent);
+    font: inherit; font-weight: 700; cursor: pointer;
+  }
+  #inside { margin-top: 12px; display: grid; gap: 12px; }
+  #inside h3 { font-size: 0.85rem; color: var(--mint); }
+  #inside pre {
+    white-space: pre-wrap; word-break: break-all; background: #0c1714;
+    border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px;
+    font-size: 0.82rem; color: var(--faint); font-family: inherit;
+  }
+  footer { text-align: center; color: var(--faint); font-size: 0.78rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>⏱️ 벼락치기 설계사</h1>
+    <p class="tag">학습 · 수업 예시 서비스</p>
+    <p class="desc">과목·시험 범위·남은 시간을 넣으면, 남은 시간에 맞춘 구간별
+    계획표와 "포기할 것 한 가지"를 만들어 줍니다.</p>
+  </header>
+
+  <section>
+    <label for="f1">과목
+      <input type="text" id="f1" placeholder="예: 한국사">
+    </label>
+    <label for="f2">시험 범위
+      <input type="text" id="f2" placeholder="예: 3단원 개항기 ~ 5단원 일제강점기">
+    </label>
+    <label for="f3">남은 시간(분)
+      <input type="text" id="f3" placeholder="예: 90">
+    </label>
+    <button class="run" id="run" type="button">계획표 받기</button>
+    <div id="status"></div>
+  </section>
+
+  <section id="result" hidden>
+    <h2>벼락치기 계획표</h2>
+    <div id="out"></div>
+  </section>
+
+  <section class="inside">
+    <button id="toggleInside" type="button">🔍 내부 보기 — 이 서비스는 어떻게 답을 만들까?</button>
+    <div id="inside" hidden>
+      <h3>① 미리 써 둔 시스템 프롬프트 (개발자가 쓴 것)</h3>
+      <pre id="sysView"></pre>
+      <h3>② 방금 조립된 사용자 메시지 (여러분 입력 세 개가 끼워진 자리)</h3>
+      <pre id="userView">아직 실행 전입니다 — 위에서 한 번 실행해 보세요.</pre>
+      <h3>③ 보낸 API 요청 요약</h3>
+      <pre id="reqView"></pre>
+    </div>
+  </section>
+
+  <footer>Solar Pro 3 · 수업용 임시 키 · 이 서비스는 수업 예시입니다</footer>
+</main>
+
+<script>
+/* ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+   이 파일의 주인이 나중에 고치는 곳은 아래 네 상수뿐입니다.
+   따옴표(`)와 기호는 그대로 두고, 그 안의 문장만 고칩니다.
+   ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+
+const SYSTEM_PROMPT = `너는 시험 전날 학생의 남은 시간을 설계하는 학습 코치다.
+
+항상 존댓말을 쓰고, 야단치지 않고 현실적인 계획을 짠다.
+
+과목, 시험 범위, 남은 시간(분)을 받으면 계획표를 만든다.
+공부 구간과 5분 휴식 구간을 합쳐 3~5개 구간으로 나누고,
+구간 시간의 합은 남은 시간과 정확히 같게 한다.
+남은 시간이 15분 미만이면 휴식 없이 1~2개 공부 구간만 만든다.
+구간마다 한 줄로 쓴다:
+[시작~끝 분] 할 일 — 이렇게 하는 이유
+계획표 마지막 줄에는 "포기할 것:"으로 시작해, 남은 시간 안에 하기 어려운 것
+한 가지를 솔직하게 적는다.
+별표, 머리기호, 굵은 글씨는 쓰지 않는다.
+
+세 칸 중 하나라도 비어 있거나, 남은 시간이 양의 숫자가 아니거나,
+공부와 무관한 입력이 오면 계획표 대신 어느 칸을 고쳐야 하는지
+정중히 안내만 한다.`;
+
+const PROMPT_TEMPLATE = `과목: {과목}
+시험 범위: {시험 범위}
+남은 시간(분): {남은 시간}`;
+
+const API_KEY = 'YOUR_UPSTAGE_API_KEY';   // 수업용 임시 키 — 수업 후 잠김
+const TEMPERATURE = 0.3;                               // 변화 적게 — 계획표는 한결같은 편이 좋다
+
+/* ── 여기부터는 서비스의 몸통 — 고칠 일이 없는 부분 ─────────────── */
+
+const API_URL = 'https://api.upstage.ai/v1/chat/completions';
+const FIELDS = [
+  { key: '과목', id: 'f1' },
+  { key: '시험 범위', id: 'f2' },
+  { key: '남은 시간', id: 'f3' },
+];
+
+const $ = (id) => document.getElementById(id);
+$('sysView').textContent = SYSTEM_PROMPT;
+$('reqView').textContent = 'model: solar-pro3\ntemperature: ' + TEMPERATURE + '\nmessages: [system 1개, user 1개]';
+
+$('toggleInside').addEventListener('click', () => {
+  $('inside').hidden = !$('inside').hidden;
+});
+
+function buildUserMessage() {
+  let msg = PROMPT_TEMPLATE;
+  for (const f of FIELDS) msg = msg.split('{' + f.key + '}').join($(f.id).value.trim());
+  return msg;
+}
+
+let coolTimer = null;
+function coolDown() {
+  const sec = 15 + Math.floor(Math.random() * 26); // 15~40초 — 함께 다시 누르는 몰림 방지
+  let left = sec;
+  $('run').disabled = true;
+  $('status').className = 'err';
+  clearInterval(coolTimer);
+  coolTimer = setInterval(() => {
+    left -= 1;
+    if (left <= 0) {
+      clearInterval(coolTimer);
+      $('run').disabled = false;
+      $('status').className = '';
+      $('status').textContent = '이제 다시 눌러도 됩니다.';
+    } else {
+      $('status').textContent = '지금 서버가 붐빕니다 — ' + left + '초 뒤 다시 눌러 주세요.';
+    }
+  }, 1000);
+  $('status').textContent = '지금 서버가 붐빕니다 — ' + sec + '초 뒤 다시 눌러 주세요.';
+}
+
+$('run').addEventListener('click', async () => {
+  const empty = FIELDS.find((f) => !$(f.id).value.trim());
+  if (empty) { $('status').className = 'err'; $('status').textContent = '「' + empty.key + '」 칸을 채워 주세요.'; return; }
+
+  const userMsg = buildUserMessage();
+  $('userView').textContent = userMsg;
+
+  $('run').disabled = true;
+  $('status').className = '';
+  $('status').textContent = 'Solar Pro 3가 계획을 짜는 중…';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'solar-pro3',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: userMsg },
+        ],
+        temperature: TEMPERATURE,
+        max_tokens: 2000,
+        reasoning_effort: 'low',
+        stream: false,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const text = data && data.choices && data.choices[0] && data.choices[0].message
+      ? String(data.choices[0].message.content || '').trim() : '';
+    if (!text) throw new Error('빈 응답');
+    $('out').textContent = text;
+    $('result').hidden = false;
+    $('run').disabled = false;
+    $('status').textContent = '';
+  } catch (e) {
+    coolDown();
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 190" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<!-- 의도: 끈 달린 종이 이름표(꼬리표). 변수 = "값에 붙이는 이름표" 비유의 소품. 가운데 크림색 칸은 비워 두고 덱이 변수 이름을 얹는다.
+     팔레트: ink #1f1a14 · face #d6336c · edge #a8204f · panel #fbf3e3 · ring #c99a2e · ringTop #e8c35a · twine #efe2c4
+     앵커: 글자 칸 viewBox x 126~368, y 62~128 (가운데 247,95) · 고리 구멍 중심 (88,95) · 끈 끝 (8,30) -->
+  <!-- 그림자 -->
+  <path d="M60 104 L98 56 Q101 52 106 52 L378 52 Q388 52 388 62 L388 150 Q388 160 378 160 L106 160 Q101 160 98 156 Z" fill="#1f1a14" opacity=".07"/>
+  <!-- 두께(옆면) -->
+  <path d="M50 99 L92 47 Q95 43 100 43 L374 43 Q384 43 384 53 L384 147 Q384 157 374 157 L100 157 Q95 157 92 153 Z" fill="#a8204f" stroke="#1f1a14" stroke-width="2.3"/>
+  <!-- 앞면 -->
+  <path d="M44 95 L86 41 Q89 37 94 37 L368 37 Q378 37 378 47 L378 143 Q378 153 368 153 L94 153 Q89 153 86 149 Z" fill="#d6336c" stroke="#1f1a14" stroke-width="2.3"/>
+  <!-- 앞면 반사 -->
+  <path d="M100 46 L360 46" stroke="#ffffff" stroke-width="2.4" opacity=".3"/>
+  <path d="M60 92 L88 56" stroke="#ffffff" stroke-width="2.2" opacity=".25"/>
+  <!-- 글자 칸 -->
+  <rect x="126" y="62" width="242" height="66" rx="9" fill="#fbf3e3" stroke="#1f1a14" stroke-width="1.8"/>
+  <path d="M138 118 L356 118" stroke="#d6336c" stroke-width="1.3" opacity=".22"/>
+  <!-- 고리(놋쇠 테) -->
+  <circle cx="88" cy="95" r="17" fill="#c99a2e" stroke="#1f1a14" stroke-width="2.2"/>
+  <path d="M76 87 A14 14 0 0 1 98 82" stroke="#e8c35a" stroke-width="3" opacity=".9"/>
+  <circle cx="88" cy="95" r="8.5" fill="#f2ead9" stroke="#1f1a14" stroke-width="1.8"/>
+  <!-- 끈: 잉크 윤곽 위에 노끈 색 -->
+  <path d="M84 91 C66 74 54 70 44 66 C28 60 20 48 8 30" stroke="#1f1a14" stroke-width="7.4"/>
+  <path d="M84 91 C66 74 54 70 44 66 C28 60 20 48 8 30" stroke="#efe2c4" stroke-width="4.2"/>
+  <path d="M92 99 C80 104 70 100 63 92" stroke="#1f1a14" stroke-width="7.4"/>
+  <path d="M92 99 C80 104 70 100 63 92" stroke="#efe2c4" stroke-width="4.2"/>
+  <!-- 노끈 꼬임 결 -->
+  <path d="M60 76 l3 -5 M44 66 l3 -5 M29 56 l4 -4 M17 42 l4 -3" stroke="#b8a77f" stroke-width="1.3"/>
+</svg>

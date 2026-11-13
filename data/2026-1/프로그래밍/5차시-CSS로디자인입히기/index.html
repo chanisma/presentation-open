@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5차시 - CSS로 디자인 입히기</title>
+  <!-- Google Fonts: Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* 1. Reset & CSS Variables */
+    :root {
+      /* Theme Colors - Blue */
+      --main: #2196f3;
+      --dark: #1565c0;
+      --light: #e3f2fd;
+      --accent: #42a5f5;
+      
+      /* Base Colors */
+      --white: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      
+      /* Secondary / Functional Colors */
+      --blue: #3b82f6; --blue-bg: #eff6ff;
+      --green: #10b981; --green-bg: #ecfdf5;
+      --purple: #8b5cf6; --purple-bg: #f5f3ff;
+      --orange: #f59e0b; --orange-bg: #fffbeb;
+      --red: #ef4444; --red-bg: #fef2f2;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: clamp(16px, 1.5vw, 28px);
+      background-color: var(--gray-50);
+      color: var(--gray-800);
+      overflow: hidden; /* 슬라이드 네비게이션을 위해 body 스크롤 금지 */
+      width: 100vw; height: 100vh;
+    }
+
+    /* 2. Base Typography */
+    h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.02em; color: var(--gray-900); }
+    h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; color: var(--gray-800); }
+    h3 { font-size: 1.15rem; font-weight: 600; line-height: 1.4; }
+    p { font-size: 1rem; line-height: 1.7; }
+    strong { font-weight: 700; color: var(--dark); }
+    
+    .text-main { color: var(--main); }
+    .text-dark { color: var(--dark); }
+    .text-accent { color: var(--accent); }
+    .text-gray { color: var(--gray-600); }
+
+    /* 3. Slide Container & Navigation */
+    .presentation {
+      position: relative;
+      width: 100%; height: 100%;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .slide {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      display: flex; justify-content: center; align-items: center;
+      padding: 2rem;
+      transform: scale(0.98);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: scale(1); z-index: 10; }
+
+    /* Progress Bar */
+    .progress-bar {
+      position: fixed; top: 0; left: 0; height: 4px; border-radius: 0 4px 4px 0;
+      background: linear-gradient(90deg, var(--main), var(--accent));
+      z-index: 1000; transition: width 0.3s ease;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      padding: 0.35rem 1.5rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--gray-200);
+      z-index: 999; font-size: 14px;
+    }
+    .nav-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 1.8rem; height: 1.8rem;
+      border: 1.5px solid var(--gray-200); border-radius: 50%;
+      background: var(--white); cursor: pointer; color: var(--gray-700);
+      transition: all 0.2s; padding: 0; line-height: 1; font-size: 0;
+    }
+    .nav-btn svg { width: 0.8rem; height: 0.8rem; fill: currentColor; display: block; }
+    .nav-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main); color: var(--white); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    
+    .nav-counter {
+      font-size: 13px; font-weight: 700; color: var(--gray-600);
+      min-width: 3rem; text-align: center; display: flex; align-items: center; gap: 0.15rem; line-height: 1;
+    }
+    .slide-input {
+      width: 1.4rem; text-align: center; border: none; border-bottom: 1.5px solid transparent;
+      background: transparent; font-size: 13px; font-weight: 700; color: inherit;
+      font-family: inherit; padding: 0; outline: none; cursor: pointer; transition: border-color 0.2s;
+    }
+    .slide-input:focus { border-bottom-color: var(--main); background: var(--light); border-radius: 4px; }
+
+    /* 4. Browser Card Chrome */
+    .browser-card {
+      width: 100%; max-width: 1400px; max-height: 90vh;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+      display: flex; flex-direction: column; overflow: hidden;
+      border: 1px solid var(--gray-200);
+    }
+    .browser-topbar {
+      background: #f1f5f9;
+      padding: 0.6rem 1rem;
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; }
+    .dot.red { background: #ff5f56; }
+    .dot.yellow { background: #ffbd2e; }
+    .dot.green { background: #27c93f; }
+    .title { margin-left: auto; margin-right: auto; font-size: 0.8rem; font-weight: 600; color: var(--gray-500); transform: translateX(-24px); }
+    
+    .browser-content {
+      padding: 2.5rem 3.5rem; flex: 1; overflow-y: auto; padding-bottom: 4rem;
+    }
+
+    /* 5. Components */
+    .badge {
+      display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px;
+      font-size: 0.82rem; font-weight: 700; margin-right: 0.4rem;
+    }
+    .badge.green { background: var(--green-bg); color: var(--green); }
+    .badge.blue { background: var(--blue-bg); color: var(--blue); }
+    .badge.purple { background: var(--purple-bg); color: var(--purple); }
+    .badge.orange { background: var(--orange-bg); color: var(--orange); }
+
+    .year-badge {
+      display: inline-block; padding: 0.4rem 1.2rem; border-radius: 30px;
+      background: var(--light); border: 1.5px solid var(--main);
+      color: var(--dark); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.05em;
+    }
+
+    .section-divider {
+      display: flex; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem;
+      border-bottom: 2px solid var(--gray-100);
+    }
+    .section-icon { font-size: 2.5rem; margin-right: 1rem; background: var(--light); width: 4.5rem; height: 4.5rem; display: flex; align-items: center; justify-content: center; border-radius: 1rem; }
+    .section-sub { display: block; font-size: 0.95rem; color: var(--gray-500); margin-top: 0.2rem; }
+
+    .highlight-box {
+      background: linear-gradient(135deg, var(--main), var(--dark));
+      border-radius: 12px; padding: 2rem; color: white; text-align: center;
+      box-shadow: 0 10px 20px rgba(21, 101, 192, 0.2); margin: 1.5rem 0;
+    }
+    .highlight-box.outline {
+      background: transparent; color: var(--dark); border: 2px solid var(--main); box-shadow: none;
+    }
+
+    .info-box {
+      background: var(--gray-50); border: 1px solid var(--gray-200);
+      border-radius: 8px; padding: 1rem 1.2rem; display: flex; gap: 1rem; align-items: flex-start;
+      margin-top: 1.5rem;
+    }
+    .info-box.orange { background: var(--orange-bg); border-color: rgba(245, 158, 11, 0.3); }
+    .info-box.orange strong { color: var(--orange); }
+    .info-box.green { background: var(--green-bg); border-color: rgba(16, 185, 129, 0.3); }
+    .info-box.green strong { color: var(--green); }
+    .info-box.blue { background: var(--blue-bg); border-color: rgba(59, 130, 246, 0.3); }
+
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .card-item {
+      background: var(--white); border: 1px solid var(--gray-200); border-radius: 12px;
+      padding: 1.5rem; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+    .task-box {
+      display: flex; gap: 1.2rem; background: white; border: 1px solid var(--gray-200);
+      border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; align-items: stretch;
+      border-left: 6px solid var(--main);
+    }
+    .task-num {
+      flex-shrink: 0; width: 2.5rem; height: 2.5rem; border-radius: 50%;
+      background: var(--light); color: var(--dark); font-weight: 800; font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .task-text h4 { font-size: 1.1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.3rem; }
+    .task-text p { font-size: 0.95rem; color: var(--gray-600); margin-bottom: 0; }
+
+    /* Code Blocks */
+    .code-block {
+      background: #1e1e1e; padding: 1rem 1.2rem; border-radius: 8px; font-family: Consolas, Monaco, 'Courier New', monospace;
+      font-size: 0.9rem; line-height: 1.5; color: #d4d4d4; overflow-x: auto; margin: 1rem 0;
+    }
+    .code-block .tag { color: #569cd6; }
+    .code-block .attr { color: #9cdcfe; }
+    .code-block .value { color: #ce9178; }
+    .code-block .comment { color: #6a9955; }
+    .code-block .css-prop { color: #9cdcfe; }
+    .code-block .css-val { color: #ce9178; }
+    .code-block .css-sel { color: #d7ba7d; }
+    
+    code.inline-code {
+      background: var(--gray-100); padding: 0.1rem 0.4rem; border-radius: 4px;
+      font-family: Consolas, monospace; font-size: 0.9em; color: var(--gray-800); border: 1px solid var(--gray-200);
+    }
+
+    /* Comparison Table / CSS Preview */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem; }
+    
+    .css-preview {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border: 1px solid var(--gray-200);
+      border-radius: 8px; overflow: hidden; margin-top: 1rem; background: var(--gray-50);
+    }
+    .css-before, .css-after { padding: 1rem; display: flex; flex-direction: column; }
+    .css-after { background: var(--white); border-left: 2px dashed var(--gray-300); }
+    .css-before-label, .css-after-label {
+      font-size: 0.8rem; font-weight: 700; margin-bottom: 0.8rem;
+      padding-bottom: 0.3rem; border-bottom: 1px solid var(--gray-200); color: var(--gray-500);
+    }
+    .css-after-label { color: var(--main); border-bottom-color: var(--light); }
+
+    /* TOC Items */
+    .toc-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+    .toc-item {
+      display: flex; align-items: center; padding: 1.2rem 1.5rem; background: var(--white);
+      border: 1px solid var(--gray-200); border-radius: 12px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toc-item:hover { transform: translateX(10px); border-color: var(--main); background: var(--light); }
+    .toc-num {
+      width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--main); color: white;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem;
+      margin-right: 1.2rem; flex-shrink: 0;
+    }
+
+    /* Responsive Utilities */
+    @media (max-width: 1024px) {
+      .browser-content { padding: 2rem 2.5rem; }
+      h1 { font-size: 2.2rem; }
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .browser-content { padding: 1.5rem; }
+      h1 { font-size: 1.8rem; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .css-preview { grid-template-columns: 1fr; }
+      .css-after { border-left: none; border-top: 2px dashed var(--gray-300); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+
+  <div class="presentation" id="presentation">
+
+    <!-- ========== Slide 1: Cover ========== -->
+    <div class="slide active" data-slide="0">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">프레젠테이션</div>
+        </div>
+        <div class="browser-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%;">
+          <div class="year-badge" style="margin-bottom: 1.5rem;">5차시</div>
+          <h1 style="margin-bottom: 1rem;"><span class="text-main">CSS</span>로 디자인 입히기</h1>
+          <h2 style="color: var(--gray-500); font-weight: 500; margin-bottom: 2.5rem;">스타일을 적용하여 예쁜 웹페이지 만들기</h2>
+          
+          <div style="display: flex; gap: 1rem;">
+            <div class="badge blue">#CSS</div>
+            <div class="badge green">#스타일시트</div>
+            <div class="badge purple">#디자인</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 2: Table of Contents ========== -->
+    <div class="slide" data-slide="1">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">목차</div>
+        </div>
+        <div class="browser-content" style="display:flex;align-items:center;justify-content:center;">
+          <div style="width:100%;max-width:800px;">
+            <div class="section-divider">
+              <div class="section-icon">📋</div>
+              <div class="section-text">
+                <h2>오늘 배울 내용</h2>
+                <span class="section-sub">이번 시간의 핵심 주제를 살펴봅시다.</span>
+              </div>
+            </div>
+            
+            <div class="toc-list">
+              <div class="toc-item" onclick="goToSlide(2)">
+                <div class="toc-num">1</div>
+                <div>
+                  <h3>class와 id 속성</h3>
+                  <p style="font-size: 0.9rem; margin-top: 0.2rem; color: var(--gray-600);">HTML의 식별자 속성: <code class="inline-code">class</code>와 <code class="inline-code">id</code> 이해하기</p>
+                </div>
+              </div>
+              <div class="toc-item" onclick="goToSlide(3)">
+                <div class="toc-num">2</div>
+                <div>
+                  <h3>CSS란 무엇인가?</h3>
+                  <p style="font-size: 0.9rem; margin-top: 0.2rem; color: var(--gray-600);">웹페이지를 꾸미는 마법사, 스타일시트의 개념 이해</p>
+                </div>
+              </div>
+              <div class="toc-item" onclick="goToSlide(5)">
+                <div class="toc-num">3</div>
+                <div>
+                  <h3>CSS를 적용하는 3가지 방법</h3>
+                  <p style="font-size: 0.9rem; margin-top: 0.2rem; color: var(--gray-600);">인라인(Inline), 내부(Internal), 외부(External) 스타일시트 실습</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 3: class와 id 속성 ========== -->
+    <div class="slide" data-slide="2">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#HTML #class #id</div>
+        </div>
+        <div class="browser-content">
+          <div style="margin-bottom:0.5rem;">
+            <span class="badge blue">HTML</span><span class="badge green">class, id 속성</span>
+          </div>
+          <h2>식별자 속성: class와 id</h2>
+          <p style="margin-bottom:0.8rem;">특정 요소를 구분하여 활용하기 위해 <strong>이름을 지정</strong>하는 속성</p>
+          
+          <div class="compare-grid">
+            <div class="card-item" style="border-left:4px solid #1565c0;padding:1.2rem;">
+              <h3 style="color:#1565c0;font-size:1.1rem;">id — <span style="font-weight: 500;">유일한 이름</span></h3>
+              <p style="font-size:0.9rem;">특정 요소를 <strong>정확하게 구분</strong>하기 위한 식별자</p>
+              <div class="code-block" style="font-size:0.8rem; margin: 0.5rem 0;">
+                <span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="value">"header"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/div&gt;</span>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-600);">→ 한 페이지에 딱 <strong>한 번만</strong> 사용 가능</p>
+            </div>
+            
+            <div class="card-item" style="border-left:4px solid #e65100;padding:1.2rem;">
+              <h3 style="color:#e65100;font-size:1.1rem;">class — <span style="font-weight: 500;">그룹 이름</span></h3>
+              <p style="font-size:0.9rem;">같은 스타일이나 기능을 <strong>모아서 적용</strong>하기 위한 식별자</p>
+              <div class="code-block" style="font-size:0.8rem; margin: 0.5rem 0;">
+                <span class="tag">&lt;button</span> <span class="attr">class</span>=<span class="value">"btn-primary"</span><span class="tag">&gt;</span>...<span class="tag">&lt;/button&gt;</span>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-600);">→ 여러 요소에 <strong>중복해서</strong> 같은 이름 사용 가능</p>
+            </div>
+          </div>
+          
+          <div class="info-box blue" style="margin-top: 1rem;">
+            ✨ 이 <strong>이름표(class, id)</strong>들이 바로 오늘 <strong>CSS 디자인을 입힐 때 대상을 지목</strong>하는 핵심 역할(선택자)을 하게 됩니다!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 4: CSS 개요 ========== -->
+    <div class="slide" data-slide="3">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#CSS #개념</div>
+        </div>
+        <div class="browser-content">
+          <div class="section-divider">
+            <div class="section-icon">🎨</div>
+            <div class="section-text">
+              <h2>CSS 란?</h2>
+              <span class="section-sub">Cascading Style Sheets</span>
+            </div>
+          </div>
+          
+          <div class="grid-2">
+            <div>
+              <p style="font-size: 1.05rem;">
+                <strong>HTML</strong>이 웹 문서의 뼈대와 내용을 만든다면, <strong>CSS</strong>는 그 뼈대에 옷을 입히고 예쁘게 화장하는 <strong>디자인 역할</strong>을 합니다.
+              </p>
+              
+              <ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--gray-700); line-height: 1.8;">
+                <li>웹 문서의 폰트 크기, 글자 색상, 배경색 등을 지정</li>
+                <li>요소들의 화면 배치(Layout)와 간격을 좌우함</li>
+                <li>화면 크기에 따라 모양이 변하는 반응형 웹을 구현</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 5: CSS 역할과 규칙 ========== -->
+    <div class="slide" data-slide="4">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#CSS #역할과규칙</div>
+        </div>
+        <div class="browser-content">
+          <div style="background: var(--white); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--gray-200); display:flex; flex-direction:column; align-items:center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h3 style="margin-bottom: 1rem; color: var(--dark);">비유하자면...</h3>
+            <div style="display:flex; justify-content:space-around; width: 100%;">
+              <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏗️</div>
+                <div class="badge gray">HTML = 뼈대</div>
+              </div>
+              <div style="font-size: 2rem; align-self: center; color: var(--gray-400);">+</div>
+              <div style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">👗</div>
+                <div class="badge purple">CSS = 옷/인테리어</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="highlight-box outline" style="margin-top: 1.5rem; text-align: left; padding: 1.5rem;">
+            <p style="font-weight: 600; font-size: 1.1rem; color: var(--dark); margin-bottom: 0.5rem;">기본 문법 (규칙)</p>
+            <div class="code-block" style="margin: 0; display: inline-block;">
+              <span class="css-sel">선택자(Selector)</span> { <br>
+              &nbsp;&nbsp;<span class="css-prop">속성명(Property)</span>: <span class="css-val">속성값(Value)</span>;<br>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 6: CSS 문법 자세히 보기 ========== -->
+    <div class="slide" data-slide="5">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#CSS #기초문법</div>
+        </div>
+        <div class="browser-content">
+          <div style="margin-bottom:0.5rem;">
+            <span class="badge purple">CSS</span><span class="badge blue">문법과 구조</span>
+          </div>
+          <h2>CSS 코드는 어떻게 생겼을까?</h2>
+          
+          <div class="css-preview" style="margin-top: 1.5rem;">
+            <div class="css-before" style="background:#282c34; color:white; border-radius: 8px 0 0 8px; font-family: Consolas, monospace; padding: 2.5rem; font-size: 1.1rem;">
+              <div style="font-size: 1.3rem; margin-bottom: 0.8rem;">
+                <span style="color: #e5c07b;">h1</span> <span style="color: #abb2bf;">{</span>
+              </div>
+              <div style="margin-left: 2rem; margin-bottom: 0.5rem;">
+                <span style="color: #9cdcfe;">color</span><span style="color: #abb2bf;">:</span> <span style="color: #ce9178;">blue</span><span style="color: #abb2bf;">;</span>
+              </div>
+              <div style="margin-left: 2rem;">
+                <span style="color: #9cdcfe;">font-size</span><span style="color: #abb2bf;">:</span> <span style="color: #b5cea8;">24px</span><span style="color: #abb2bf;">;</span>
+              </div>
+              <div style="font-size: 1.3rem; margin-top: 0.8rem;">
+                <span style="color: #abb2bf;">}</span>
+              </div>
+            </div>
+            
+            <div class="css-after" style="display:flex; justify-content:center; flex-direction: column; gap: 1rem; border-radius: 0 8px 8px 0;">
+              
+              <div style="display:flex; align-items:flex-start; gap: 0.8rem;">
+                <div class="badge" style="background:var(--gray-800); color:white; min-width: 80px; text-align:center;">선택자<br>(Selector)</div>
+                <div>
+                  <h4 style="color:var(--dark);">누구를 꾸밀 것인가?</h4>
+                  <p style="font-size:0.9rem; color:var(--gray-600);">위 예시에서는 문서의 모든 <code class="inline-code">&lt;h1&gt;</code> 태그를 지목했습니다.</p>
+                </div>
+              </div>
+              
+              <div style="display:flex; align-items:flex-start; gap: 0.8rem;">
+                <div class="badge" style="background:#e65100; color:white; min-width: 80px; text-align:center;">속성<br>(Property)</div>
+                <div>
+                  <h4 style="color:var(--dark);">어떤 속성을 바꿀 것인가?</h4>
+                  <p style="font-size:0.9rem; color:var(--gray-600);">예시는 글자 색(<code class="inline-code">color</code>)과 크기(<code class="inline-code">font-size</code>)를 변경합니다.</p>
+                </div>
+              </div>
+
+              <div style="display:flex; align-items:flex-start; gap: 0.8rem;">
+                <div class="badge" style="background:#7b1fa2; color:white; min-width: 80px; text-align:center;">값<br>(Value)</div>
+                <div>
+                  <h4 style="color:var(--dark);">어떻게 변경할 것인가?</h4>
+                  <p style="font-size:0.9rem; color:var(--gray-600);">파란색(<code class="inline-code">blue</code>)으로, 24픽셀 크기로 꾸밉니다.<br><span style="color:red;font-weight:700;">중요:</span> 한 구문이 끝나면 반드시 세미콜론(<code class="inline-code">;</code>)을 붙입니다!</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 7: 적용하는 3가지 방법 개요 ========== -->
+    <div class="slide" data-slide="6">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#CSS #적용방법</div>
+        </div>
+        <div class="browser-content">
+          <div class="section-divider">
+            <div class="section-icon">🔗</div>
+            <div class="section-text">
+              <h2>CSS를 적용하는 3가지 방법</h2>
+              <span class="section-sub">HTML 문서에 스타일을 입히는 방식은 크게 3가지입니다.</span>
+            </div>
+          </div>
+          
+          <div class="grid-3">
+            <div class="card-item" style="border-top: 4px solid var(--accent);">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📝</div>
+              <h3 style="margin-bottom: 0.5rem;">1. 인라인 스타일</h3>
+              <p style="font-size: 0.9rem; color: var(--gray-600);">HTML 태그 안에 직접 <code class="inline-code">style</code> 속성 작성</p>
+              <div class="badge gray" style="margin-top: 0.5rem; font-size:0.75rem;">가장 간단하지만 유지보수 힘듦</div>
+            </div>
+            
+            <div class="card-item" style="border-top: 4px solid var(--main);">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+              <h3 style="margin-bottom: 0.5rem;">2. 내부 스타일시트</h3>
+              <p style="font-size: 0.9rem; color: var(--gray-600);">HTML 문서의 <code class="inline-code">&lt;head&gt;</code> 안 <code class="inline-code">&lt;style&gt;</code> 태그에 작성</p>
+              <div class="badge blue" style="margin-top: 0.5rem; font-size:0.75rem;">하나의 파일 안에서 해결</div>
+            </div>
+            
+            <div class="card-item" style="border-top: 4px solid var(--purple);">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">📁</div>
+              <h3 style="margin-bottom: 0.5rem;">3. 외부 스타일시트</h3>
+              <p style="font-size: 0.9rem; color: var(--gray-600);">별도의 <code class="inline-code">.css</code> 파일을 만들고 HTML 문서에 연결</p>
+              <div class="badge purple" style="margin-top: 0.5rem; font-size:0.75rem;">현업 필수! 깔끔한 유지보수</div>
+            </div>
+          </div>
+          
+          <p style="margin-top: 1.5rem; text-align: center; font-weight: 600;">👉 이제부터 1번부터 차근차근 직접 실습해 봅시다!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 8: 방법 1 - 인라인 스타일 ========== -->
+    <div class="slide" data-slide="7">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#CSS #1번째방법</div>
+        </div>
+        <div class="browser-content">
+          <div style="margin-bottom:0.5rem;">
+            <span class="badge blue">방법 1</span>
+          </div>
+          <h2>인라인 스타일 (Inline Style)</h2>
+          <p style="margin-bottom:0.8rem; color: var(--gray-600);">HTML 태그 내부에 <code class="inline-code">style</code> 속성을 사용하여 디자인을 직접 입력하는 방법</p>
+          
+          <div class="css-preview">
+            <div class="css-before" style="flex:1.5;">
+              <div class="css-before-label" style="display:flex; justify-content:space-between;">
+                <span>🧑‍💻 코드 실습 (수정 가능)</span>
+                <span style="color:var(--main); cursor:pointer;" onclick="navigator.clipboard.writeText('<h1 style=\'color: red; background-color: yellow;\'>인라인 스타일입니다!</h1>')">📋 복사하기</span>
+              </div>
+              <div class="code-block" style="margin:0; outline: none;" id="inline-code-editor" contenteditable="true" oninput="updateInlinePreview()">
+                <span class="tag">&lt;h1</span> 
+                <span class="attr">style</span>=<span class="value">"color: red; background-color: yellow;"</span><span class="tag">&gt;</span><br>
+                &nbsp;&nbsp;인라인 스타일입니다!<br>
+                <span class="tag">&lt;/h1&gt;</span>
+              </div>
+              
+              <div class="info-box orange" style="margin-top: 1rem; padding: 0.8rem;">
+                <div style="font-size: 0.85rem; line-height: 1.5;">
+                  <strong>특징:</strong> 직관적이고 빠르지만, 꾸며줄 태그가 많아질수록 코드 관리가 감당할 수 없을 만큼 지저분해집니다.
+                </div>
+              </div>
+            </div>
+            
+            <div class="css-after" style="flex:1;">
+              <div class="css-after-label">👁️ 눈에 보이는 결과</div>
+              <div style="display:flex; align-items:center; justify-content:center; height: 100%; transition: all 0.2s;" id="inline-preview">
+                <h1 style="color: red; background-color: yellow; padding: 0.5rem; text-align:center;">인라인 스타일입니다!</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 9: 방법 2 - 내부 스타일 시트 ========== -->
+    <div class="slide" data-slide="8">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#CSS #2번째방법</div>
+        </div>
+        <div class="browser-content">
+          <div style="margin-bottom:0.5rem;">
+            <span class="badge green">방법 2</span>
+          </div>
+          <h2>내부 스타일 시트 (Internal Style Sheet)</h2>
+          <p style="margin-bottom:0.8rem; color: var(--gray-600);">HTML의 <code class="inline-code">&lt;head&gt;</code> 부분에 <code class="inline-code">&lt;style&gt;</code> 태그를 열어 한 번에 작성하는 방법</p>
+          
+          <div class="grid-2">
+            <div>
+              <div class="code-block" style="margin:0;">
+                <span class="tag">&lt;head&gt;</span>
+                  <span class="tag">&lt;style&gt;</span>
+<div id="internal-code-editor" contenteditable="true" oninput="updateInternalPreview()" style="outline: none; margin-left: 1rem; border-left: 2px solid var(--accent); padding-left: 0.5rem;">
+<span class="css-sel">h1</span> {
+  <span class="css-prop">color</span>: <span class="css-val">blue</span>;
+}
+<br><br>
+<span class="css-sel">p</span> {
+  <span class="css-prop">font-size</span>: <span class="css-val">20px</span>;
+}
+</div>
+                  <span class="tag">&lt;/style&gt;</span>
+                <span class="tag">&lt;/head&gt;</span>
+                <br>
+                <span class="tag">&lt;body&gt;</span>
+                  <div style="margin-left: 1rem;">
+                    <span class="tag">&lt;h1&gt;</span>파란색 제목<span class="tag">&lt;/h1&gt;</span><br>
+                    <span class="tag">&lt;p&gt;</span>조금 커진 문장입니다.<span class="tag">&lt;/p&gt;</span>
+                  </div>
+                <span class="tag">&lt;/body&gt;</span>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column;">
+              <div style="flex:1; background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; padding: 1.5rem; position: relative;">
+                <h3 style="color: var(--dark); margin-bottom: 0.5rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem;">👁️ 화면 결과 (실시간 렌더링)</h3>
+                <style id="internal-preview-style">
+                  #internal-preview-container h1 { color: blue; }
+                  #internal-preview-container p { font-size: 20px; }
+                </style>
+                <div id="internal-preview-container">
+                  <h1>파란색 제목</h1>
+                  <p>조금 커진 문장입니다.</p>
+                </div>
+              </div>
+              <div class="info-box blue" style="margin-top: 1rem; padding: 0.8rem;">
+                <div style="font-size: 0.85rem; line-height: 1.5;">
+                  <strong>장점:</strong> HTML 태그 자체가 깔끔해지고, 선택자를 통해 한 번에 여러 태그의 디자인 변경이 가능합니다.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 10: 방법 3 - 외부 스타일 시트 ========== -->
+    <div class="slide" data-slide="9">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#CSS #3번째방법</div>
+        </div>
+        <div class="browser-content">
+          <div style="margin-bottom:0.5rem;">
+            <span class="badge purple">방법 3</span>
+          </div>
+          <h2>외부 스타일 시트 (External Style Sheet) - <span style="color:var(--purple);">★실무 권장</span></h2>
+          <p style="margin-bottom:0.8rem; color: var(--gray-600);">디자인 코드만 담긴 <code class="inline-code">.css</code> 파일을 따로 만들고, HTML에 연결(<code class="inline-code">&lt;link&gt;</code>)하는 방법</p>
+          
+          <div class="compare-grid">
+            <div class="card-item" style="border-top:4px solid #f59e0b; padding:1.2rem;">
+              <h3 style="font-size:1.1rem; margin-bottom: 0.5rem;">📄 index.html</h3>
+              <p style="font-size:0.85rem; color:var(--gray-600); margin-bottom: 0.5rem;">문서 <code class="inline-code">&lt;head&gt;</code>에 링크 추가하기</p>
+              <div class="code-block" style="font-size:0.85rem; margin: 0;">
+                <span class="tag">&lt;head&gt;</span><br>
+                &nbsp;&nbsp;<span class="tag">&lt;link</span> <span class="attr">rel</span>=<span class="value">"stylesheet"</span> <span class="attr">href</span>=<span class="value">"style.css"</span><span class="tag">&gt;</span><br>
+                <span class="tag">&lt;/head&gt;</span>
+              </div>
+            </div>
+            
+            <div class="card-item" style="border-top:4px solid #8b5cf6; padding:1.2rem;">
+              <h3 style="font-size:1.1rem; margin-bottom: 0.5rem;">🎨 style.css (새 파일)</h3>
+              <p style="font-size:0.85rem; color:var(--gray-600); margin-bottom: 0.5rem;">CSS 코드는 이곳에 분리 작성</p>
+              <div class="code-block" style="font-size:0.85rem; margin: 0;">
+                <span class="css-sel">body</span> {<br>
+                &nbsp;&nbsp;<span class="css-prop">background-color</span>: <span class="css-val">#f0f0f0</span>;<br>
+                }<br>
+                <br>
+                <span class="css-sel">h1</span> {<br>
+                &nbsp;&nbsp;<span class="css-prop">color</span>: <span class="css-val">green</span>;<br>
+                }
+              </div>
+            </div>
+          </div>
+          
+          <div class="highlight-box" style="margin-top: 1.5rem; text-align: center; padding: 1.5rem;">
+            <p style="font-weight: 600; font-size: 1.05rem;">
+              <strong>가장 완벽한 분업!</strong> 프로젝트의 모든 페이지에서 같은 <code class="inline-code">style.css</code>를 링크하면,<br>
+              수백 개의 페이지 디자인을 CSS 파일 단 하나 수정만으로 변경할 수 있습니다. 🪄
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== Slide 11: 마무리 ========== -->
+    <div class="slide" data-slide="10">
+      <div class="browser-card">
+        <div class="browser-topbar">
+          <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+          <div class="title">#마무리</div>
+        </div>
+        <div class="browser-content" style="display:flex;align-items:center;justify-content:center;text-align:center;">
+          <div>
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+            <h1 style="margin-bottom: 1rem;">수고하셨습니다</h1>
+            <h2 style="color: var(--gray-600); margin-bottom: 2rem;">여러분의 첫 CSS 디자인은 어땠나요?</h2>
+            
+            <div class="grid-3" style="text-align:left; margin-bottom:2rem;">
+              <div class="badge gray" style="padding:0.8rem; border-radius:8px;">✅ 선택자(대상) 지정하기</div>
+              <div class="badge gray" style="padding:0.8rem; border-radius:8px;">✅ 속성(속성명:값;) 변경하기</div>
+              <div class="badge gray" style="padding:0.8rem; border-radius:8px;">✅ CSS를 HTML에 연결하기</div>
+            </div>
+            
+            <p style="color: var(--dark); font-weight: 700; font-size: 1.1rem;">
+              다음 시간에는 본격적으로 여백(Margin, Padding)과 배치(flex)를 배웁니다!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- end of .presentation -->
+
+  <!-- Navigation -->
+  <div class="nav-bar">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled aria-label="이전">
+      <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+    <span class="nav-counter">
+      <input type="text" class="slide-input" id="slideInput" value="1" aria-label="슬라이드 번호 입력"> / <span id="totalSlides">11</span>
+    </span>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="다음">
+      <svg viewBox="0 0 24 24"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+    </button>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideInput = document.getElementById('slideInput');
+    const totalSlidesEl = document.getElementById('totalSlides');
+    const progressBar = document.getElementById('progressBar');
+    
+    let currentSlide = 0;
+    totalSlidesEl.textContent = totalSlides;
+
+    function updateNav() {
+      slides.forEach((slide, index) => {
+        if(index === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+      
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+      slideInput.value = currentSlide + 1;
+      
+      const progress = ((currentSlide) / (totalSlides - 1)) * 100;
+      progressBar.style.width = `${progress}%`;
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateNav();
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateNav();
+      }
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateNav();
+      }
+    }
+
+    // Inline Editor Preview Logic
+    function updateInlinePreview() {
+      const editor = document.getElementById('inline-code-editor');
+      const preview = document.getElementById('inline-preview');
+      if (editor && preview) {
+        // Create an invisible div to safely parse and extract changes
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = editor.innerText || editor.textContent;
+        // Check if there is an h1 element inside it
+        const h1Elem = tempDiv.querySelector('h1');
+        
+        if (h1Elem) {
+          preview.innerHTML = h1Elem.outerHTML;
+        } else {
+          // If the element is messed up, fallback to text
+          preview.innerHTML = `<p>${editor.innerText}</p>`;
+        }
+      }
+    }
+
+    // Internal Editor Preview Logic
+    function updateInternalPreview() {
+      const editor = document.getElementById('internal-code-editor');
+      const styleTag = document.getElementById('internal-preview-style');
+      if (editor && styleTag) {
+        // Get raw text from editor, stripping out HTML span tags that are used for syntax highlighting initially
+        // Using innerText preserves line breaks better than textContent
+        const rawCSS = editor.innerText;
+        
+        // Scope the CSS so it only affects the preview container to prevent breaking the whole presentation
+        // Simple regex replace to prepend #internal-preview-container to rules
+        // Note: This is a basic scoping strategy suitable for simple presentation examples
+        const scopedCSS = rawCSS.replace(/([^\r\n,{}]+)(,(?=[^}]*{)|\s*{)/g, (match) => {
+          // Ignore comment blocks and keyframes (simplistic check)
+          if (match.trim().startsWith('/*') || match.trim().startsWith('@')) return match;
+          
+          return match.split(',').map(selector => {
+            const trimmed = selector.trim();
+            if(!trimmed) return selector; // empty selector
+            if(trimmed.endsWith('{')) {
+              const sel = trimmed.slice(0, -1).trim();
+              if(!sel) return '{'; // Just the bracket
+              return `#internal-preview-container ${sel} {`;
+            }
+            return `#internal-preview-container ${trimmed}`;
+          }).join(', ');
+        });
+        
+        styleTag.textContent = scopedCSS;
+      }
+    }
+
+    // Keyboard & Clicker controls
+    document.addEventListener('keydown', (e) => {
+      // Input 창 포커스 중일 땐 좌우 화살표 무시
+      if (document.activeElement === slideInput) return;
+      
+      // Inline Editor 포커스 중일 땐 화살표 무시 (내부 텍스트 이동에 사용)
+      if (document.activeElement.id === 'inline-code-editor' || document.activeElement.id === 'internal-code-editor') {
+        if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+          return; // 슬라이드 이동 방지
+        }
+      }
+      
+      if (['ArrowRight', 'ArrowDown', ' ', 'PageDown'].includes(e.key)) {
+        e.preventDefault();
+        nextSlide();
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goToSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goToSlide(totalSlides - 1);
+      }
+    });
+
+    // Touch swipe support
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+    
+    document.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, {passive: true});
+    
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      if (touchEndX < touchStartX - swipeThreshold) nextSlide();
+      if (touchEndX > touchStartX + swipeThreshold) prevSlide();
+    }
+
+    // Mouse wheel navigation
+    let wheelLocked = false;
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault(); // 기본 스크롤 동작 방지 (슬라이드 내부 스크롤은 별도 처리할 수 있으나 가이드 기준 막음)
+      if (wheelLocked) return;
+      wheelLocked = true;
+      
+      if (e.deltaY > 0) nextSlide();
+      else if (e.deltaY < 0) prevSlide();
+      
+      setTimeout(() => { wheelLocked = false; }, 600);
+    }, { passive: false });
+
+    // Direct page input
+    slideInput.addEventListener('change', (e) => {
+      let val = parseInt(e.target.value);
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > totalSlides) val = totalSlides;
+      goToSlide(val - 1);
+      e.target.blur();
+    });
+    
+    slideInput.addEventListener('focus', function() {
+      this.select();
+    });
+    
+    slideInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        this.blur();
+      } else if (e.key === 'Escape') {
+        this.value = currentSlide + 1;
+        this.blur();
+      } else {
+        // Prevent keyboard shortcut conflicts
+        e.stopPropagation();
+      }
+    });
+
+    // Initialize
+    updateNav();
+  </script>
+  <script type="module" src="../../../../live/runtime/chrome.js?v=2"></script>
+</body>
+</html>

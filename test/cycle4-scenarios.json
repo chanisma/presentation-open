@@ -1,0 +1,259 @@
+[
+  {
+    "id": "scenario-1",
+    "subject": "과학 (지구과학)",
+    "title": "태양계 탐험: 행성과 우주의 신비",
+    "audience": "고등학생 (1~2학년)",
+    "style": "Glassmorphism",
+    "slide_count": 10,
+    "image_ratio": "40%",
+    "slides": [
+      {
+        "number": 1,
+        "title": "태양계 탐험",
+        "component": "cover",
+        "needs_image": true,
+        "image_keywords_en": "solar system planets aesthetic background site:wikimedia.org"
+      },
+      {
+        "number": 2,
+        "title": "학습 목표",
+        "component": "key-points",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 3,
+        "title": "태양계의 구조",
+        "component": "image-focus",
+        "needs_image": true,
+        "image_keywords_en": "solar system diagram planets order site:wikimedia.org"
+      },
+      {
+        "number": 4,
+        "title": "내행성: 수성, 금성, 지구, 화성",
+        "component": "grid-cards",
+        "needs_image": true,
+        "image_keywords_en": "inner planets mercury venus earth mars comparison site:wikimedia.org"
+      },
+      {
+        "number": 5,
+        "title": "외행성: 목성, 토성, 천왕성, 해왕성",
+        "component": "grid-cards",
+        "needs_image": true,
+        "image_keywords_en": "outer planets jupiter saturn uranus neptune site:wikimedia.org"
+      },
+      {
+        "number": 6,
+        "title": "행성의 크기 비교",
+        "component": "stat-highlight",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 7,
+        "title": "태양계 탐사 역사",
+        "component": "timeline",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 8,
+        "title": "화성 탐사: 퍼서비어런스 로버",
+        "component": "two-column",
+        "needs_image": true,
+        "image_keywords_en": "mars perseverance rover NASA photo site:wikimedia.org"
+      },
+      {
+        "number": 9,
+        "title": "핵심 정리",
+        "component": "key-points",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 10,
+        "title": "질문과 토론",
+        "component": "closing",
+        "needs_image": false,
+        "image_keywords_en": null
+      }
+    ]
+  },
+  {
+    "id": "scenario-2",
+    "subject": "역사/문화",
+    "title": "유네스코 세계 문화유산으로 떠나는 여행",
+    "audience": "중학생 (2~3학년)",
+    "style": "Dark Academia",
+    "slide_count": 10,
+    "image_ratio": "50%",
+    "slides": [
+      {
+        "number": 1,
+        "title": "세계 문화유산 여행",
+        "component": "cover",
+        "needs_image": true,
+        "image_keywords_en": "UNESCO world heritage sites collage aesthetic site:wikimedia.org"
+      },
+      {
+        "number": 2,
+        "title": "세계 문화유산이란?",
+        "component": "definition-card",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 3,
+        "title": "한국의 문화유산: 경복궁",
+        "component": "two-column",
+        "needs_image": true,
+        "image_keywords_en": "Gyeongbokgung palace Seoul Korea landscape photo site:wikimedia.org"
+      },
+      {
+        "number": 4,
+        "title": "한국의 문화유산: 석굴암과 불국사",
+        "component": "two-column",
+        "needs_image": true,
+        "image_keywords_en": "Seokguram grotto Bulguksa temple Korea site:wikimedia.org"
+      },
+      {
+        "number": 5,
+        "title": "아시아의 문화유산",
+        "component": "grid-cards",
+        "needs_image": true,
+        "image_keywords_en": "Angkor Wat Cambodia temple landscape photo site:wikimedia.org"
+      },
+      {
+        "number": 6,
+        "title": "유럽의 문화유산",
+        "component": "image-focus",
+        "needs_image": true,
+        "image_keywords_en": "Colosseum Rome Italy landscape photo site:wikimedia.org"
+      },
+      {
+        "number": 7,
+        "title": "문화유산 보존의 중요성",
+        "component": "key-points",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 8,
+        "title": "등재 기준과 절차",
+        "component": "process-steps",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 9,
+        "title": "위험에 처한 문화유산",
+        "component": "comparison",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 10,
+        "title": "우리가 할 수 있는 일",
+        "component": "closing",
+        "needs_image": false,
+        "image_keywords_en": null
+      }
+    ]
+  },
+  {
+    "id": "scenario-3",
+    "subject": "기술/AI",
+    "title": "인공지능의 이해와 교육적 활용",
+    "audience": "교사 (연수/워크숍)",
+    "style": "Bento Grid",
+    "slide_count": 12,
+    "image_ratio": "33%",
+    "slides": [
+      {
+        "number": 1,
+        "title": "인공지능의 이해와 교육적 활용",
+        "component": "cover",
+        "needs_image": true,
+        "image_keywords_en": "artificial intelligence education futuristic background"
+      },
+      {
+        "number": 2,
+        "title": "연수 목표 및 일정",
+        "component": "key-points",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 3,
+        "title": "AI란 무엇인가?",
+        "component": "definition-card",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 4,
+        "title": "AI의 발전 역사",
+        "component": "timeline",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 5,
+        "title": "머신러닝과 딥러닝의 차이",
+        "component": "comparison",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 6,
+        "title": "생성형 AI: ChatGPT와 Claude",
+        "component": "two-column",
+        "needs_image": true,
+        "image_keywords_en": "generative AI chatbot interface education diagram site:wikimedia.org"
+      },
+      {
+        "number": 7,
+        "title": "교실에서의 AI 활용 사례",
+        "component": "grid-cards",
+        "needs_image": true,
+        "image_keywords_en": "AI classroom education technology students learning photo"
+      },
+      {
+        "number": 8,
+        "title": "AI 활용 수업 설계 방법",
+        "component": "process-steps",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 9,
+        "title": "AI 윤리와 저작권",
+        "component": "key-points",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 10,
+        "title": "주요 AI 도구 비교",
+        "component": "comparison",
+        "needs_image": false,
+        "image_keywords_en": null
+      },
+      {
+        "number": 11,
+        "title": "실습: AI로 수업 자료 만들기",
+        "component": "two-column",
+        "needs_image": true,
+        "image_keywords_en": "teacher using AI laptop classroom workshop photo"
+      },
+      {
+        "number": 12,
+        "title": "Q&A 및 마무리",
+        "component": "closing",
+        "needs_image": false,
+        "image_keywords_en": null
+      }
+    ]
+  }
+]
